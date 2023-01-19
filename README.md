@@ -49,6 +49,17 @@ The main purpose of this website is to play Pong versus other players and show e
 - The game must be responsive!
 - The user should be able to watch a live play between other users without interfering with it.
 
+# Contributers
+
+- [Mohamed SAOUAB](https://github.com/msaouab)
+	- [intra](https://profile.intra.42.fr/users/msaouab)
+- [Ilyass QESSAM](https://github.com/iqessam)
+	- [intra](https://profile.intra.42.fr/users/iqessam)
+- [Youssef GBOURI](https://github.com/ygbouri)
+	- [intra](https://profile.intra.42.fr/users/ygbouri)
+- [Issam el-ferkh](https://github.com/issamelferkh)
+	- [intra](https://profile.intra.42.fr/users/iel-ferk)
+
 # Technology used
 <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" /> <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
 <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
