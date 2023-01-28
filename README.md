@@ -55,8 +55,6 @@ The main purpose of this website is to play Pong versus other players and show e
 	- [intra](https://profile.intra.42.fr/users/msaouab)
 - [Ilyass QESSAM](https://github.com/iqessam)
 	- [intra](https://profile.intra.42.fr/users/iqessam)
-- [Youssef GBOURI](https://github.com/ygbouri)
-	- [intra](https://profile.intra.42.fr/users/ygbouri)
 - [Issam el-ferkh](https://github.com/issamelferkh)
 	- [intra](https://profile.intra.42.fr/users/iel-ferk)
 
