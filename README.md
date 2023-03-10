@@ -53,15 +53,26 @@ The main purpose of this website is to play Pong versus other players and show e
 
 - [Mohamed SAOUAB](https://github.com/msaouab)
 	- [intra](https://profile.intra.42.fr/users/msaouab)
+	- [linkedin](https://www.linkedin.com/in/msaouab/)
 - [Ilyass QESSAM](https://github.com/iqessam)
 	- [intra](https://profile.intra.42.fr/users/iqessam)
-- [Issam el-ferkh](https://github.com/issamelferkh)
-	- [intra](https://profile.intra.42.fr/users/iel-ferk)
+	- [linkedin](https://www.linkedin.com/in/ilyassqessam/)
+- [Ismail Choukri](https://github.com/ichoukri)
+	- [intra](https://profile.intra.42.fr/users/ichoukri)
+	<!-- - [linkedin](https://www.linkedin.com/in/ilyassqessam/) -->
+- [Rida En-nasry](https://github.com/RidaEn-nasry)
+	- [intra](https://profile.intra.42.fr/users/ren-nasr)
+	- [linkedin](https://www.linkedin.com/in/rida-ennasry/)
 
 # Technology used
-<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" /> <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
-<img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
-<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
-<img src="https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=mui&logoColor=white" />
 <img src="https://img.shields.io/badge/storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white" />
 <img src="https://img.shields.io/badge/Miro-F7C922?style=for-the-badge&logo=Miro&logoColor=050036" />
+<img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" />
+<img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" />
+<img src="https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=mui&logoColor=white" />
+<img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" />
+<img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/NestJS-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+<img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+<img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
