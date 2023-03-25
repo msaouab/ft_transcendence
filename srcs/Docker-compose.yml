@@ -1,0 +1,46 @@
+version: '3'
+services:
+  # Front-end Part
+  Front-end:
+    build: ./requirements/Frontend/
+    image: front
+    container_name: fe
+    restart: always
+    volumes:
+      - 
+    ports:
+      - 
+    networks:
+      - 
+    env_file:
+      - .env
+
+  # Back-end Part
+  Back-end:
+    build: ./requirements/Backend/
+    image: back
+    container_name: be
+    restart: always
+    volumes:
+      - 
+    ports:
+      - 
+    networks:
+      - 
+    env_file:
+      - .env
+  # Database Part
+  Database:
+    build: ./requirements/db/
+    image: db
+    container_name: db
+    restart: always
+    volumes:
+      - 
+    ports:
+      - 
+    networks:
+      - 
+    env_file:
+      - .env
+

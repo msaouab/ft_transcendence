@@ -42,11 +42,8 @@ down:
 
 clean: down
 	@echo "$(GREEN)████████████████████ Remove images ████████████████████$(ED)"
-	@docker image rmi -f nginx wordpress mariadb adminer ftp redis website cadvisor
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Clean sys ████████████████████$(ED)"
-	@rm -rf /home/msaouab/data/wordpress
-	@docker volume rm srcs_vl_mariadb srcs_vl_wp
 
 re: fclean all
