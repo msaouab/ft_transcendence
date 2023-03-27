@@ -69,11 +69,10 @@ model FriendsTab {
   @@unique([user_id, friendUser_id])
 }
 
-
 model BlockTab {
   user_id         String
   user            User    @relation("blockRelation", fields: [user_id], references: [id])
-  blockedUser_id  String // blockedRelation
+  blockedUser_id  String
 
   @@unique([user_id, blockedUser_id])
 }
@@ -88,16 +87,6 @@ model ChannelsJoinTab {
   @@index([channel_id], name: "channel_id") 
 }
 
-model  RankingData {
-  user_id              String               @unique
-  user                 User                 @relation("rankingDataRelation", fields: [user_id], references: [id])
-  wins                 Int                  @default(0)
-  loses                Int                  @default(0)
-  draws                Int                  @default(0)
-  level                Int                  @default(0)
-  rank                 Rank                 @default(Novice)
-  player_achievements  PlayerAchievements[] @relation("PlayerAchievementsRelation")
-}
 
 model Channel {
   id              String            @id @default(uuid())
@@ -136,8 +125,7 @@ model Message {
   dateCreated DateTime  @default(now())
   sender_id   String
   receiver_id String
-  channel_id  String
-  channel     Channel   @relation("messageRelation", fields: [channel_id], references: [id])
+  channel     Channel   @relation("messageRelation", fields: [receiver_id], references: [id])
   content     String //not empty
   seen        Boolean @default(false)
 
@@ -168,14 +156,16 @@ model Game {
   gameHistory GameHistoryTab[] @relation("gameHistoryRelation")
 }
 
-model PlayerAchievements {
-  player_id       String              @id
-  player          RankingData         @relation("PlayerAchievementsRelation", fields: [player_id], references: [user_id])
-  achievement_id  Int[]
-  // @@
-  }
-
-
+model  RankingData {
+  user_id                  String                     @unique
+  user                     User                       @relation("rankingDataRelation", fields: [user_id], references: [id])
+  wins                     Int                        @default(0)
+  loses                    Int                        @default(0)
+  draws                    Int                        @default(0)
+  level                    Int                        @default(0)
+  rank                     Rank                       @default(Novice)
+  achievements_assignement AchievementsAssignement[]  @relation("PlayerAchievementsRelation")
+}
 model Achievements {
   achievement_id           Int                        @id @default(autoincrement())
   name                     String
@@ -188,6 +178,7 @@ model AchievementsAssignement {
   achievement_id  Int
   achievement     Achievements @relation("AchievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
   player_id       String
+  player          RankingData  @relation("PlayerAchievementsRelation", fields: [player_id], references: [user_id])
 
   
   @@id([achievement_id, player_id])
