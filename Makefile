@@ -17,16 +17,16 @@ credit:
 	@echo "██║        ██║███████║██║   ██║  ██║██║  ██║██║ ╚████║███████║╚██████╗███████╗██║ ╚████║███████╔╝███████╗██║ ╚████║╚██████╗███████╗"
 	@echo "╚═╝        ╚═╝╚══════╝╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚══════╝ ╚═════╝╚══════╝╚═╝  ╚═══╝╚══════╝ ╚══════╝╚═╝  ╚═══╝ ╚═════╝╚══════╝${ED}"
 	@echo "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗"
-	@echo "║████████████████████████████████████████████ ${bold}${GREEN}created-by: ${BLUE}{msaouab}{iqessam}{ichoukri}${ED} ███████████████████████████████████████████║"
+	@echo "║████████████████████████████████████ ${bold}${GREEN}created-by: ${BLUE}{msaouab}{iqessam}{ichoukri}{ren-nasr}{mbehhar}${ED} ████████████████████████████████║"
 	@echo "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"
 
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"
-	@docker-compose -f ./srcs/docker-compose.yml build
+	@docker-compose -f ./srcs/docker-compose.yml --env-file ./.env build
 
 up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
-	@docker-compose -f ./srcs/docker-compose.yml up --build
+	@docker-compose  -f ./srcs/docker-compose.yml  up -d --build
 
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
@@ -45,5 +45,6 @@ clean: down
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Clean sys ████████████████████$(ED)"
+	@docker system prune -a -f
 
 re: fclean all
