@@ -166,6 +166,7 @@ model  RankingData {
   rank                     Rank                       @default(Novice)
   achievements_assignement AchievementsAssignement[]  @relation("PlayerAchievementsRelation")
 }
+
 model Achievements {
   achievement_id           Int                        @id @default(autoincrement())
   name                     String
