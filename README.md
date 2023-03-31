@@ -59,10 +59,12 @@ The main purpose of this website is to play Pong versus other players and show e
 	- [linkedin](https://www.linkedin.com/in/ilyassqessam/)
 - [Ismail Choukri](https://github.com/ichoukri)
 	- [intra](https://profile.intra.42.fr/users/ichoukri)
-	<!-- - [linkedin](https://www.linkedin.com/in/ilyassqessam/) -->
 - [Rida En-nasry](https://github.com/RidaEn-nasry)
 	- [intra](https://profile.intra.42.fr/users/ren-nasr)
 	- [linkedin](https://www.linkedin.com/in/rida-ennasry/)
+- [Mohamed Behhar](https://github.com/MohamedBehhar)
+	- [intra](https://profile.intra.42.fr/users/mbehhar)
+	- [linkedin](https://www.linkedin.com/in/mohamed-behhar-332025155/)
 
 # Technology used
 <img src="https://img.shields.io/badge/storybook-FF4785?style=for-the-badge&logo=storybook&logoColor=white" /> <img src="https://img.shields.io/badge/Miro-F7C922?style=for-the-badge&logo=Miro&logoColor=050036" />
