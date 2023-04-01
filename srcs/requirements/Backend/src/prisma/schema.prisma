@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  // provider = "prisma-client-js"
+  provider = "prisma-dbml-generator"
 }
 
 datasource db {
@@ -32,7 +33,7 @@ enum GameStatus {
   OnGoing
   Finished
 }
-    
+
 enum Rank {
   Novice
   Intermediate
@@ -40,174 +41,219 @@ enum Rank {
   Master
 }
 
+enum MemeberStatusTime {
+  Permanent
+  Temporary
+}
+
+enum InviteStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
 // type  attributes att functions
 model User {
-  id              String            @id @default(uuid())
-  login           String            @unique
-  email           String            @unique
-  firstName       String
-  lastName        String
-  password        String
-  dateJoined      DateTime          @default(now())
-  updated         DateTime          @updatedAt()
-  avatar          String            @default("<ralative_path>")
-  status          Status 
-  friends         FriendsTab[]      @relation("friendRelation")
-  blockedUsers    BlockTab[]        @relation("blockRelation")
-  channelsJoined  ChannelsJoinTab[] @relation("channelsJoinedRelation")
-  gameHistory     GameHistoryTab[]  @relation("playerGameHistoryRelation")
-  rankingData     RankingData[]     @relation("rankingDataRelation")
-  notification    Notification[]    @relation("NotificationRelation")
+  id             String            @id @default(uuid())
+  login          String            @unique
+  email          String            @unique
+  firstName      String
+  lastName       String
+  password       String
+  dateJoined     DateTime          @default(now())
+  updated        DateTime          @updatedAt()
+  avatar         String            @default("<ralative_path>")
+  status         Status
+  friends        FriendsTab[]      @relation("friendsTabRelation")
+  blockedUsers   BlockTab[]        @relation("blockTabRelation")
+  channelsJoined ChannelsJoinTab[] @relation("channelsJoinTabRelation")
+  gameHistory    GameHistoryTab[]  @relation("gameHistoryRelation")
+  rankingData    RankingData[]     @relation("rankingDataRelation")
+  notification   Notification[]    @relation("notificationRelation")
+
+  frendshipInvites FrindshipInvites[] @relation("frindshipInvitesRelation")
+  gameInvites      GameInvites[]      @relation("gameInvitesRelation")
   // @@
+  // GameHistoryTab   GameHistoryTab[]
+}
+
+model FrindshipInvites {
+  sender_id   String
+  receiver_id String
+  sender      User         @relation("frindshipInvitesRelation", fields: [sender_id], references: [id])
+  status      InviteStatus @default(Pending)
+
+  @@unique([sender_id, receiver_id])
 }
 
 model FriendsTab {
   user_id       String
-  user          User      @relation("friendRelation", fields: [user_id], references: [id])
+  user          User   @relation("friendsTabRelation", fields: [user_id], references: [id])
   friendUser_id String
+
   // friendUinviteStringInvite      Message[] @relation("privateMessageRelation")
+  friendsMessage PrivateMessage[] @relation("privateMessageRelation")
+
   @@unique([user_id, friendUser_id])
 }
 
+model PrivateMessage {
+  id          String     @id @default(uuid())
+  dateCreated DateTime   @default(now())
+  sender_id   String
+  receiver_id String
+  content     String //not empty
+  seen        Boolean    @default(false)
+  friendsTab  FriendsTab @relation("privateMessageRelation", fields: [sender_id, receiver_id], references: [user_id, friendUser_id])
+}
+
 model BlockTab {
-  user_id         String
-  user            User    @relation("blockRelation", fields: [user_id], references: [id])
-  blockedUser_id  String
+  user_id        String
+  user           User   @relation("blockTabRelation", fields: [user_id], references: [id])
+  blockedUser_id String
 
   @@unique([user_id, blockedUser_id])
 }
 
 model ChannelsJoinTab {
-  user_id       String
-  user          User    @relation("channelsJoinedRelation", fields: [user_id], references: [id])
-  channel_id    String  @unique()
-  channel_name  String  
-  role          ChanRoles
-  
-  @@index([channel_id], name: "channel_id") 
+  user_id      String
+  user         User      @relation("channelsJoinTabRelation", fields: [user_id], references: [id])
+  channel_id   String    @unique()
+  channel_name String
+  role         ChanRoles
+
+  @@index([channel_id], name: "channel_id")
 }
 
-
 model Channel {
-  id              String            @id @default(uuid())
-  name            String            @unique
-  dateCreated     DateTime          @default(now())
-  chann_type      ChanType
-  owner_id        String            
-  password        String?
-  limit_members   Int
-  members         MembersTab[]      @relation("membersRelation")
-  messages        Message[]         @relation("messageRelation")
-  bannedUsers     BannedUsers[]     @relation("bannedUsersRelation")
-  // @@
+  id            String          @id @default(uuid())
+  name          String          @unique
+  dateCreated   DateTime        @default(now())
+  chann_type    ChanType
+  owner_id      String
+  password      String?
+  limit_members Int
+  members       MembersTab[]    @relation("membersTabRelation")
+  messages      Message[]       @relation("channelMessageRelation")
+  bannedUsers   BannedMembers[] @relation("bannedMembersRelation")
+  adminstrators AdminMembers[]  @relation("adminMembersRelation")
+  mutedMembers  MutedMembers[]  @relation("mutedMembersRelation")
+  kickedMembers kickedMembers[] @relation("kickedMembersRelation")
 }
 
 model MembersTab {
-  channel_id  String 
-  channel     Channel @relation("membersRelation", fields: [channel_id], references: [id])
-  user_id     String
-  role        ChanRoles
+  channel_id String
+  channel    Channel @relation("membersTabRelation", fields: [channel_id], references: [id])
+  member_id  String
 
-  @@unique([channel_id, user_id])
+  @@unique([channel_id, member_id])
 }
 
-model BannedUsers {
-  channel_id  String
-  channel     Channel @relation("bannedUsersRelation", fields: [channel_id], references: [id])
-  user_id     String
-  reason      String
+model BannedMembers {
+  channel_id      String
+  channel         Channel            @relation("bannedMembersRelation", fields: [channel_id], references: [id])
+  banned_id       String
+  status          MemeberStatusTime?
+  status_end_time DateTime?
 
-  @@unique([channel_id, user_id])
+  @@unique([channel_id, banned_id])
+}
+
+model AdminMembers {
+  channel_id String
+  channel    Channel @relation("adminMembersRelation", fields: [channel_id], references: [id])
+  admin_id   String
+
+  @@unique([channel_id, admin_id])
+}
+
+model kickedMembers {
+  channel_id String
+  channel    Channel @relation("kickedMembersRelation", fields: [channel_id], references: [id])
+  kicked_id  String
+
+  @@unique([channel_id, kicked_id])
+}
+
+model MutedMembers {
+  channel_id      String
+  channel         Channel            @relation("mutedMembersRelation", fields: [channel_id], references: [id])
+  muted_id        String
+  status          MemeberStatusTime?
+  status_end_time DateTime?
+
+  @@unique([channel_id, muted_id])
 }
 
 model Message {
-  id          String    @id @default(uuid())
-  dateCreated DateTime  @default(now())
+  id          String   @id @default(uuid())
+  dateCreated DateTime @default(now())
   sender_id   String
   receiver_id String
-  channel     Channel   @relation("messageRelation", fields: [receiver_id], references: [id])
+  channel     Channel  @relation("channelMessageRelation", fields: [receiver_id], references: [id])
   content     String //not empty
-  seen        Boolean @default(false)
-
+  seen        Boolean  @default(false)
 }
 
 model Notification {
-notification_id String @id @default(uuid())
-user_id String
-user  User @relation("NotificationRelation", fields: [notification_id], references: [id])
-// invite_data InviteData[] @relation("InviteDataRelation")
-
-}
-
-model InviteData {
-  invite_id String @id @default(uuid()) 
-  // invite_type
-
+  notification_id String @id @default(uuid())
+  user_id         String
+  user            User   @relation("notificationRelation", fields: [notification_id], references: [id])
+  // invite_data InviteData[] @relation("InviteDataRelation")
 }
 
 model Game {
-  id          String          @id @default(uuid())
-  dateCreated DateTime        @default(now())
+  id          String           @id @default(uuid())
+  dateCreated DateTime         @default(now())
   gameStatus  GameStatus
   player1_id  String
   player2_id  String
   player1_pts Int
-  player2_pts Int   
+  player2_pts Int
+  // gameHistory GameHistoryTab[] @relation("gameHistoryRelation")
   gameHistory GameHistoryTab[] @relation("gameHistoryRelation")
 }
 
-model  RankingData {
-  user_id                  String                     @unique
-  user                     User                       @relation("rankingDataRelation", fields: [user_id], references: [id])
-  wins                     Int                        @default(0)
-  loses                    Int                        @default(0)
-  draws                    Int                        @default(0)
-  level                    Int                        @default(0)
-  rank                     Rank                       @default(Novice)
-  achievements_assignement AchievementsAssignement[]  @relation("PlayerAchievementsRelation")
+model GameInvites {
+  sender_id   String
+  receiver_id String
+  sender      User         @relation("gameInvitesRelation", fields: [sender_id], references: [id])
+  status      InviteStatus @default(Pending)
+  validUntil  DateTime
+
+  @@unique([sender_id, receiver_id])
+}
+
+model RankingData {
+  user_id                  String                    @unique
+  user                     User                      @relation("rankingDataRelation", fields: [user_id], references: [id])
+  wins                     Int                       @default(0)
+  loses                    Int                       @default(0)
+  draws                    Int                       @default(0)
+  level                    Int                       @default(0)
+  rank                     Rank                      @default(Novice)
+  achievements_assignement AchievementsAssignement[]
 }
 
 model Achievements {
-  achievement_id           Int                        @id @default(autoincrement())
+  achievement_id           Int                       @id @default(autoincrement())
   name                     String
   description              String
-  achievements_assignement AchievementsAssignement[] @relation("AchievementsAssignementRelation")
-  // @@
+  achievements_assignement AchievementsAssignement[] @relation("achievementsAssignementRelation")
 }
 
 model AchievementsAssignement {
-  achievement_id  Int
-  achievement     Achievements @relation("AchievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
-  player_id       String
-  player          RankingData  @relation("PlayerAchievementsRelation", fields: [player_id], references: [user_id])
+  achievement_id Int
+  achievement    Achievements @relation("achievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
+  player_id      String
+  player         RankingData  @relation(fields: [player_id], references: [user_id])
 
-  
   @@id([achievement_id, player_id])
 }
+
 model GameHistoryTab {
-  game_id       String
-  game          Game    @relation("gameHistoryRelation", fields: [game_id], references: [id])
-  user_id       String  @id
-  user          User    @relation("playerGameHistoryRelation", fields: [user_id], references: [id])
-  // @@
+  game_id String
+  game    Game   @relation("gameHistoryRelation", fields: [game_id], references: [id])
+  user_id String @id
+  user    User   @relation("gameHistoryRelation", fields: [user_id], references: [id])
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
