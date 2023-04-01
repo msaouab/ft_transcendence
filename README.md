@@ -69,6 +69,7 @@ The main purpose of this website is to play Pong versus other players and show e
 - [Mohamed Behhar](https://github.com/MohamedBehhar)
 	- [intra](https://profile.intra.42.fr/users/mbehhar)
 	- [linkedin](https://www.linkedin.com/in/mohamed-behhar-332025155/)
+
 # Technology used
 <img src="https://img.shields.io/badge/NestJS-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
 <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
