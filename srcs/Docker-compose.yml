@@ -1,46 +1,65 @@
 version: '3'
 services:
-  # Front-end Part
-  Front-end:
-    build: ./requirements/Frontend/
-    image: front
-    container_name: fe
-    restart: always
-    volumes:
-      - 
-    ports:
-      - 
-    networks:
-      - 
-    env_file:
-      - .env
-
   # Back-end Part
-  Back-end:
-    build: ./requirements/Backend/
-    image: back
-    container_name: be
-    restart: always
-    volumes:
-      - 
-    ports:
-      - 
+  nest:
+    build:
+      context: requirements/Backend
+      dockerfile: Dockerfile
+    image: nest
+    container_name: nest
+    ports: 
+      - "3000:3000"
     networks:
-      - 
-    env_file:
-      - .env
-  # Database Part
-  Database:
-    build: ./requirements/db/
-    image: db
-    container_name: db
+      - local_net
+    volumes: 
+      - ./requirements/Backend/src:/home
     restart: always
-    volumes:
-      - 
-    ports:
-      - 
-    networks:
-      - 
-    env_file:
-      - .env
 
+  # Front-end Part
+  # react:
+  #   build:
+  #     context: requirements/Frontend
+  #     dockerfile: Dockerfile
+  #   image: react
+  #   container_name: react
+  #   ports: 
+  #     - "3001:3001"
+  #   networks:
+  #     - local_net
+  #   volumes: 
+  #     - ./requirements/Frontend/src:/home
+  #   restart: always
+  
+  # Database Part
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: cherry
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      # POSTGRES_USER: ${DATABASE_USERNAME}
+      # POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      # POSTGRES_DB: ${DATABASE_NAME}
+    ports: 
+      - "5432:5432"
+    networks:
+      - local_net
+    volumes: 
+      - ./requirements/db:/var/lib/postgresql/data
+    restart: always
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    networks:
+      - local_net
+    ports:
+      - 8080:8080
+    restart: always
+
+networks:
+  local_net:
+    driver: bridge
