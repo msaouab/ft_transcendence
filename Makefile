@@ -26,6 +26,7 @@ build:
 
 up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
+	@mkdir ./src/requirements/db
 	@docker-compose  -f ./srcs/docker-compose.yml  up -d --build
 
 stop:
