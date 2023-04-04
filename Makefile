@@ -6,7 +6,7 @@ YELLOW = \033[1;33m
 BLUE = \033[1;34m
 ED = \033[0m
 
-all: credit up
+all: credit env up
 
 credit:
 	@echo "${GREEN}"
@@ -20,13 +20,18 @@ credit:
 	@echo "║████████████████████████████████████ ${bold}${GREEN}created-by: ${BLUE}{msaouab}{iqessam}{ichoukri}{ren-nasr}{mbehhar}${ED} ████████████████████████████████║"
 	@echo "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"
 
+
+env:
+	@mkdir -p ./srcs/requirements/db
+	@cp ./srcs/env-example ./srcs/.env
+	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env
+
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"
 	@docker-compose -f ./srcs/docker-compose.yml --env-file ./.env build
 
 up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
-	@mkdir ./src/requirements/db
 	@docker-compose  -f ./srcs/docker-compose.yml  up -d --build
 
 stop:
