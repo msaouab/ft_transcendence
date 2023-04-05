@@ -1,4 +1,5 @@
 .vscode/*
 .env
-./src/requirements/backend/node_modules/*
-./src/requirements/db/*
+./srcs/requirements/Backend/node_modules/*
+./srcs/requirements/db/*
+./srcs/requirements/Backend/dist/*
