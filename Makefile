@@ -24,7 +24,7 @@ credit:
 env:
 	@mkdir -p ./srcs/requirements/db
 	@cp ./srcs/env-example ./srcs/.env
-	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env
+	@cp ./srcs/requirements/Backend/src/nest-app/db-env-example ./srcs/requirements/Backend/src/nest-app/.env
 
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"
@@ -51,6 +51,9 @@ clean: down
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Clean sys ████████████████████$(ED)"
+	@rm -rf ./srcs/requirements/db
+	@rm -rf ./srcs/.env
+	@rm -rf ./srcs/requirements/Backend/src/nest-app/.env
 	@docker system prune -a -f
 
 re: fclean all

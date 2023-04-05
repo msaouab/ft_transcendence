@@ -1,12 +1,11 @@
 FROM node
-COPY init.sh .
 RUN apt-get update
-RUN chmod +x init.sh
-# RUN ./init.sh
 # RUN npm i
 WORKDIR /home/
-COPY ./src .
-RUN npm install 
+COPY init.sh .
+COPY ./src/nest-app .
+RUN chmod +x init.sh
+RUN ./init.sh 
 
 EXPOSE 3000/tcp
 

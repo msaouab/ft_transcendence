@@ -1,35 +1,5 @@
 version: '3'
 services:
-  # Back-end Part
-  nest:
-    build:
-      context: requirements/Backend
-      dockerfile: Dockerfile
-    image: nest
-    container_name: nest
-    ports: 
-      - "3000:3000"
-    networks:
-      - local_net
-    volumes: 
-      - ./requirements/Backend/src:/home
-    restart: always
-
-  # Front-end Part
-  # react:
-  #   build:
-  #     context: requirements/Frontend
-  #     dockerfile: Dockerfile
-  #   image: react
-  #   container_name: react
-  #   ports: 
-  #     - "3001:3001"
-  #   networks:
-  #     - local_net
-  #   volumes: 
-  #     - ./requirements/Frontend/src:/home
-  #   restart: always
-  
   # Database Part
   postgres:
     image: postgres:13
@@ -50,6 +20,39 @@ services:
     volumes: 
       - ./requirements/db:/var/lib/postgresql/data
     restart: always
+  
+  # Back-end Part
+  nest:
+    build:
+      context: requirements/Backend
+      dockerfile: Dockerfile
+    image: nest
+    container_name: nest
+    ports: 
+      - "3000:3000"
+    networks:
+      - local_net
+    volumes: 
+      - ./requirements/Backend/src:/home
+    depends_on:
+      - postgres
+    restart: always
+
+  # Front-end Part
+  # react:
+  #   build:
+  #     context: requirements/Frontend
+  #     dockerfile: Dockerfile
+  #   image: react
+  #   container_name: react
+  #   ports: 
+  #     - "3001:3001"
+  #   networks:
+  #     - local_net
+  #   volumes: 
+  #     - ./requirements/Frontend/src:/home
+  #   restart: always
+  
 
   adminer:
     image: adminer
