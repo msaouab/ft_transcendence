@@ -1,12 +1,11 @@
 FROM node
-COPY init.sh .
 RUN apt-get update
-RUN chmod +x init.sh
-# RUN ./init.sh
 # RUN npm i
 WORKDIR /home/
+COPY init.sh .
 COPY ./src .
-RUN npm install 
+RUN chmod +x init.sh
+RUN ./init.sh 
 
 EXPOSE 3000/tcp
 

@@ -51,6 +51,7 @@ clean: down
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Clean sys ████████████████████$(ED)"
+	@rm -rf ./srcs/requirements/db
 	@docker system prune -a -f
 
 re: fclean all
