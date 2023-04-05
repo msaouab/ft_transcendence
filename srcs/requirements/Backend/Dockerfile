@@ -3,7 +3,7 @@ RUN apt-get update
 # RUN npm i
 WORKDIR /home/
 COPY init.sh .
-COPY ./src .
+COPY ./src/nest-app .
 RUN chmod +x init.sh
 RUN ./init.sh 
 
