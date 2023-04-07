@@ -1,3 +1,0 @@
-DATABASE_URL="postgresql://postgres:cherry@postgres:5432/AUTH101?schema=public"
-
-JWT_SECRET = secret 

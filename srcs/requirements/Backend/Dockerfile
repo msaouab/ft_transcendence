@@ -3,10 +3,10 @@ RUN apt-get update
 # RUN npm i
 WORKDIR /home/
 COPY init.sh .
-COPY ./src/nest-app .
+COPY ./src/ .
 RUN chmod +x init.sh
-RUN ./init.sh 
 
 EXPOSE 3000/tcp
 
-ENTRYPOINT [ "tail", "-f" ]
+ENTRYPOINT [ "npm", "run", "start:dev" ]
+CMD [ "./init.sh" ]
