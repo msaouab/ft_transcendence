@@ -1,6 +1,7 @@
 # ft_transcendence
 This project is about creating a website for the mighty Pong contest!
 
+
 # Overview
 Thanks to your website, users will play Pong with others. You will provide a nice user interface, a chat, and real-time multiplayer online games!
 Your work has to comply with the following rules:
@@ -12,6 +13,7 @@ Your work has to comply with the following rules:
 - Your website must be compatible with the latest stable up-to-date version of Google Chrome and one additional web browser of your choice.
 - The user should encounter no unhandled errors and no warnings when browsing the website.
 - Everything has to be launch by a single call to: docker-compose up --build
+
 
 # Security concerns
 In order to create a fully functional website, here are a few security concerns that you have to tackle:
@@ -81,3 +83,4 @@ The main purpose of this website is to play Pong versus other players and show e
 <img src="https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white" />
 <img src="https://img.shields.io/badge/-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
 <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+

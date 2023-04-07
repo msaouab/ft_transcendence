@@ -8,6 +8,9 @@ ED = \033[0m
 
 all: credit env up
 
+
+
+
 credit:
 	@echo "${GREEN}"
 	@echo "███████╗████████╗  ████████╗██████╗  █████╗ ███╗   ██╗███████╗ ██████╗███████╗███╗   ██╗███████╗ ███████╗███╗   ██╗ ██████╗███████╗"
@@ -34,26 +37,26 @@ up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
 	@docker-compose  -f ./srcs/docker-compose.yml  up -d --build
 
+
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
-	@docker-compose -f ./srcs/docker-compose.yml stop
+	@docker stop nest postgres adminer || true
 
 start:
 	@echo "$(GREEN)███████████████████ Start Containers ███████████████████$(ED)"
 	@docker-compose -f ./srcs/docker-compose.yml start
 
-down:
-	@echo "$(GREEN)████████████████ Remove all Containers ████████████████$(ED)"
-	@docker-compose -f ./srcs/docker-compose.yml down
+clean: stop 
+	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
+	@docker rm nest postgres adminer || true
 
-clean: down
-	@echo "$(GREEN)████████████████████ Remove images ████████████████████$(ED)"
 
 fclean: clean
-	@echo "$(GREEN)████████████████████ Clean sys ████████████████████$(ED)"
-	@rm -rf ./srcs/requirements/db
-	@rm -rf ./srcs/.env
-	@rm -rf ./srcs/requirements/Backend/src/.env
-	@docker system prune -a -f
+	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"
+	@docker-compose -f ./srcs/docker-compose.yml down || true 
+	@rm -rf ./srcs/requirements/db || true
+	@rm -rf ./srcs/.env || true
+	@rm -rf ./srcs/requirements/Backend/src/.env || true
+
 
 re: fclean all
