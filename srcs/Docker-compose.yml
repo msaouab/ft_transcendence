@@ -11,7 +11,7 @@ services:
       # POSTGRES_DB: postgres
       # POSTGRES_USER: postgres
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
@@ -20,17 +20,17 @@ services:
     volumes:
       - ./requirements/db:/var/lib/postgresql/data
     restart: always
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Back-end Part
   nest:
     build:
       context: requirements/Backend/
       dockerfile: Dockerfile
+      args:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - DATABASE_HOST=${DATABASE_HOST}
+    env_file:
+      - ./requirements/Backend/src/.env
     image: nest
     container_name: nest
     ports:
@@ -40,8 +40,7 @@ services:
     volumes:
       - ./requirements/Backend/src:/home
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
 
     restart: always
 
