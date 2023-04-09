@@ -1,3 +1,4 @@
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=cherry
 POSTGRES_DB=postgres
+DATABASE_HOST=postgres
