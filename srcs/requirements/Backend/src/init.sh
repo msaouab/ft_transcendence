@@ -1,5 +1,7 @@
 #!/bin/sh
 
+
+echo $DATABASE_URL
 until pg_isready -h $DATABASE_HOST -p 5432 -U $POSTGRES_USER
 do
   echo "$(date) - waiting for database to start"
