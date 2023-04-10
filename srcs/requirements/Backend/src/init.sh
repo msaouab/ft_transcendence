@@ -6,8 +6,10 @@ do
   sleep 2
 done
 
+
 npm install
 npx prisma migrate dev --name dev --preview-feature
 npx prisma generate
+npx prisma db seed
 
 exec "$@"

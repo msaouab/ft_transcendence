@@ -64,7 +64,7 @@ model User {
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
   avatar         String            @default("<ralative_path>")
-  status         Status
+  status         Status            @default(Offline)
   friends        FriendsTab[]      @relation("friendsTabRelation")
   blockedUsers   BlockTab[]        @relation("blockTabRelation")
   channelsJoined ChannelsJoinTab[] @relation("channelsJoinTabRelation")
