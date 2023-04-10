@@ -1,7 +1,20 @@
-import { Controller, 
-            Get,
-            Post,
+import {
+    Controller,
+    Get,
+    Post,
 } from "@nestjs/common";
 
+import { ApiTags } from "@nestjs/swagger";
 
-// @Controller('invites')
+@ApiTags('User')
+@Controller('User')
+export class InvitesController {
+    @Get(':id/invites')
+    getInvites() {
+        return 'getInvites';
+    }
+    @Post(':id/invites')
+    postInvites() {
+        return 'postInvites';
+    }
+}

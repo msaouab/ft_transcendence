@@ -13,22 +13,17 @@ async function bootstrap() {
     .setTitle('Pong API')
     .setDescription('The Pong API description')
     .setVersion('1.0')
+    // .addTag('pong')
     .build();
+  // this is the line that enables versioning
+  // api versioning is /api/v1/... so if shit happens later on you can just /api/v2/...
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v',
     defaultVersion: process.env.API_VERSION,
   })
-
-
-  console.log('The env API_VERSION is: ', process.env.API_VERSION);
-  // reading api version from the env
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
-
-  // this is the line that enables versioning
-  // api versioning is /api/v1/... so if shit happens later on you can just /api/v2/...
   await app.listen(3000);
 }
 
