@@ -4,6 +4,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -64,7 +65,7 @@ model User {
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
   avatar         String            @default("<ralative_path>")
-  status         Status            @default(Offline)
+  status         Status            @default(Online)
   friends        FriendsTab[]      @relation("friendsTabRelation")
   blockedUsers   BlockTab[]        @relation("blockTabRelation")
   channelsJoined ChannelsJoinTab[] @relation("channelsJoinTabRelation")
@@ -72,17 +73,18 @@ model User {
   rankingData    RankingData[]     @relation("rankingDataRelation")
   notification   Notification[]    @relation("notificationRelation")
 
-  frendshipInvites FrindshipInvites[] @relation("frindshipInvitesRelation")
-  gameInvites      GameInvites[]      @relation("gameInvitesRelation")
+  frendshipInvites FriendshipInvites[] @relation("friendshipInvitesRelation")
+  gameInvites      GameInvites[]       @relation("gameInvitesRelation")
   // @@
   // GameHistoryTab   GameHistoryTab[]
 }
 
-model FrindshipInvites {
+model FriendshipInvites {
   sender_id   String
   receiver_id String
-  sender      User         @relation("frindshipInvitesRelation", fields: [sender_id], references: [id])
+  sender      User         @relation("friendshipInvitesRelation", fields: [sender_id], references: [id])
   status      InviteStatus @default(Pending)
+  createdAt   DateTime     @default(now())
 
   @@unique([sender_id, receiver_id])
 }

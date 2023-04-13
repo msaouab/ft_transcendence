@@ -42,6 +42,8 @@ services:
     container_name: nest
     ports:
       - "3000:3000"
+      # remove later for prisma studio
+      - "5555:5555"
     networks:
       - local_net
     volumes:
