@@ -9,6 +9,11 @@ import { PostInviteDto } from './dto/post-invite.dto';
 import { PutInviteDto } from './dto/put-invite.dto';
 
 
+// services
+import {
+    UserService
+} from 'src/user/user.service';
+
 import {
     ForbiddenException,
     ConflictException,
@@ -17,21 +22,14 @@ import {
 
 @Injectable()
 export class InvitesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, 
+        private readonly UserService: UserService
+        ) { }
 
     async getInvites(id: string): Promise<FriendshipInvites[]> {
         //if the user doesn't exist, throw a 404 exception
-        const userExists = await this.prisma.user.findFirst({
-            where: {
-                id,
-            },
-        });
-
-        if (!userExists) {
-            throw new NotFoundException('User does not exist');
-        }
-
-
+        const userExist = await this.UserService.getUserById(id);
+        
         // getInvites returns all invites for a user whether they are the sender or receiver
         return this.prisma.friendshipInvites.findMany({
             where: {
@@ -73,15 +71,7 @@ export class InvitesService {
 
 
         // check if the invite is to a user that doesn't exist
-        const userExists = await this.prisma.user.findFirst({
-            where: {
-                id: receiver_id,
-            },
-        });
-
-        if (!userExists) {
-            throw new NotFoundException('User does not exist');
-        }
+        await this.UserService.getUserById(receiver_id);
 
         // check if the invite is to a user that is already a friend
         // for later when friendships are implemented
