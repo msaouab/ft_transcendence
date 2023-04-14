@@ -1,7 +1,11 @@
 
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { FriendshipInvites } from '@prisma/client';
+import {
+    FriendshipInvites,
+    FriendsTab
+} from '@prisma/client';
+
 
 
 import { PostInviteDto } from './dto/post-invite.dto';
@@ -10,9 +14,8 @@ import { PutInviteDto } from './dto/put-invite.dto';
 
 
 // services
-import {
-    UserService
-} from 'src/user/user.service';
+import { UserService } from 'src/user/user.service';
+import { FriendsService } from 'src/friends/friends.service';
 
 import {
     ForbiddenException,
@@ -22,14 +25,15 @@ import {
 
 @Injectable()
 export class InvitesService {
-    constructor(private prisma: PrismaService, 
-        private readonly UserService: UserService
-        ) { }
+    constructor(private prisma: PrismaService,
+        private readonly UserService: UserService,
+        private readonly FriendsService: FriendsService
+    ) { }
 
     async getInvites(id: string): Promise<FriendshipInvites[]> {
         //if the user doesn't exist, throw a 404 exception
-        const userExist = await this.UserService.getUserById(id);
-        
+        await this.UserService.getUserById(id);
+
         // getInvites returns all invites for a user whether they are the sender or receiver
         return this.prisma.friendshipInvites.findMany({
             where: {
@@ -68,15 +72,10 @@ export class InvitesService {
             throw new ForbiddenException('You cannot send an invite to yourself');
 
         }
-
-
         // check if the invite is to a user that doesn't exist
         await this.UserService.getUserById(receiver_id);
-
         // check if the invite is to a user that is already a friend
         // for later when friendships are implemented
-
-
         // create the invite
         return this.prisma.friendshipInvites.create({
             data: {
@@ -85,7 +84,6 @@ export class InvitesService {
             },
         });
     }
-
 
     async putInvites(putInviteDto: PutInviteDto, sender_id: string): Promise<FriendshipInvites> {
         // putInvites updates an existing invite
@@ -108,15 +106,11 @@ export class InvitesService {
             throw new ConflictException('Invite does not exist');
         }
 
-        // find the invite by looking for sender_id and receiver_id
-        const invite = await this.prisma.friendshipInvites.findFirst({
-            where: {
-                sender_id,
-                receiver_id,
-            },
-        });
-
-
+        // if invite is "Accpeted" let's create a friendship
+        if (status === 'Accepted') {
+            // create a friendship
+            await this.FriendsService.createFriendship(sender_id, receiver_id);
+        }
         // update the invite
         return this.prisma.friendshipInvites.update({
 
