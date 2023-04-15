@@ -1,0 +1,82 @@
+version: '3'
+services:
+  # Database Part
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    env_file:
+      - .env
+    environment:
+      # POSTGRES_PASSWORD: cherry
+      # POSTGRES_DB: postgres
+      # POSTGRES_USER: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - local_net
+    volumes:
+      - ./requirements/db:/var/lib/postgresql/data
+    restart: always
+
+  # Back-end Part
+  nest:
+    build:
+      context: requirements/Backend/
+      dockerfile: Dockerfile
+      args:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - DATABASE_HOST=${DATABASE_HOST}
+    env_file:
+      - ./requirements/Backend/src/.env
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DATABASE_HOST}:5432/${POSTGRES_DB}?schema=public"
+    image: nest
+    container_name: nest
+    ports:
+      - "3000:3000"
+      # remove later for prisma studio
+      - "5555:5555"
+    networks:
+      - local_net
+    volumes:
+      - ./requirements/Backend/src:/home
+    depends_on:
+      - postgres
+    restart: always
+
+  # Front-end Part
+  # react:
+  #   build:
+  #     context: requirements/Frontend
+  #     dockerfile: Dockerfile
+  #   image: react
+  #   container_name: react
+  #   ports: 
+  #     - "3001:3001"
+  #   networks:
+  #     - local_net
+  #   volumes: 
+  #     - ./requirements/Frontend/src:/home
+  #   restart: always
+
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    networks:
+      - local_net
+    ports:
+      - 8080:8080
+    restart: always
+
+networks:
+  local_net:
+    driver: bridge

@@ -1,0 +1,6 @@
+<%- include('./header.ejs') %> <% if (!user) { %>
+<a class="btn btn-dark" href="/api/v1/login">log in.</a></p>
+<% } else { %>
+<!-- <p><a class="btn btn-primary" href="/profile">profile</a></p> -->
+<!-- <p><%= user %></p> -->
+<% } %> <%- include('./footer.ejs') %>
