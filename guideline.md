@@ -9,3 +9,6 @@ check it https://www.npmjs.com/package/class-validator , it's used in our DTOs t
 
 - it's convenient and best practice to document our API, check this https://docs.nestjs.com/openapi/introduction on how to document your endpoints.
 
+- **Passport** is authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped in to any Express-based web application. A comprehensive set of strategies support authentication using 42 strategie aka passport-42 check it: https://www.passportjs.org/packages/passport-42/
+
+- **Express-session** is a middleware that allows you to store session data on the server. It's used to store the user's data in the session, so we can use it in the whole application. check it: https://www.npmjs.com/package/express-session

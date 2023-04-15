@@ -3,7 +3,6 @@ import { User } from './auth/user.decorator/user.decorator';
 import { Profile } from 'passport-42';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
 import { Request } from 'express';
-import { firstValueFrom, map } from 'rxjs';
 import { Prisma } from '@prisma/client';
 import { UserService } from './user/user.service';
 import { PrismaService } from 'prisma/prisma.service';
