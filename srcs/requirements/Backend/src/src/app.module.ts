@@ -6,14 +6,16 @@ import { AppController } from './app.controller';
 import { AuthModule, } from './auth/auth.module';
 import { InvitesModule } from './invites/invites.module';
 import { UserModule } from './user/user.module';
-
+import { FriendsModule } from './friends/friends.module';
 
 @Module({
   controllers: [AppController],
   imports: [PrismaModule,
     UserModule,
     AuthModule,
-    InvitesModule],
+    InvitesModule,
+    FriendsModule
+  ],
 
 })
 export class AppModule { }

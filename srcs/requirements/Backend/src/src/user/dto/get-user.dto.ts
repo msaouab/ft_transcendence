@@ -2,13 +2,11 @@
 
 
 import { IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 
-export class PostInviteDto {
-
+export class GetUserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    receiver_id: string;
-}
-
+    id: string;
+};
