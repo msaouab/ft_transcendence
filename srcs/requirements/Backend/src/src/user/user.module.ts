@@ -8,5 +8,6 @@ import { UserService } from './user.service';
 @Module({
   controllers: [UserController],
   providers: [ConfigService, FtStrategy, UserService],
+  exports: [UserService]
 })
-export class UserModule {}
+export class UserModule { }

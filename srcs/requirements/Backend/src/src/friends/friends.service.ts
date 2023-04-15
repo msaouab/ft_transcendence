@@ -16,7 +16,7 @@ export class FriendsService {
     ) { }
     async getFriends(id: string): Promise<FriendsTab[]> {
 
-        await this.UserService.getUserById(id);
+        await this.UserService.getUser(id);
         return await this.prisma.friendsTab.findMany({
             where: {
                 OR: [
@@ -37,8 +37,8 @@ export class FriendsService {
         *   if friendship already exist
         *   if user_id or friendUser_id not exist
         */
-        await this.UserService.getUserById(user_id);
-        await this.UserService.getUserById(friendUser_id);
+        await this.UserService.getUser(user_id);
+        await this.UserService.getUser(friendUser_id);
         const freindship = await this.prisma.friendsTab.findUnique({
             where: {
                 user_id_friendUser_id: {

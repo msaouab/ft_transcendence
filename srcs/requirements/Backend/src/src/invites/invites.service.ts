@@ -21,7 +21,8 @@ import {
 
 @Injectable()
 export class InvitesService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService,
+        private friendService: FriendsService) { }
 
     async getInvites(id: string): Promise<FriendshipInvites[]> {
         //if the user doesn't exist, throw a 404 exception
@@ -124,7 +125,7 @@ export class InvitesService {
         // if invite is "Accpeted" let's create a friendship
         if (status === 'Accepted') {
             // create a friendship
-            await this.FriendsService.createFriendship(sender_id, receiver_id);
+            await this.friendService.createFriendship(sender_id, receiver_id);
         }
         // find the invite by looking for sender_id and receiver_id
         const invite = await this.prisma.friendshipInvites.findFirst({
