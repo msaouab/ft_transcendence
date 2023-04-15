@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
+import { FtStrategy } from './strategy/ft.strategy';
 import { AuthController } from './auth.controller';
+import { SessionSerializer } from './session/session.serialize';
+import { AuthService } from './auth.service';
 
 @Module({
-  imports: [],
   controllers: [AuthController],
-  providers: [AuthService]
+  providers: [ConfigService, FtStrategy, SessionSerializer, AuthService],
 })
 export class AuthModule {}

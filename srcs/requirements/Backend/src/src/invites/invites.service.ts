@@ -32,7 +32,7 @@ export class InvitesService {
 
     async getInvites(id: string): Promise<FriendshipInvites[]> {
         //if the user doesn't exist, throw a 404 exception
-        await this.UserService.getUserById(id);
+        await this.UserService.getUser(id);
 
         // getInvites returns all invites for a user whether they are the sender or receiver
         return this.prisma.friendshipInvites.findMany({
@@ -73,7 +73,7 @@ export class InvitesService {
 
         }
         // check if the invite is to a user that doesn't exist
-        await this.UserService.getUserById(receiver_id);
+        await this.UserService.getUser(receiver_id);
         // check if the invite is to a user that is already a friend
         // for later when friendships are implemented
         // create the invite
