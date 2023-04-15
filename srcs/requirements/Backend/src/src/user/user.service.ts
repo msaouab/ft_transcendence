@@ -1,32 +1,43 @@
-
-
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException, Redirect, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { User } from '@prisma/client';
-
-// exceptions
-
-import { UserNotFoundException } from 'src/exceptions/UserNotFound.exception';
+import { Response } from 'express';
+import { Passport, Profile } from 'passport';
+import { User } from '../auth/user.decorator/user.decorator';
 
 
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
-    async getUserById(id: string): Promise<User> {
-        // if the user doesn't exist, throw a 404 exception
-        const user = await this.prisma.user.findFirst({
+
+    async getUser(id: string) {
+        const user = await this.prisma.user.findUnique({
             where: {
-                id,
+                id: id,
             },
         });
         if (!user) {
-            throw new UserNotFoundException();
+            throw new NotFoundException('User not found');
         }
-        
         return user;
     }
+
+    async updateUser(id: string, user, data: any) {
+        const finduser = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (finduser.email != user._json.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: data,
+        });
+    }
 }
-
-
-
-
