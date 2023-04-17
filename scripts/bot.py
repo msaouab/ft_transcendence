@@ -15,6 +15,7 @@ client = discord.Client(intents=discord.Intents.default())
 async def on_ready():
     channel = client.get_channel(1097125038622265497)
     await channel.send( "@everyone A new update of the Dev branch is available! ")
+    
     await client.close()
     
 client.run(TOKEN)
