@@ -4,7 +4,8 @@ import {
     Post,
     Put,
     Param,
-    Body
+    Body,
+    Delete
 } from "@nestjs/common";
 
 import { ApiTags } from "@nestjs/swagger";
@@ -15,7 +16,7 @@ import { InvitesService } from './invites.service';
 
 // dto's
 import { PostInviteDto } from './dto/post-invite.dto';
-
+import { DeleteInviteDto } from "./dto/delete-invite.dto";
 import { PutInviteDto } from './dto/put-invite.dto';
 
 @ApiTags('User')
@@ -31,15 +32,19 @@ export class InvitesController {
     }
 
     @Post(':id/invites')
-    postInvites(@Body() postInviteDto: PostInviteDto, @Param('id') sender_id: string) {
-        return this.InvitesService.postInvites(postInviteDto, sender_id);
+    postInvites(@Body() postInviteDto: PostInviteDto, @Param('id') receiver_id: string) {
+        return this.InvitesService.postInvites(postInviteDto, receiver_id);
     }
 
     @Put(':id/invites')
-    putInvites(@Body() putInviteDto: PutInviteDto, @Param('id') sender_id: string) {
-        return this.InvitesService.putInvites(putInviteDto, sender_id);
+    putInvites(@Body() putInviteDto: PutInviteDto, @Param('id') receiver_id: string) {
+        return this.InvitesService.putInvites(putInviteDto, receiver_id);
     }
 
+    @Delete(':id/invites')
+    deleteInvites(@Body() DeleteInviteDto: DeleteInviteDto, @Param('id') receiver_id: string) {
+        return this.InvitesService.deleteInvites(DeleteInviteDto, receiver_id);
+    }
 
 
 }

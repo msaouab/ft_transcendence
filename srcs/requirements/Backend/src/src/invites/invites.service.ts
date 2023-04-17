@@ -5,7 +5,7 @@ import { FriendshipInvites } from '@prisma/client';
 
 
 import { PostInviteDto } from './dto/post-invite.dto';
-
+import { DeleteInviteDto } from "./dto/delete-invite.dto";
 import { PutInviteDto } from './dto/put-invite.dto';
 
 
@@ -152,6 +152,35 @@ export class InvitesService {
 
     }
 
+
+    async deleteInvites(deleteInviteDto: DeleteInviteDto, sender_id: string): Promise<FriendshipInvites> {
+        const { receiver_id } = deleteInviteDto;
+        // deleting an invite
+        /* err cases:
+            * if invite doesn't exist, throw a 404 exception
+        */
+        const inviteExists = await this.prisma.friendshipInvites.findFirst({
+            where: {
+                sender_id,
+                receiver_id,
+            },
+        });
+
+        if (!inviteExists) {
+            throw new NotFoundException('Invite does not exist');
+        }
+
+        // delete the invite
+        return this.prisma.friendshipInvites.delete({
+            where: {
+                sender_id_receiver_id: {
+
+                    sender_id: sender_id,
+                    receiver_id: receiver_id,
+                },
+            },
+        });
+    }
 }
 
 

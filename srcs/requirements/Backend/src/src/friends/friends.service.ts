@@ -7,7 +7,7 @@ import { FriendshipExistsException } from 'src/exceptions/FriendshipExist.except
 
 // imported services
 import { UserService } from "src/user/user.service";
-
+import { DeleteFriendshipDto } from "./dto/delete-friendship.dto";
 
 @Injectable()
 export class FriendsService {
@@ -47,11 +47,9 @@ export class FriendsService {
                 },
             },
         });
-
         if (freindship) {
             throw new FriendshipExistsException();
         }
-
         // create friendship
         return await this.prisma.friendsTab.create({
             data: {
@@ -60,4 +58,33 @@ export class FriendsService {
             },
         });
     }
+    async deleteFriendship(deleteFriendshipDto: DeleteFriendshipDto, user_id: string): Promise<FriendsTab> {
+        /* errs:
+        *   if friendship not exist
+        */
+        const { friendUser_id } = deleteFriendshipDto;
+        const freindship = await this.prisma.friendsTab.findUnique({
+            where: {
+                user_id_friendUser_id: {
+                    user_id: user_id,
+                    friendUser_id: friendUser_id,
+                },
+            },
+        });
+        if (!freindship) {
+            throw new HttpException("friendship not exist", 404);
+        }
+        // delete friendship
+        return await this.prisma.friendsTab.delete({
+            where: {
+                user_id_friendUser_id: {
+                    user_id: user_id,
+                    friendUser_id: friendUser_id,
+                },
+            },
+        });
+    }
+
 }
+
+
