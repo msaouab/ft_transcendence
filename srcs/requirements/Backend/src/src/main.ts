@@ -46,6 +46,7 @@ async function bootstrap() {
                   }),
     );
     app.use(cookieParser());
+    // app.use(cookieParser());
     //secret from .env
 
   //passport start
