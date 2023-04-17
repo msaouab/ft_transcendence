@@ -1,14 +1,26 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { VersioningType } from '@nestjs/common';
+import * as passport from 'passport';
+import { Body, VersioningType } from '@nestjs/common';
+import bodyParser from 'body-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
 
 
 
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  //ejs temp front end
+  app.useStaticAssets(join('/','home', 'public'));
+  app.setBaseViewsDir(join('/','home', 'views'));
+  app.setViewEngine('ejs');
+  //end ejs
+
   const config = new DocumentBuilder()
     .setTitle('Pong API')
     .setDescription('The Pong API description')
@@ -24,6 +36,25 @@ async function bootstrap() {
   })
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
+  // express session
+  app.use(session({ 
+                    resave: false,
+                    saveUninitialized: false,
+                    secret: 'secret',
+                    store: new session.MemoryStore(),
+                    cookie: { maxAge: 24 * 60 * 60 * 1000}
+                  }),
+    );
+    app.use(cookieParser());
+    //secret from .env
+
+  //passport start
+  app.use(passport.initialize());
+  app.use(passport.session());
+  //passport end
+
+
+
   await app.listen(3000);
 }
 

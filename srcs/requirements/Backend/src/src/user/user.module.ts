@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common'
-import { UserController } from './user.controller'
-import { UserService } from './user.service'
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { FtStrategy } from '../auth/strategy/ft.strategy';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
+
 
 @Module({
-    imports: [],
-    controllers: [UserController],
-    providers: [UserService],
-    exports: [UserService],
+  controllers: [UserController],
+  providers: [ConfigService, FtStrategy, UserService],
+  exports: [UserService]
 })
 export class UserModule { }
-
