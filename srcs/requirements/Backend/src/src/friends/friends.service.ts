@@ -47,11 +47,9 @@ export class FriendsService {
                 },
             },
         });
-
         if (freindship) {
             throw new FriendshipExistsException();
         }
-
         // create friendship
         return await this.prisma.friendsTab.create({
             data: {

@@ -1,12 +1,12 @@
 
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { User } from '@prisma/client';
 
 // exceptions
 
-import { UserNotFoundException } from 'src/exceptions/UserNotFound.exception';
+// import { UserNotFoundException } from 'src/exceptions/UserNotFound.exception';
 
 
 @Injectable()
@@ -20,9 +20,9 @@ export class UserService {
             },
         });
         if (!user) {
-            throw new UserNotFoundException();
+            throw new HttpException('User not found', 404);
         }
-        
+
         return user;
     }
 }

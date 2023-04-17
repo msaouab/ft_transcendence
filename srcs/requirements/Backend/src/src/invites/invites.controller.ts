@@ -40,6 +40,4 @@ export class InvitesController {
         return this.InvitesService.putInvites(putInviteDto, sender_id);
     }
 
-
-
 }

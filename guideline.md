@@ -22,4 +22,3 @@ check it https://www.npmjs.com/package/class-validator , it's used in our DTOs t
 
 - When designing your API make this guide as your reference https://www.vinaysahni.com/best-practices-for-a-pragmatic-restful-api#restful
 
-
