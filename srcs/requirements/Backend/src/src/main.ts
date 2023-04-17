@@ -7,6 +7,7 @@ import { Body, VersioningType } from '@nestjs/common';
 import bodyParser from 'body-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
+import * as cookieParser from 'cookie-parser';
 
 
 
@@ -44,6 +45,7 @@ async function bootstrap() {
                     cookie: { maxAge: 24 * 60 * 60 * 1000}
                   }),
     );
+    app.use(cookieParser());
     //secret from .env
 
   //passport start

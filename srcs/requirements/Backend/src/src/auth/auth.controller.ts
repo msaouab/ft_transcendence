@@ -1,4 +1,4 @@
-import { Controller, Get, Redirect, UseGuards } from '@nestjs/common';
+import { Controller, Get, Redirect, Res, UseGuards } from '@nestjs/common';
 import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { AuthService } from './auth.service';
 import { User } from './user.decorator/user.decorator';
@@ -16,8 +16,8 @@ export class AuthController {
   @Get('42/return')
   @UseGuards(FtOauthGuard)
   @Redirect('/api/v1/')
-  ftAuthCallback(@User() user: Profile) {
-    return this.authService.login(user);
+  ftAuthCallback(@User() user: Profile, @Res() res: Response) {
+    return this.authService.login(user, res);
   }
 
 

@@ -1,4 +1,4 @@
-import {Controller, Get, Redirect, Render, Req, UseGuards, Session, Param, Post, Body,} from '@nestjs/common';
+import {Controller, Get, Redirect, Render, Req, UseGuards, Session, Param, Post, Body, Res} from '@nestjs/common';
 import { User } from './auth/user.decorator/user.decorator';
 import { Profile } from 'passport-42';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
@@ -43,18 +43,18 @@ import { ApiTags } from '@nestjs/swagger';
     }
     @Get('logout')
     @Redirect('/api/v1/')
-    logOut(@Req() req: Request, @User() user: Profile) {
+    logOut(@Req() req: Request, @User() user: Profile, @Res() res: Response) {
         req.logout(function(err) {
             { return; }
           });
-      return this.authService.logout(user);
+      return this.authService.logout(user, res);
     }
 
     @Get('delete')
     @UseGuards(AuthenticatedGuard)
     @Redirect('logout')
-    async delete(@User() user: Profile) {
-      return this.authService.delete(user);
+    async delete(@User() user: Profile, @Res() res: Response) {
+      return this.authService.delete(user,res);
     }
 
     @Get('me')
@@ -62,6 +62,10 @@ import { ApiTags } from '@nestjs/swagger';
     async me(@User() user: Profile) {
         return user;
     }
+
+
+
+
 
     // @Get('update')
     // @UseGuards(AuthenticatedGuard)
@@ -88,5 +92,7 @@ import { ApiTags } from '@nestjs/swagger';
     // @Redirect('/profile')
     // async twoFactorverifcheck(@Body () body: any, @User() user: Profile, @Req() req) {
     //   return this.authService.twoFactorverify(body, user, req);
+
+
     }
   

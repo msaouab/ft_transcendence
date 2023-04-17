@@ -3,17 +3,13 @@ import { PrismaService } from 'prisma/prisma.service';
 import { Response } from 'express';
 import passport, { Passport } from 'passport';
 import { writeFileSync } from 'fs';
-const fs = require('fs')
-// const speakeasy = require('speakeasy');
-// const qrcode = require('qrcode');
 import * as rawbody from 'raw-body';
 
 @Injectable()
 export class AuthService {
     constructor(private prisma: PrismaService) { }
 
-    async signup(user) {
-        fs.writeFileSync('file.json', JSON.stringify(user._json));
+    async signup(user, res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -33,11 +29,11 @@ export class AuthService {
                 status: 'Offline',
             },
         })
-        this.login(user);
+        this.login(user,res);
         return createUser;
     }
 
-    async logout(user) {
+    async logout(user,res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -52,11 +48,12 @@ export class AuthService {
                     status: 'Offline',
                 },
             })
+            res.clearCookie('id');
             return updateUser;
         }
     }
 
-    async login(user) {
+    async login(user, res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -72,16 +69,20 @@ export class AuthService {
                     password: 'update',
                 },
             })
+            res.cookie('id', find_user.id, {
+                httpOnly: true,
+                secure: false,
+            })
         
             return updateUser;
         }
 
         else {
-            return this.signup(user);
+            return this.signup(user,res);
         }
     }
 
-    async delete(user) {
+    async delete(user,res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -93,6 +94,7 @@ export class AuthService {
                     id: find_user.id,
                 },
             })
+            res.clearCookie('id');
             return deleteUser;
         }
     }
