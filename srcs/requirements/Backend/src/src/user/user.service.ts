@@ -4,7 +4,6 @@ import { Response } from 'express';
 import { Passport, Profile } from 'passport';
 import { User } from '../auth/user.decorator/user.decorator';
 
-
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
