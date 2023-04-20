@@ -60,11 +60,11 @@ services:
   #   image: react
   #   container_name: react
   #   ports: 
-  #     - "3001:3001"
+  #     - "5173:5173"
   #   networks:
   #     - local_net
   #   volumes: 
-  #     - ./requirements/Frontend/src:/home
+  #     - ./requirements/Frontend/src:/app
   #   restart: always
 
 

@@ -29,8 +29,8 @@ export class AuthService {
                 status: 'Offline',
             },
         })
-        this.login(user,res);
-        return createUser;
+        
+        return this.login(user,res);
     }
 
     async logout(user,res) {
@@ -95,7 +95,7 @@ export class AuthService {
                 },
             })
             res.clearCookie('id');
-            return deleteUser;
+            // return deleteUser;
         }
     }
     
