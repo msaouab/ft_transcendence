@@ -12,6 +12,7 @@ import { UserController } from './user/user.controller';
 //services
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
+import { ChannelModule } from './channel/channel.module';
 
 
 @Module({
@@ -23,7 +24,8 @@ import { UserService } from './user/user.service';
     PrismaModule,
     UserModule,
     AuthModule,
-    InvitesModule],
+    InvitesModule,
+    ChannelModule],
 
     controllers: [AppController, UserController],
     providers: [AuthService, UserService],

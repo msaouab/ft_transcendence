@@ -3,7 +3,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import * as passport from 'passport';
-import { Body, VersioningType } from '@nestjs/common';
+import { Body, ValidationPipe, VersioningType } from '@nestjs/common';
 import bodyParser from 'body-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
@@ -56,6 +56,7 @@ async function bootstrap() {
 
 
 
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 
