@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { ChannelDto } from "./dto";
+import { ChannelDto, MemberDto } from "./dto";
 import { Request } from "express";
 import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -44,5 +44,53 @@ export class ChannelService {
         if (channel === null)
             throw new HttpException("Channel not found", HttpStatus.NOT_FOUND)
         return channel;
+    }
+
+    async addMember(channelId: string, dto: MemberDto){
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const memberTab = await this.prisma.membersTab.create({
+                data:{
+                    member_id: dto.userId,
+                    channel_id: channelId,
+                }
+            })
+            return memberTab;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+                throw new ForbiddenException("This user is already a Member");
+            }
+            throw error;
+        }
+    }
+    async getMembers(channelId: string): Promise<string[]>{
+        await this.getChannelById(channelId);
+        const memberTab =  await this.prisma.membersTab.findMany({
+            where:{ channel_id: channelId },
+            select: { member_id: true }
+        })
+        if (memberTab !== null)
+            return memberTab.map((el) => el.member_id)
+        else
+            return []
+    }
+
+    async deleteMember(channelId: string, dto: MemberDto){
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try{
+            const deleteMember = await this.prisma.membersTab.delete({
+                where:{
+                    channel_id_member_id:{
+                        member_id: dto.userId,
+                        channel_id: channelId
+                    }
+                }
+            })
+            return deleteMember;
+        }catch(error){
+            throw new ForbiddenException("No Member with ID provided");
+        }
     }
 }
