@@ -3,6 +3,8 @@ import { PrismaService } from 'prisma/prisma.service';
 import { Response } from 'express';
 import { Passport, Profile } from 'passport';
 import { User } from '../auth/user.decorator/user.decorator';
+import { ChanRoles, Prisma } from '@prisma/client';
+import { log } from 'console';
 
 @Injectable()
 export class UserService {
@@ -38,5 +40,34 @@ export class UserService {
             },
             data: data,
         });
+    }
+
+    async addChannel(channelId: string, channelName: string, userId: string, role: ChanRoles){
+        try{
+            const channel = await this.prisma.channelsJoinTab.create({
+                data:{
+                    user_id: userId,
+                    channel_name: channelName,
+                    channel_id: channelId,
+                    role: role
+                }
+            });
+            return channel;
+        }catch(error){
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+                throw new ForbiddenException("The channel is already joined")
+            throw error;
+        }
+        
+    }
+
+    async getJoindChannels(id: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { id: id },
+            include: { channelsJoined: true }
+        })
+        if (user === null)
+            throw new NotFoundException('No User was found with id provided');
+        return user.channelsJoined;
     }
 }

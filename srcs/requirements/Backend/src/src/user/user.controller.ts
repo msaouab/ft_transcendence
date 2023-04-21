@@ -5,6 +5,7 @@ import { Profile } from 'passport';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { User } from '../auth/user.decorator/user.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { log } from 'console';
 
 @ApiTags('user')
 @Controller('user')
@@ -23,5 +24,9 @@ export class UserController {
         return this.userService.updateUser(id, user, data);
     }
 
-
+  @Get(':id/channels')
+  @UseGuards(AuthenticatedGuard)
+  getJoindChannels(@Param('id') id: string){
+    return this.userService.getJoindChannels(id);
+  }
 }
