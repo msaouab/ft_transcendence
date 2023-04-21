@@ -26,6 +26,7 @@ export class ChannelService {
                     limit_members: -1
                 }
             })
+            this.UserService.addChannel(channel.id, channel.name, userId, "Owner");
             return channel;
         }catch(error){
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"){
@@ -48,7 +49,7 @@ export class ChannelService {
 
     async addMember(channelId: string, dto: MemberDto){
         await this.UserService.getUser(dto.userId);
-        await this.getChannelById(channelId);
+        const channel = await this.getChannelById(channelId);
         try {
             const memberTab = await this.prisma.membersTab.create({
                 data:{
@@ -56,6 +57,7 @@ export class ChannelService {
                     channel_id: channelId,
                 }
             })
+            this.UserService.addChannel(channel.id, channel.name, dto.userId, "Member");
             return memberTab;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
