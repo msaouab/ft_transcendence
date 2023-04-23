@@ -9,7 +9,7 @@ import { log } from "console";
 
 @Injectable({})
 export class ChannelService {
-    constructor(private prisma: PrismaService, 
+    constructor(private prisma: PrismaService,
         private readonly UserService: UserService){}
 
     async createChannel(request: Request, dto: ChannelDto){
@@ -47,7 +47,7 @@ export class ChannelService {
         return channel;
     }
 
-    async addMember(channelId: string, dto: MemberDto){
+    async addMember(channelId: string, dto: MemberDto, addChannel: boolean = true) {
         await this.UserService.getUser(dto.userId);
         const channel = await this.getChannelById(channelId);
         try {
@@ -57,7 +57,8 @@ export class ChannelService {
                     channel_id: channelId,
                 }
             })
-            this.UserService.addChannel(channel.id, channel.name, dto.userId, "Member");
+            if (addChannel === true)
+                await this.UserService.addChannel(channel.id, channel.name, dto.userId, "Member");
             return memberTab;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
@@ -78,7 +79,7 @@ export class ChannelService {
             return []
     }
 
-    async deleteMember(channelId: string, dto: MemberDto){
+    async deleteMember(channelId: string, dto: MemberDto, deleteChannel: boolean = true) {
         await this.UserService.getUser(dto.userId);
         await this.getChannelById(channelId);
         try{
@@ -90,9 +91,13 @@ export class ChannelService {
                     }
                 }
             })
+            if (deleteChannel === true)
+                await this.UserService.deleteChannel(channelId, dto.userId);
             return deleteMember;
-        }catch(error){
-            throw new ForbiddenException("No Member with ID provided");
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not a member of this channel");
+            throw error;
         }
     }
 }
