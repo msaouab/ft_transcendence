@@ -47,6 +47,50 @@ export class ChannelService {
         return channel;
     }
 
+    async deleteAllMembers(channelId: string) {
+        try {
+            await this.prisma.membersTab.deleteMany({
+                where: {
+                    channel_id: channelId
+                }
+            })
+        } catch (error) {
+            throw new HttpException("Error while deleting members", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async deleteAllAdministators(channelId: string) {
+        try {
+            await this.prisma.adminMembers.deleteMany({
+                where: {
+                    channel_id: channelId
+                }
+            })
+        } catch (error) {
+            throw new HttpException("Error while deleting administrators", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
+    async deleteChannel(id: string) {
+        await this.getChannelById(id);
+        await this.deleteAllMembers(id);
+        await this.deleteAllAdministators(id);
+        try {
+            await this.prisma.channelsJoinTab.deleteMany({
+                where: {
+                    channel_id: id,
+                }
+            })
+            await this.prisma.channel.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            throw new HttpException("Error while deleting channels", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+    }
+
     async addMember(channelId: string, dto: MemberDto, addChannel: boolean = true) {
         await this.UserService.getUser(dto.userId);
         const channel = await this.getChannelById(channelId);

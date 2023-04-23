@@ -23,6 +23,12 @@ export class ChannelController{
     getChannel(@Param('id') channelId: string){
         return this.ChannelService.getChannelById(channelId);
     }
+
+    @Delete(':id')
+    @UseGuards(ownerPermissionGuard)
+    deleteChannel(@Param('id') channelId: string){
+        return this.ChannelService.deleteChannel(channelId);
+    }
     
     @Post(':id/members')
     // @UseGuards(AuthenticatedGuard)
