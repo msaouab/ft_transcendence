@@ -70,4 +70,23 @@ export class UserService {
             throw new NotFoundException('No User was found with id provided');
         return user.channelsJoined;
     }
+
+    async deleteChannel(channelId: string, userId: string){
+        try {
+            const channel = await this.prisma.channelsJoinTab.delete({
+                where:{
+                    user_id_channel_id:{
+                        user_id: userId,
+                        channel_id: channelId
+                    }
+                }
+            })
+            return channel;
+        }
+        catch (error){
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("The channel is not joined")
+            throw error;
+        }
+    }
 }
