@@ -100,4 +100,84 @@ export class ChannelService {
             throw error;
         }
     }
+
+    async addAdministrator(channelId: string, dto: MemberDto) {
+        await this.deleteMember(channelId, dto, false);
+        try {
+            const adminTab = await this.prisma.adminMembers.create({
+                data: {
+                    channel_id: channelId,
+                    admin_id: dto.userId
+                }
+            })
+            try {
+                await this.prisma.channelsJoinTab.update({
+                    where: {
+                        user_id_channel_id: {
+                            user_id: dto.userId,
+                            channel_id: channelId
+                        }
+                    },
+                    data: {
+                        role: "Admin"
+                    }
+                })
+            } catch (error) {
+                throw new ForbiddenException("Update role from Member to Admin failed");
+            }
+            return adminTab;
+        }
+        catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+                throw new ForbiddenException("This user is already an Administrator");
+            throw error;
+        }
+    }
+    async getAdministrators(channelId: string) {
+        await this.getChannelById(channelId);
+        const adminTab = await this.prisma.adminMembers.findMany({
+            where: { channel_id: channelId },
+            select: { admin_id: true }
+        })
+        if (adminTab !== null)
+            return adminTab.map((el) => el.admin_id)
+        else
+            return []
+    }
+
+    async deleteAdministrator(channelId: string, dto: MemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const deleteAdmin = await this.prisma.adminMembers.delete({
+                where: {
+                    channel_id_admin_id: {
+                        admin_id: dto.userId,
+                        channel_id: channelId
+                    }
+                }
+            })
+            try {
+                await this.prisma.channelsJoinTab.update({
+                    where: {
+                        user_id_channel_id: {
+                            user_id: dto.userId,
+                            channel_id: channelId
+                        }
+                    },
+                    data: {
+                        role: "Member"
+                    }
+                })
+            } catch (error) {
+                throw new ForbiddenException("Update role from Admin to Member failed");
+            }
+            this.addMember(channelId, dto, false);
+            return deleteAdmin;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not an Administrator of this channel");
+            throw error;
+        }
+    }
 }

@@ -5,6 +5,7 @@ import { ChannelDto, MemberDto } from "./dto";
 import { Request } from "express";
 import { log } from "console";
 import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
+import { ownerPermissionGuard } from "./guards/ownerPermission.guard";
 
 @ApiTags('Channels')
 @Controller('Channels')
@@ -39,5 +40,22 @@ export class ChannelController{
     // @UseGuards(AuthenticatedGuard)
     deleteMember(@Param('id') channelId: string, @Body() dto: MemberDto){
         return this.ChannelService.deleteMember(channelId, dto);
+    }
+
+    @Post(':id/administrators')
+    @UseGuards(ownerPermissionGuard)
+
+    addAdministrator(@Param('id') channelId: string, @Body() dto: MemberDto) {
+        return this.ChannelService.addAdministrator(channelId, dto);
+    }
+
+    @Get(':id/administrators')
+    getAdministrators(@Param('id') channelId: string) {
+        return this.ChannelService.getAdministrators(channelId);
+    }
+    @Delete(':id/administrators')
+    @UseGuards(ownerPermissionGuard)
+    deleteAdministrator(@Param('id') channelId: string, @Body() dto: MemberDto) {
+        return this.ChannelService.deleteAdministrator(channelId, dto);
     }
 }
