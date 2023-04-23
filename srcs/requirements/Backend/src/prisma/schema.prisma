@@ -121,11 +121,10 @@ model BlockTab {
 model ChannelsJoinTab {
   user_id      String
   user         User      @relation("channelsJoinTabRelation", fields: [user_id], references: [id])
-  channel_id   String    @unique()
+  channel_id   String    
   channel_name String
   role         ChanRoles
-
-  @@index([channel_id], name: "channel_id")
+  @@unique([user_id, channel_id])
 }
 
 model Channel {
