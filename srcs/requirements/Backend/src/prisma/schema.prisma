@@ -54,6 +54,12 @@ enum InviteStatus {
   Rejected
 }
 
+enum PrivateChatRoomStatus {
+  Pending
+  Accepted
+  Rejected
+}
+
 // type  attributes att functions
 model User {
   id             String            @id @default(uuid())
@@ -75,7 +81,11 @@ model User {
 
   frendshipInvites FriendshipInvites[] @relation("friendshipInvitesRelation")
   gameInvites      GameInvites[]       @relation("gameInvitesRelation")
-  // @@
+  // relation to chat 
+
+  sender   PrivateChatRoom[] @relation("senderRelation")
+  receiver PrivateChatRoom[] @relation("receiverRelation")
+
   // GameHistoryTab   GameHistoryTab[]
 }
 
@@ -94,20 +104,25 @@ model FriendsTab {
   user          User   @relation("friendsTabRelation", fields: [user_id], references: [id])
   friendUser_id String
 
-  // friendUinviteStringInvite      Message[] @relation("privateMessageRelation")
-  friendsMessage PrivateMessage[] @relation("privateMessageRelation")
-
   @@unique([user_id, friendUser_id])
 }
 
 model PrivateMessage {
-  id          String     @id @default(uuid())
-  dateCreated DateTime   @default(now())
-  sender_id   String
-  receiver_id String
+  id          String          @id
+  dateCreated DateTime        @default(now())
   content     String //not empty
-  seen        Boolean    @default(false)
-  friendsTab  FriendsTab @relation("privateMessageRelation", fields: [sender_id, receiver_id], references: [user_id, friendUser_id])
+  seen        Boolean         @default(false)
+  chatRoom_id String
+  chatRoom    PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
+}
+
+model PrivateChatRoom {
+  id              String                @id
+  sender_id       String
+  receiver_id     String
+  messages        PrivateMessage[]      @relation("privateChatRoomRelation")
+  sender          User                  @relation("senderRelation", fields: [sender_id], references: [id])
+  receiver        User                  @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
 }
 
 model BlockTab {
