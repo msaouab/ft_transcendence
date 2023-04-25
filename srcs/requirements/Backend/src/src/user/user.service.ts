@@ -20,6 +20,7 @@ export class UserService {
         }
         return user;
     }
+
     async updateUser(id: string, user, PutUserDto ){
         const { login, firstName, lastName } = PutUserDto;
         const finduser = await this.prisma.user.findUnique({

@@ -85,6 +85,17 @@ export class FriendsService {
         });
     }
 
+    async getFriendship(user_id: string, friendUser_id: string): Promise<FriendsTab> {
+        return await this.prisma.friendsTab.findUnique({
+            where: {
+                user_id_friendUser_id: {
+                    user_id: user_id,
+                    friendUser_id: friendUser_id,
+                },
+            },
+        });
+    }
+    
 }
 
 

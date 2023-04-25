@@ -11,13 +11,14 @@ import * as cookieParser from 'cookie-parser';
 
 
 
+
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   //ejs temp front end
-  app.useStaticAssets(join('/','home', 'public'));
-  app.setBaseViewsDir(join('/','home', 'views'));
+  app.useStaticAssets(join('/', 'home', 'public'));
+  app.setBaseViewsDir(join('/', 'home', 'views'));
   app.setViewEngine('ejs');
   //end ejs
 
@@ -37,23 +38,22 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
   // express session
-  app.use(session({ 
-                    resave: false,
-                    saveUninitialized: false,
-                    secret: 'secret',
-                    store: new session.MemoryStore(),
-                    cookie: { maxAge: 24 * 60 * 60 * 1000}
-                  }),
-    );
-    app.use(cookieParser());
-    // app.use(cookieParser());
-    //secret from .env
+  app.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: 'secret',
+    store: new session.MemoryStore(),
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  }),
+  );
+  app.use(cookieParser());
+  // app.use(cookieParser());
+  //secret from .env
 
   //passport start
   app.use(passport.initialize());
   app.use(passport.session());
   //passport end
-
 
 
   await app.listen(3000);

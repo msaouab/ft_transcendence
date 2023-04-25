@@ -3,10 +3,12 @@ import { FtOauthGuard } from './guards/ft-oauth.guard';
 import { AuthService } from './auth.service';
 import { User } from './user.decorator/user.decorator';
 import { Profile } from 'passport';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('login')
+@ApiTags('Auth')
+@Controller('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
   @Get('42')
   @UseGuards(FtOauthGuard)
   ftAuth() {

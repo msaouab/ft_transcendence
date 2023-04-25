@@ -7,22 +7,20 @@ import { User } from '../auth/user.decorator/user.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { PutUserDto } from './dto/put-user.dto';
 
-@ApiTags('user')
+@ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
-  
+  constructor(private readonly userService: UserService) { }
+
   @Get(':id')
   @UseGuards(AuthenticatedGuard)
-    ftAuth(@Param('id') id: string) {
-        return this.userService.getUser(id);
-    }
+  ftAuth(@Param('id') id: string) {
+    return this.userService.getUser(id);
+  }
 
   @Put(':id/update')
   @UseGuards(AuthenticatedGuard)
     updateUser(@Param('id') id: string,@User() user: Profile, @Body() PutUserDto: PutUserDto) {
         return this.userService.updateUser(id, user, PutUserDto);
     }
-
-
 }

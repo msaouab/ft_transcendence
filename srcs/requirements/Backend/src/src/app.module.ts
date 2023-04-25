@@ -6,12 +6,15 @@ import { configValidationSchema } from './config.schema';
 import { AuthModule, } from './auth/auth.module';
 import { InvitesModule } from './invites/invites.module';
 import { UserModule } from './user/user.module';
+import { ChatModule } from './chat/chat.module';
+import { BlockedUsersModule } from './blockedUsers/blockedUsers.module';
 //Contollers
 import { AppController } from './app.controller';
 import { UserController } from './user/user.controller';
 //services
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
+import { ChatGateway } from './chat/chat.gateway';
 
 
 @Module({
@@ -23,10 +26,14 @@ import { UserService } from './user/user.service';
     PrismaModule,
     UserModule,
     AuthModule,
-    InvitesModule],
+    InvitesModule,
+    ChatModule,
+    BlockedUsersModule
+  ],
 
-    controllers: [AppController, UserController],
-    providers: [AuthService, UserService],
+  controllers: [AppController, UserController],
+  providers: [AuthService, UserService,
+  ],
 
 })
 export class AppModule { }
