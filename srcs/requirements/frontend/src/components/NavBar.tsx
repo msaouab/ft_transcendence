@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Routes, Route, Link } from 'react-router-dom';
 import HomePage from '../pages/landingPage/HomePage'
 import AboutPage from '../pages/landingPage/AboutPage';
+import { useState } from 'react';
 // import ContactPage from '../pages/landingPage/ContactPage';
 import '../index.scss'
 
@@ -46,14 +47,18 @@ const NavbarContainer = styled.header`
 `;
 
 const NavBar = () => {
+	const [activeLink, setActiveLink] = useState('Home')
+	const handleLinkClick = (link: string) => {
+		setActiveLink(link);
+	};
 	return (
 		<NavbarContainer>
 			<header>
 				<Link to="/" className='logo'><img src={logo} alt="PingPong Logo" /></Link>
 				<nav>
-					<Link to="/" className='active'>Home</Link>
-					<Link to="/about" className=''>About</Link>
-					<Link to="/contact" className=''>Contact</Link>
+					<Link to="/" className={activeLink === 'Home' ? 'active' : ''} onClick={() => handleLinkClick('Home')}>Home</Link>
+					<Link to="/about" className={activeLink === 'About' ? 'active' : ''} onClick={() => handleLinkClick('About')}>About</Link>
+					<Link to="/contact" className={activeLink === 'Contact' ? 'active' : ''} onClick={() => handleLinkClick('Contact')}>Contact</Link>
 				</nav>
 			</header>
 			<Routes>
@@ -65,3 +70,12 @@ const NavBar = () => {
 }
 
 export	default NavBar
+
+
+{/* <Link
+            to="/"
+            className={activeLink === 'Home' ? 'active' : ''}
+            onClick={() => handleLinkClick('Home')}
+          >
+            Home
+          </Link> */}

@@ -17,7 +17,7 @@ const	HomePageContainer = styled.div`
 				align-items: center;
 				justify-content: center;
 				width: 50%;
-				h1, .quotes, .btn, p, .animation {
+				h1, .quotes, .btn, p {
 					padding: 1rem;
 				}
 				h1 {
@@ -26,35 +26,47 @@ const	HomePageContainer = styled.div`
 					color: #E9D990;
 				}
 				.textLandingPage {
-					padding-top: 2rem;
-					color: #C4C4C4;
+					padding: 1rem 0;
 					width: 60%;
 					text-align: center;
-					font-size: 20px;
-				}
-				.animation {
-					border: 1px solid red;
-					display: flex;
-					justify-content: space-between;
-					padding: 1rem 0;
-					width: 20%;
-					height: 150px;
-					.pallete, .ball {
-						width: 20px;
-						background-color: var(--goldColor);
+					color: #C4C4C4;
+					h2 {
+						font-size: 40px;
+						text-align: start;
+						padding-left: 1rem;
 					}
-					.pallete {
-						height: 100px;
-						width: 15px;
+					p {
+						padding: 0 0 2rem 0;
+						font-size: 20px;
 					}
-					.p1 {
-					}
-					.ball {
-						border-radius: 50%;
-						align-items: center;
+					.animation {
+						position: relative;
 						margin: auto;
-						height: 20px;
-						margin: 1rem 5rem;
+						width: 50%;
+						height: 200px;
+						.pallete, .ball {
+							background-color: var(--goldColor);
+							position: absolute;
+						}
+						.pallete {
+							width: 15px;
+							height: 66%;
+						}
+						.p1 {
+							top: 0;
+							left: 0;
+						}
+						.p2 {
+							bottom: 0;
+							right: 0;
+						}
+						.ball {
+							width: 20px;
+							height: 20px;
+							border-radius: 50%;
+							left: 28%;
+							bottom: 50%;
+						}
 					}
 				}
 			}
@@ -81,14 +93,17 @@ function	HomePage() {
 						<h1>PING PONG</h1>
 						<div className='quotes'><Quotes></Quotes></div>
 						<div className='btn'><RegisterNowBtn></RegisterNowBtn></div>
-						<p className='textLandingPage'>Is a table tennis–themed twitch arcade sports video game, 
-							featuring simple two-dimensional graphics, 
-							manufactured by Atari and originally released in 1972.
-						</p>
-						<div className='animation'>
-							<div className='pallete p1'></div>
-							<div className='ball'></div>
-							<div className='pallete p2'></div>
+						<div className='textLandingPage'>
+							<h2>Pong</h2>
+							<p>Is a table tennis–themed twitch arcade sports video game, 
+								featuring simple two-dimensional graphics, 
+								manufactured by Atari and originally released in 1972.
+							</p>
+							<div className='animation'>
+								<div className='pallete p1'></div>
+								<div className='ball'></div>
+								<div className='pallete p2'></div>
+							</div>
 						</div>
 					</div>
 					<div className='gifContent'>
@@ -101,40 +116,3 @@ function	HomePage() {
 }
 
 export	default HomePage
-
-// .footerLandingPage {
-// 	border: 1px solid white;
-// 	/* position: absolute; */
-// 	display: grid;
-// 	align-items: center;
-// 	justify-content: center;
-// 	/* left: 15%; */
-// 	/* bottom: 0; */
-// 	p {
-// 		color: #C4C4C4;
-// 		font-size: 1.2rem;
-// 		line-height: 30px;
-// 		width: 60rem;
-// 	}
-// 	.animation {
-// 		border: 1px solid red;
-// 		display: flex;
-// 		align-items: center;
-// 		.pallete {
-// 			width: 15px;
-// 			height: 110px;
-// 			background-color: var(--goldColor);
-// 		}
-// 		.p1 {
-// 		}
-// 		.p2 {
-// 		}
-// 		.ball {
-// 			width: 20px;
-// 			height: 20px;
-// 			border-radius: 50%;
-// 			background-color: var(--goldColor);
-// 			/* justify-content: center; */
-// 		}
-// 	}
-// }
