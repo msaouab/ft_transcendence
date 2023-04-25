@@ -1,3 +1,4 @@
+
 #frontend
 
 # Use an official Node runtime as a parent image
@@ -23,3 +24,4 @@ EXPOSE 80
 
 # Start the app
 CMD ["npm", "run",  "dev"]
+
