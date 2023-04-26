@@ -1,27 +1,13 @@
-
 #frontend
 
 # Use an official Node runtime as a parent image
-FROM node:14-alpine
+FROM node
 
 # Set the working directory to /app
-WORKDIR /app
+WORKDIR /app/
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+EXPOSE 5173
 
-# Copy the rest of the project files to the working directory
-COPY . .
-
-# Build the React app
-# RUN npm run build
-
-# Expose port 80
-EXPOSE 80
-
-# Start the app
+ENTRYPOINT [ "sh", "init.sh" ]
 CMD ["npm", "run",  "dev"]
-
