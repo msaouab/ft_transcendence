@@ -24,3 +24,4 @@ export class UserController {
         return this.userService.updateUser(id, user, PutUserDto);
     }
 }
+
