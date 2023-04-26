@@ -15,7 +15,6 @@ import { ApiTags } from "@nestjs/swagger"
 
 @ApiTags('User')
 @Controller('User')
-
 export class FriendsController {
 
     constructor(
@@ -33,4 +32,5 @@ export class FriendsController {
         const friends = await this.FriendsService.deleteFriendship(DeleteFriendshipDto, id);
         return friends;
     }
+
 }

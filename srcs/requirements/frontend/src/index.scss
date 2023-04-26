@@ -1,0 +1,34 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --goldColor: #E9D990;
+  --backColor: #1E1D19;
+  --fontColor: #FFFFFF;
+  --fontFamily: 'Oxanium';
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--fontFamily);
+  background-color: var(--backColor);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
+
+body{
+  width: 100vw;
+  height: 100vh;
+}
