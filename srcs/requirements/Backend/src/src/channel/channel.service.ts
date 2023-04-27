@@ -302,4 +302,80 @@ export class ChannelService {
             throw error;
         }
     }
+
+    async muteMember(channelId: string, dto: BannedMemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const muteMember = await this.prisma.mutedMembers.create({
+                data: {
+                    channel_id: channelId,
+                    muted_id: dto.userId,
+                    status: dto.status,
+                    status_end_time: dto.end_time
+                }
+            })
+            return muteMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+                throw new ForbiddenException("This user is already muted");
+            throw error;
+        }
+    }
+
+    async getMutedMembers(channelId: string) {
+        await this.getChannelById(channelId);
+        const mutedTab = await this.prisma.mutedMembers.findMany({
+            where: { channel_id: channelId },
+            select: { muted_id: true }
+        })
+        if (mutedTab !== null)
+            return mutedTab.map((el) => el.muted_id)
+        else
+            return []
+    }
+
+    async unmuteMember(channelId: string, dto: MemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const unmuteMember = await this.prisma.mutedMembers.delete({
+                where: {
+                    channel_id_muted_id: {
+                        muted_id: dto.userId,
+                        channel_id: channelId
+                    }
+                }
+            })
+            return unmuteMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not muted");
+            throw error;
+        }
+    }
+
+    async updateMutedMember(channelId: string, dto: BannedMemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const updateMutedMember = await this.prisma.mutedMembers.update({
+                where: {
+                    channel_id_muted_id: {
+                        muted_id: dto.userId,
+                        channel_id: channelId
+                    }
+                },
+                data: {
+                    status: dto.status,
+                    status_end_time: dto.end_time
+                }
+            })
+            return updateMutedMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not muted");
+            throw error;
+        }
+    }
 }

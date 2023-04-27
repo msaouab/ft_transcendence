@@ -87,4 +87,27 @@ export class ChannelController{
     unbanMember(@Param('id') channelId: string, @Body() dto: MemberDto) {
         return this.ChannelService.unbanMember(channelId, dto);
     }
+
+    @Post(':id/muted')
+    @UseGuards(administratorPermissionGuard)
+    muteMember(@Req() req: Request, @Param('id') channelId: string, @Body() dto: BannedMemberDto) {
+        return this.ChannelService.muteMember(channelId, dto);
+    }
+
+    @Get(':id/muted')
+    getMutedMembers(@Param('id') channelId: string) {
+        return this.ChannelService.getMutedMembers(channelId);
+    }
+
+    @Put(':id/muted')
+    @UseGuards(administratorPermissionGuard)
+    updateMutedMember(@Param('id') channelId: string, @Body() dto: BannedMemberDto) {
+        return this.ChannelService.updateMutedMember(channelId, dto);
+    }
+
+    @Delete(':id/muted')
+    @UseGuards(administratorPermissionGuard)
+    unmuteMember(@Param('id') channelId: string, @Body() dto: MemberDto) {
+        return this.ChannelService.unmuteMember(channelId, dto);
+    }
 }
