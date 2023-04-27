@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
 import { ApiTags } from "@nestjs/swagger";
-import { ChannelDto, MemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto } from "./dto";
 import { Request } from "express";
 import { log } from "console";
 import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
 import { ownerPermissionGuard } from "./guards/ownerPermission.guard";
+import { administratorPermissionGuard } from "./guards/administratorPermission.guard";
 
 @ApiTags('Channels')
 @Controller('Channels')
@@ -63,5 +64,27 @@ export class ChannelController{
     @UseGuards(ownerPermissionGuard)
     deleteAdministrator(@Param('id') channelId: string, @Body() dto: MemberDto) {
         return this.ChannelService.deleteAdministrator(channelId, dto);
+    }
+
+    @Post(':id/banned')
+    @UseGuards(administratorPermissionGuard)
+    banMember(@Param('id') channelId: string, @Body() dto: BannedMemberDto) {
+        return this.ChannelService.banMember(channelId, dto);
+    }
+    @Get(':id/banned')
+    getBannedMembers(@Param('id') channelId: string) {
+        return this.ChannelService.getBannedMembers(channelId);
+    }
+
+    @Put(':id/banned')
+    @UseGuards(administratorPermissionGuard)
+    updateBannedMember(@Param('id') channelId: string, @Body() dto: BannedMemberDto) {
+        return this.ChannelService.updateBannedMember(channelId, dto);
+    }
+
+    @Delete(':id/banned')
+    @UseGuards(administratorPermissionGuard)
+    unbanMember(@Param('id') channelId: string, @Body() dto: MemberDto) {
+        return this.ChannelService.unbanMember(channelId, dto);
     }
 }

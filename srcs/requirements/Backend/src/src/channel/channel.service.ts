@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { ChannelDto, MemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto } from "./dto";
 import { Request } from "express";
 import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -221,6 +221,84 @@ export class ChannelService {
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
                 throw new ForbiddenException("This user is not an Administrator of this channel");
+            throw error;
+        }
+    }
+
+    async banMember(channelId: string, dto: BannedMemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const banMember = await this.prisma.bannedMembers.create({
+                data: {
+                    channel_id: channelId,
+                    banned_id: dto.userId,
+                    status: dto.status,
+                    status_end_time: dto.end_time
+                }
+            })
+            await this.deleteMember(channelId, dto);
+            return banMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002")
+                throw new ForbiddenException("This user is already banned");
+            throw error;
+        }
+    }
+
+    async getBannedMembers(channelId: string) {
+        await this.getChannelById(channelId);
+        const bannedTab = await this.prisma.bannedMembers.findMany({
+            where: { channel_id: channelId },
+            select: { banned_id: true }
+        })
+        if (bannedTab !== null)
+            return bannedTab.map((el) => el.banned_id)
+        else
+            return []
+    }
+
+    async unbanMember(channelId: string, dto: MemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const unbanMember = await this.prisma.bannedMembers.delete({
+                where: {
+                    channel_id_banned_id: {
+                        banned_id: dto.userId,
+                        channel_id: channelId
+                    }
+                }
+            })
+            await this.addMember(channelId, dto, true);
+            return unbanMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not banned");
+            throw error;
+        }
+    }
+
+    async updateBannedMember(channelId: string, dto: BannedMemberDto) {
+        await this.UserService.getUser(dto.userId);
+        await this.getChannelById(channelId);
+        try {
+            const updateBannedMember = await this.prisma.bannedMembers.update({
+                where: {
+                    channel_id_banned_id: {
+                        banned_id: dto.userId,
+                        channel_id: channelId
+                    }
+                },
+                data: {
+                    status: dto.status,
+                    status_end_time: dto.end_time
+                }
+            })
+            return updateBannedMember;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
+                throw new ForbiddenException("This user is not banned");
             throw error;
         }
     }
