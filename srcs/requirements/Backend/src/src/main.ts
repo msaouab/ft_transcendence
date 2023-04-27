@@ -17,8 +17,8 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   //ejs temp front end
-  app.useStaticAssets(join('/', 'home', 'public'));
-  app.setBaseViewsDir(join('/', 'home', 'views'));
+  app.useStaticAssets(join('/', 'app', 'public'));
+  app.setBaseViewsDir(join('/', 'app', 'views'));
   app.setViewEngine('ejs');
   //end ejs
 
