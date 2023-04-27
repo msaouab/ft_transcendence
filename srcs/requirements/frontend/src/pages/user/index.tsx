@@ -1,6 +1,6 @@
-import React from "react";
+// import React from "react";
 
-const index = () => {
+const Index = () => {
   return (
     <div className="text-4xl flex justify-center items-center w-screen h-screen bg-red-50">
       user
@@ -8,4 +8,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

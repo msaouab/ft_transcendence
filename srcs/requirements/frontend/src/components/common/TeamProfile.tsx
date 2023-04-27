@@ -6,11 +6,10 @@ const TeamProfileContainer = styled.div`
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
 	gap: 2rem;
-
 	@media (max-width: 1200px) {
 		grid-template-columns: repeat(4, 1fr);
 	}
-
+	
 	@media (max-width: 992px) {
 		grid-template-columns: repeat(3, 1fr);
 	}
@@ -26,7 +25,6 @@ const TeamProfileContainer = styled.div`
 	.memberTeam {
     	display: flex;
     	flex-direction: column;
-    	justify-content: space-between;
     	padding: 1rem;
     	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 		img {

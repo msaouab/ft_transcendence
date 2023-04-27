@@ -1,21 +1,15 @@
-import { BrowserRouter } from 'react-router-dom';
-import styled from 'styled-components'
+import { Route, Routes } from 'react-router-dom';
+import AboutPage from './pages/landingPage/AboutPage';
+// import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from './pages/landingPage/LandingPage';
 
-const AppContainer = styled.div`
-`;
-
 function App() {
-
-  return (
-    // <BrowserRouter>
-      <AppContainer>
-        <div className="App">
-          <LandingPage />
-        </div>
-      </AppContainer>
-    // </BrowserRouter>
-  );
+	return (
+		<Routes>
+			<Route path='/' element={<LandingPage />} />
+			<Route path='/about' element={<AboutPage />} />
+		</Routes>
+	);
 }
 
 export default App;

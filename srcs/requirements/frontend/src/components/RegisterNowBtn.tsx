@@ -1,4 +1,5 @@
 import arrowbtn from '../assets/arrowbtn.svg';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components'
 
 const RegisterNowBtnContainer = styled.div`
@@ -24,9 +25,11 @@ const RegisterNowBtnContainer = styled.div`
 function RegisterNowBtn() {
 	return (
 		<RegisterNowBtnContainer>
-			<button>Register Now
-				<img src={arrowbtn} alt="arrow-Btn" />
-			</button>
+			<Link to="/login">
+				<button>Register Now
+					<img src={arrowbtn} alt="arrow-Btn" />
+				</button>
+			</Link>
 		</RegisterNowBtnContainer>
 	)
 }
