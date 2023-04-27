@@ -25,7 +25,7 @@ const RegisterNowBtnContainer = styled.div`
 function RegisterNowBtn() {
 	return (
 		<RegisterNowBtnContainer>
-			<Link to="/login">
+			<Link to="/">
 				<button>Register Now
 					<img src={arrowbtn} alt="arrow-Btn" />
 				</button>

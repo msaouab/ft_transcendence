@@ -1,10 +1,14 @@
-// import React from "react";
+import styled from "styled-components";
+
+const SideBarContainer = styled.div`
+`;
 
 const Index = () => {
   return (
-    <div className="text-4xl flex justify-center items-center w-screen h-screen bg-red-50">
-      user
-    </div>
+    <SideBarContainer>
+      <h1>Index</h1>
+    </SideBarContainer>
+    
   );
 };
 

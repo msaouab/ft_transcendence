@@ -1,11 +1,7 @@
 import logo from '/logo.svg'
 import styled from 'styled-components'
-import { Link, NavLink, useLocation } from 'react-router-dom';
-// import AboutPage from '../pages/landingPage/AboutPage';
-// import ContactPage from '../pages/landingPage/ContactPage';
-// import { Route, Routes } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-// import LandingPage from '../pages/landingPage/LandingPage';
 
 const NavbarContainer = styled.nav`
 	nav {
@@ -169,13 +165,13 @@ const NavBar = () => {
 		<NavbarContainer>
 			<nav className="navbar">
     			<div className="navbar-brand">
-    				<Link
+    				<NavLink
         				to="/"
         				className={activeLink === 'Home' ? 'active' : ''}
         				onClick={() => handleLinkClick('Home')}
     				>
         				<img src={logo} alt="Logo" className='logo'/>
-    				</Link>
+    				</NavLink>
         			<button
     					className={`navbar-burger burger ${showMenu ? 'is-active' : ''}`}
     					aria-label="menu"
@@ -191,11 +187,11 @@ const NavBar = () => {
     			<div id="navbarMenu" className={`navbar-menu ${showMenu ? 'is-active' : ''}`}>
         			<div className="navbar-end">
         				<NavLink to="/" className={`navbar-item ${location.pathname === '/' ? 'active' : ''}`}
-        					onClick={() => handleLinkClick('Home')}>Home</NavLink>
+        					onClick={() => handleLinkClick('Landing')}>Home</NavLink>
         			  	<NavLink to="/about" className={`navbar-item ${location.pathname === '/about' ? 'active' : '' }`}
         			    	onClick={() => handleLinkClick('About')}>About</NavLink>
-        				<NavLink to="/login" className={`navbar-item play-now-item`}
-        			    	onClick={() => handleLinkClick('Index')}>
+        				<NavLink to="/home" className={`navbar-item play-now-item`}
+        			    	onClick={() => handleLinkClick('Home')}>
 								<button className='play-now'>Play Now</button>
 						</NavLink>
         			</div>
