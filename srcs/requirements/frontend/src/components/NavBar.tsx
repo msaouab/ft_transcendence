@@ -195,7 +195,7 @@ const NavBar = () => {
         			  	<NavLink to="/about" className={`navbar-item ${location.pathname === '/about' ? 'active' : '' }`}
         			    	onClick={() => handleLinkClick('About')}>About</NavLink>
         				<NavLink to="/login" className={`navbar-item play-now-item`}
-        			    	onClick={() => handleLinkClick('Index')}>
+        			    	onClick={() => handleLinkClick('Login')}>
 								<button className='play-now'>Play Now</button>
 						</NavLink>
         			</div>

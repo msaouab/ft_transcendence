@@ -17,7 +17,8 @@ import { ApiTags } from '@nestjs/swagger';
     // })
   @Controller()
   export class AppController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService,
+      private userservice: UserService) {}
     @Get()
     @Render('home')
     home(@User() user: Profile) {
@@ -60,7 +61,7 @@ import { ApiTags } from '@nestjs/swagger';
     @Get('me')
     @UseGuards(AuthenticatedGuard)
     async me(@User() user: Profile) {
-        return user;
+        return this.userservice.getUserByEmail(user._json.email);
     }
 
 
