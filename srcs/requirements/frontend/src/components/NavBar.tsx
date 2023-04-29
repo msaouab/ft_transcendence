@@ -43,6 +43,14 @@ const NavbarContainer = styled.nav`
 					border: 1px solid var(--goldColor);
 					border-radius: 10px;
 				}
+				.play-now-item:hover {
+					border: 1px solid var(--goldColor);
+					border-radius: 7px ;
+					box-shadow: 10px 10px var(--goldColor);
+					color: white;
+					background-color: transparent;
+					transition: all 0.5s ease-in-out;
+				}
 			}
 		}
 	}
@@ -140,10 +148,9 @@ const NavbarContainer = styled.nav`
 	}
 `;
 
-
 const NavBar = () => {
 	const location = useLocation();
-	const [activeLink, setActiveLink] = useState<string>('Home');
+	const [activeLink, setActiveLink] = useState<string>('home');
 	const [showMenu, setShowMenu] = useState<boolean>(false);
 	
 	useEffect(() => {
@@ -156,7 +163,6 @@ const NavBar = () => {
 	useEffect(() => {
 		localStorage.setItem('activeLink', activeLink);
 	}, [activeLink]);
-
 	const handleLinkClick = (link: string) => {
 		setActiveLink(link);
 		setShowMenu(false);
