@@ -1,25 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNotEmpty, IsString } from "class-validator"
+import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator"
 
-enum ChannelStatus{
-    Public="Public",
-    Private="Private",
-    Secret ="Secret"
+enum ChannelStatus {
+    Public = "Public",
+    Private = "Private",
+    Secret = "Secret"
 }
 
-export class ChannelDto{
+export class ChannelDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
     name: string
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
+    @IsEnum(ChannelStatus)
     status: ChannelStatus
 
     @ApiProperty()
-    password?: string
+    @ValidateIf((o) => o.status === ChannelStatus.Secret)
+    @IsString()
+    @IsNotEmpty()
+    password: string
+
     @ApiProperty()
-    limitUsers?: number
+    limitUsers: number
 }

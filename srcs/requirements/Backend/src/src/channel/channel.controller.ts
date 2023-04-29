@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
 import { ApiTags } from "@nestjs/swagger";
-import { BannedMemberDto, ChannelDto, MemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
 import { Request } from "express";
 import { log } from "console";
 import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
@@ -33,7 +33,7 @@ export class ChannelController{
     
     @Post(':id/members')
     // @UseGuards(AuthenticatedGuard)
-    addMember(@Param('id') channelId: string, @Body() dto: MemberDto){
+    addMember(@Param('id') channelId: string, @Body() dto: JoinMemberDto){
         return this.ChannelService.addMember(channelId, dto)
     }
     

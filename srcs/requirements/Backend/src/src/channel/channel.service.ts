@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { BannedMemberDto, ChannelDto, MemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
 import { Request } from "express";
 import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -21,7 +21,8 @@ export class ChannelService {
             const channel = await this.prisma.channel.create({
                 data:{
                     name: dto.name,
-                    chann_type: "Public",
+                    chann_type: dto.status,
+                    password: dto.password,
                     owner_id: userId,
                     limit_members: -1
                 }
@@ -91,10 +92,12 @@ export class ChannelService {
         }
     }
 
-    async addMember(channelId: string, dto: MemberDto, addChannel: boolean = true) {
+    async addMember(channelId: string, dto: JoinMemberDto, addChannel: boolean = true) {
         await this.UserService.getUser(dto.userId);
         const channel = await this.getChannelById(channelId);
         try {
+            if (channel.chann_type === "Secret" && channel.password !== dto.password)
+                throw new ForbiddenException("Wrong password");
             const memberTab = await this.prisma.membersTab.create({
                 data:{
                     member_id: dto.userId,
@@ -191,7 +194,7 @@ export class ChannelService {
 
     async deleteAdministrator(channelId: string, dto: MemberDto) {
         await this.UserService.getUser(dto.userId);
-        await this.getChannelById(channelId);
+        const channel = await this.getChannelById(channelId);
         try {
             const deleteAdmin = await this.prisma.adminMembers.delete({
                 where: {
@@ -216,7 +219,7 @@ export class ChannelService {
             } catch (error) {
                 throw new ForbiddenException("Update role from Admin to Member failed");
             }
-            this.addMember(channelId, dto, false);
+            this.addMember(channelId, {userId: dto.userId, password: channel.password}, false);
             return deleteAdmin;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
@@ -260,7 +263,7 @@ export class ChannelService {
 
     async unbanMember(channelId: string, dto: MemberDto) {
         await this.UserService.getUser(dto.userId);
-        await this.getChannelById(channelId);
+        const channel = await this.getChannelById(channelId);
         try {
             const unbanMember = await this.prisma.bannedMembers.delete({
                 where: {
@@ -270,7 +273,7 @@ export class ChannelService {
                     }
                 }
             })
-            await this.addMember(channelId, dto, true);
+            await this.addMember(channelId, { userId: dto.userId, password: channel.password }, true);
             return unbanMember;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
