@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Logo from '/logo.svg'
 import {Home, Chat , Game, Settings, Profile, Logout} from '../../assets/icons'
 
-const	SideBarContainer = styled.div<{ width?: number }>`
+const	SideBarContainer = styled.div<{ width?: number; isSidebarOpen: boolean }>`
 	background-color: #504A4A;
 	width: 80px;
 	position: absolute;
@@ -23,7 +23,7 @@ const	SideBarContainer = styled.div<{ width?: number }>`
 	transition: width 0.5s ease-in-out;
 `;
 
-const LogoContainer = styled.div`
+const LogoContainer = styled.div<{ isSidebarOpen: boolean }>`
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -35,24 +35,30 @@ const LogoContainer = styled.div`
 `;
 
 const SideBarMenu = styled.div<{ width?: number }>`
+	margin-top: 2rem;
 	display: flex;
 	justify-content: space-evenly;
+	align-items: center;
 	${props => props.width && `width: ${props.width}px;`}
+	padding: 10px 0;
+	border-radius: 3px;
+	background-color: #5b5656;
+	cursor: pointer;
+	&:hover {
+		background-color: #494343;
+	}
 	& > .menu {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		width: 30px;
 		height: 20px;
-		cursor: pointer;
-		transition: transform 0.5s ease-in-out;
-		cursor: pointer;
+		transition: transform 0.1s ease-in-out;
 		& > span {
 			width: 30px;
 			height: 3px;
 			background-color: white;
 			border-radius: 3px;
-			transition: transform 0.5s ease-in-out;
+			transition: transform 0.1s ease-in-out;
 		}
 	}
 	.activeMenu .bar1 {
@@ -72,9 +78,18 @@ const SideBarMenu = styled.div<{ width?: number }>`
 		display: block;
 		color: white;
 	}
+	@media (max-width: 768px) {
+		border: 1px solid white;
+		width: 40px;
+		margin-top: 0;
+		& > .show {
+			display: none;
+		}
+	}
 `;
 
-const IconsContainer = styled.div<{ width?: number }>`
+const IconsContainer = styled.div<{ width?: number; isSidebarOpen: boolean }>`
+	margin-top: -5rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -168,12 +183,15 @@ const LogoutContainer = styled.div<{ width?: number }>`
 		background-color: #494343;
 		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.75);
 	}
+	@media (max-width: 768px) {
+	}
 `;
 
 const SideBar = () => {
 	const [activeLink, setActiveLink] = useState<string>('home');
 	const [activeMenu, setActiveMenu] = useState<boolean>(false);
 	const [sidebarWidth, setSidebarWidth] = useState<number>(80);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const location = useLocation();
 
 	useEffect(() => {
@@ -195,22 +213,32 @@ const SideBar = () => {
 		setActiveMenu(!activeMenu);
 		setSidebarWidth(prevWidth => prevWidth === 80 ? 240 : 80);
 	};
+	const handleToggleSidebar = () => {
+		setIsSidebarOpen(!isSidebarOpen);
+	};
 
 	return (
-		<SideBarContainer width={sidebarWidth}>
-			<LogoContainer className='iconContainer'>
+		<SideBarContainer width={sidebarWidth} isSidebarOpen={isSidebarOpen}>
+			<LogoContainer className='iconContainer' isSidebarOpen={isSidebarOpen}>
 				<Link to="/home" className=' iconLogo'><img src={Logo} alt="Logo" className='logo'/></Link>
-				<SideBarMenu width={sidebarWidth}>
-					<div className={`menu ${activeMenu ? 'activeMenu' : ''}`}
-						onClick={handleMenuClick}>
-						<span className="bar1"></span>
-						<span className="bar2"></span>
-						<span className="bar3"></span>
+				<SideBarMenu width={sidebarWidth === 240 ? 180 : 40} onClick={() => {
+					handleMenuClick();
+					handleToggleSidebar();
+				}}>
+					<div className={`menu ${activeMenu ? 'activeMenu' : ''}`}>
+						<span className={isSidebarOpen ? "bar1 activeMenu" : "bar1"}></span>
+						<span className={isSidebarOpen ? "bar2 activeMenu" : "bar2"}></span>
+						<span className={isSidebarOpen ? "bar3 activeMenu" : "bar3"}></span>
 					</div>
 					<p className={`${sidebarWidth >= 200 ? 'show' : 'hide'}`}>Task Manager</p>
 				</SideBarMenu>
 			</LogoContainer>
-			<IconsContainer className='iconContainer' width={`${sidebarWidth == 240 ? 200 : 80}`}>
+			<IconsContainer className='iconContainer' width={sidebarWidth} isSidebarOpen={isSidebarOpen}>
+				{/* <div className="menu" onClick={handleToggleSidebar}>
+					<span className={isSidebarOpen ? "bar1 activeMenu" : "bar1"}></span>
+					<span className={isSidebarOpen ? "bar2 activeMenu" : "bar2"}></span>
+					<span className={isSidebarOpen ? "bar3 activeMenu" : "bar3"}></span>
+				</div> */}
 				<Link to="/home"
 					className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'} ${location.pathname === '/home' ? 'active' : ''}`}
 					onClick={() => handleClick('home')}>
@@ -237,7 +265,7 @@ const SideBar = () => {
 					<Settings /><span>Setting</span>
 				</Link>
 			</IconsContainer>
-			<LogoutContainer className='iconContainer' width={`${sidebarWidth == 240 ? 200 : 80}`}>
+			<LogoutContainer className='iconContainer' width={sidebarWidth}>
 				<Link to="/" className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'}`}><Logout/><span>Logout</span></Link>
 			</LogoutContainer>
 		</SideBarContainer>
