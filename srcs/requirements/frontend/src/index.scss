@@ -1,7 +1,17 @@
 /* src/index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+// import tailwind
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 
 :root {
   --goldColor: #E9D990;
@@ -21,16 +31,24 @@ body {
   background-color: var(--backColor);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  
-}
 
 body{
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  
+}
+
+.debug {
+  border: 1px solid red;
+  &* {
+    border: 1px solid rgb(38, 144, 0);
+    &* {
+      border: 1px solid rgb(0, 0, 255);
+      &* {
+        border: 1px solid rgb(255, 0, 200);
+      }
+    }
+  }
+
 }
