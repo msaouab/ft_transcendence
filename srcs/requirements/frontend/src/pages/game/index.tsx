@@ -1,8 +1,9 @@
+import { Outlet } from "react-router-dom"
 
 const index = () => {
   return (
-	<div className=''>
-    
+	<div className='w-full h-full '>
+    <Outlet />
   </div>
   )
 }

@@ -40,13 +40,12 @@ const index = () => {
             <MdOutlineNotifications className="text-4xl text-white font-bold" />
           </div>
           <div className="user flex justify-center items-center">
-            <FaUserCircle className="text-4xl text-white font-bold" />
-            <BsChevronDown className="text-xl text-white font-bold" />
+            <FaUserCircle className="text-4xl text-white font-bold mr-1" />
+            <BsChevronDown className="text-xl text-[#A6A6A6] font-bold" />
           </div>
         </div>
         <div className="content debug h-[90%]">
           <Outlet />
-          {console.log("outlet", <Outlet />)}
         </div>
       </div>
     </LayoutStyle>
