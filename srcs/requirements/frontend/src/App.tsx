@@ -1,14 +1,23 @@
 import { Route, Routes } from 'react-router-dom';
 import AboutPage from './pages/landingPage/AboutPage';
-// import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from './pages/landingPage/LandingPage';
+// import SideBar from './components/common/SideBar';
+import styled from 'styled-components';
+import TableGame from './pages/game/TableGame';
+
+const AppContainer = styled.div`
+`;
 
 function App() {
 	return (
-		<Routes>
-			<Route path='/' element={<LandingPage />} />
-			<Route path='/about' element={<AboutPage />} />
-		</Routes>
+		<AppContainer>
+
+			<Routes>
+				<Route path='/' element={<LandingPage />} />
+				<Route path='/about' element={<AboutPage />} />
+				<Route path='/game' element={<TableGame />} />
+			</Routes>
+		</AppContainer>
 	);
 }
 
