@@ -53,7 +53,6 @@ const LoginContainer = styled.div`
 				div {
 					display: inline-block;
 					vertical-align: middle;
-					/* margin-left: -10rem; */
     				height: auto;
     				position: relative;
 				}
@@ -186,7 +185,7 @@ function	LoginPage() {
 			</div>
 			<div className='whiteBoard'>
 				<img src={logoBlack} alt="Logo" className='logo'/>
-				<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}>
+				{/* <Link to="localhost:3000/api/v1/login/42" className={`ftauth`}> */}
 					<a href="localhost:3000/api/v1/login/42" target="_blank" rel="noreferrer">
 					<div className='ftbutton'>
 
@@ -196,18 +195,19 @@ function	LoginPage() {
 							</div>
 					</div>
 					</a>
-				</Link>
+				{/* </Link> */}
 				<div className='prvs'>
 					<Link to="/" className="previous">&laquo; </Link>
 					<p>Go Back</p>
 				</div>
 				<div className='terms'>
-					<p>By continuing, you agree to our <a href="https://www.42.fr/en/privacy-policy/" target="_blank" rel="noreferrer">
+					<p>By continuing, you agree to our <a href="https://42.fr/en/tos/" target="_blank" rel="noreferrer">
 						Terms of Service</a> and <a href="https://www.42.fr/en/privacy-policy/" target="_blank" rel="noreferrer">
-						Privacy Policy</a></p>
-						<div className="rectangle"></div>
-						<p>NOT ON PONG YET?</p>
-						<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}
+						Privacy Policy</a>
+					</p>
+					<div className="rectangle"></div>
+					<p>NOT ON PONG YET?</p>
+					<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}
         				onClick={() => handleLinkClick('localhost:3000/api/v1/login/42')}>
 							SIGN UP NOW!
 					</Link>

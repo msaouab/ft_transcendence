@@ -43,7 +43,6 @@ import { ApiTags } from '@nestjs/swagger';
       return { user };
     }
     @Get('logout')
-    @Redirect('/api/v1/')
     logOut(@Req() req: Request, @User() user: Profile, @Res() res: Response) {
         req.logout(function(err) {
             { return; }

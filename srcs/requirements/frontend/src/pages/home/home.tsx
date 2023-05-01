@@ -1,9 +1,13 @@
+import SideBar from "../../components/common/SideBar";
 import Ldata from "../loginPage/datalogin";
 
 const Home = () => {
 
   return (
-    <Ldata></Ldata>
+    <div>
+      <SideBar></SideBar>
+      <Ldata></Ldata>
+    </div>
   );
 };
 

@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+// import { History} from "history"
 
 const LdataContainer = styled.div`
     .spinner {
@@ -30,35 +32,35 @@ function	Ldata() {
 		lastName: '',
 		status: '',
 	});
-
-	const [ip,setIP] = useState('');
-    
-    //creating function to load ip address from the API
-    const getData = async()=>{
-        const res = await axios.get('https://geolocation-db.com/json/')
-        console.log(res.data);
-        setIP(res.data.IPv4)
-		console.log("IP: ", ip);
-    }
+	const navigate = useNavigate();
     
 
 	useEffect(() => {
 		setLoading(true);
         const apiUrl = 'http://localhost:3000/api/v1/me'
-        axios.get(apiUrl, {
-         withCredentials: true,
-        })
-         .then(response => {
-            printData(response.data);
-			setLoading(false);
-           console.log(response.data);
-         })
-         .catch(error => {
-			setLoading(false);
-           console.error(error);
-		})
-		getData();
-	}, []);
+		async function fetchData() {
+		try {
+			await axios.get(apiUrl, {
+        	 withCredentials: true,
+        	})
+			.then(response => {
+				if (response.statusText) {
+					printData(response.data);
+				}
+				setLoading(false);;
+			})
+			.catch(error => {
+			   setLoading(false);
+			   if (error.response.status == 401) {
+				   navigate('/login');
+				 }
+			})
+		} catch (error) {
+			console.log(error);
+		}
+	}
+	fetchData();
+		}, []);
 
 	return (
 		<LdataContainer className='l'>
