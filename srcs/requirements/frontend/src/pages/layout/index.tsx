@@ -24,7 +24,7 @@ const index = () => {
     <LayoutStyle>
       <div className="side-bar"></div>
       <div className="main-content">
-        <div className="header flex justify-end debug gap-8 items-center debug h-[10%]">
+        <div className="header flex justify-end  gap-8 items-center  h-[10%]">
           <div className="search">
             <CustomInput
               placeHolder="Search"
@@ -44,7 +44,7 @@ const index = () => {
             <BsChevronDown className="text-xl text-[#A6A6A6] font-bold" />
           </div>
         </div>
-        <div className="content debug h-[90%]">
+        <div className="content  h-[90%]">
           <Outlet />
         </div>
       </div>

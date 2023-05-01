@@ -12,6 +12,8 @@
   box-sizing: border-box;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200;300;400;500;600;700;800&family=Ubuntu:wght@300;400;500;700&display=swap');
+
 
 :root {
   --goldColor: #E9D990;
@@ -27,8 +29,9 @@
 }
 
 body {
-  font-family: var(--fontFamily);
-  background-color: var(--backColor);
+  font-family: 'Oxanium', cursive;
+// font-family: 'Ubuntu', sans-serif;
+  // background-color: var(--backColor);
 }
 
 
@@ -40,15 +43,11 @@ body{
 }
 
 .debug {
-  border: 1px solid red;
-  &* {
-    border: 1px solid rgb(38, 144, 0);
-    &* {
-      border: 1px solid rgb(0, 0, 255);
-      &* {
-        border: 1px solid rgb(255, 0, 200);
-      }
+  border: 1px solid red !important;
+  & * {
+    border: 1px solid green !important;
+    & * {
+      border: 1px solid blue !important;
     }
   }
-
 }
