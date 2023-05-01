@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 import Logo from '/logo.svg'
 import {Home, Chat , Game, Settings, Profile, Logout} from '../../assets/icons'
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const	SideBarContainer = styled.div<{ width?: number; isSidebarOpen: boolean }>`
 	background-color: #504A4A;
@@ -193,6 +195,7 @@ const SideBar = () => {
 	const [sidebarWidth, setSidebarWidth] = useState<number>(80);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const location = useLocation();
+	// function log
 
 	useEffect(() => {
 		const storedLink = localStorage.getItem('activeLink');
@@ -216,6 +219,27 @@ const SideBar = () => {
 	const handleToggleSidebar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};
+	const navigate = useNavigate();
+	const handleLogout = () => {
+		async function logout() {
+			const apiUrl = 'http://localhost:3000/api/v1/logout';
+			try {
+				await axios.get(apiUrl, { withCredentials: true })
+				.catch(error => {
+					if (error.response.status == 401) {
+				   navigate('/login');
+				}
+				})
+			} catch (error) {
+				console.log(error);
+			}
+		}
+		logout();
+	};
+
+
+
+
 
 	return (
 		<SideBarContainer width={sidebarWidth} isSidebarOpen={isSidebarOpen}>
@@ -266,7 +290,9 @@ const SideBar = () => {
 				</Link>
 			</IconsContainer>
 			<LogoutContainer className='iconContainer' width={sidebarWidth}>
-				<Link to="/" className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'}`}><Logout/><span>Logout</span></Link>
+				<Link to="/login" className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'}`}
+				onClick={() => handleLogout()}
+				><Logout/><span>Logout</span></Link>
 			</LogoutContainer>
 		</SideBarContainer>
 	)

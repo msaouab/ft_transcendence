@@ -10,33 +10,42 @@ export class AuthService {
     constructor(private prisma: PrismaService) { }
 
     async signup(user, res) {
-        const find_user = await this.prisma.user.findUnique({
-            where: {
-                login: user.username,
-            },
-        })
-        if (find_user) {
-            return find_user;
+        try {
+            const find_user = await this.prisma.user.findUnique({
+                where: {
+                    login: user.username,
+                    email: user._json.email,
+                },
+            })
+            if (find_user) {
+                return this.login(user,res);
+            }
+            const createUser = await this.prisma.user.create({
+                data: {
+                    login: user.username,
+                    email:  user._json.email,
+                    firstName:  user.name.givenName,
+                    lastName:  user.name.familyName,
+                    password: 'create',
+                    avatar: './public/default.png',
+                    status: 'Online',
+                },
+            })
+
         }
-        const createUser = await this.prisma.user.create({
-            data: {
-                login: user.username,
-                email:  user._json.email,
-                firstName:  user.name.givenName,
-                lastName:  user.name.familyName,
-                password: 'create',
-                avatar: './public/default.png',
-                status: 'Offline',
-            },
-        })
-        
+        catch (e) {
+            console.log(e);
+        }
         return this.login(user,res);
     }
 
     async logout(user,res) {
+        if (!user)
+            throw new NotFoundException('User not found');
+        try {
         const find_user = await this.prisma.user.findUnique({
             where: {
-                login: user.username,
+                email: user._json.email,
             },
         })
         if (find_user) {
@@ -51,51 +60,66 @@ export class AuthService {
             res.clearCookie('id');
             return updateUser;
         }
+        }
+        catch (e) {
+            console.log(e);
+        }
+        
     }
 
     async login(user, res) {
-        const find_user = await this.prisma.user.findUnique({
-            where: {
-                login: user.username,
-            },
-        })
-        if (find_user) {
-            const updateUser = await this.prisma.user.update({
+        try {
+            const find_user = await this.prisma.user.findUnique({
                 where: {
-                    id: find_user.id,
-                },
-                data: {
-                    status: 'Online',
-                    password: 'update',
+                    email: user._json.email,
                 },
             })
-            res.cookie('id', find_user.id, {
-                httpOnly: true,
-                secure: false,
-            })
-        
-            return updateUser;
-        }
+            if (find_user) {
+                const updateUser = await this.prisma.user.update({
+                    where: {
+                        id: find_user.id,
+                    },
+                    data: {
+                        status: 'Online',
+                        password: 'update',
+                    },
+                })
+                res.cookie('id', find_user.id, {
+                    httpOnly: true,
+                    secure: false,
+                })
+            
+                return updateUser;
+            }
 
-        else {
-            return this.signup(user,res);
+            else {
+                return this.signup(user,res);
+            }
+        }
+        catch (e) {
+            console.log(e);
         }
     }
 
     async delete(user,res) {
-        const find_user = await this.prisma.user.findUnique({
-            where: {
-                login: user.username,
-            },
-        })
-        if (find_user) {
-            const deleteUser = await this.prisma.user.delete({
+        try  {
+            const find_user = await this.prisma.user.findUnique({
                 where: {
-                    id: find_user.id,
+                    email: user._json.email,
                 },
             })
-            res.clearCookie('id');
-            // return deleteUser;
+            if (find_user) {
+                const deleteUser = await this.prisma.user.delete({
+                    where: {
+                        id: find_user.id,
+                    },
+                })
+                res.clearCookie('id');
+                // return deleteUser;
+            }
+        }
+        catch (e) {
+            console.log(e);
         }
     }
     
