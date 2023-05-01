@@ -13,6 +13,7 @@ export class AuthService {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
+                //add emal later
             },
         })
         if (find_user) {

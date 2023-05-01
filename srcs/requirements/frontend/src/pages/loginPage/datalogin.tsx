@@ -31,6 +31,17 @@ function	Ldata() {
 		status: '',
 	});
 
+	const [ip,setIP] = useState('');
+    
+    //creating function to load ip address from the API
+    const getData = async()=>{
+        const res = await axios.get('https://geolocation-db.com/json/')
+        console.log(res.data);
+        setIP(res.data.IPv4)
+		console.log("IP: ", ip);
+    }
+    
+
 	useEffect(() => {
 		setLoading(true);
         const apiUrl = 'http://localhost:3000/api/v1/me'
@@ -46,6 +57,7 @@ function	Ldata() {
 			setLoading(false);
            console.error(error);
 		})
+		getData();
 	}, []);
 
 	return (
