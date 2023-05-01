@@ -17,7 +17,8 @@ import { ApiTags } from '@nestjs/swagger';
     // })
   @Controller()
   export class AppController {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService,
+      private userservice: UserService) {}
     @Get()
     @Render('home')
     home(@User() user: Profile) {
@@ -42,7 +43,6 @@ import { ApiTags } from '@nestjs/swagger';
       return { user };
     }
     @Get('logout')
-    @Redirect('/api/v1/')
     logOut(@Req() req: Request, @User() user: Profile, @Res() res: Response) {
         req.logout(function(err) {
             { return; }
@@ -60,7 +60,7 @@ import { ApiTags } from '@nestjs/swagger';
     @Get('me')
     @UseGuards(AuthenticatedGuard)
     async me(@User() user: Profile) {
-        return user;
+        return this.userservice.getUserByEmail(user._json.email);
     }
 
 

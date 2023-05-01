@@ -1,23 +1,17 @@
 import { Route, Routes } from 'react-router-dom';
 import AboutPage from './pages/landingPage/AboutPage';
 import LandingPage from './pages/landingPage/LandingPage';
-// import SideBar from './components/common/SideBar';
-import styled from 'styled-components';
-import TableGame from './pages/game/TableGame';
-
-const AppContainer = styled.div`
-`;
+import LoginPage from './pages/loginPage/LoginPage';
+import Home from './pages/home/home';
 
 function App() {
 	return (
-		<AppContainer>
-
-			<Routes>
-				<Route path='/' element={<LandingPage />} />
-				<Route path='/about' element={<AboutPage />} />
-				<Route path='/game' element={<TableGame />} />
-			</Routes>
-		</AppContainer>
+		<Routes>
+			<Route path='/' element={<LandingPage />} />
+			<Route path='/about' element={<AboutPage />} />
+			<Route path='/login' element={<LoginPage />} />
+			<Route path='/home' element={<Home />} />
+		</Routes>
 	);
 }
 
