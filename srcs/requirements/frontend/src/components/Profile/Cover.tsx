@@ -6,7 +6,6 @@ import avatar from '../../../public/default.png'
 import cover from '../../../public/cover.jpg'
 import WebFont from 'webfontloader';
 import {Joystick} from '../../assets/icons'
-// import { History} from "history"
 
 const CoverContainer = styled.div`
     background-image: url(${cover});
@@ -14,6 +13,8 @@ const CoverContainer = styled.div`
     background-position: center;
     display: grid;
     grid-template-columns: 1fr 4fr 1fr;
+    border-radius: 1rem;
+
 
     .spinner {
   		width: 50px;
@@ -28,21 +29,7 @@ const CoverContainer = styled.div`
 			transform: rotate(360deg);
 		}
 	}
-    /* .PP{
-        display: grid;
-        grid-template-rows: 1fr;
-        grid-template-columns: 5fr 1fr;
-        
-    } */
     .PP {
-
-        /* border-radius: 50%;
-        /* width: 20rem;
-        height: 20rem; 
-        border: 1px solid #726969;
-        box-sizing: content-box; */
-        /* position: relative; */
-        border: 1px solid red;
         width: 20rem;
         margin: 2rem;
     .avatar {
@@ -50,26 +37,18 @@ const CoverContainer = styled.div`
         width: 100%;
         height: auto;
         border-radius: 50%;
-        border: 3px solid black;
         box-sizing: border-box;
-        /* display: flex; */
+
 
     }
     .circle {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        /* grid-template-columns: auto; */
-        /* justify-self: end;
-        justify-content: end; */
         position:absolute;
-        top: 19.1rem;
+        top: 23.5rem;
         left: 24rem;
-        /* margin-left: 20rem;
-        margin-top: -6rem; */
-        border: 1px solid aqua;
         z-index: 1;
-        /* align-items: center; */
         .circle-outgame {
             display: none;
         }
@@ -89,6 +68,12 @@ const CoverContainer = styled.div`
     }
     .InGame {
         background-color: purple;
+        .joystick{
+            position: absolute;
+            top: 4px;
+            left: 5px;
+
+        }
     }
     .user-name {
         padding: 2rem;
@@ -105,6 +90,7 @@ const CoverContainer = styled.div`
 	}
     .status {
         padding-top: 2rem;
+        padding-bottom: 1rem;
         text-align: center;
         justify-content: center;
     }
@@ -112,7 +98,7 @@ const CoverContainer = styled.div`
 
 function	Cover() {
     const [loading, setLoading] = useState(true);
-    const [OnlineStat, setOnlineStat] = useState('Online');
+
 	const [user, printData] = useState({
         id: '',
 		login: '',
@@ -168,7 +154,9 @@ function	Cover() {
                                 <div className={`
                                     ${user.status == 'InGame' ? 'circle-ingame' : 'circle-outgame'}
                                 `}>
-                                    <Joystick />
+                                    <div className="joystick">
+                                         <Joystick />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -177,8 +165,8 @@ function	Cover() {
                             {/* <b>aka</b> */}
 						    <p>{user.login}</p>
                         </div>
-						<p>{user.id}</p>
-                        <p className="status">{user.status}</p>
+						{/* <p>{user.id}</p> */}
+                        <p className="status">MASTER</p>
 					</>
 				)
 			}
