@@ -41,6 +41,8 @@ const users = [
 ]
 
 
+
+
 class FriendshipInvites {
     id: string;
     sender_id: string;

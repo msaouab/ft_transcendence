@@ -4,7 +4,7 @@ import SideBar from "../../components/common/SideBar";
 import Cover from "../../components/Profile/Cover";
 import GameHistory from "../../components/Profile/GameHistory";
 import Achievements from "../../components/Profile/Achievements";
-import FriendsList from "../../components/Profile/FriendsList";
+import Friends from "../../components/Profile/Friends";
 
 const ProfileContainer = styled.div`
   display: grid;
@@ -62,7 +62,7 @@ const Profile = () => {
           </div>
         <div className="AchievsAndFriends">
             <Achievements></Achievements>
-            <FriendsList></FriendsList>
+            <Friends></Friends>
         </div>
     </div>
     </ProfileContainer>

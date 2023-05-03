@@ -24,5 +24,10 @@ export class UserController {
         return this.userService.updateUser(id, user, PutUserDto);
     }
 
+    @Get(':id/rankData')
+    @UseGuards(AuthenticatedGuard)
+    getRankData(@Param('id') id: string) {
+        return this.userService.getRankData(id);
+    }
 
 }
