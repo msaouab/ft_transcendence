@@ -1,5 +1,4 @@
-import React from "react";
-import { ReusableCardStyle } from "./Profile";
+import { ReusableCardStyle } from "./Home";
 
 const chalenger = [
   {

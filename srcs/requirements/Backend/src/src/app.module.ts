@@ -6,12 +6,15 @@ import { configValidationSchema } from './config.schema';
 import { AuthModule, } from './auth/auth.module';
 import { InvitesModule } from './invites/invites.module';
 import { UserModule } from './user/user.module';
+import { GameModule } from './game/game.module';
 //Contollers
 import { AppController } from './app.controller';
 import { UserController } from './user/user.controller';
+import { GameController } from './game/game.controller';
 //services
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
+import { GameService } from './game/game.service';
 
 
 @Module({
@@ -23,12 +26,12 @@ import { UserService } from './user/user.service';
     PrismaModule,
     UserModule,
     AuthModule,
-    InvitesModule],
+    InvitesModule,
+    GameModule
+  ],
 
-    controllers: [AppController, UserController],
-    providers: [AuthService, UserService],
+    controllers: [AppController, UserController, GameController],
+    providers: [AuthService, UserService, GameService],
 
 })
 export class AppModule { }
-
-

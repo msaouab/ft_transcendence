@@ -64,7 +64,6 @@ services:
     depends_on:
       - Backend
 
-
   adminer:
     image: adminer
     container_name: adminer

@@ -9,8 +9,6 @@ ED = \033[0m
 all: credit env up
 # all: env up
 
-
-
 credit:
 	@echo "${GREEN}"
 	@echo "███████╗████████╗  ████████╗██████╗  █████╗ ███╗   ██╗███████╗ ██████╗███████╗███╗   ██╗███████╗ ███████╗███╗   ██╗ ██████╗███████╗"
@@ -22,7 +20,6 @@ credit:
 	@echo "╔═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗"
 	@echo "║████████████████████████████████████ ${bold}${GREEN}created-by: ${BLUE}{msaouab}{iqessam}{ichoukri}{ren-nasr}{mbehhar}${ED} ████████████████████████████████║"
 	@echo "╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"
-
 
 env:
 	@mkdir -p ./srcs/requirements/db
@@ -37,7 +34,6 @@ up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
 	@cd srcs && docker-compose up -d --build
 
-
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
 	@docker stop nest postgres adminer || true
@@ -50,13 +46,11 @@ clean: stop
 	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
 	@docker rm nest postgres adminer || true
 
-
 fclean: clean
 	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"
 	@cd srcs && docker-compose down || true 
 	@rm -rf ./srcs/requirements/db || true
 	@rm -rf ./srcs/.env || true
 	@rm -rf ./srcs/requirements/Backend/src/.env || true
-
 
 re: fclean all

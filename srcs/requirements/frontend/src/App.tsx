@@ -3,12 +3,13 @@ import AboutPage from "./pages/landingPage/AboutPage";
 // import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from "./pages/landingPage/LandingPage";
 import Game from "./pages/game";
-import Gameprofile from "./pages/game/Profile";
+import Home from "./pages/game/Home";
 import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";
 import { useState } from "react";
 import { MdDoubleArrow } from "react-icons/md";
+// import { ReactComponent as SearchIcon } from '../src/assets/icons/searchIcon.svg'
 
 function App() {
   const [bgColor, setBgColor] = useState("#1E1D19");
@@ -25,6 +26,7 @@ function App() {
   return (
     <>
       <GlobalStyle background={bgColor} textColor={textColor} />
+      {/* <SearchIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl" /> */}
       <div
         className={`absolute w-[35rem] rounded-lg text-white bg-slate-400 flex items-center gap-3 p-2 ${
           isPaletteOpen ? "left-0" : "left-[-32rem] "
@@ -55,12 +57,11 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="" element={<Layout />}>
-          <Route path="/game" element={<Game />}>
-            <Route path="/game/profile" element={<Gameprofile />} />
-            <Route path="/game/dashboard" element={<GameDashboard />} />
-          </Route>
-          
-          
+          <Route path="/home" element={<Home />} />
+          <Route path="/game" element={<GameDashboard />} />
+          {/* <Route path="/game" element={<Game />}> */}
+          {/* <Route path="/profile" element={<Gameprofile />} /> */}
+          {/* </Route> */}
         </Route>
       </Routes>
     </>

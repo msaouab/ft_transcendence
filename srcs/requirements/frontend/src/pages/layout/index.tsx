@@ -6,6 +6,7 @@ import { BiSearch } from "react-icons/bi";
 import { MdOutlineNotifications } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { BsChevronDown } from "react-icons/bs";
+import SideBar from "../../components/common/SideBar";
 
 const index = () => {
   const LayoutStyle = styled.div`
@@ -22,8 +23,8 @@ const index = () => {
 
   return (
     <LayoutStyle>
-      <div className="side-bar">
-        
+      <div className="side-bar ">
+        <SideBar />
       </div>
       <div className="main-content">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]">

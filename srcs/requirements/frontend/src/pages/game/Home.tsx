@@ -45,7 +45,7 @@ padding: 1rem;
   }
 `;
 
-const Profile = () => {
+const Home = () => {
   return (
     <div className="w-full h-full flex flex-col justify-between">
       <ReusableCardStyle className="profile-card    w-[35rem] min-h-[12rem] ">
@@ -82,4 +82,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default Home;
