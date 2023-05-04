@@ -27,7 +27,7 @@ function App() {
       <GlobalStyle background={bgColor} textColor={textColor} />
       <div
         className={`absolute w-[35rem] rounded-lg text-white bg-slate-400 flex items-center gap-3 p-2 ${
-          isPaletteOpen ? "left-0" : "left-[-33rem]"
+          isPaletteOpen ? "left-0" : "left-[-32rem] "
         } transition-all ease-in-out duration-300`}
       >
         <p>choose bg color</p>
@@ -59,6 +59,8 @@ function App() {
             <Route path="/game/profile" element={<Gameprofile />} />
             <Route path="/game/dashboard" element={<GameDashboard />} />
           </Route>
+          
+          
         </Route>
       </Routes>
     </>

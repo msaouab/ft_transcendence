@@ -22,7 +22,9 @@ const index = () => {
 
   return (
     <LayoutStyle>
-      <div className="side-bar"></div>
+      <div className="side-bar">
+        
+      </div>
       <div className="main-content">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]">
           <div className="search">
