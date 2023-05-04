@@ -28,6 +28,7 @@ export class UserController {
     @UseGuards(AuthenticatedGuard)
     getRankData(@Param('id') id: string) {
         return this.userService.getRankData(id);
+        
     }
 
 }

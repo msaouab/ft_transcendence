@@ -29,7 +29,9 @@ const AchievementsContainer = styled.div`
 	}
 	
 	.one {
-		height: 10rem;
+		/* height: 10rem; */
+		overflow-y: scroll; 
+	 min-height: 25rem;
 	}
 	
 	`;
@@ -74,6 +76,7 @@ const AchivementCard = styled.div`
 	.achv {
 		display: grid;
 		grid-template-columns: 1fr 7fr;
+
 		/* display: flex;
 		flex-direction: column;
 		justify-content: space-between; */
@@ -144,10 +147,10 @@ function	Achievements() {
 
 	return (
 		<AchievementsContainer className='Achievementsctnr'>
-			<div className="one">
+			<div className="one ">
 			{Achivements.map((achivement, index) => (
 			<AchivementCard  key={index}>
-				<div className="achv">
+				<div className="achv debug" >
             		<div className="logo">
 						<img src={avatar} alt="Avatar" className="avatar"/>
 					</div>

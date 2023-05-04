@@ -212,7 +212,7 @@ function	Cover() {
                         <p>DRAWS : {rankData.draws}</p>
                         {/* <p className="status">MASTER</p> */}
                         </div>
-                        <ProgressBar completed={rankData.level} bgColor="black" height="3rem" />
+                        <ProgressBar completed={rankData.level + 70} bgColor="black" height="3rem" />
                         </div>
                         {/* <p>MASTER</p> */}
                         {/* <CircularProgressbar value={percentage} text={`${percentage}%`}  /> */}

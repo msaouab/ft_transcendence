@@ -17,6 +17,16 @@
   box-sizing: border-box;
 }
 
+.debug{
+  border: 1px solid red;  
+  & *{
+    border: 1px solid green;
+    & *{
+      border: 1px solid blue;
+    }
+  }
+}
+
 body {
   font-family: var(--fontFamily);
   background-color: var(--backColor);

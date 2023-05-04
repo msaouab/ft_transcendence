@@ -26,8 +26,8 @@ credit:
 
 env:
 	@mkdir -p ./srcs/requirements/db
-	@echo hostname >> ./srcs/requirements/Backend/src/db-env-example
-	@echo hostname >> ./srcs/requirements/frontend/.env.example
+	@echo "HOSTNAME="$(hostname) >> ./srcs/requirements/Backend/src/db-env-example
+	@echo "HOSTNAME="$(hostname) >> ./srcs/requirements/frontend/.env.example
 	@cp ./srcs/env-example ./srcs/.env
 	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env
 

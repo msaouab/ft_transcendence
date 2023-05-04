@@ -102,55 +102,56 @@ const FriendCard = styled.div`
 function	Friends() {
     
 
-    interface friendsInterface {
-        login: string;
-        Status: string;
-    }
 
-    const friends: friendsInterface[] = [];
-
-    const [loading, setLoading] = useState(false);
-	const [user, printData] = useState({
-        friendUser_id: '',
-        
-	});
+	interface friendsInterface {
+		login: string;
+		Status: string;
+	}
+	const [loading, setLoading] = useState(true);
+	
 	const navigate = useNavigate();
-    // useEffect(() => {
-    //     WebFont.load({
-    //       google: {
-    //         families: ['Fjalla One', 'sans-serif']
-    //       }
-    //     });
-    //    }, []);
-    // api/v1/User/3fe03a21-1cf3-44ab-9422-f5420384ea8f/friends'
+	const [friends, setFriends] = useState<friendsInterface[]>([]);
+	
+	const [user, printData] = useState({
+		friendUser_id: '',
+	});
+	
+	
 	useEffect(() => {
 		setLoading(true);
-		let userfriends = '';
-        const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
+		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
 		async function fetchData() {
-		try {
-			 await axios.get(apiUrl, {
-        	 withCredentials: true,
-        	})
-			.then(response => {
-		        
-				setLoading(false);
-				userfriends = response.data;
-			})
-			.catch(error => {
-			   setLoading(false);
-			   if (error.response.status == 401) {
-				   navigate('/login');
-				 }
-			})
-			console.log(userfriends);
-		} catch (error) {
-			console.log(error);
+			try {
+				await axios.get(apiUrl, {
+					withCredentials: true,
+				})
+				.then(response => {
+					for (let i = 0; i < response.data.length; i++) {
+						axios.get('http://localhost:3000/api/v1/User/' + response.data[i].friendUser_id, {
+							withCredentials: true,
+						})
+						.then(responses => {
+							setFriends(friends => [...friends, {
+								login: responses.data.login,
+									Status: responses.data.Status
+									}]);
+						})
+					}
+					setLoading(false);
+				})
+				.catch(error => {
+					setLoading(false);
+					if (error.response.status == 401) {
+						navigate('/login');
+					}
+				})
+			} catch (error) {
+				console.log(error);
+			}
 		}
-	}
-	fetchData();
-		}, []);
-    
+		fetchData();
+	}, []);
+	console.log(friends);
 
 	return (
 		<FriendsContainer className='Friendsctnr'>
