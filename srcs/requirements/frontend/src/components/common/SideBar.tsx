@@ -220,6 +220,28 @@ const SideBar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};
 	const navigate = useNavigate();
+	useEffect(() => {
+        const apiUrl = 'http://localhost:3000/api/v1/me'
+		async function fetchData() {
+            try {
+                await axios.get(apiUrl, {
+        	 withCredentials: true,
+        	})
+			.then(response => {
+				if (response.statusText) {
+				}
+                // setOnlineStat(user.status);
+			})
+			.catch(error => {
+                if (error.response.status == 401) {
+                    navigate('/login');
+                }
+			})
+		} catch (error) {
+            console.log(error);
+		}
+	}  fetchData();
+    }, []);
 	const handleLogout = () => {
 		async function logout() {
 			const apiUrl = 'http://localhost:3000/api/v1/logout';
@@ -290,7 +312,7 @@ const SideBar = () => {
 				</Link>
 			</IconsContainer>
 			<LogoutContainer className='iconContainer' width={sidebarWidth}>
-				<Link to="/login" className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'}`}
+				<Link to="/" className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'}`}
 				onClick={() => handleLogout()}
 				><Logout/><span>Logout</span></Link>
 			</LogoutContainer>

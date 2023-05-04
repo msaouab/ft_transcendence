@@ -14,7 +14,6 @@ export class AuthService {
             const find_user = await this.prisma.user.findUnique({
                 where: {
                     login: user.username,
-                    email: user._json.email,
                 },
             })
             if (find_user) {
@@ -31,8 +30,12 @@ export class AuthService {
                     status: 'Online',
                 },
             })
-
-        }
+            const createUserRankingData = await this.prisma.rankingData.create({
+                data: {
+                    user_id: createUser.id,
+                },
+            })
+            }
         catch (e) {
             console.log(e);
         }

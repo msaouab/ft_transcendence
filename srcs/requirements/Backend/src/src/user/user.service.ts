@@ -70,4 +70,25 @@ export class UserService {
             },
         });
     }
-}
+    async getRankData(id: string) {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+            const rankData = await this.prisma.rankingData.findUnique({
+                where: {
+                    user_id: id,
+                },
+            });
+            if (!rankData) {
+                throw new NotFoundException('Ranking Data not found');
+            }
+            return rankData;
+
+        }
+    
+    }

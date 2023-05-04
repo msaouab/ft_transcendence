@@ -1,12 +1,26 @@
 /* src/index.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
+// import tailwind
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200;300;400;500;600;700;800&family=Ubuntu:wght@300;400;500;700&display=swap');
+
 
 :root {
   --goldColor: rgb(233, 217, 144);
   --backColor: #1E1D19;
   --fontColor: #FFFFFF;
+  --backgColor: #b4b4b460;
+  --backgcard: rgba(128, 128, 128, 0.932);
   --fontFamily: 'Oxanium';
 }
 
@@ -16,21 +30,28 @@
   box-sizing: border-box;
 }
 
+
+
 body {
-  font-family: var(--fontFamily);
-  background-color: var(--backColor);
+  font-family: 'Oxanium', cursive;
+// font-family: 'Ubuntu', sans-serif;
+  // background-color: var(--backColor);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  
-}
 
 body{
   width: 100vw;
-  height: 100vh;
+  height: 100%;
   max-width: 100%;
-  overflow-x: hidden;
+  
+}
+
+.debug {
+  border: 1px solid red !important;
+  & * {
+    border: 1px solid green !important;
+    & * {
+      border: 1px solid blue !important;
+    }
+  }
 }

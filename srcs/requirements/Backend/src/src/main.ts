@@ -26,13 +26,13 @@ async function bootstrap() {
   app.setBaseViewsDir(join('/','app', 'views'));
   app.setViewEngine('ejs');
   //end ejs
-
+  
   const config = new DocumentBuilder()
-    .setTitle('Pong API')
-    .setDescription('The Pong API description')
-    .setVersion('1.0')
-    // .addTag('pong')
-    .build();
+  .setTitle('Pong API')
+  .setDescription('The Pong API description')
+  .setVersion('1.0')
+  // .addTag('pong')
+  .build();
   // this is the line that enables versioning
   // api versioning is /api/v1/... so if shit happens later on you can just /api/v2/...
   app.enableVersioning({
@@ -40,6 +40,8 @@ async function bootstrap() {
     prefix: 'api/v',
     defaultVersion: process.env.API_VERSION,
   })
+
+   
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
   // express session
@@ -59,7 +61,6 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
   //passport end
-
 
 
   await app.listen(3000);

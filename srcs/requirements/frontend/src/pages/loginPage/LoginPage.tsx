@@ -162,7 +162,7 @@ const LoginContainer = styled.div`
 
 
 function	LoginPage() {
-	const [activeLink,setActiveLink] = useState<string>('localhost:3000/api/v1/login/42');
+	const [activeLink,setActiveLink] = useState<string>('http://localhost:3000/api/v1/login/42');
 		useEffect(() => {
 			const storedLink = localStorage.getItem('activeLink');
 			if (storedLink) {
@@ -186,7 +186,7 @@ function	LoginPage() {
 			<div className='whiteBoard'>
 				<img src={logoBlack} alt="Logo" className='logo'/>
 				{/* <Link to="localhost:3000/api/v1/login/42" className={`ftauth`}> */}
-					<a href="localhost:3000/api/v1/login/42" target="_blank" rel="noreferrer">
+					<a href="http://localhost:3000/api/v1/login/42" target="_blank" rel="noreferrer">
 					<div className='ftbutton'>
 
 							<img src={ftlogo} alt="42logo" className='ftlogo' />
@@ -207,8 +207,8 @@ function	LoginPage() {
 					</p>
 					<div className="rectangle"></div>
 					<p>NOT ON PONG YET?</p>
-					<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}
-        				onClick={() => handleLinkClick('localhost:3000/api/v1/login/42')}>
+					<Link to="http://localhost:3000/api/v1/login/42" className={`ftauth`}
+        				onClick={() => handleLinkClick('http://localhost:3000/api/v1/login/42')}>
 							SIGN UP NOW!
 					</Link>
 				</div>
