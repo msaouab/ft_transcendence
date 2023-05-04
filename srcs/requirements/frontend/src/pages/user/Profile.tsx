@@ -8,7 +8,7 @@ import Friends from "../../components/Profile/Friends";
 
 const ProfileContainer = styled.div`
   display: grid;
-  overflow: hidden;
+  /* overflow: scroll; */
   height: 100vh;
   /* position: absolute; */
   /* margin: 1rem 1rem 1rem 7rem; */

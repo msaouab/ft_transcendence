@@ -30,35 +30,15 @@ const FriendsContainer = styled.div`
 	}
 	
 	.one {
-		height: 10rem;
+		overflow-y: scroll; 
+	 	min-height: 25rem;
 	}
 	
 	`;
 
-// const Friendsc = [
-// 	{
-// 	  login: "iqessam",
-// 	  Status: "Online",
-// 	},
-// 	{
-// 		login: "iqessam",
-// 	    Status: "Online",
-// 	},
-// 	{
-// 		login: "iqessam",
-// 	    Status: "Online",
-// 	},
-// 	{
-// 		login: "iqessam",
-// 		Status: "Online",
-// 	},
-    
-	
-// ];
-
 
 const FriendCard = styled.div`
-	background: gray;
+	background: #808080;
 	margin: .5rem;
 	border-radius: 1rem;
 	overflow: hidden;
@@ -110,13 +90,13 @@ function	Friends() {
 	const [loading, setLoading] = useState(true);
 	
 	const navigate = useNavigate();
-	const [friends, setFriends] = useState<friendsInterface[]>([]);
 	
 	const [user, printData] = useState({
 		friendUser_id: '',
 	});
 	
 	
+	const [friends, setFriends] = useState<friendsInterface[]>([]);
 	useEffect(() => {
 		setLoading(true);
 		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
@@ -133,8 +113,8 @@ function	Friends() {
 						.then(responses => {
 							setFriends(friends => [...friends, {
 								login: responses.data.login,
-									Status: responses.data.Status
-									}]);
+								Status: responses.data.status
+							}]);
 						})
 					}
 					setLoading(false);
@@ -151,7 +131,6 @@ function	Friends() {
 		}
 		fetchData();
 	}, []);
-	console.log(friends);
 
 	return (
 		<FriendsContainer className='Friendsctnr'>
@@ -166,6 +145,7 @@ function	Friends() {
             			<div className="login">{Friend.login}</div>
             			<div className="Status">{Friend.Status}</div>
 					</div>
+					
 				</div>
           </FriendCard>
 			))

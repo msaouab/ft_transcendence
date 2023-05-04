@@ -8,6 +8,7 @@
   --backColor: #1E1D19;
   --fontColor: #FFFFFF;
   --backgColor: #b4b4b460;
+  --backgcard: rgba(128, 128, 128, 0.932);
   --fontFamily: 'Oxanium';
 }
 
@@ -43,5 +44,5 @@ body{
   width: 100vw;
   height: 100vh;
   max-width: 100%;
-  overflow-x: hidden;
+  // overflow-x: hidden;
 }

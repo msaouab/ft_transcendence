@@ -25,13 +25,6 @@ const users = [
         password: 'msaouab',
     },
     {
-        login: 'iqessam',
-        email: 'iqessam@student.1337.ma',
-        firstName: 'Ilyass',
-        lastName: 'Qessam',
-        password: 'iqessam',
-    },
-    {
         login: 'mbehhar',
         email: 'mbehhar@student.1337.ma',
         firstName: 'Mohamed',
