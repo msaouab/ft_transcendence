@@ -15,9 +15,10 @@ export class AuthController {
 
   @Get('42/return')
   @UseGuards(FtOauthGuard)
-  @Redirect('/api/v1/')
+  @Redirect('http://localhost:5173/home')
   ftAuthCallback(@User() user: Profile, @Res() res: Response) {
     return this.authService.login(user, res);
+  
   }
 
 

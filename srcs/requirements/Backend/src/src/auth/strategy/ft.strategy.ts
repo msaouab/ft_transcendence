@@ -10,6 +10,8 @@ export class FtStrategy extends PassportStrategy(Strategy, '42') {
       clientID: configService.get<string>('FORTYTWO_CLIENT_ID'),
       clientSecret: configService.get<string>('FORTYTWO_CLIENT_SECRET'),
       callbackURL: '/api/v1/login/42/return',
+      // callbackURL: 'http://localhost:5173/home',
+
       passReqToCallback: true,
     });
   }

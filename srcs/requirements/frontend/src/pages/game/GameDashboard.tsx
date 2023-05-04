@@ -1,5 +1,5 @@
 import { ReusableCardStyle } from "./Home";
-
+import { Link } from "react-router-dom";
 const chalenger = [
   {
     name: "Ilyass",
@@ -55,18 +55,18 @@ const GameDashboard = () => {
   return (
     <div className="grid grid-cols-12 gap-10 grid-rows-2  h-full">
       <ReusableCardStyle className="col-span-4 row-span-1 flex justify-center items-center">
-        <div className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center">
+        <Link to="/game/10"  className="  left flex-1 h-[80%] w-full flex flex-col justify-center items-center ">
           <div className="title text-4xl font-bold text-[#E9D990] text-center mb-4">
             Round Table
           </div>
           <div className="w-[12rem] aspect-square border-[1.2rem]  border-yellow-200/50 rounded-[50%] flex items-center justify-center"></div>
-        </div>
-        <div className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center">
+        </Link>
+        <Link to="/game/10" className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center">
           <div className="title text-4xl font-bold text-[#E9D990] text-center mb-4">
             Timing Table
           </div>
           <div className="w-[12rem] aspect-square border-[1.2rem]  border-yellow-200/50 rounded-[50%] flex items-center justify-center"></div>
-        </div>
+        </Link>
       </ReusableCardStyle>
       <ReusableCardStyle className="col-span-8 row-span-1 flex justify-between items-center gap-4">
         <div className="left w-[60%] h-full ">

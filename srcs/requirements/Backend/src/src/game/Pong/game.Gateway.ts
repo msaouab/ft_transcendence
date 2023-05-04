@@ -9,12 +9,12 @@ import {
 } from "@nestjs/websockets";
 import { Server } from "socket.io";
 
-@WebSocketGateway({
-	cors:{
-		origin: "*",
-	}, 
-	namespace: 'game'
-})
+// @WebSocketGateway({
+// 	cors:{
+// 		origin: "*",
+// 	}, 
+// 	namespace: 'game'
+// })
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 

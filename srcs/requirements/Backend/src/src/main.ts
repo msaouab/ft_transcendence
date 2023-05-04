@@ -14,7 +14,13 @@ import * as cookieParser from 'cookie-parser';
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    cors: {
+      origin: 'http://localhost:5173',
+      credentials: true,
+    }
+  });
+
   //ejs temp front end
   app.useStaticAssets(join('/','app', 'public'));
   app.setBaseViewsDir(join('/','app', 'views'));
@@ -34,13 +40,8 @@ async function bootstrap() {
     prefix: 'api/v',
     defaultVersion: process.env.API_VERSION,
   })
-  app.enableCors({
-    origin: '*',
-    credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 
-    preflightContinue: false,
-  });
+   
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
   // express session

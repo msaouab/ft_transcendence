@@ -19,6 +19,8 @@
   --goldColor: rgb(233, 217, 144);
   --backColor: #1E1D19;
   --fontColor: #FFFFFF;
+  --backgColor: #b4b4b460;
+  --backgcard: rgba(128, 128, 128, 0.932);
   --fontFamily: 'Oxanium';
 }
 
@@ -27,6 +29,8 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+
 
 body {
   font-family: 'Oxanium', cursive;

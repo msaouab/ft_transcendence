@@ -20,6 +20,17 @@ export class UserService {
         }
         return user;
     }
+    async getUserByEmail(email: string) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: email,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
     async updateUser(id: string, user, PutUserDto ){
         const { login, firstName, lastName } = PutUserDto;
         const finduser = await this.prisma.user.findUnique({
@@ -59,4 +70,25 @@ export class UserService {
             },
         });
     }
-}
+    async getRankData(id: string) {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+            const rankData = await this.prisma.rankingData.findUnique({
+                where: {
+                    user_id: id,
+                },
+            });
+            if (!rankData) {
+                throw new NotFoundException('Ranking Data not found');
+            }
+            return rankData;
+
+        }
+    
+    }

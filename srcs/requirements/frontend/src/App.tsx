@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router-dom";
 import AboutPage from "./pages/landingPage/AboutPage";
 // import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from "./pages/landingPage/LandingPage";
-import Game from "./pages/game";
 import Home from "./pages/game/Home";
 import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
@@ -10,6 +9,10 @@ import GlobalStyle from "./GlobalStyle";
 import { useState } from "react";
 import { MdDoubleArrow } from "react-icons/md";
 // import { ReactComponent as SearchIcon } from '../src/assets/icons/searchIcon.svg'
+import LoginPage from "./pages/loginPage/LoginPage";
+import Profile from "./pages/user/Profile";
+import Game from "./components/common/Game";
+
 
 function App() {
   const [bgColor, setBgColor] = useState("#1E1D19");
@@ -27,7 +30,7 @@ function App() {
     <>
       <GlobalStyle background={bgColor} textColor={textColor} />
       {/* <SearchIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl" /> */}
-      <div
+      {/* <div
         className={`absolute w-[35rem] rounded-lg text-white bg-slate-400 flex items-center gap-3 p-2 ${
           isPaletteOpen ? "left-0" : "left-[-32rem] "
         } transition-all ease-in-out duration-300`}
@@ -52,15 +55,18 @@ function App() {
           }`}
           onClick={() => setIsPaletteOpen(!isPaletteOpen)}
         />
-      </div>
+      </div> */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="" element={<Layout />}>
           <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/game" element={<GameDashboard />} />
+          <Route path="/game/10" element={<Game />} />
+
           {/* <Route path="/game" element={<Game />}> */}
-          {/* <Route path="/profile" element={<Gameprofile />} /> */}
           {/* </Route> */}
         </Route>
       </Routes>
