@@ -82,11 +82,12 @@ model User {
   frendshipInvites FriendshipInvites[] @relation("friendshipInvitesRelation")
   gameInvites      GameInvites[]       @relation("gameInvitesRelation")
   // relation to chat 
+  MsgSender        PrivateMessage[]    @relation("privateMessageRelationSender")
+  MsgReceiver      PrivateMessage[]    @relation("privateChatRoomRelationReceiver")
 
-  sender   PrivateChatRoom[] @relation("senderRelation")
-  receiver PrivateChatRoom[] @relation("receiverRelation")
-
-  // GameHistoryTab   GameHistoryTab[]
+  // relation to privatchatroom
+  privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
+  privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
 }
 
 model FriendshipInvites {
@@ -108,21 +109,28 @@ model FriendsTab {
 }
 
 model PrivateMessage {
-  id          String          @id
+  id          String          @id @default(uuid())
   dateCreated DateTime        @default(now())
   content     String //not empty
   seen        Boolean         @default(false)
   chatRoom_id String
+  sender      User            @relation("privateMessageRelationSender", fields: [sender_id], references: [id])
+  sender_id   String
+  receiver_id String
+  receiver    User            @relation("privateChatRoomRelationReceiver", fields: [receiver_id], references: [id])
   chatRoom    PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
+  // chatRoom PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
 }
 
 model PrivateChatRoom {
-  id              String                @id
+  id              String           @id
   sender_id       String
   receiver_id     String
-  messages        PrivateMessage[]      @relation("privateChatRoomRelation")
-  sender          User                  @relation("senderRelation", fields: [sender_id], references: [id])
-  receiver        User                  @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
+  messages        PrivateMessage[] @relation("privateChatRoomRelation")
+  // adding this to be able to sort the chat rooms by newest message
+  lastUpdatedTime DateTime         @default(now())
+  sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
+  receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
 }
 
 model BlockTab {

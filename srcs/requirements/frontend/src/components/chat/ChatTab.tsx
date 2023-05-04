@@ -6,14 +6,12 @@ import Cookies from 'js-cookie';
 
 
 // components
-import MessageDate from './MessageDate';
+import MessageDate from './SeenDate';
 
 const ChatTabStyle = styled.div`
     background: transparent; 
     width: 100%;
-
     cursor: pointer;
-
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -57,7 +55,7 @@ const ChatTab = (props: PrivateMessage) => {
                     {props.login}
                 </div>
                 <div className="chat-tab__info__last-message text-xs font-thin opacity-50">
-                    {props.lastMessage}
+                    {props.lastMessage.length > 25 ? props.lastMessage.slice(0, 25) + '...' : props.lastMessage}
                 </div>
             </div>
             <MessageDate {...props} />

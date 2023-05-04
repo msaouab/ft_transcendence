@@ -5,8 +5,9 @@ import { User } from './user.decorator/user.decorator';
 import { Profile } from 'passport';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('Auth')
-@Controller('Auth')
+
+@ApiTags('login')
+@Controller('login')
 export class AuthController {
   constructor(private readonly authService: AuthService) { }
   @Get('42')

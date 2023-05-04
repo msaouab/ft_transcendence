@@ -17,8 +17,8 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   //ejs temp front end
-  app.useStaticAssets(join('/', 'home', 'public'));
-  app.setBaseViewsDir(join('/', 'home', 'views'));
+  app.useStaticAssets(join('/', 'app', 'public'));
+  app.setBaseViewsDir(join('/', 'app', 'views'));
   app.setViewEngine('ejs');
   //end ejs
 
@@ -29,7 +29,7 @@ async function bootstrap() {
     // .addTag('pong')
     .build();
   // this is the line that enables versioning
-  // api versioning is /api/v1/... so if shit happens later on you can just /api/v2/...
+  // api versioning is /api/v1/... so if shit happens moving on you can just /api/v2/...
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v',
@@ -55,7 +55,11 @@ async function bootstrap() {
   app.use(passport.session());
   //passport end
 
-
+  app.enableCors(
+    {
+      origin: "*"
+    }
+  )
   await app.listen(3000);
 }
 

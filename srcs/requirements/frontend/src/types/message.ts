@@ -17,5 +17,13 @@ export interface PrivateMessage {
 };
 
 
-
+export interface singleMessage {
+    chatRoom_id: string,
+    content: string,
+    dateCreated: string,
+    id: string,
+    receiver_id: string,
+    seen: string,
+    sender_id: string
+}
 

@@ -13,26 +13,26 @@ import { ApiTags } from "@nestjs/swagger"
 import { BlockedUsersService } from "./blockedUsers.service"
 import { BlockedUserDto } from "./dto/block-user.dto";
 @ApiTags('User')
-@Controller('User')
+@Controller('user')
 export class BlockedUsersController {
 
     constructor(
         private readonly BlockedUsersService: BlockedUsersService
     ) { }
 
-    @Get(":id/blockedUsers")
+    @Get(":id/blockedusers")
     async getBlockedUsers(@Param('id') id: string) {
         const blockedUsers = await this.BlockedUsersService.getBlockedUsers(id);
         return blockedUsers;
     }
 
-    @Post(":id/blockedUsers")
+    @Post(":id/blockedusers")
     async postBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
         const blockedUsers = await this.BlockedUsersService.createBlockedUser(BlockedUserDto, id);
         return blockedUsers;
     }
 
-    @Delete(":id/blockedUsers")
+    @Delete(":id/blockedusers")
     async deleteBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
         const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(BlockedUserDto, id);
         return blockedUsers;

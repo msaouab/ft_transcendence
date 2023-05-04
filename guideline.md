@@ -5,16 +5,22 @@
 
 
 
-# COMMON SERVICES (SERVICES THAT ALREADY IMPLEMENTED THAT YOU CAN USE, DRY)
+# COMMON STUFF (SERVICES, or GUARDS THAT ALREADY IMPLEMENTED THAT YOU CAN USE, DRY)
 - any service you created and you think others might need put it here.
 
 - To get a user by id, throw an exception if notfound, import `getUserById(id: string): Promise<User>` in the user service.
+
+- use GUARD "AuthenticatedGuard" to add auth functionality to your routes 
+- use GUARD "UserExistsGuard" to check if user exist in your routes
+
+
 
 
 # Packages Used 
 
 - There's a package called class-validator, that allows us to check if the data sent to the server is valid. we don't want to save invalid data in our database. 
 check it https://www.npmjs.com/package/class-validator , it's used in our DTOs to check the validity of the data, and it's used in the service layer to check if the data is valid before saving it in the database. check an example at /invites/dto/post-invite.dto.ts. 
+- you can use js-cookie to parse cookies
 
 # GUIDELINES 
 

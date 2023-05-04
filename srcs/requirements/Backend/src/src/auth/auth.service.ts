@@ -21,19 +21,19 @@ export class AuthService {
         const createUser = await this.prisma.user.create({
             data: {
                 login: user.username,
-                email:  user._json.email,
-                firstName:  user.name.givenName,
-                lastName:  user.name.familyName,
+                email: user._json.email,
+                firstName: user.name.givenName,
+                lastName: user.name.familyName,
                 password: 'create',
                 avatar: './public/default.png',
                 status: 'Offline',
             },
         })
-        
-        return this.login(user,res);
+
+        return this.login(user, res);
     }
 
-    async logout(user,res) {
+    async logout(user, res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -70,19 +70,26 @@ export class AuthService {
                 },
             })
             res.cookie('id', find_user.id, {
-                httpOnly: true,
-                secure: false,
+
+                /* 
+                please don't uncomment this, httpOnly is a security feature
+                that prevents client-side JavaScript from accessing cookies.
+                we need to access id from client side, it's not sensitive data
+                so we don't need to protect it.
+                */
+                // httpOnly: true,
+                // secure: false,
             })
-        
+
             return updateUser;
         }
 
         else {
-            return this.signup(user,res);
+            return this.signup(user, res);
         }
     }
 
-    async delete(user,res) {
+    async delete(user, res) {
         const find_user = await this.prisma.user.findUnique({
             where: {
                 login: user.username,
@@ -98,18 +105,18 @@ export class AuthService {
             // return deleteUser;
         }
     }
-    
+
     // async return_user(user) {
-        //     const find_user = await this.prisma.user.findUnique({
+    //     const find_user = await this.prisma.user.findUnique({
     //         where: {
     //             login: user.username,
     //         },
     //     })
     //     return find_user;
     // }
-    
+
     // async twoFactor(user) : Promise<string> {
-        //     var secret = speakeasy.generateSecret({
+    //     var secret = speakeasy.generateSecret({
     //         length: 20,
     //         name: 'PONG',
     //     });
@@ -118,7 +125,7 @@ export class AuthService {
     //     });
     //     return secret.base32;
     // }
-    
+
     // async twoFactorverify(body, user,req) {
     //     var st = await this.twoFactor(user);
     //     var verify = speakeasy.totp.verify({

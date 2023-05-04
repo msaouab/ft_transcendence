@@ -27,7 +27,6 @@ input:focus {
 }
 `;
 
-
 const SearchBar = () => {
     return (
 

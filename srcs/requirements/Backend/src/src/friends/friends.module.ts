@@ -12,6 +12,7 @@ import { UserModule } from 'src/user/user.module';
     providers: [FriendsService],
     exports: [FriendsService]
 })
+
 export class FriendsModule { }
 
 

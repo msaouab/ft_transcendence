@@ -2,7 +2,10 @@ import styled from 'styled-components';
 import SearchBar from '../common/SearchBar';
 
 import GroupChatList from './GroupsChatList';
-import UsersChatList from './UsersChatList';
+import UsersChatList from './PrivateChatList';
+
+
+import { PrivateMessage } from '../../types/message';
 
 const ChatListStyle = styled.div`
     background: transparent;
@@ -24,12 +27,12 @@ const ChatListStyle = styled.div`
     }
     `;
 
-const ChatList = () => {
+const ChatList = ({ setSelectedChat }: { setSelectedChat: (chat: PrivateMessage) => void }) => {
     return (
         <ChatListStyle>
             <SearchBar />
             <GroupChatList />
-            <UsersChatList />
+            <UsersChatList setSelectedChat={setSelectedChat} />
         </ChatListStyle>
     );
 };

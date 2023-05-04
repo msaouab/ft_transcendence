@@ -1,32 +1,32 @@
 
 
-const io = require('socket.io-client');
+// const io = require('socket.io-client');
 
-// take senderId and receiverId as arguments
-const senderId = process.argv[2];
-const receiverId = process.argv[3];
+// // take senderId and receiverId as arguments
+// const senderId = process.argv[2];
+// const receiverId = process.argv[3];
 
-const socket = io('http://localhost:3000/chat');
+// const socket = io('http://localhost:3000/chat');
 
-socket.on('connect', () => {
-    console.log('connected');
-});
+// socket.on('connect', () => {
+//     console.log('connected');
+// });
 
-// if there's something in stdin, send it to the server
-process.stdin.on('data', (data) => {
+// // if there's something in stdin, send it to the server
+// process.stdin.on('data', (data) => {
 
-    // creating a payload 
-    const payload = {
-        senderId: senderId,
-        receiverId: receiverId,
-        message: data.toString()
-    }
+//     // creating a payload 
+//     const payload = {
+//         senderId: senderId,
+//         receiverId: receiverId,
+//         message: data.toString()
+//     }
 
-    socket.emit('chatPrivately', payload);
+//     socket.emit('chatPrivately', payload);
 
-});
-// if the server sends a message, print it to stdout
-socket.on('chatPrivately', (data) => {
-    console.log(data.content);
-});
+// });
+// // if the server sends a message, print it to stdout
+// socket.on('chatPrivately', (data) => {
+//     console.log(data.content);
+// });
 

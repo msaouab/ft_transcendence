@@ -8,6 +8,8 @@ import axios from "axios";
 import SeenIcon from '../../assets/seen.svg';
 import notSeenIcon from '../../assets/notSeen.svg';
 import { useEffect, useState } from "react";
+import { getDateChat } from "../common/CommonFunc"
+
 const SeenNotSeenIconStyle = styled.img`
     width: 17px;
     height: 17px;
@@ -37,17 +39,6 @@ const MessageDateStyle = styled.div`
     
     `;
 
-const getDate = (date: string) => {
-    const d = new Date(date);
-    const day = d.toLocaleDateString("en-US", { weekday: "short" });
-    const hour = d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-    return `${day}, ${hour} `;
-};
-
-
-// interface UserMessageProps {
-//     user: PrivateMessage;
-// }
 
 // use a function expression and use props parameter
 const MessageDate = (props: PrivateMessage) => {
@@ -56,7 +47,6 @@ const MessageDate = (props: PrivateMessage) => {
 
     // move getNumberOfNotSeeMessages inside the component and use props parameter
     const getNumberOfNotSeeMessages = async () => {
-        // console.log(`http://localhost:${process.env.BACKEND_PORT}/api/v1/user/${id}/chatrooms/private/${chatId}/messages/unseencount/`)
         let count = await axios.get(
             `http://localhost:${3000}/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
         );
@@ -72,19 +62,18 @@ const MessageDate = (props: PrivateMessage) => {
         // use an empty dependency array to run only once
     }, []);
 
-    // count how many messages are not seen
     if (props.receiver_id === Cookies.get('id') && count > 0) {
         return (
             <MessageDateStyle>
-                <div>{getDate(props.lastMessageDate)}</div>
-                <div className="rounded-full bg-[#E9D990] text-[#1E1D18] text-xs w-4 h-4 flex justify-center items-center">{count}</div>
+                <div>{getDateChat(props.lastMessageDate)}</div>
+                <div className="rounded-full bg-[#E9D990] text-[#1E1D18] text-xs w-4 h-4 flex justify-center items-center p-2">{count}</div>
             </MessageDateStyle >
         );
     }
     return (
         <div className="chat-tab__date__seen">
 
-            {getDate(props.lastMessageDate)}
+            {getDateChat(props.lastMessageDate)}
             {
                 props.seen ? <SeenNotSeenIconStyle src={SeenIcon} alt="seen" />
                     :

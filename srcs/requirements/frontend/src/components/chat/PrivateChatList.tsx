@@ -26,34 +26,38 @@ const UsersChatListStyle = styled.div`
     }
 `;
 
-const UsersChatList = () => {
+const UsersChatList = ({ setSelectedChat }: { setSelectedChat: (chat: PrivateMessage) => void }) => {
+
     const [privateChatRooms, setPrivateChatRooms] = useState([]);
-    const getUser = async (message: any): Promise<{ login: string, profileImage: string }> => {
-        const { sender_id, receiver_id } = message;
+
+    const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
         const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
         return user.data;
     }
-    const getPrivateChats = async () => {
+
+    const getPrivateChats = async (limitRoom: string, limitMsg: string) => {
         // get id from cookies
         const Tabs: any = [];
         let id = Cookies.get('id');
         try {
             // getting the first five private chat rooms only, by date 
-            const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=5`);
+            const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             // use Promise.all to wait for all the promises
             await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
                 const { id } = room;
-                const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=1`);
-                const user = await getUser(message.data[0]);
+
+                const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
+                const user = await getUser(message.data[1][0].sender_id, message.data[1][0].receiver_id)
+                // const
                 const data: PrivateMessage = {
                     chatRoomid: id,
-                    messageId: message.data[0].id,
-                    sender_id: message.data[0].sender_id,
-                    receiver_id: message.data[0].receiver_id,
-                    lastMessage: message.data[0].content,
-                    lastMessageDate: message.data[0].dateCreated,
-                    seen: message.data[0].seen,
+                    messageId: message.data[1][0].id,
+                    sender_id: message.data[1][0].sender_id,
+                    receiver_id: message.data[1][0].receiver_id,
+                    lastMessage: message.data[1][0].content,
+                    lastMessageDate: message.data[1][0].dateCreated,
+                    seen: message.data[1][0].seen,
                     login: user.login,
                     profileImage: user.profileImage,
                     status: user.status
@@ -64,15 +68,22 @@ const UsersChatList = () => {
             Tabs.sort((a: any, b: any) => {
                 return new Date(b.lastMessageDate).getTime() - new Date(a.lastMessageDate).getTime();
             });
+            setPrivateChatRooms(Tabs)
 
-            setPrivateChatRooms(Tabs);
         } catch (error) {
             console.error(error);
         }
     }
+
+
     useEffect(() => {
-        getPrivateChats();
+        getPrivateChats('5', '1')
     }, []);
+
+    useEffect(() => {
+        privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
+    }, [privateChatRooms])
+
     return (
         <UsersChatListStyle>
             <div className='flex justify-between'>
@@ -87,7 +98,9 @@ const UsersChatList = () => {
             {
                 privateChatRooms.map((props: PrivateMessage) => {
                     return (
-                        <div key={props.chatRoomid}>
+                        <div key={props.chatRoomid} onClick={() => {
+                            setSelectedChat(props);
+                        }}>
                             <ChatTab {...props} key={props.chatRoomid} />
                             {/* seperator should show under all compontes excpet the last one */}
                             {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?

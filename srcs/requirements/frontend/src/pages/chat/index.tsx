@@ -1,9 +1,38 @@
 import React from 'react'
+import Styled from 'styled-components'
+import ChatList from '../../components/chat/ChatList';
+import ChatBox from '../../components/chat/ChatBox';
+const ChatStyle = Styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  padding: 10px;
+  justify-content: flex-start;
+  background: #1E1D18;
+  gap: 2px;
+  & > *:nth-child(3) {
+    margin-top: 20px;
+    height: 95%;
+}
+`;
 
-const index = () => {
+import Loader from '../../components/common/Loader';
+
+import { PrivateMessage } from '../../types/message';
+const Chat = () => {
+  //  add default chatbox later 
+  // passing a prop to ChatList, to get event when a user is clicked and pass it to ChatBox
+  const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
   return (
-	<div className='text-4xl flex justify-center items-center w-screen h-screen bg-red-50'>chat</div>
+    <ChatStyle>
+      <div className="side-bar w-1/7 h-full bg-gray-500">
+        <h1>Side Bar</h1>
+      </div>
+      <ChatList setSelectedChat={setSelectedChat} />
+      <ChatBox  {...selectedChat} key={selectedChat.chatRoomid} />
+    </ChatStyle >
   )
 }
 
-export default index
+export default Chat

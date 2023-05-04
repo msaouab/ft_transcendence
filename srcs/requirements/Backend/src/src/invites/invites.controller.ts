@@ -20,7 +20,7 @@ import { DeleteInviteDto } from "./dto/delete-invite.dto";
 import { PutInviteDto } from './dto/put-invite.dto';
 
 @ApiTags('User')
-@Controller('User')
+@Controller('user')
 export class InvitesController {
 
     constructor(private readonly InvitesService: InvitesService) { }

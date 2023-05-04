@@ -11,4 +11,3 @@ import { UserModule } from 'src/user/user.module';
     exports: []
 })
 export class BlockedUsersModule { }
-

@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { Passport, Profile } from 'passport';
 import { User } from '../auth/user.decorator/user.decorator';
 import { PutUserDto } from './dto/put-user.dto';
-
+import { PrivateMessage } from '@prisma/client';
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -21,7 +21,7 @@ export class UserService {
         return user;
     }
 
-    async updateUser(id: string, user, PutUserDto ){
+    async updateUser(id: string, user, PutUserDto) {
         const { login, firstName, lastName } = PutUserDto;
         const finduser = await this.prisma.user.findUnique({
             where: {
@@ -47,8 +47,6 @@ export class UserService {
             throw new BadRequestException('Empty fields');
         }
 
-        
-
         return await this.prisma.user.update({
             where: {
                 id: id,
@@ -60,4 +58,6 @@ export class UserService {
             },
         });
     }
+
+
 }

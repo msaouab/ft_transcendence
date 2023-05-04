@@ -6,8 +6,8 @@ YELLOW = \033[1;33m
 BLUE = \033[1;34m
 ED = \033[0m
 
-all: credit env up
-# all: env up
+# all: credit env up
+all: env up
 
 
 
@@ -40,7 +40,7 @@ up:
 
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
-	@docker stop nest postgres adminer || true
+	@docker stop backend postgres adminer || true
 
 start:
 	@echo "$(GREEN)███████████████████ Start Containers ███████████████████$(ED)"
@@ -48,7 +48,7 @@ start:
 
 clean: stop 
 	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
-	@docker rm nest postgres adminer || true
+	@docker rm backend postgres adminer || true
 
 
 fclean: clean
