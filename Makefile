@@ -30,15 +30,15 @@ env:
 
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"
-	@cd srcs && docker-compose build
+	@cd srcs && docker-compose -f Docker-compose.yml  up -d
 
 up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
-	@cd srcs && docker-compose up -d --build
+	@cd srcs && docker-compose -f Docker-compose.yml up -d --build
 
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
-	@docker stop nest postgres adminer || true
+	@docker stop backend postgres frontend adminer || true
 
 start:
 	@echo "$(GREEN)███████████████████ Start Containers ███████████████████$(ED)"
@@ -46,7 +46,7 @@ start:
 
 clean: stop 
 	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
-	@docker rm nest postgres adminer || true
+	@docker rm backend postgres frontend adminer || true
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"

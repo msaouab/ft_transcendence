@@ -12,6 +12,7 @@ import { MdDoubleArrow } from "react-icons/md";
 import LoginPage from "./pages/loginPage/LoginPage";
 import Profile from "./pages/user/Profile";
 import Game from "./components/common/Game";
+import UserSettings from "./pages/user/UserSettings";
 
 
 function App() {
@@ -63,6 +64,7 @@ function App() {
         <Route path="" element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<UserSettings />} />
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />
 

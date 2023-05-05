@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import SideBar from "../../components/common/SideBar";
 // import Ldata from "../loginPage/datalogin";
 import Cover from "../../components/Profile/Cover";
 import GameHistory from "../../components/Profile/GameHistory";

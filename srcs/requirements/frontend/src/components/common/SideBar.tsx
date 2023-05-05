@@ -305,9 +305,9 @@ const SideBar = () => {
 					onClick={() => handleClick('chat')}>
 					<Chat /><span>Chat</span>
 				</Link>
-				<Link to="/setting"
-					className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'} ${location.pathname === '/setting' ? 'active' : ''}`}
-					onClick={() => handleClick('setting')}>
+				<Link to="/settings"
+					className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'} ${location.pathname === '/settings' ? 'active' : ''}`}
+					onClick={() => handleClick('settings')}>
 					<Settings /><span>Setting</span>
 				</Link>
 			</IconsContainer>
