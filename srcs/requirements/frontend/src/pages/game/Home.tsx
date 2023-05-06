@@ -33,8 +33,8 @@ const Achivements = [
 ];
 
 const AchivementCard = styled.div`
-background: rgba(255, 255, 255, 0.1);
-padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
   .title {
     font-size: 2rem;
     font-weight: 800;
@@ -53,7 +53,6 @@ const Home = () => {
         <div className="flex gap-16 items-center ">
           <div className="text-2xl">It’s good to see you again.</div>
           <div className="padel">
-            l
             <PadelSvg />
           </div>
         </div>
@@ -69,13 +68,12 @@ const Home = () => {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-4">
-
-        {Achivements.map((achivement, index) => (
-          <AchivementCard  key={index}>
-            <div className="title">{achivement.title}</div>
-            <div className="description">{achivement.description}</div>
-          </AchivementCard>
-        ))}
+          {Achivements.map((achivement, index) => (
+            <AchivementCard key={index}>
+              <div className="title">{achivement.title}</div>
+              <div className="description">{achivement.description}</div>
+            </AchivementCard>
+          ))}
         </div>
       </ReusableCardStyle>
     </div>
