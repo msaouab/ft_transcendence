@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import Cookies from 'js-cookie';
 // import { History} from "history"
 
 const LdataContainer = styled.div`
@@ -34,7 +35,7 @@ function	Ldata() {
 	});
 	const navigate = useNavigate();
     
-
+//http://localhost:3000/api/v1/user/c9e8fb46-65d1-488f-a2af-0db0832c1926/file
 	useEffect(() => {
 		setLoading(true);
         const apiUrl = 'http://localhost:3000/api/v1/me'
@@ -46,6 +47,7 @@ function	Ldata() {
 			.then(response => {
 				if (response.statusText) {
 					printData(response.data);
+					Cookies.set('userid', response.data.id);
 				}
 				setLoading(false);;
 			})

@@ -91,4 +91,33 @@ export class UserService {
 
         }
     
+    async uploadImage(id: string,ft_user, file) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        //if (user.email != ft_user._json.email) {
+          //  throw new UnauthorizedException('Unauthorized');
+        // }
+        if (!file) {
+            throw new BadRequestException('No file');
+        };
+        if (file.mimetype != 'image/png' && file.mimetype != 'image/jpeg') {
+            throw new BadRequestException('Wrong file type');
+        }
+        const updatePath = await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                avatar: file.destination + '/' + file.filename,
+            },
+        });
+
     }
+}
+    

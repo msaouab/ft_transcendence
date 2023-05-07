@@ -15,6 +15,7 @@ import { GameController } from './game/game.controller';
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
 import { GameService } from './game/game.service';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
@@ -22,6 +23,9 @@ import { GameService } from './game/game.service';
     ConfigModule.forRoot({
       envFilePath: '.env',
       validationSchema: configValidationSchema,
+    }),
+      MulterModule.register({
+        dest: '../public',
     }),
     PrismaModule,
     UserModule,

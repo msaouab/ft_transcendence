@@ -5,6 +5,7 @@ import Logo from '/logo.svg'
 import {Home, Chat , Game, Settings, Profile, Logout} from '../../assets/icons'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const	SideBarContainer = styled.div<{ width?: number; isSidebarOpen: boolean }>`
 	background-color: #504A4A;
@@ -230,6 +231,7 @@ const SideBar = () => {
 			.then(response => {
 				if (response.statusText) {
 				}
+				Cookies.set('userid', response.data.id);
                 // setOnlineStat(user.status);
 			})
 			.catch(error => {

@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import Data from "../../components/Profile/UserSettings/Data";
+import Avatar from "../../components/Profile/UserSettings/Avatar";
 
 const UserSettingsContainer = styled.div` 
   .main {
@@ -31,6 +32,7 @@ const UserSettings = () => {
         </div>
         <div className="profile-picture">
             <h1>Profile picture</h1>
+            <Avatar></Avatar>
         </div>
       </div>
     </UserSettingsContainer>
