@@ -40,14 +40,26 @@ const UsersChatList = ({ setSelectedChat }: { setSelectedChat: (chat: PrivateMes
         // get id from cookies
         const Tabs: any = [];
         let id = Cookies.get('id');
+        if (!id) return;
         try {
+
+
             // getting the first five private chat rooms only, by date 
+            // try {
+
+            // }
             const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
+            // console.log(privateRooms.data);
+            // check if status is 200 if not throw error
+            if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
+            console.log(privateRooms.status);
+
             // use Promise.all to wait for all the promises
             await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
                 const { id } = room;
 
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
+
                 const user = await getUser(message.data[1][0].sender_id, message.data[1][0].receiver_id)
                 // const
                 const data: PrivateMessage = {
@@ -95,19 +107,36 @@ const UsersChatList = ({ setSelectedChat }: { setSelectedChat: (chat: PrivateMes
                     <CiEdit className='text-2xl text-white' />
                 </div>
             </div>
-            {
-                privateChatRooms.map((props: PrivateMessage) => {
-                    return (
-                        <div key={props.chatRoomid} onClick={() => {
-                            setSelectedChat(props);
-                        }}>
-                            <ChatTab {...props} key={props.chatRoomid} />
-                            {/* seperator should show under all compontes excpet the last one */}
-                            {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?
-                                <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 opacity-60'></div> : null}
-                        </div>
-                    )
-                })
+
+            {/* if there no privatechatrooms to show
+                we should show a message to the user
+            */}
+            {privateChatRooms.length === 0 ?
+                <div className='flex flex-col items-center justify-center h-full text-center'>
+                    <div className='text-2xl text-white'>Your chat history is looking a little empty</div>
+                    <div>
+                        <div className='text-xl text-white'>want to fix that?</div>
+                    </div>
+
+                </div> :
+
+                (
+
+                    // {
+                    privateChatRooms.map((props: PrivateMessage) => {
+                        return (
+                            <div key={props.chatRoomid} onClick={() => {
+                                setSelectedChat(props);
+                            }}>
+                                <ChatTab {...props} key={props.chatRoomid} />
+                                {/* seperator should show under all compontes excpet the last one */}
+                                {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?
+                                    <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 opacity-60'></div> : null}
+                            </div>
+                        )
+                    })
+                    // }
+                )
             }
         </UsersChatListStyle>
     );

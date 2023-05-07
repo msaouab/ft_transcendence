@@ -15,6 +15,7 @@ import { UserController } from './user/user.controller';
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
 import { ChatGateway } from './chat/chat.gateway';
+import { SearchModule } from './search/search.module';
 
 
 @Module({
@@ -28,7 +29,8 @@ import { ChatGateway } from './chat/chat.gateway';
     AuthModule,
     InvitesModule,
     ChatModule,
-    BlockedUsersModule
+    BlockedUsersModule,
+    SearchModule
   ],
 
   controllers: [AppController, UserController],

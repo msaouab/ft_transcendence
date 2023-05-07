@@ -25,12 +25,15 @@ const Chat = () => {
   // passing a prop to ChatList, to get event when a user is clicked and pass it to ChatBox
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
   return (
+
     <ChatStyle>
       <div className="side-bar w-1/7 h-full bg-gray-500">
         <h1>Side Bar</h1>
       </div>
       <ChatList setSelectedChat={setSelectedChat} />
-      <ChatBox  {...selectedChat} key={selectedChat.chatRoomid} />
+      <div className="chat-box w-[63%] h-full">
+        <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" />
+      </div>
     </ChatStyle >
   )
 }

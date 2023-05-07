@@ -7,15 +7,18 @@ import { Body, VersioningType } from '@nestjs/common';
 import bodyParser from 'body-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
+
+// importing cors
+import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
-
-
+import { SocketAdapter } from './socket.adapter';
 
 
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   //ejs temp front end
   app.useStaticAssets(join('/', 'app', 'public'));
   app.setBaseViewsDir(join('/', 'app', 'views'));
@@ -47,7 +50,6 @@ async function bootstrap() {
   }),
   );
   app.use(cookieParser());
-  // app.use(cookieParser());
   //secret from .env
 
   //passport start
@@ -60,6 +62,8 @@ async function bootstrap() {
       origin: "*"
     }
   )
+
+  app.useWebSocketAdapter(new SocketAdapter(app));
   await app.listen(3000);
 }
 

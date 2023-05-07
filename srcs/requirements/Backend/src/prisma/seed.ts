@@ -2,14 +2,14 @@
 import { PrismaClient, User } from '@prisma/client'
 const prisma = new PrismaClient()
 import { createHash } from 'crypto';
+// {
+//     login: 'ren-nasr',
+//     email: 'ren-nasr@student.1337.ma',
+//     firstName: 'rida',
+//     lastName: 'ennasry',
+//     password: 'ren-nasr',
+// },
 const users = [
-    {
-        login: 'ren-nasr',
-        email: 'ren-nasr@student.1337.ma',
-        firstName: 'rida',
-        lastName: 'ennasry',
-        password: 'ren-nasr',
-    },
     {
         login: 'ichoukri',
         email: 'ichoukri@student.1337.ma',
@@ -32,8 +32,15 @@ const users = [
         password: 'iqessam',
     },
     {
+        login: 'ren-nasr',
+        email: 'ren-nasr@student.1337.ma',
+        firstName: 'rida',
+        lastName: 'ennasry',
+        password: 'ren-nasr'
+    },
+    {
         login: 'mbehhar',
-        email: 'mbehharrbenjell',
+        email: 'mbehhar@student.1337.ma',
         firstName: 'Mohamed',
         lastName: 'Behhar',
         password: 'mbehhar',
@@ -124,6 +131,7 @@ const getRoomId = async (senderId: string, receiverId: string) => {
 async function main() {
     console.log(`Start seeding ...`)
     for (const user of users) {
+        // let newArr = users.filter((user) => user.login !== 'ren-nasr')
         const checkUser = await prisma.user.findUnique({
             where: {
                 login: user.login,
@@ -136,63 +144,93 @@ async function main() {
         const userCreate = await prisma.user.create({
             data: user,
         })
+
+
         // add id to users arr 
+        await prisma.channel.create({
+            data: {
+                name: `channel-${Math.floor(Math.random() * 100)}`,
+                chann_type: 'Public',
+                owner_id: userCreate.id,
+                limit_members: 10,
+            },
+        })
 
         console.log(`Created user with id: ${userCreate.id}`)
     }
+
+    let user = await prisma.user.findUnique({
+        where: {
+            login: 'ren-nasr',
+        },
+    })
+
+
+
 
 
     // adding a seed for private chat room and messages 
     // creating 10 private chat rooms two rooms for each user, each rooms should have ren-nasr as a member
     // then at each room we create 50 messages, while selecting a random user to be the sender or the receiver from the room members
-    for (let i = 0; i < 5; i++) {
-        let newArr = users.filter((user) => user.login !== 'ren-nasr')
-        let user1 = await prisma.user.findUnique({
-            where: {
-                login: newArr[i].login,
-            },
-        })
+    // for (let i = 0; i < 5; i++) {
+    let newArr = users.filter((user) => user.login !== 'ren-nasr')
+    let user1 = await prisma.user.findUnique({
+        where: {
+            // login: newArr[i].login,
+            login: 'ichoukri'
+        },
+    })
 
 
-        // while (user1.login === 'ren-nasr') {
-        //     user1 = await getRandomUser(    
-        // }
+    // while (user1.login === 'ren-nasr') {
+    //     user1 = await getRandomUser(    
+    // }
 
-        // user 2 should be ren-nasr
+    // user 2 should be ren-nasr
 
-        const user2 = await prisma.user.findUnique({
-            where: {
-                login: 'ren-nasr',
-            },
-        })
+    const user2 = await prisma.user.findUnique({
+        where: {
+            login: 'ren-nasr',
+        },
+    })
 
-        const privateChatRoom = await prisma.privateChatRoom.create({
+    const privateChatRoom = await prisma.privateChatRoom.create({
+        data: {
+            id: await getRoomId(user1.id, user2.id),
+            sender_id: user1.id, receiver_id: user2.id,
+
+        },
+    })
+    console.log(`Created private chat room with id: ${privateChatRoom.id}`)
+    for (let j = 0; j < 50; j++) {
+        let sender = Math.random() >= 0.5 ? user1 : user2
+        let receiver = sender.id === user1.id ? user2 : user1
+        let content = messages[Math.floor(Math.random() * messages.length)]
+        const privateMessage = await prisma.privateMessage.create({
             data: {
-                id: await getRoomId(user1.id, user2.id),
-                sender_id: user1.id, receiver_id: user2.id,
-
+                sender_id: sender.id,
+                receiver_id: receiver.id,
+                chatRoom_id: privateChatRoom.id,
+                dateCreated: new Date(),
+                content: content,
+                seen: Math.random() >= 0.5 ? true : false,
+                id: sender.id + receiver.id + Date.now().toString(),
             },
         })
-        console.log(`Created private chat room with id: ${privateChatRoom.id}`)
-        for (let j = 0; j < 50; j++) {
-            let sender = Math.random() >= 0.5 ? user1 : user2
-            let receiver = sender.id === user1.id ? user2 : user1
-            let content = messages[Math.floor(Math.random() * messages.length)]
-            const privateMessage = await prisma.privateMessage.create({
-                data: {
-                    sender_id: sender.id,
-                    receiver_id: receiver.id,
-                    chatRoom_id: privateChatRoom.id,
-                    dateCreated: new Date(),
-                    content: content,
-                    seen: Math.random() >= 0.5 ? true : false,
-                    id: sender.id + receiver.id + Date.now().toString(),
-                },
-            })
-            console.log(`Created private message with id: ${privateMessage.id}`)
-        }
+        console.log(`Created private message with id: ${privateMessage.id}`)
     }
+
+    // creatigng channels
+
+
+    // const rennasr = await prisma.user.findUnique({
+    //     where: {
+    //         login: 'ren-nasr',
+    //     },
+    // })
+
 }
+
 
 
 
@@ -208,8 +246,6 @@ main()
 
 
 // remove this whole file later
-
-
 
 
 

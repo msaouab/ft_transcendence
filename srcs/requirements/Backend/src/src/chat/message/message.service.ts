@@ -7,12 +7,13 @@ import {
     Prisma,
     PrivateMessage
 } from "@prisma/client"
+// import { } from "@prisma/client";
 
 import { createMessageDto, updateMessageDto } from "./message.dto";
 import { Request } from 'express';
 export class MessageService {
     constructor(
-        private readonly prismService: PrismaService
+        private readonly prismService: PrismaService,
     ) { }
 
     async getPrivateChatMessage(id: string, msgId: string): Promise<PrivateMessage[]> {
@@ -31,16 +32,25 @@ export class MessageService {
             }
         }
     }
+
     async createPrivateChatMessage(body: createMessageDto): Promise<PrivateMessage> {
         try {
+            console.log("Body: ", body);
             const privateChatMessages = await this.prismService.privateMessage.create({
                 data: {
                     ...body
                 }
             });
+            if (privateChatMessages == null) {
+                throw new HttpException("Private Chat Message not created", 500);
+
+            }
+
+            console.log("Private Chat Message created: ", privateChatMessages);
             return privateChatMessages;
         } catch (error) {
-            throw new HttpException(error, 500);
+            console.log("Error: ", error);
+            throw new HttpException("Private Chat Message not created", 500);
         }
     }
     async deletePrivateChatMessage(id: string, msgId: string, @Req() request: Request): Promise<PrivateMessage> {

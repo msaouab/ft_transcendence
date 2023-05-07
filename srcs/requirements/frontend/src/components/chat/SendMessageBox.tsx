@@ -2,9 +2,10 @@
 import styled from 'styled-components';
 import { CiPaperplane, CiChat1 } from 'react-icons/ci';
 import { PrivateMessage } from '../../types/message';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
 
-
+import Cookies from 'js-cookie';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     height: 8%;
@@ -43,16 +44,73 @@ const SendMessageBoxStyle = styled.div`
 const SendMessageBox = (selectedChat: PrivateMessage) => {
 
     const [message, setMessage] = useState<string>('');
+    const [connected, setConnected] = useState<boolean>(false);
+    let socket = useRef(null);
+    useEffect(() => {
+        if (!connected) {
+            // try {
+            socket.current = io('http://localhost:3000/chat');
+            setConnected(true);
+        }
+        return () => {
+            socket.current.disconnect();
+            setConnected(false);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (socket.current) {
+            socket.current.on('disconnect', () => {
+                setConnected(false);
+            }
+            );
+        }
+
+        if (socket.current) {
+            socket.current.on('connect', () => {
+                setConnected(true);
+                // console.log('connected');
+            }
+            );
+        }
+        if (socket.current) {
+            socket.current.on('MessageCreated', (message: any) => {
+                console.log('received a message: ', message);
+            });
+
+        }
+
+    }, [connected]);
+
+
+
+
+
+
 
 
 
     const sendMessage = (messageProp: string) => {
-
         // open a websocket connection, send the messageProp to the server
         // the server will then send the messageProp to the other user
+        // setMessage(messageProp);
+        setMessage('');
 
-        setMessage(messageProp);
-        // console.log(messageProp);
+        console.log(messageProp);
+        let message = {
+            dateCreated: new Date(),
+            content: messageProp,
+            seen: false,
+            chatRoom_id: selectedChat.chatRoomid,
+            sender_id: Cookies.get('id'),
+            receiver_id: selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id
+
+        };
+
+        if (connected) {
+            console.log('sending the message: ', message);
+            socket.current.emit('sendPrivateMessage', message);
+        }
         // console.log(selectedChat);
     };
 
@@ -65,7 +123,10 @@ const SendMessageBox = (selectedChat: PrivateMessage) => {
                 <input type='text' placeholder='Type a message...' onChange={(e) => setMessage(e.target.value)} />
             </form>
             <div className='send-icon'>
-                <CiPaperplane size={30} color='#ffff' />
+                <a href='#' onClick={() => sendMessage(message)}>
+
+                    <CiPaperplane size={30} color='#ffff' />
+                </a>
             </div>
         </SendMessageBoxStyle>
     );

@@ -34,7 +34,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 @Injectable()
 export class ChatService {
     constructor(private prisma: PrismaService,
-        private MessageService: MessageService
+        // private MessageService: MessageService
     ) { }
 
     /* joinPrivateChatRoom(senderId: string, receiverId: string) 
@@ -50,36 +50,6 @@ export class ChatService {
         const hash = createHash('md5');
         const hashedRoomName = hash.update(roomName + secretKey).digest('hex');
         return hashedRoomName;
-    }
-
-    // one note here is that you can check if the room exist or not
-    // by only hashing the sender_id,receiver_id and secret key and 
-    // check if room id matches that of client sent room id
-    // which would reduce a whole db query, anyways...
-    async CreatePrivateChatRoom(client: Socket, payload: {
-        senderId: string,
-        receiverId: string
-    }) {
-        const { senderId, receiverId } = payload;
-        const hashedRoomName = await this.getRoomId(senderId, receiverId);
-        // client.join(hashedRoomName);
-        // console.log("Im sender and I joined the room: ", hashedRoomName);
-        // create the private chat room if it doesn't exist, and if it exist, throw an error
-        try {
-            const privateChatRoom = await this.prisma.privateChatRoom.create({
-                data: {
-                    id: hashedRoomName,
-                    sender_id: senderId,
-                    receiver_id: receiverId
-                }
-            });
-            return privateChatRoom;
-        } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                console.log("Error: ", error);
-                throw new HttpException("Private chat already exist", 409);
-            }
-        }
     }
 
 
@@ -103,7 +73,42 @@ export class ChatService {
                 throw new HttpException("Private chat doesn't exist", 404);
             }
         }
+
     }
+
+    // one note here is that you can check if the room exist or not
+    // by only hashing the sender_id,receiver_id and secret key and 
+    // check if room id matches that of client sent room id
+    // which would reduce a whole db query, anyways...
+    async CreatePrivateChatRoom(client: Socket, payload: {
+        senderId: string,
+        receiverId: string
+    }) {
+        const { senderId, receiverId } = payload;
+        const hashedRoomName = await this.getRoomId(senderId, receiverId);
+        // client.join(hashedRoomName);
+        // console.log("Im sender and I joined the room: ", hashedRoomName);
+        // create the private chat room if it doesn't exist, and if it exist, throw an error
+        try {
+            await this.prisma.privateChatRoom.create({
+                data: {
+                    id: hashedRoomName,
+                    sender_id: senderId,
+                    receiver_id: receiverId
+                }
+            });
+            return this.joinPrivateChatRoom(client, payload);
+            // return privateChatRoom;
+        } catch (error) {
+            if (error instanceof PrismaClientKnownRequestError) {
+                console.log("Error: ", error);
+                throw new HttpException("Private chat already exist", 409);
+            }
+        }
+
+    }
+
+
 
 
     async leavePrivateChatRoom(client: Socket, payload: {
@@ -130,6 +135,8 @@ export class ChatService {
 
     /* sendPrivateMessage(senderId: string, receiverId: string, message: string) */
     async sendPrivateMessage(client: Socket, payload: createMessageDto) {
+
+
         // if room doesn't exist, call joinPrivateChatRoom
         const subPayload = {
             senderId: payload.sender_id,
@@ -139,6 +146,8 @@ export class ChatService {
             content: payload.content
 
         }
+
+        console.log("Subpayload: ", subPayload);
         // const privateRoom = await this.CreatePrivateChatRoom(client, subPayload);
         // return "ok";
 
@@ -149,13 +158,36 @@ export class ChatService {
                     id: await this.getRoomId(payload.sender_id, payload.receiver_id),
                 },
             })
-            console.log("Private room: ", privateRoom);
+            // console.log("Private room: ", privateRoom);
             // if client socket is not joined to the private chat room, throw an exception
+            // join cli
             if (!client.rooms.has(privateRoom.id)) {
-                throw new HttpException("You're not in the private chat room", 403);
+                console.log("You're not in the private chat room");
+                // throw new HttpException("You're not in the private chat room", 403);
+                await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
             }
+
+            console.log("we're creating the private message");
             // create a new private message, and adds it to the private chat room
-            const privateMessage = await this.MessageService.createPrivateChatMessage(payload);
+            // let privateMessage = await this.MessageService.createPrivateChatMessage(payload);
+            let message = await this.prisma.privateMessage.create({
+                data: {
+                    content: payload.content,
+                    seen: payload.seen,
+                    sender_id: payload.sender_id,
+                    receiver_id: payload.receiver_id,
+                    chatRoom_id: payload.chatRoom_id,
+                }
+            });
+            if (!message) {
+                throw new HttpException("Error creating private message", 500);
+            }
+            console.log("Private message: ", message);
+
+
+
+
+
             await this.prisma.privateChatRoom.update({
                 where: {
                     id: privateRoom.id
@@ -166,7 +198,7 @@ export class ChatService {
             });
             console.log("We're sending the event to room: ", privateRoom);
             // send the private message to the all the clients in the private chat room
-            client.to(privateRoom.id).emit('chatPrivately', privateMessage);
+            client.to(privateRoom.id).emit('MessageCreated', message);
 
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
@@ -240,7 +272,7 @@ export class ChatService {
 
                     },
                     orderBy: {
-                        dateCreated: 'asc'
+                        dateCreated: 'desc'
                     }
                 })
             ]);
@@ -263,7 +295,7 @@ export class ChatService {
                     chatRoom_id: id
                 },
                 orderBy: {
-                    dateCreated: 'asc'
+                    dateCreated: 'desc'
                 },
                 skip: Number(offset),
                 take: limitNumber

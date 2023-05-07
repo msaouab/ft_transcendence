@@ -14,7 +14,6 @@ const GroupChatListStyle = styled.div`
 const GroupChatList = () => {
     return (
         <GroupChatListStyle>
-
         </GroupChatListStyle>
     );
 };

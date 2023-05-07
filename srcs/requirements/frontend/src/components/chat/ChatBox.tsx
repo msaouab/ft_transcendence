@@ -1,15 +1,18 @@
 import styled from 'styled-components';
 import React, { useEffect } from 'react';
 // import socket from '../../socket';
+import Cookies from 'js-cookie';
 import { io } from 'socket.io-client';
 const ChatBoxStyle = styled.div`
     background: transparent;
-    width: 60%;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: rgba(217, 217, 217, 0.3);
-    border-radius: 25px;
+    background: ${(props) => props.size === 'small' ? 'rgba(217, 217, 217, 0.2)' : ' rgba(217, 217, 217, 0.3)'};
+    border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
+
+
     padding: 20px;
 `;
 
@@ -25,9 +28,11 @@ import Message from './Message/Message';
 import axios from 'axios';
 
 
+const ChatBox = ({ selectedChat, size }: {
+    selectedChat: PrivateMessage,
+    size: string
+}) => {
 
-
-const ChatBox = (selectedChat: PrivateMessage) => {
     // states
     let initialState = {
         messages: [] as singleMessage[],
@@ -50,6 +55,7 @@ const ChatBox = (selectedChat: PrivateMessage) => {
     };
 
     const getMessages = async () => {
+        if (!selectedChat.chatRoomid) return [];
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         return responseMessages.data[1];
@@ -62,7 +68,7 @@ const ChatBox = (selectedChat: PrivateMessage) => {
                 offset: prevState.offset + newMessages.length,
                 hasMore: totalMessages > prevState.offset + newMessages.length
             }));
-        });
+        })
     };
 
     React.useEffect(() => {
@@ -74,65 +80,56 @@ const ChatBox = (selectedChat: PrivateMessage) => {
                 hasMore: true,
             }));
         });
-
-        // joinPrivateChatRoom(chatRoomid);
-
     }, [selectedChat]);
 
 
-    // useEffect(() => {
-    //     const socket = io('http://localhost:3000');
-    //     socket.on('connect', () => {
-    //         setIsConnected(true);
-    //     });
-    //     socket.on('disconnect', () => {
-    //         setIsConnected(false);
-    //     });
-    // }, []);
-
-
     return (
-        <ChatBoxStyle>
-            <div>
-                <ChatBoxTopBar login={selectedChat.login} profileImage={selectedChat.profileImage} status={selectedChat.status} />
-                <div className='h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60'></div>
-            </div>
-            <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id='scrollableDiv'>
-                <InfiniteScroll
-                    scrollableTarget="scrollableDiv"
-                    dataLength={messages.length} //This is important field to render the next data
-                    next={next}
-                    hasMore={hasMore}
-                    loader={
-                        <h4
-                            style={{
-                                textAlign: 'center',
-                                color: 'white',
-                                position: 'absolute',
-                                top: '15%',
-                                left: '60%',
-                            }}>Loading...</h4>
-                    }
-                    inverse={true}
-                >
-                    {messages
-                        .slice() // make a copy of the array
-                        .reverse() // reverse the order of the array
-                        .map((message) => {
-                            const prevMessage = messages[messages.indexOf(message) - 1];
-                            return <Message key={message.id} message={message} prevMessage={prevMessage} />;
-                        })}
-                </InfiniteScroll>
-            </div>
-            <SendMessageBox {...selectedChat} />
+        <ChatBoxStyle size={size}>
+            {
+                selectedChat.sender_id === undefined && selectedChat.receiver_id === undefined ? (
 
+                    <div className='flex flex-col items-center justify-center h-full'>
+                        <div className='text-2xl text-white'>nothing to see here</div>
+                        <div className='text-xl text-white'>try selecting a chat</div>
+                    </div>
+                )
+                    :
+                    (
+                        <>
+                            <div>
+                                <ChatBoxTopBar login={selectedChat.login} profileImage={selectedChat.profileImage} status={selectedChat.status} id={selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id} />
+                                <div className='h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60'></div>
+                            </div>
+                            <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id='scrollableDiv'>
+                                <InfiniteScroll
+                                    // key={selectedChat.chatRoomid}
+                                    scrollableTarget="scrollableDiv"
+                                    dataLength={messages.length} //This is important field to render the next data
+                                    next={next}
+                                    hasMore={hasMore}
+                                    inverse={true}
+                                >
+                                    {messages
+                                        .slice() // make a copy of the array
+                                        .reverse() // reverse the order of the array
+                                        .map((message) => {
+                                            const prevMessage = messages[messages.indexOf(message) - 1];
+                                            return <Message key={message.id} message={message} prevMessage={prevMessage} />;
+                                        })}
 
-
-        </ChatBoxStyle >
+                                </InfiniteScroll>
+                            </div>
+                            <SendMessageBox {...selectedChat} />
+                        </>
+                    )
+            }
+        </ChatBoxStyle>
     );
 };
 
 export default ChatBox;
+
+
 
 
 

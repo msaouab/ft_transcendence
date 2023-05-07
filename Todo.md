@@ -12,7 +12,8 @@
  - [x] make the message component maxwidth 50%
  - [x] make the message preview in list users  
  - [x] show date at last message only + show only first message as rounded with dot
-
-
+ - [ ] add searches endpoint it should takes query params and return
+ - [ ] add tmp chat component to full screen search box
+    
 # Notes
 - webapp is crashing in logout ()
