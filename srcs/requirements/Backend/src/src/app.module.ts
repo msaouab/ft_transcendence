@@ -16,6 +16,7 @@ import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
 import { ChannelModule } from './channel/channel.module';
 import { ChatGateway } from './chat/chat.gateway';
+import { SearchModule } from './search/search.module';
 
 
 @Module({
@@ -30,7 +31,8 @@ import { ChatGateway } from './chat/chat.gateway';
     InvitesModule,
     ChannelModule,
     ChatModule,
-    BlockedUsersModule
+    BlockedUsersModule,
+    SearchModule
   ],
 
   controllers: [AppController, UserController],

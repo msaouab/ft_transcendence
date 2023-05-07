@@ -110,4 +110,16 @@ export class UserService {
             throw error;
         }
     }
+
+    async search(query: string) {
+        // search for users with `query` in their login
+        const users = await this.prisma.user.findMany({
+            where: {
+                login: {
+                    contains: query,
+                },
+            },  
+        });
+        return users;
+    }
 }

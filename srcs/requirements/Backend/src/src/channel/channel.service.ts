@@ -10,16 +10,16 @@ import { log } from "console";
 @Injectable({})
 export class ChannelService {
     constructor(private prisma: PrismaService,
-        private readonly UserService: UserService){}
+        private readonly UserService: UserService) { }
 
-    async createChannel(request: Request, dto: ChannelDto){
+    async createChannel(request: Request, dto: ChannelDto) {
         const userId = request.cookies?.id;
         if (userId === undefined)
             throw new ForbiddenException("There is no ID in cookies");
         await this.UserService.getUser(userId)
-        try{
+        try {
             const channel = await this.prisma.channel.create({
-                data:{
+                data: {
                     name: dto.name,
                     chann_type: dto.status,
                     password: dto.password,
@@ -29,8 +29,8 @@ export class ChannelService {
             })
             this.UserService.addChannel(channel.id, channel.name, userId, "Owner");
             return channel;
-        }catch(error){
-            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"){
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
                 throw new ForbiddenException("There is already a channel with the name provided");
             }
             throw error;
@@ -39,7 +39,7 @@ export class ChannelService {
 
     async getChannelById(id: string) {
         const channel = await this.prisma.channel.findUnique({
-            where:{
+            where: {
                 id: id
             }
         })
@@ -99,7 +99,7 @@ export class ChannelService {
             if (channel.chann_type === "Secret" && channel.password !== dto.password)
                 throw new ForbiddenException("Wrong password");
             const memberTab = await this.prisma.membersTab.create({
-                data:{
+                data: {
                     member_id: dto.userId,
                     channel_id: channelId,
                 }
@@ -114,10 +114,10 @@ export class ChannelService {
             throw error;
         }
     }
-    async getMembers(channelId: string): Promise<string[]>{
+    async getMembers(channelId: string): Promise<string[]> {
         await this.getChannelById(channelId);
-        const memberTab =  await this.prisma.membersTab.findMany({
-            where:{ channel_id: channelId },
+        const memberTab = await this.prisma.membersTab.findMany({
+            where: { channel_id: channelId },
             select: { member_id: true }
         })
         if (memberTab !== null)
@@ -129,10 +129,10 @@ export class ChannelService {
     async deleteMember(channelId: string, dto: MemberDto, deleteChannel: boolean = true) {
         await this.UserService.getUser(dto.userId);
         await this.getChannelById(channelId);
-        try{
+        try {
             const deleteMember = await this.prisma.membersTab.delete({
-                where:{
-                    channel_id_member_id:{
+                where: {
+                    channel_id_member_id: {
                         member_id: dto.userId,
                         channel_id: channelId
                     }
@@ -219,7 +219,7 @@ export class ChannelService {
             } catch (error) {
                 throw new ForbiddenException("Update role from Admin to Member failed");
             }
-            this.addMember(channelId, {userId: dto.userId, password: channel.password}, false);
+            this.addMember(channelId, { userId: dto.userId, password: channel.password }, false);
             return deleteAdmin;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025")
@@ -380,5 +380,41 @@ export class ChannelService {
                 throw new ForbiddenException("This user is not muted");
             throw error;
         }
+    }
+
+    async search(search: string, userId: string) {
+        // search for channels with name containing search that are Public or Secret or Private and user is member
+        const channels = await this.prisma.channel.findMany({
+            where: {
+                name: {
+                    contains: search
+                },
+                OR: [
+                    { chann_type: "Public" },
+                    { chann_type: "Secret" },
+                    {
+                        AND: [
+                            { chann_type: "Private" },
+                            {
+                                OR: [
+                                    { members: { some: { member_id: userId } } },
+                                    { owner_id: userId },
+                                    { adminstrators : { some: { admin_id: userId } } },
+                                    { mutedMembers : { some: { muted_id: userId } } },
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                name: true,
+                chann_type: true,
+                owner_id: true,
+                dateCreated: true,
+            }
+        });
+        return channels;
     }
 }
