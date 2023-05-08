@@ -60,7 +60,7 @@ const Achivements = [
 
 const FreindCard = () => {
   return (
-    <div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
+    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
       <div className="image">
         <img src={Avatar} alt="" width={60} />
       </div>
@@ -75,7 +75,7 @@ const FreindCard = () => {
 
 const GameCard = () => {
   return (
-    <div className="flex justify-center  p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]	">
+    <div className="flex justify-center mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]	">
       <div className="flex items-center gap-7">
         <div className="firstAdversary text-xl">Lala dodo</div>
         <div className="result text-xl font-bold text-red-400">1 - 0</div>
@@ -87,7 +87,7 @@ const GameCard = () => {
 
 const ChanelCard = () => {
   return (
-    <div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
+    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
       <div className="chanelname text-xl font-bold">Mohima</div>
       <div className="membersNumber"> Members : 210</div>
       <div className="subject">Subject : Hadra Khauia</div>
@@ -97,7 +97,7 @@ const ChanelCard = () => {
 
 const AchivementCard = ({ title, description, imgPath }: any) => {
   return (
-    <div className="bg-white shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
+    <div className="bg-white  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
       <div className="image">
         <img src={imgPath} alt="" width={150} />
       </div>
