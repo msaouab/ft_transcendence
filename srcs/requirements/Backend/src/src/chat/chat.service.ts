@@ -9,21 +9,12 @@ messages from a database
 
 import { Body, HttpException, Injectable, Param, Query } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { Socket } from 'socket.io';
+import { Socket, Server } from 'socket.io';
 import { createHash } from 'crypto';
-
-import { Server } from 'socket.io'
-import { MessageService } from './message/message.service';
 import {
     PrivateChatRoom,
     PrivateMessage
 } from '@prisma/client';
-
-import { GetPrivateChatMessagesDto } from './dto/getPrivateChatRoom.dto';
-import {
-    Inject,
-    forwardRef
-} from '@nestjs/common';
 
 
 // dto's
@@ -73,7 +64,6 @@ export class ChatService {
                 throw new HttpException("Private chat doesn't exist", 404);
             }
         }
-
     }
 
     // one note here is that you can check if the room exist or not
@@ -109,8 +99,6 @@ export class ChatService {
     }
 
 
-
-
     async leavePrivateChatRoom(client: Socket, payload: {
         senderId: string,
         receiverId: string
@@ -134,8 +122,7 @@ export class ChatService {
     }
 
     /* sendPrivateMessage(senderId: string, receiverId: string, message: string) */
-    async sendPrivateMessage(client: Socket, payload: createMessageDto) {
-
+    async sendPrivateMessage(client: Socket, payload: createMessageDto, server: Server) {
 
         // if room doesn't exist, call joinPrivateChatRoom
         const subPayload = {
@@ -144,7 +131,6 @@ export class ChatService {
             chatRoomId: payload.chatRoom_id,
             seen: payload.seen,
             content: payload.content
-
         }
 
         console.log("Subpayload: ", subPayload);
@@ -183,11 +169,6 @@ export class ChatService {
                 throw new HttpException("Error creating private message", 500);
             }
             console.log("Private message: ", message);
-
-
-
-
-
             await this.prisma.privateChatRoom.update({
                 where: {
                     id: privateRoom.id
@@ -197,8 +178,7 @@ export class ChatService {
                 }
             });
             console.log("We're sending the event to room: ", privateRoom);
-            // send the private message to the all the clients in the private chat room
-            client.to(privateRoom.id).emit('MessageCreated', message);
+            server.to(privateRoom.id).emit('newPrivateMessage', message);
 
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {

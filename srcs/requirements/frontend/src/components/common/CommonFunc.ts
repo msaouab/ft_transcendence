@@ -23,3 +23,12 @@ export const dateStrToNum = (dateStr: string) => {
 
 }
 
+
+export const dateToStr = (date: Date): string => {
+    // convet date string to number
+    // 2023-05-04T12:38:43.532Z -> 20230504123843
+    return date.toISOString().replace(/[-T:.Z]/g, '');
+
+}
+
+

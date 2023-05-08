@@ -24,6 +24,7 @@ const Chat = () => {
   //  add default chatbox later 
   // passing a prop to ChatList, to get event when a user is clicked and pass it to ChatBox
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
+  // const [newMessage, setNewMessage] = React.useState<PrivateMessage>({} as PrivateMessage);
   return (
 
     <ChatStyle>

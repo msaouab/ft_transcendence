@@ -14,6 +14,8 @@
  - [x] show date at last message only + show only first message as rounded with dot
  - [ ] add searches endpoint it should takes query params and return
  - [ ] add tmp chat component to full screen search box
-    
+ - [ ] the dot , date thing doesn't work!!! do you understand that my friend!!!!
+
+ 
 # Notes
 - webapp is crashing in logout ()
