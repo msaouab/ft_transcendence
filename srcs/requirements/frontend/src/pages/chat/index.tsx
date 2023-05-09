@@ -35,7 +35,7 @@ const Chat = () => {
       <div className="side-bar w-1/7 h-full bg-gray-500">
         <h1>Side Bar</h1>
       </div>
-      <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage``} />
+      <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       <div className="chat-box w-[63%] h-full">
         <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" setNewLatestMessage={setNewLatestMessage} />
       </div>
