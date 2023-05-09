@@ -14,5 +14,5 @@ import { SearchGateway } from './search.gateway';
     ],
     exports: []
 })
-export class SearchModule { }
+export class SearchWebSocketModule { }
 

@@ -9,7 +9,7 @@ import { Injectable } from "@nestjs/common";
 export class SearchService {
     constructor(private prisma: PrismaService) { }
 
-    async search(search: string, limit: number) {
+    async searchWebSocket(search: string, limit: number) {
 
         if (search == '') {
             return [];

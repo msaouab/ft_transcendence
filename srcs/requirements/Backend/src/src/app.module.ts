@@ -15,7 +15,7 @@ import { UserController } from './user/user.controller';
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
 import { ChatGateway } from './chat/chat.gateway';
-import { SearchModule } from './search/search.module';
+import { SearchWebSocketModule } from './searchWebSocket/search.module';
 
 
 @Module({
@@ -30,7 +30,7 @@ import { SearchModule } from './search/search.module';
     InvitesModule,
     ChatModule,
     BlockedUsersModule,
-    SearchModule
+    SearchWebSocketModule
   ],
 
   controllers: [AppController, UserController],
