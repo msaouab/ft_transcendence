@@ -14,8 +14,10 @@ import { UserController } from './user/user.controller';
 //services
 import { AuthService } from './auth/auth.service';
 import { UserService } from './user/user.service';
+import { ChannelModule } from './channel/channel.module';
 import { ChatGateway } from './chat/chat.gateway';
 import { SearchWebSocketModule } from './searchWebSocket/search.module';
+import { SearchModule } from './search/search.module';
 
 
 @Module({
@@ -28,9 +30,11 @@ import { SearchWebSocketModule } from './searchWebSocket/search.module';
     UserModule,
     AuthModule,
     InvitesModule,
+    ChannelModule,
     ChatModule,
     BlockedUsersModule,
-    SearchWebSocketModule
+    SearchWebSocketModule,
+    SearchModule
   ],
 
   controllers: [AppController, UserController],

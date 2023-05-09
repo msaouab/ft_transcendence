@@ -13,7 +13,7 @@ import {
 } from 'src/guards/user-exists.guard';
 
 @ApiTags('User')
-@Controller('user')
+@Controller('User')
 export class UserController {
   constructor(private readonly userService: UserService,
     private readonly chatService: ChatService) { }
@@ -53,5 +53,14 @@ export class UserController {
 
 
 
+    // updateUser(@Param('id') id: string,@User() user: Profile, @Body() PutUserDto: PutUserDto) {
+    //     return this.userService.updateUser(id, user, PutUserDto);
+    // }
+
+  @Get(':id/channels')
+  @UseGuards(AuthenticatedGuard)
+  getJoindChannels(@Param('id') id: string){
+    return this.userService.getJoindChannels(id);
+  }
 }
 
