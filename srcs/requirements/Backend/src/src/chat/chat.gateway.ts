@@ -43,23 +43,40 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log(`Client with id ${id} disconnected`);
     }
 
-    @SubscribeMessage('createPrivateRoom')
-    async handleCreateRoom(client: Socket, payload: {
-        senderId: string,
+
+    @SubscribeMessage('checkOnline')
+    async handleCheckOnline(client: Socket, payload: {
+        // senderId: string,
         receiverId: string
     }) {
         console.log("We've got the event");
-        await this.chatService.CreatePrivateChatRoom(client, payload);
-        // 
+        // return await this.chatService.checkOnline(client, payload, this.server);
     }
 
-    @SubscribeMessage('joinRoom')
-    async handleJoinRoom(client: Socket, payload: {
-        senderId: string,
-        receiverId: string
-    }) {
-        console.log("We've got the event");
-    }
+
+    // @SubscribeMessage('createPrivateRoom')
+    // async handleCreateRoom(client: Socket, payload: {
+    //     senderId: string,
+    //     receiverId: string
+    // }) {
+    //     console.log("We've got the event to create a private room");
+    //     return await this.chatService.CreatePrivateChatRoom(client, payload, this.server);
+    //     // console.log("privatChatRoom: ", privatChatRoom.id);
+    //     // this.server.to(privatChatRoom.id).emit('privateRoomCreated', privatChatRoom);
+    //     // client.emit(callback, privatChatRoom);
+    // }
+
+    // 
+
+
+
+    // @SubscribeMessage('joinRoom')
+    // async handleJoinRoom(client: Socket, payload: {
+    //     senderId: string,
+    //     receiverId: string
+    // }) {
+    //     console.log("We've got the event");
+    // }
 
     @SubscribeMessage('leaveRoom')
     async handleLeaveRoom(client: Socket, payload: {

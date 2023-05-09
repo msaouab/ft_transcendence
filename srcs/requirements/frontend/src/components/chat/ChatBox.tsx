@@ -10,10 +10,9 @@ const ChatBoxStyle = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: ${(props) => props.size === 'small' ? 'rgba(217, 217, 217, 0.2)' : ' rgba(217, 217, 217, 0.3)'};
+    background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
-
-
+    font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px;
 `;
 
@@ -31,9 +30,10 @@ import ChatInfiniteScroll from './ChatInfiniteScroll';
 
 
 
-const ChatBox = ({ selectedChat, size }: {
+const ChatBox = ({ selectedChat, size, setNewLatestMessage }: {
     selectedChat: PrivateMessage,
     size: string,
+    setNewLatestMessage?: any
 }) => {
     let initialState = {
         messages: [] as singleMessage[],
@@ -43,40 +43,39 @@ const ChatBox = ({ selectedChat, size }: {
     };
 
 
+
+
+
+
+
+
+
     let chatSocket = useRef(null);
     const [connected, setConnected] = useState(false);
 
-    // add for chat connect and disconnect
-
+    // console.log('im inside chat box and im rendering with the selected chat: ', selectedChat);
     useEffect(() => {
         if (!connected) {
             chatSocket.current = io('http://localhost:3000/chat');
             setConnected(true);
+            console.log('connected to the server');
+
+            if (connected) {
+                chatSocket.current.on('newPrivateMessage', (message: any) => {
+                    setState((prevState: any) => ({
+                        ...prevState,
+                        messages: [message, ...prevState.messages]
+                    }));
+                })
+            }
         }
-
-        if (chatSocket.current && connected) {
-            chatSocket.current.on('newPrivateMessage', (message: any) => {
-                console.log("im inside chat box and i got a new message from the server: ", message);
-                setState((prevState: any) => ({
-                    ...prevState,
-                    messages: [message, ...prevState.messages]
-                }));
-            });
-
-            // move the scroll to the bottom
-            let chatBox = document.getElementById('chatBox');
-        }
-
-
-
         return () => {
             if (chatSocket.current && connected) {
-                chatSocket.current.off('newPrivateMessage');
+                // chatSocket.current.off('newPrivateMessage');
                 chatSocket.current.disconnect();
                 setConnected(false);
             }
         }
-
     }, []);
 
 
@@ -84,17 +83,13 @@ const ChatBox = ({ selectedChat, size }: {
 
         if (chatSocket.current && connected) {
             chatSocket.current.on('newPrivateMessage', (message: any) => {
-                console.log("im inside chat box and i got a new message from the server: ", message);
+                // console.log("im inside chat box and i got a new message from the server: ", message);
                 setState((prevState: any) => ({
                     ...prevState,
                     messages: [message, ...prevState.messages]
                 }));
             });
-
-            // move the scroll to the bottom
-            // let chatBox = document.getElementById('chatBox');
         }
-
 
     }, [chatSocket.current]);
 
@@ -106,7 +101,9 @@ const ChatBox = ({ selectedChat, size }: {
     let limit = 14;
 
     const getMessages = async () => {
+
         if (!selectedChat.chatRoomid) return [];
+
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         return responseMessages.data[1];
@@ -125,13 +122,31 @@ const ChatBox = ({ selectedChat, size }: {
 
     useEffect(() => {
         // console.log("im the chat box and i got a new message from the server: ", selectedChat);
+
+        // console.log('a new chat was selected: ', selectedChat);
         getMessages().then((messages) => {
-            setState((prevState) => ({
-                ...prevState,
-                messages: [...prevState.messages, ...messages],
-                offset: prevState.offset + messages.length,
-                hasMore: true,
-            }));
+            // console.log("The selected chat messages: ", messages);
+            // if a new message is selected then reset the state
+            if (messages.length == 0
+                || (messages[0] && selectedChat.chatRoomid !== messages[0].chatRoom_id)) {
+                // don't use the previous state
+                setState({
+                    messages: messages,
+                    hasMore: messages.length < totalMessages,
+                    offset: messages.length,
+                    totalMessages: totalMessages,
+                });
+            }
+            else {
+                setState((prevState) => ({
+                    ...prevState,
+                    messages: [...prevState.messages, ...messages],
+                    offset: prevState.offset + messages.length,
+                    hasMore: true,
+                }));
+                // add the message as the last 
+            }
+
         });
     }, [selectedChat]);
 
@@ -156,7 +171,7 @@ const ChatBox = ({ selectedChat, size }: {
                             <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id='scrollableDiv'>
                                 <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} />
                             </div>
-                            <SendMessageBox selectedChat={selectedChat} setState={setState} socket={chatSocket} connected={connected} />
+                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage}/>
                         </>
                     )
             }
@@ -171,24 +186,6 @@ export default ChatBox;
 
 
 
-
-
-{/* <InfiniteScroll
-                                    // key={selectedChat.chatRoomid}
-                                    scrollableTarget="scrollableDiv"
-                                    dataLength={messages.length} //This is important field to render the next data
-                                    next={next}
-                                    hasMore={hasMore}
-                                    inverse={true}
-                                >
-                                    {messages
-                                        .slice() // make a copy of the array
-                                        .reverse() // reverse the order of the array
-                                        .map((message) => {
-                                            const prevMessage = messages[messages.indexOf(message) - 1];
-                                            return <Message key={message.id} message={message} prevMessage={prevMessage} />;
-                                        })}
-                                </InfiniteScroll> */}
 
 
 

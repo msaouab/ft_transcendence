@@ -17,23 +17,27 @@ const ChatStyle = Styled.div`
 }
 `;
 
-import Loader from '../../components/common/Loader';
+// import Loader from '../../components/common/Loader';
+
 
 import { PrivateMessage } from '../../types/message';
 const Chat = () => {
   //  add default chatbox later 
   // passing a prop to ChatList, to get event when a user is clicked and pass it to ChatBox
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
-  // const [newMessage, setNewMessage] = React.useState<PrivateMessage>({} as PrivateMessage);
+  // const [updatList, setUpdatList] = React.useState<string>('');
+  const [newLatestMessage, setNewLatestMessage] = React.useState<string>('');
+
+
   return (
 
     <ChatStyle>
       <div className="side-bar w-1/7 h-full bg-gray-500">
         <h1>Side Bar</h1>
       </div>
-      <ChatList setSelectedChat={setSelectedChat} />
+      <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage``} />
       <div className="chat-box w-[63%] h-full">
-        <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" />
+        <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" setNewLatestMessage={setNewLatestMessage} />
       </div>
     </ChatStyle >
   )

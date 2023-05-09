@@ -102,10 +102,7 @@ const SearchResultsStyle = styled.div`
 
 
 
-
-
-const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
-
+const SearchBar = () => {
     const [search, setSearch] = useState<string>('');
     const [dropdown, setDropdown] = useState<boolean>(false);
     const searchBarRef = useRef<HTMLDivElement>(null);
@@ -114,11 +111,12 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
     let [searchResults, setSearchResults] = useState<any[]>([]);
     const [tmpChatData, setTmpChatData] = useState({});
     const [showTempChat, setShowTempChat] = useState<boolean>(false);
+
     const handleTempChat = (user: any) => {
+        console.log("handle temp chat");
         setShowTempChat(true);
         setTmpChatData(user);
     }
-
 
 
     // connection to websocket
@@ -131,11 +129,7 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
             );
         }
 
-        if (!dropdown && !fullScreenDropdown && searchConnected) {
-            // console.log("disconnecting");
-            socket.current.disconnect();
-            setSearchConnected(false);
-        }
+
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
             socket.current = io('http://localhost:3000/search');
 
@@ -158,6 +152,17 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
             setShowTempChat(false);
             setFullScreenDropdown(false);
         }
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyPress);
+            // disconnect from websocket
+            if (searchConnected) {
+                socket.current.disconnect();
+                setSearchConnected(false);
+            }
+
+        }
+
     }, []);
 
     useEffect(() => {
@@ -191,25 +196,23 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
             return null;
         }
         socket.current.on('searchInfo', (data: any) => {
-            // console.log("searchInfo", data);
             setSearchResults(data);
         }
         );
         setSearch(searchProp);
         socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
     };
-    const handleDropdown = (event: any) => {
+    const handleDropdown = () => {
         setDropdown(!dropdown);
     };
+
+
     const navigate = useNavigate();
     return (
-        // <div className="flex flex-col justify-center items-center gap-4 w-full max-w-3xl relative">
         <div>
-
             <div className="flex flex-col justify-center items-center gap-4 w-full max-w-3xl relative ">
                 <SearchBarStyle $width={90} className="search-bar" ref={searchBarRef}>
-                    {/* <CiSearch className="search-icon" size={30} /> */}
-                    {/* <div className="inline-dropdown-search flex flex-col justify-center items-center gap-4 w-full relative border-2 border-red-500"> */}
+
                     <CiSearch className="search-icon" size={30} />
                     <form className="flex flex-row justify-between w-full" onSubmit={(e) => {
                         e.preventDefault();
@@ -225,11 +228,7 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
                                     {
                                         !searchResults['users'] && !searchResults['channels'] && (
                                             <div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
-                                                <h1
-                                                    className="text-2xl font-bold text-black-500 w-9/12 text-center"
-                                                >
-                                                    type something it doesn't have to make sense.
-
+                                                <h1 className="text-2xl font-bold text-black-500 w-9/12 text-center">type something it doesn't have to make sense.
                                                 </h1>
                                                 <CiLollipop className="search-icon" size={50} color='#ffff' opacity={1} />
                                             </div>
@@ -248,28 +247,19 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
                                         ) : null
                                     }
 
-
                                     <div className="search-results">
                                         {
                                             searchResults['users'] && searchResults['users'].length > 0 ? (
                                                 <div className="search-results-header flex flex-row items-center w-full">
-                                                    <h1
-                                                        className="text-base font-bold text-zinc-800 w-9/12 text-left justify-between"
-                                                    >
-                                                        People</h1>
+                                                    <h1 className="text-base font-bold text-zinc-800 w-9/12 text-left justify-between" > People</h1>
                                                     <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                                        <a
-                                                            className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-                                                        >
-                                                            See more</a>
+                                                        <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4" >See more</a>
                                                     </div>
                                                 </div>
 
                                             ) : null
                                         }
                                         {
-
-
                                             searchResults['users'] && searchResults['users'].map((user: any) => {
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg">
@@ -282,47 +272,34 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
                                                                     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
                                                                     {/* </div> */}
                                                                     <div className="search-result-info ">
-                                                                        <h1
-                                                                            className="text-xl font-bold "
-                                                                        >{user.login}</h1>
-                                                                        <p
-                                                                            className="text-zinc-900"
-                                                                        >{user.firstName} {user.lastName}</p>
+                                                                        <h1 className="text-xl font-bold ">{user.login}</h1>
+                                                                        <p className="text-zinc-900" >{user.firstName} {user.lastName}</p>
                                                                     </div>
                                                                 </div>
-                                                                <div className="chat-button flex justify-center items-center mr-1">
-                                                                    <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        handleTempChat(user);
-                                                                    }}>
-                                                                        <CiChat2 className="chat-icon " size={30} />
-                                                                    </a>
-
-                                                                </div>
-
                                                             </Link>
                                                         </div>
+                                                        <div className="chat-button flex justify-center items-center mr-1">
+                                                            <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
+                                                                e.preventDefault();
+                                                                console.log("chat button clicked");
+                                                                handleTempChat(user);
+                                                            }}>
+                                                                <CiChat2 className="chat-icon " size={30} />
+                                                            </a>
+                                                        </div>
+
                                                     </div>
                                                 )
                                             })
                                         }
-
                                         {
                                             searchResults['channels'] && searchResults['channels'].length > 0 ? (
                                                 <div className="search-results-header mt-3 flex flex-row items-center w-ful justify-between">
-                                                    <h1
-
-                                                        className='text-base font-bold text-zinc-800 w-9/12 text-left'
-                                                    >Channels</h1>
+                                                    <h1 className='text-base font-bold text-zinc-800 w-9/12 text-left' >Channels</h1>
 
                                                     <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                                        <Link
-                                                            to={`/search?entity=channels&keyword=${search}`}
-                                                            className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-                                                        >See more</Link>
+                                                        <Link to={`/search?entity=channels&keyword=${search}`} className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4" >See more</Link>
                                                     </div>
-
-
                                                 </div>
                                             ) : null
                                         }
@@ -338,14 +315,9 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
                                                                     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
                                                                 </div>
                                                                 <div className="search-result-info">
-                                                                    <h1
-                                                                        className="text-xl font-bold "
-                                                                    >{channel.name}</h1>
-                                                                    <p
-                                                                        className="text-zinc-900"
-                                                                    > {channel.chann_type}</p>
+                                                                    <h1 className="text-xl font-bold ">{channel.name}</h1>
+                                                                    <p className="text-zinc-900" > {channel.chann_type}</p>
                                                                 </div>
-
                                                             </Link>
                                                         </div>
                                                     </div>
@@ -360,15 +332,22 @@ const SearchBar = ({ searchOptions }: { searchOptions: SearchOptions[] }) => {
                     <div className='shortcuts-icons'>
                         <img src={cmdKeyIcon} alt="cmd" className="cmdkey-icon" />
                         <img src={kKeyIcon} alt="k" className="kkey-icon" />
-                        {/* </div> */}
                     </div>
                 </SearchBarStyle >
-
             </div >
 
-            <SearchBarFull fullScreenDropdown={fullScreenDropdown} searchBarRef={searchBarRef} />
+            {
+                fullScreenDropdown &&
+                <SearchBarFull fullScreenDropdown={fullScreenDropdown} searchBarRef={searchBarRef} key={search} handleTempChat={handleTempChat} /> 
+            }
 
-            <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} key={tmpChatData} />
+
+            {/* there should be  */}
+            {showTempChat == true &&
+
+                <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} key={tmpChatData} />
+            }
+            {/* <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} /> */}
 
 
 

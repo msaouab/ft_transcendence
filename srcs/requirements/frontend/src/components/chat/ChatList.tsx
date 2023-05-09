@@ -30,19 +30,12 @@ const ChatListStyle = styled.div`
     }
     `;
 
-const searchOptions: SearchOptions[] = [
-    {
-        sectionTitle: 'Users',
-        endpoint: '/api/users',
-    }
-]
-
-const ChatList = ({ setSelectedChat }: { setSelectedChat: (chat: PrivateMessage) => void }) => {
+const ChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {
     return (
         <ChatListStyle>
-            <SearchBar searchOptions={searchOptions} />
+            <SearchBar />
             <GroupChatList />
-            <UsersChatList setSelectedChat={setSelectedChat} />
+            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
         </ChatListStyle>
     );
 };

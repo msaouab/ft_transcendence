@@ -6,9 +6,15 @@ import {
 
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetPrivateChatMessagesDto {
+export class PostPrivateChatRoomDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    privateChatRoom_id: string;
-}
+    senderId: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    receiverId: string;
+
+};

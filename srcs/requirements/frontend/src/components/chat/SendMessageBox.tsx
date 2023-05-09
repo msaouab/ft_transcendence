@@ -1,12 +1,11 @@
 
 import styled from 'styled-components';
 import { CiPaperplane, CiChat1 } from 'react-icons/ci';
-import { PrivateMessage } from '../../types/message';
-import { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
+import { useState } from 'react';
 
 import Cookies from 'js-cookie';
 import { dateToStr } from '../common/CommonFunc';
+import axios from 'axios';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     height: 8%;
@@ -42,8 +41,10 @@ const SendMessageBoxStyle = styled.div`
 `;
 
 
-const SendMessageBox = ({ selectedChat, setState, socket, connected }: { selectedChat: any, setState: any, socket: any, connected: boolean }) => {
+const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any }) => {
     const [message, setMessage] = useState<string>('');
+
+
 
     const sendMessage = (messageProp: string) => {
         if (messageProp === '') {
@@ -57,11 +58,17 @@ const SendMessageBox = ({ selectedChat, setState, socket, connected }: { selecte
             sender_id: Cookies.get('id'),
             receiver_id: selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id
         };
+
         if (connected) {
-            console.log('sending the message: ', message);
+            // console.log('sending the message: ', message);
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
+            if (setNewLatestMessage) {
+                console.log("hey from zone 1kp2")
+                setNewLatestMessage(message.dateCreated)
+            }
         }
+        // if 
     };
 
     return (

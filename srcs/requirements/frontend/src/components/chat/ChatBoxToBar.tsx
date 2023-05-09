@@ -29,7 +29,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
     // console.log("id is: ", props.id);
     // if (!props.id) useNavigate().push('/login');
     const navigate = useNavigate();
-    if (!props.id) navigate('/login');
+    // if (!props.id) navigate('/login');
     return (
         <ChatBoxTopBarStyle>
             <div className="flex flex-row ">

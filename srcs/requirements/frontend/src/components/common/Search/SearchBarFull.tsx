@@ -39,7 +39,7 @@ const DropdownSeachStyle = styled.div`
 
 import { SearchBarStyle } from "./SearchBar";
 
-const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdown: boolean, searchBarRef: any }) => {
+const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { fullScreenDropdown: boolean, searchBarRef: any, handleTempChat: any }) => {
 
     // console.log(searchResults);
     const [search, setSearch] = useState<string>('');
@@ -56,10 +56,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
         if (socket.current) {
             socket.current.on('disconnect', () => {
                 setSearchConnected(false);
-                console.log("disconnected");
-                // console.log("searchResults", searchResults);
-                // console.log("users:", searchResults['channels']);
-                // console.log("messages:", searchResults['users']);
+                // console.log("disconnected");
             }
             );
         }
@@ -74,12 +71,11 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
             setSearch('');
         }
         if ((fullScreenDropdown) && !searchConnected) {
-            console.log("connecting");
+            // console.log("connecting");
             socket.current = io('http://localhost:3000/search');
             socket.current.on('connect', () => {
                 setSearchConnected(true);
-
-                console.log("connected");
+                // console.log("connected");
             });
         }
     }, [fullScreenDropdown]);
@@ -87,9 +83,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
 
 
     const handleSearch = (searchProp: string) => {
-        console.log("Handle search")
+        // console.log("Handle search")
         if (!searchConnected) {
-            console.log("not connected");
+            // console.log("not connected");
             return null;
         }
         socket.current.on('searchInfo', (data: any) => {
@@ -178,7 +174,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
                                             to={`/search?entity=users&keyword=${search}`}
                                             className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
                                         >See more</Link>
-    
+
                                     </div>
                                 </div>
 
@@ -208,7 +204,13 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
                                                     </div>
                                                 </div>
                                                 <div className="chat-button flex justify-center items-center mr-1">
-                                                    <a href={`/chat/${user.id}`} className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white">
+                                                    <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={
+                                                        (e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleTempChat(user);
+                                                        }
+                                                    }>
                                                         <CiChat2 className="chat-icon " size={30} />
                                                     </a>
 
@@ -269,9 +271,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef }: { fullScreenDropdow
                             })
                         }
                     </div>
-                </div>
+                </div >
 
-            </DropdownSeachStyle>
+            </DropdownSeachStyle >
         )
     )
 }
