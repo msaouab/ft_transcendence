@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import avatar from '../../../public/default.png'
 import cover from '../../../public/cover.jpg'
 import WebFont from 'webfontloader';
 import {Joystick} from '../../assets/icons'
@@ -40,7 +39,7 @@ const CoverContainer = styled.div`
         padding: 0rem;
         width: 100%;
         height: auto;
-        border-radius: 50%;
+        border-radius: 100%;
         box-sizing: border-box;
 
 
@@ -123,6 +122,7 @@ function	Cover() {
         level: '',
         rank: '',
     });
+    const [avatar, setAvatar] = useState<string | null>(null);
 	const navigate = useNavigate();
     useEffect(() => {
         WebFont.load({
@@ -159,6 +159,33 @@ function	Cover() {
 		}
 	}  fetchData();
     }, []);
+
+    useEffect(() => {
+        const avatarUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/avatar';
+        async function fetchAvatar() {
+            try {
+                await axios.get(avatarUrl, {
+                withCredentials: true,
+                responseType: 'blob'
+            })
+            .then(response => {
+                if (response.statusText) {
+                    setAvatar(URL.createObjectURL(response.data));
+                }
+                setLoading(false);
+            })
+            .catch(error => {
+                setLoading(false);
+                if (error.response.status == 401) {
+                    navigate('/login');
+                }
+            })
+        } catch (error) {
+            console.log(error);
+		}
+    }  fetchAvatar();
+}, []);
+    
     useEffect(() => {
     const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
     async function fetchRankData() {
@@ -192,7 +219,7 @@ function	Cover() {
 				loading ? ( <div className='spinner'></div> ) : (
 					<>
                         <div className="PP">
-                            <img src={avatar} alt="Avatar" className="avatar"/>
+                            {avatar && <img src={avatar} alt="Avatar" className="avatar"/>}
                             <div className={`circle ${user.status}`} >
                                 <div className={`
                                     ${user.status == 'InGame' ? 'circle-ingame' : 'circle-outgame'}

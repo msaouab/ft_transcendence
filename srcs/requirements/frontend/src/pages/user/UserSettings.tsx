@@ -25,7 +25,7 @@ const UserSettings = () => {
 
   return (
     <UserSettingsContainer>
-      <div className="main debug">
+      <div className="main ">
         <div className="user-info">
             <h1>User Informations</h1>
             <Data></Data>

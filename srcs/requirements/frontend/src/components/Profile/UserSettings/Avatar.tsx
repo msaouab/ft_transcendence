@@ -30,7 +30,7 @@ function Avatar() {
 
 
 
-    axios.post('http://localhost:3000/api/v1/user/' +  cookie.get('userid') + '/file', formData, { withCredentials: true }
+    axios.post('http://localhost:3000/api/v1/user/' +  cookie.get('userid') + '/avatar', formData, { withCredentials: true }
     )
       .then(response => {
         console.log('File uploaded successfully');
@@ -48,9 +48,9 @@ function Avatar() {
     <form onSubmit={handleSubmit}>
       <label>
         Upload file:
-        <input type="file" onChange={handleFileChange} />
+        <input type="file" onChange={handleFileChange} accept="image/*" />
       </label>
-      <button type="submit">Submit</button>
+      <button type="submit" className='bg-mygray'>Submit</button>
     </form>
   );
 }

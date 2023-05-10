@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { Passport, Profile } from 'passport';
 import { User } from '../auth/user.decorator/user.decorator';
 import { PutUserDto } from './dto/put-user.dto';
+import { readFile,unlink } from 'fs/promises';
 
 @Injectable()
 export class UserService {
@@ -57,8 +58,6 @@ export class UserService {
             throw new BadRequestException('Empty fields');
         }
 
-        
-
         return await this.prisma.user.update({
             where: {
                 id: id,
@@ -100,15 +99,18 @@ export class UserService {
         if (!user) {
             throw new NotFoundException('User not found');
         }
-        //if (user.email != ft_user._json.email) {
-          //  throw new UnauthorizedException('Unauthorized');
-        // }
+        if (user.email != ft_user._json.email) {
+           throw new UnauthorizedException('Unauthorized');
+        }
         if (!file) {
             throw new BadRequestException('No file');
         };
         if (file.mimetype != 'image/png' && file.mimetype != 'image/jpeg') {
             throw new BadRequestException('Wrong file type');
         }
+
+        if (user.avatar != "default.png")
+            unlink(user.avatar);
         const updatePath = await this.prisma.user.update({
             where: {
                 id: id,
@@ -118,6 +120,22 @@ export class UserService {
             },
         });
 
+    }
+
+    async getImage(id: string) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        const imageData = await readFile(user.avatar);
+        return {
+            buffer: imageData,
+            contentType: 'image/jpeg',
+          };
     }
 }
     

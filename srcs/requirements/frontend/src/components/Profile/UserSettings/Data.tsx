@@ -85,7 +85,7 @@ import axios from 'axios';
         <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} />
       </label>
       <br />
-      <button type="submit">Submit</button>
+      <button type="submit" className='bg-mygray' >Submit</button>
     </form>
   );
 }

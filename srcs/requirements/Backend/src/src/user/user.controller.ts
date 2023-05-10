@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Redirect, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Redirect, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FtOauthGuard } from '../auth/guards/ft-oauth.guard';
 import { UserService } from './user.service';
 import { Profile } from 'passport';
@@ -33,8 +33,8 @@ export class UserController {
         return this.userService.getRankData(id);    
     }
 
-    @Post(':id/file')
-    //@UseGuards(AuthenticatedGuard)
+    @Post(':id/avatar')
+    @UseGuards(AuthenticatedGuard)
     @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -47,10 +47,25 @@ export class UserController {
           callback(null, filename);
         },
       }),
+      fileFilter: (req, file, cb) => {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(new Error('Only image files are allowed!'), false);
+        }
+        cb(null, true);
+      },
+
     }),
   )
     handleUpload(@Param('id') id: string, @User() user: Profile, @UploadedFile() file: Express.Multer.File) {
     return this.userService.uploadImage(id,user,file);
 }
+
+  @Get(':id/avatar')
+  @UseGuards(AuthenticatedGuard)
+    async getImage(@Param('id') id: string, @Res() res) {
+      const imageData = await  this.userService.getImage(id);
+      res.set('Content-Type', imageData.contentType);
+      res.send(imageData.buffer);
+    }
 
 }
