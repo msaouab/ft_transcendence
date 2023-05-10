@@ -109,8 +109,8 @@ export class UserService {
             throw new BadRequestException('Wrong file type');
         }
 
-        if (user.avatar != "default.png")
-            unlink(user.avatar);
+        // if (user.avatar != "default.png")
+        //     unlink(user.avatar);
         const updatePath = await this.prisma.user.update({
             where: {
                 id: id,
