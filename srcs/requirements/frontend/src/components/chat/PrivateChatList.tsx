@@ -19,13 +19,19 @@ const UsersChatListStyle = styled.div`
     flex-direction: column;
     gap: 20px;
 
-
     h1 {
         color: #fff;
         text-align: start;
 
         font-size: 1.5rem;
     }
+
+    // @media (max-width: 768px) {
+    //     width: 70%;
+    //     margin: 0 auto;
+    // }
+
+   
 `;
 
 const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {

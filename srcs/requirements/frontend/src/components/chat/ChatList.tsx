@@ -10,7 +10,7 @@ import { SearchOptions } from '../../types/search';
 const ChatListStyle = styled.div`
     background: transparent;
     border: 1 solid #fff;
-    width: 30%;
+    width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -18,7 +18,6 @@ const ChatListStyle = styled.div`
     padding: 20px;
     gap: 10px;
     & > *:first-child {
-        height: 10%;
         width: 100%;
     }
 
@@ -28,6 +27,32 @@ const ChatListStyle = styled.div`
     & > *:nth-child(2) {
         height: 55%; 
     }
+
+    @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        width: 100vw;
+        height: 100vh;
+        border: black 1px solid;
+
+        & > *:first-child {
+            width: 90%;
+
+        }
+        & > *:nth-child(2) {
+            // height: 35%;
+            width: 90%;
+
+        }
+        & > *:nth-child(3) {
+            width: 90%;
+
+        }
+
+    }
+
     `;
 
 const ChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {

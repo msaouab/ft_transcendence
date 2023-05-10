@@ -14,6 +14,13 @@ const ChatBoxStyle = styled.div`
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px;
+
+    @media (max-width: 768px) {
+        display: ${(props) => props.size === 'small' ? 'flex' : 'none'};
+    }
+    
+    
+
 `;
 
 
@@ -171,7 +178,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage }: {
                             <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id='scrollableDiv'>
                                 <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} />
                             </div>
-                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage}/>
+                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} />
                         </>
                     )
             }

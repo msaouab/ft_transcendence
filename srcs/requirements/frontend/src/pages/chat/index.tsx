@@ -11,10 +11,20 @@ const ChatStyle = Styled.div`
   justify-content: flex-start;
   background: #1E1D18;
   gap: 2px;
-  & > *:nth-child(3) {
+
+  border: 1px solid #fff;
+
+    .chat-box {
     margin-top: 20px;
     height: 95%;
 }
+
+
+  @media (max-width: 768px) {
+    height: 100vh;
+  }
+  
+
 `;
 
 // import Loader from '../../components/common/Loader';
@@ -30,17 +40,22 @@ const Chat = () => {
 
 
   return (
-
     <ChatStyle>
       <div className="side-bar w-1/7 h-full bg-gray-500">
         <h1>Side Bar</h1>
       </div>
-      <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+      <div className="chat-list w-[30%] h-full
+  
+        ">
+        <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+      </div>
       <div className="chat-box w-[63%] h-full">
         <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" setNewLatestMessage={setNewLatestMessage} />
       </div>
     </ChatStyle >
   )
 }
+
+
 
 export default Chat

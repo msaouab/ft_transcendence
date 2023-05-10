@@ -22,7 +22,7 @@ export const SearchBarStyle = styled.div`
     max-height: 45px;
     padding: 10px;
     width: ${(props) => props.$width}%;
-    max-width: 600px;
+
     margin: 0 auto;
     color: #fff;
     input {
@@ -338,7 +338,7 @@ const SearchBar = () => {
 
             {
                 fullScreenDropdown &&
-                <SearchBarFull fullScreenDropdown={fullScreenDropdown} searchBarRef={searchBarRef} key={search} handleTempChat={handleTempChat} /> 
+                <SearchBarFull fullScreenDropdown={fullScreenDropdown} searchBarRef={searchBarRef} key={search} handleTempChat={handleTempChat} />
             }
 
 
