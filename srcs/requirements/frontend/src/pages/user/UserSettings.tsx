@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Data from "../../components/Profile/UserSettings/Data";
 import Avatar from "../../components/Profile/UserSettings/Avatar";
+import CheckMark from "../../components/Profile/UserSettings/CheckMark";
 
 const UserSettingsContainer = styled.div`
   .main {
@@ -17,6 +18,10 @@ const UserSettings = () => {
         <div className="user-info">
           <Data></Data>
         </div>
+      <div className="tfa">
+            <h1>Two Factor Authentication</h1>
+            <CheckMark></CheckMark>
+      </div>
       </div>
   );
 };
