@@ -50,7 +50,7 @@ services:
   # Front-end Part
   Frontend:
     build:
-      context: requirements/Frontend
+      context: requirements/frontend
       dockerfile: Dockerfile
     image: frontend
     container_name: frontend
@@ -59,7 +59,7 @@ services:
     networks:
       - local_net
     volumes: 
-      - ./requirements/Frontend:/app
+      - ./requirements/frontend:/app
     restart: always
     depends_on:
       - Backend

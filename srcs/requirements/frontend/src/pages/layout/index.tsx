@@ -11,7 +11,7 @@ import SideBar from "../../components/common/SideBar";
 const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
-    width: 100vw;
+    /* width: 100vw; */
     display: grid;
     grid-template-columns: 1fr 11fr;
     padding: 1rem 2rem;

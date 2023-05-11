@@ -6,6 +6,7 @@ interface CustomInputProps {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   icon?: ReactNode;
+  name?:string;
 }
 
 const CustomInput = (props: CustomInputProps) => {
@@ -19,6 +20,7 @@ const CustomInput = (props: CustomInputProps) => {
         aria-label="Full name"
         value={props.value}
         onChange={props.onChange}
+        name={props.name}
       />
     </div>
   );

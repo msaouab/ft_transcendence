@@ -25,7 +25,6 @@ export class AuthService {
                     email:  user._json.email,
                     firstName:  user.name.givenName,
                     lastName:  user.name.familyName,
-                    password: 'create',
                     avatar: './public/default.png',
                     status: 'Online',
                 },
@@ -84,7 +83,6 @@ export class AuthService {
                     },
                     data: {
                         status: 'Online',
-                        password: 'update',
                     },
                 })
                 res.cookie('id', find_user.id, {

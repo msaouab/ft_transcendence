@@ -5,6 +5,7 @@ import Logo from '/logo.svg'
 import {Home, Chat , Game, Settings, Profile, Logout} from '../../assets/icons'
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 
 const	SideBarContainer = styled.div<{ width?: number; isSidebarOpen: boolean }>`
 	background-color: #504A4A;
@@ -230,6 +231,7 @@ const SideBar = () => {
 			.then(response => {
 				if (response.statusText) {
 				}
+				Cookies.set('userid', response.data.id);
                 // setOnlineStat(user.status);
 			})
 			.catch(error => {
@@ -305,9 +307,9 @@ const SideBar = () => {
 					onClick={() => handleClick('chat')}>
 					<Chat /><span>Chat</span>
 				</Link>
-				<Link to="/setting"
-					className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'} ${location.pathname === '/setting' ? 'active' : ''}`}
-					onClick={() => handleClick('setting')}>
+				<Link to="/settings"
+					className={`icon ${sidebarWidth >= 200 ? 'show' : 'hide'} ${location.pathname === '/settings' ? 'active' : ''}`}
+					onClick={() => handleClick('settings')}>
 					<Settings /><span>Setting</span>
 				</Link>
 			</IconsContainer>

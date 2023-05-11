@@ -112,12 +112,12 @@ const AchivementCard = ({ title, description, imgPath }: any) => {
 const Home = () => {
   return (
     <div className="w-full h-full flex flex-col gap-10">
-      <div className="top pb-10 flex items-center gap-10 border-b border-white/50 ">
+      <div className="top  pb-5  flex items-center gap-10 border-b border-white/50  ">
         <div className="image">
-          <img src={Avatar} alt="" width={150} />
+          <img src={Avatar} alt="" width={100} />
         </div>
         <div className="description flex flex-col  justify-center">
-          <div className="name text-6xl font-[800] mb-6">Koko Nani</div>
+          <div className="name text-4xl font-[800] ">Koko Nani</div>
           <div className="flex gap-10 items-center ">
             <div className="text-2xl">Ready to Play!!</div>
           </div>
@@ -141,7 +141,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="midel h-[50rem] flex flex-col gap-4 items-center  ">
+      <div className="midel h-[50rem]  flex flex-col gap-4 items-center  ">
         <div className="stats flex gap-6 h-[50%] w-full">
           <div className="freinds flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
             <div className="top border-b border-white/50  h-[5rem]  ">
