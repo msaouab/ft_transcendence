@@ -8,28 +8,24 @@ const users = [
         email: 'ren-nasr@student.1337.ma',
         firstName: 'rida',
         lastName: 'ennasry',
-        password: 'ren-nasr',
     },
     {
         login: 'ichoukri',
         email: 'ichoukri@student.1337.ma',
         firstName: 'Ismail',
         lastName: 'Choukri',
-        password: 'ichoukri',
     },
     {
         login: 'msaouab',
         email: 'msaouab@student.1337.ma',
         firstName: 'mohamed',
         lastName: 'saouab',
-        password: 'msaouab',
     },
     {
         login: 'mbehhar',
         email: 'mbehhar@student.1337.ma',
         firstName: 'Mohamed',
         lastName: 'Behhar',
-        password: 'mbehhar',
     }
 ]
 

@@ -74,12 +74,12 @@ import { ApiTags } from '@nestjs/swagger';
     //   return this.authService.update(user);
     // }
 
-    // @Get('2fa')
-    // @UseGuards(AuthenticatedGuard)
-    // @Render('2fa')
-    // async twoFactor(@User() user: Profile) {
-    //     this.authService.twoFactor(user);
-    // }
+    @Get('2fa')
+    @UseGuards(AuthenticatedGuard)
+    @Render('2fa')
+    async twoFactor(@User() user: Profile) {
+        this.authService.twoFactor(user);
+    }
 
     // @Get('verify2fa')
     // @UseGuards(AuthenticatedGuard)

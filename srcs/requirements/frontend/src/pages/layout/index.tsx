@@ -7,15 +7,30 @@ import { MdOutlineNotifications } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { BsChevronDown } from "react-icons/bs";
 import SideBar from "../../components/common/SideBar";
+import { useState } from "react";
+
+const DropDown = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: #fff;
+  width: 200px;
+  height: 200px;
+  border-radius: 5px;
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.75);
+  z-index: 10;
+`;
 
 const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
-    width: 100vw;
+    /* width: 100vw; */
     display: grid;
     grid-template-columns: 1fr 11fr;
     padding: 1rem 2rem;
   `;
+
+  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
 
   const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
@@ -33,7 +48,7 @@ const index = () => {
               placeHolder="Search"
               type="text"
               onChange={handelOnchange}
-              icon={<BiSearch />}
+              icon={<BiSearch className="text-[#1E1D19]" />}
             />
           </div>
           <div className="notification relative">
@@ -42,9 +57,21 @@ const index = () => {
             </div>
             <MdOutlineNotifications className="text-4xl text-white font-bold" />
           </div>
-          <div className="user flex justify-center items-center">
+          <div className="user flex justify-center items-center  relative">
             <FaUserCircle className="text-4xl text-white font-bold mr-1" />
-            <BsChevronDown className="text-xl text-[#A6A6A6] font-bold" />
+            <BsChevronDown
+              className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
+              onClick={() => setIsDropDownOpen(!isDropDownOpen)}
+            />
+            <div
+              className={`settings bg-slate-50 h-[8rem] flex flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${
+                isDropDownOpen ? "block" : "hidden"
+              } transition-all duration-200 absolute top-12 right-0 z-10`}
+            >
+              <div className="setting-item">Profile</div>
+              <div className="setting-item">Logout</div>
+              <div className="setting-item">Status</div>
+            </div>
           </div>
         </div>
         <div className="content  h-[90%]">
