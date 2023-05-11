@@ -7,20 +7,24 @@ interface CustomInputProps {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   icon?: ReactNode;
   name?:string;
+  className?:string;
+  lenght?: number;
 }
 
 const CustomInput = (props: CustomInputProps) => {
   return (
-    <div className="flex items-center rounded-lg bg-white border-teal-500 px-1 py-2">
+    <div className="flex items-center rounded-lg shadow-sm bg-white border-1 border-gray-800 px-1 py-2">
       <div className="text-2xl">{props.icon}</div>
       <input
-        className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+        className={`appearance-none bg-transparent  w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none `}
         type={props.type}
         placeholder={props.placeHolder}
         aria-label="Full name"
         value={props.value}
         onChange={props.onChange}
         name={props.name}
+        maxLength={props.lenght}
+        
       />
     </div>
   );

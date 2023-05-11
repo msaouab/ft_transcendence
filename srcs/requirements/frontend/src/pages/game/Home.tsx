@@ -14,6 +14,10 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
+import { useEffect, useState } from "react";
+import instance from "../../api/axios";
+import Cookies from "js-cookie";
+
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -80,6 +84,7 @@ const Status = styled.div<{ userStatus: string }>`
   position: relative;
   img {
     position: relative;
+    border-radius: 50%;
   }
   &:after {
     content: "";
@@ -105,12 +110,33 @@ const Status = styled.div<{ userStatus: string }>`
 `;
 
 const Home = () => {
+  const [userAvatar, setUserAvatar] = useState("");
   const { userStatus } = useGlobalContext();
+
+  const GetAvatar = async () => {
+    await instance
+      .get("/user/" + Cookies.get("userid") + "/avatar", {
+        responseType: "blob",
+      })
+      .then((res) => {
+        setUserAvatar(URL.createObjectURL(res.data));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    GetAvatar();
+  }, []);
+
   return (
     <div className="w-full h-full flex flex-col gap-10">
       <div className="top  pb-5  flex items-center gap-10 border-b border-white/50  ">
         <Status className="" userStatus={userStatus.toLowerCase()}>
-          <img src={Avatar} alt="" width={100} className="" />
+          {userAvatar && (
+            <img src={userAvatar} alt="" width={100} className="" />
+          )}
         </Status>
         <div className="description flex flex-col  justify-center">
           <div className="name text-4xl font-[800] ">Koko Nani</div>

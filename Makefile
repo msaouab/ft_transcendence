@@ -30,11 +30,11 @@ env:
 
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"
-	@cd srcs && docker-compose -f Docker-compose.yml  up -d
+	@cd srcs && docker-compose -f Docker-compose.yml  up -d --build
 
 up:
 	@echo "$(GREEN)█████████████████████ Run Images ████████████████████$(ED)"
-	@cd srcs && docker-compose -f Docker-compose.yml up -d --build
+	@cd srcs && docker-compose -f Docker-compose.yml up -d 
 
 stop:
 	@echo "$(GREEN)███████████████████ Stop Containers ███████████████████$(ED)"
@@ -55,4 +55,4 @@ fclean: clean
 	@rm -rf ./srcs/.env || true
 	@rm -rf ./srcs/requirements/Backend/src/.env || true
 
-re: fclean all
+re: fclean env build
