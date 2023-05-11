@@ -5,7 +5,6 @@ import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import AvatarImg from "../../../assets/avatar.png";
 
-
 function Avatar() {
   const cookie = new Cookies();
   const [cookies] = useCookies(["id"]);
@@ -56,6 +55,7 @@ function Avatar() {
         <label>
           <div className="border  rounded-md overflow-hidden h-[3rem] border-dashed border-gray-500 relative flex items-center bg-slate-300/10">
             <input
+              accept="image/*"
               type="file"
               multiple
               className="cursor-pointer relative block opacity-0 w-full h-full  z-50"
@@ -87,7 +87,10 @@ function Avatar() {
           </div>
           {/* <input type="file" onChange={handleFileChange} accept="image/*" /> */}
         </label>
-        <button type="submit" className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md">
+        <button
+          type="submit"
+          className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md"
+        >
           Submit
         </button>
       </form>
