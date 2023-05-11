@@ -137,5 +137,30 @@ export class UserService {
             contentType: 'image/jpeg',
           };
     }
+    async setStatus(id,status, ftuser) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.email != ftuser._json.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        if (status != 'Online' && status != 'Offline' && status != 'Idle' && status != 'Donotdisturb'
+            && status != 'InGame') {
+            throw new BadRequestException('Wrong status');
+        }
+        return await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                status: status,
+            },
+        });
+    }
 }
     

@@ -77,4 +77,10 @@ export class UserController {
       return this.authService.set2fa(id, TfaDto, user);
     }
 
+    @Put(':id/:status')
+    @UseGuards(AuthenticatedGuard)
+    async setStatus(@Param('id') id: string,@Param('status') status: string, @User() user: Profile) {
+      return this.userService.setStatus(id, status, user);
+    }
+
 }
