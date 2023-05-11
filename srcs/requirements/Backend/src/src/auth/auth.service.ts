@@ -4,6 +4,7 @@ import { Response } from 'express';
 import passport, { Passport } from 'passport';
 import { writeFileSync } from 'fs';
 import * as rawbody from 'raw-body';
+import { TfaDto } from 'src/user/dto/Tfa.dto';
 
 @Injectable()
 export class AuthService {
@@ -115,7 +116,7 @@ export class AuthService {
                         id: find_user.id,
                     },
                 })
-                res.clearCookie('id');
+               res.clearCookie('id');
                 // return deleteUser;
             }
         }
@@ -133,16 +134,35 @@ export class AuthService {
     //     return find_user;
     // }
     
-    // async twoFactor(user) : Promise<string> {
-        //     var secret = speakeasy.generateSecret({
-    //         length: 20,
-    //         name: 'PONG',
-    //     });
-    //     qrcode.toDataURL(secret.otpauth_url, function (err, data_url) {
-    //         writeFileSync('views/qrcode.ejs', "<img src=\"" + data_url + "\">");
-    //     });
-    //     return secret.base32;
-    // }
+    async twoFactor(user) {
+        
+    }
+
+    async set2fa(id, TfaDto: TfaDto, user)
+    {
+        const status = TfaDto.IsActive;
+        const find_user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        })
+        if (!find_user)
+            throw new NotFoundException('User not found');
+        if (find_user.email != user._json.email) {
+            throw new ForbiddenException('Not allowed');
+        }
+        if (find_user) {
+            const updateUser = await this.prisma.user.update({
+                where: {
+                    id: find_user.id,
+                },
+                data: {
+                    tfa: status === 'true' ? 'true' : 'false',
+                },
+            })
+            return updateUser;
+        }
+    }
     
     // async twoFactorverify(body, user,req) {
     //     var st = await this.twoFactor(user);

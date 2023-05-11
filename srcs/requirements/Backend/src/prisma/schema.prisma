@@ -54,6 +54,11 @@ enum InviteStatus {
   Rejected
 }
 
+enum tfa {
+  true
+  false
+}
+
 // type  attributes att functions
 model User {
   id             String            @id @default(uuid())
@@ -61,11 +66,13 @@ model User {
   email          String            @unique
   firstName      String
   lastName       String
-  tfa            Boolean           @default(false)
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
   avatar         String            @default("/app/public/default.png")
   status         Status            @default(Online)
+  tfa            tfa               @default(false)
+  otp_verified   Boolean           @default(false)
+  otp_base32     String?
   friends        FriendsTab[]      @relation("friendsTabRelation")
   blockedUsers   BlockTab[]        @relation("blockTabRelation")
   channelsJoined ChannelsJoinTab[] @relation("channelsJoinTabRelation")
