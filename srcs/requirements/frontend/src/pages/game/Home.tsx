@@ -13,7 +13,7 @@ import AchivementImg4 from "../../assets/achivement4.png";
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
-
+import { useGlobalContext } from "../../provider/AppContext";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -24,39 +24,6 @@ export const ReusableCardStyle = styled.div`
   border-radius: 20px 20px 0px 0px;
   padding: 1rem;
 `;
-
-const Achivements = [
-  {
-    title: "First Game",
-    description: "You played your first game",
-  },
-  {
-    title: "Comeback Kid",
-    description: "You won a game after being down 5-0",
-  },
-  {
-    title: "Winning Streak",
-    description: "You won 5 games in a row",
-  },
-  {
-    title: "Strategist",
-    description:
-      "Win a game without hitting any balls with the same type of shot twice Win a game without hitting any balls with the same type of shot twice",
-  },
-];
-
-// const AchivementCard = styled.div`
-//   background: rgba(255, 255, 255, 0.1);
-//   padding: 1rem;
-//   .title {
-//     font-size: 2rem;
-//     font-weight: 800;
-//   }
-//   .description {
-//     font-size: 1.5rem;
-//     font-weight: 500;
-//   }
-// `;
 
 const FreindCard = () => {
   return (
@@ -109,13 +76,42 @@ const AchivementCard = ({ title, description, imgPath }: any) => {
   );
 };
 
+const Status = styled.div<{ userStatus: string }>`
+  position: relative;
+  img {
+    position: relative;
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    right: 10%;
+    background-color: ${({ userStatus }) =>
+      userStatus === "online"
+        ? "#00ff00"
+        : userStatus === "offline"
+        ? "#6a6a6a"
+        : userStatus === "donotdisturb"
+        ? "#ff0000"
+        : userStatus === "ingame"
+        ? "#011c77"
+        : "#ffcc00"};
+    border: 1px solid #ececec;
+    width: 15%;
+    height: 15%;
+    border-radius: 50%;
+    z-index: 10;
+  }
+`;
+
 const Home = () => {
+  const { userStatus } = useGlobalContext();
   return (
     <div className="w-full h-full flex flex-col gap-10">
       <div className="top  pb-5  flex items-center gap-10 border-b border-white/50  ">
-        <div className="image">
-          <img src={Avatar} alt="" width={100} />
-        </div>
+        <Status className="" userStatus={userStatus.toLowerCase()}>
+          <img src={Avatar} alt="" width={100} className="" />
+        </Status>
         <div className="description flex flex-col  justify-center">
           <div className="name text-4xl font-[800] ">Koko Nani</div>
           <div className="flex gap-10 items-center ">

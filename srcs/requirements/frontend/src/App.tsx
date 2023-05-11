@@ -63,7 +63,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="" element={<Layout />}>
           <Route path="/home" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<Home />} />
           <Route path="/settings" element={<UserSettings />} />
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />

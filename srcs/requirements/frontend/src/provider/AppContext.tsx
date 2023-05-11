@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface AppContextType {
-  text: string;
-  setText: React.Dispatch<React.SetStateAction<string>>;
+  userStatus: string;
+  setUserStatus: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -12,11 +12,11 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const [text, setText] = useState<string>("hello world");
+  const [userStatus, setUserStatus] = useState<string>("");
 
   const value = {
-    text,
-    setText,
+    userStatus,
+    setUserStatus,
   };
 
   return (

@@ -10,7 +10,7 @@ const UserSettingsContainer = styled.div`
 
 const UserSettings = () => {
   return (
-      <div className="main text-white flex flex-col justify-around  items-center  h-full ">
+      <div className="main text-white flex flex-col justify-center gap-10  items-center  h-[80%]  ">
         <div className="profile-picture">
           <Avatar></Avatar>
         </div>
