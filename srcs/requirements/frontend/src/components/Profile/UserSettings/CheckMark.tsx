@@ -20,9 +20,7 @@ function CheckMark() {
       .put(
         "http://localhost:3000/api/v1/user/" +
           Cookies.get("userid") +
-          "/2fa" +
-          "?IsActive=" +
-          checked,
+          "/2fa/setup",
         sixDigit,
         { withCredentials: true }
       )

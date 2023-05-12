@@ -1,10 +1,14 @@
 import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException, Redirect } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Response } from 'express';
-import passport, { Passport } from 'passport';
+import { PassportStrategy } from '@nestjs/passport';
 import { writeFileSync } from 'fs';
 import * as rawbody from 'raw-body';
 import { TfaDto } from 'src/user/dto/Tfa.dto';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
+import { Strategy } from 'passport-otp';
+
 
 @Injectable()
 export class AuthService {
@@ -138,9 +142,9 @@ export class AuthService {
         
     }
 
-    async set2fa(id, TfaDto: TfaDto, user)
+    async set2fa(id, body: TfaDto, user)
     {
-        const status = TfaDto.IsActive;
+        const Digitsinput = body.sixDigits; 
         const find_user = await this.prisma.user.findUnique({
             where: {
                 id: id,
@@ -152,12 +156,23 @@ export class AuthService {
             throw new ForbiddenException('Not allowed');
         }
         if (find_user) {
+            const secret = authenticator.generateSecret();
+            const token = authenticator.generate(secret);
+            const otpauth = authenticator.keyuri(
+                find_user.id,
+                'PONG',
+                secret,
+              );
+              
+            
             const updateUser = await this.prisma.user.update({
                 where: {
                     id: find_user.id,
                 },
                 data: {
-                    tfa: status === 'true' ? 'true' : 'false',
+                    tfa: !find_user.tfa,
+                    otp_verified: true,
+                    otp_base32: secret,
                 },
             })
             return updateUser;
@@ -174,3 +189,6 @@ export class AuthService {
     //     console.log(verify);
     //     // res.render('restaurants',{  });}
 }
+
+
+  

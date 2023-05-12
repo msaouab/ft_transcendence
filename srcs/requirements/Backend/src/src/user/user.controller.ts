@@ -71,10 +71,10 @@ export class UserController {
       res.send(imageData.buffer);
     }
 
-    @Put(':id/2fa')
+    @Put(':id/2fa/setup')
     @UseGuards(AuthenticatedGuard)
-    async set2fa(@Param('id') id: string, @Query() TfaDto: TfaDto, @User() user: Profile) {
-      return this.authService.set2fa(id, TfaDto, user);
+    async set2fa(@Param('id') id: string, @Body() body: TfaDto , @User() user: Profile) {
+      return this.authService.set2fa(id, body, user);
     }
 
     @Put(':id/:status')
