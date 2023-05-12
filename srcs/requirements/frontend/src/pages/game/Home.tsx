@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import Avatar from "../../assets/avatar.png";
 import PlayWithMe from "../../assets/playWithMe.svg";
-import FreindsImg from "../../assets/freinds.png";
+import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
@@ -17,6 +17,8 @@ import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useState } from "react";
 import instance from "../../api/axios";
 import Cookies from "js-cookie";
+import axios from "axios";
+
 
 
 export const ReusableCardStyle = styled.div`
@@ -24,18 +26,20 @@ export const ReusableCardStyle = styled.div`
     180deg,
     rgba(233, 217, 144, 0.2379) 0%,
     rgba(233, 217, 144, 0) 100%
-  );
-  border-radius: 20px 20px 0px 0px;
-  padding: 1rem;
+    );
+    border-radius: 20px 20px 0px 0px;
+    padding: 1rem;
+    `;
+const FreindCarde = styled.div`
 `;
-
 const FreindCard = () => {
+  
   return (
     <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
       <div className="image">
         <img src={Avatar} alt="" width={60} />
       </div>
-      <div className="name text-2xl font-[800]">Koko Nani</div>
+      <div className="name text-2xl font-[800]"></div>
       <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
         online
         <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
@@ -109,13 +113,32 @@ const Status = styled.div<{ userStatus: string }>`
   }
 `;
 
+interface friendsInterface {
+  login: string;
+  Status: string;
+}
+
 const Home = () => {
   const [userAvatar, setUserAvatar] = useState("");
   const { userStatus } = useGlobalContext();
+  const [user, setData] = useState({
+    id: '',
+    login: '',
+    firstName: '',
+    lastName: '',
+    status: '',
+    });
+    const [rankData, getRankData] = useState({
+      wins: '',
+      loses: '',
+      draws: '',
+      level: '',
+      rank: '',
+  });
 
   const GetAvatar = async () => {
     await instance
-      .get("/user/" + Cookies.get("userid") + "/avatar", {
+    .get("/user/" + Cookies.get("userid") + "/avatar", {
         responseType: "blob",
       })
       .then((res) => {
@@ -130,6 +153,80 @@ const Home = () => {
     GetAvatar();
   }, []);
 
+  useEffect(() => {
+        const apiUrl = 'http://localhost:3000/api/v1/me'
+        async function fetchData() {
+          try {
+            await axios.get(apiUrl, {
+              withCredentials: true,
+            })
+			.then(response => {
+				if (response.statusText) {
+					setData(response.data);
+				}
+                // setOnlineStat(user.status);
+			})
+		} catch (error) {
+            console.log(error);
+		}
+	}  fetchData();
+}, []);
+
+    useEffect(() => {
+      const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
+      async function fetchRankData() {
+          try {
+              await axios.get(rankUrl, {
+                withCredentials: true,
+              })
+              .then(response => {
+                if (response.statusText) {
+                  getRankData(response.data);
+                }
+          })
+          .catch(error => {
+              if (error.response.status == 401) {
+                  }
+              })
+          } 
+          catch (error) {
+            console.log(error);
+          }
+        } fetchRankData();
+      }, []);
+      
+      const [friends, setFriends] = useState<friendsInterface[]>([]);
+	useEffect(() => {
+		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
+		async function fetchData() {
+			try {
+        await axios.get(apiUrl, {
+					withCredentials: true,
+				})
+				.then(response => {
+					for (let i = 0; i < response.data.length; i++) {
+						axios.get('http://localhost:3000/api/v1/User/' + response.data[i].friendUser_id, {
+							withCredentials: true,
+						})
+						.then(responses => {
+							setFriends(friends => [...friends, {
+								login: responses.data.login,
+								Status: responses.data.status
+							}]);
+						})
+					}
+				})
+				.catch(error => {
+					if (error.response.status == 401) {
+					}
+				})
+			} catch (error) {
+				console.log(error);
+			}
+		}
+		fetchData();
+	}, []);
+
   return (
     <div className="w-full h-full flex flex-col gap-10">
       <div className="top  pb-5  flex items-center gap-10 border-b border-white/50  ">
@@ -139,7 +236,8 @@ const Home = () => {
           )}
         </Status>
         <div className="description flex flex-col  justify-center">
-          <div className="name text-4xl font-[800] ">Koko Nani</div>
+          <div className="name text-4xl font-[800] ">{user.firstName} {user.lastName}</div>
+          <div className="name  font-[400] ">{user.login}</div>
           <div className="flex gap-10 items-center ">
             <div className="text-2xl">Ready to Play!!</div>
           </div>
@@ -147,35 +245,47 @@ const Home = () => {
         <div className="gamesInfo  h-full justify-self-stretch flex-1 flex justify-around  gap-2  ">
           <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
             <img src={Dice} alt="" width={50} />
-            Games : 10
+            Games : {rankData.wins + rankData.loses + rankData.draws}
           </div>
           <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
             <img src={AchivementImg1} width={50} alt="" />
-            Wins : 10
+            Wins : {rankData.wins}
           </div>
           <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
             <img src={Draw} alt="" width={50} />
-            Draw: 0
+            Draw: {rankData.draws}
           </div>
           <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
             <img src={Lose} alt="" width={50} />
-            Lose: 0
+            Lose: {rankData.loses}
           </div>
         </div>
       </div>
       <div className="midel h-[50rem]  flex flex-col gap-4 items-center  ">
         <div className="stats flex gap-6 h-[50%] w-full">
-          <div className="freinds flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
-                <img src={FreindsImg} alt="" width={50} />
-                Freinds
+                <img src={FriendsImg} alt="" width={50} />
+                Friends
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any) => (
-                <FreindCard />
-              ))}
+                {friends.map((Friend, index) => (
+                <FreindCarde key={index} >
+                  <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
+                      <div className="image">
+                        <img src={Avatar} alt="" width={60} />
+                      </div>
+                      <div className="name text-2xl font-[800]">{Friend.login}</div>
+                      <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
+                      {Friend.Status}
+                        <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
+                      </div>
+                    </div>
+                </FreindCarde>
+              ))
+              }
             </div>
           </div>
           <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
