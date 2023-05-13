@@ -24,6 +24,9 @@ export class AuthService {
             if (find_user) {
                 return this.login(user,res);
             }
+            const secret = authenticator.generateSecret();
+            const token = authenticator.generate(secret);
+        //hash secret later
             const createUser = await this.prisma.user.create({
                 data: {
                     login: user.username,
@@ -32,6 +35,7 @@ export class AuthService {
                     lastName:  user.name.familyName,
                     avatar: './public/default.png',
                     status: 'Online',
+                    otp_base32: secret,
                 },
             })
             const createUserRankingData = await this.prisma.rankingData.create({
@@ -156,13 +160,7 @@ export class AuthService {
             throw new ForbiddenException('Not allowed');
         }
         if (find_user) {
-            const secret = authenticator.generateSecret();
-            const token = authenticator.generate(secret);
-            const otpauth = authenticator.keyuri(
-                find_user.id,
-                'PONG',
-                secret,
-              );
+            
               
             
             const updateUser = await this.prisma.user.update({
@@ -172,7 +170,6 @@ export class AuthService {
                 data: {
                     tfa: !find_user.tfa,
                     otp_verified: true,
-                    otp_base32: secret,
                 },
             })
             return updateUser;

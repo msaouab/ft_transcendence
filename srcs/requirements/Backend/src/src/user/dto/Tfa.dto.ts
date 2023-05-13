@@ -5,7 +5,7 @@ export class TfaDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    @Length(6, 6)
+    @Length(6,6)
 
     sixDigits: string;
 

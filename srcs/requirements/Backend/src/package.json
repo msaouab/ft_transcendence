@@ -50,8 +50,10 @@
     "passport-42": "^1.2.6",
     "passport-otp": "^0.0.1",
     "qrcode": "^1.5.3",
+    "qrcode-svg": "^1.1.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "svg2img": "^1.0.0-beta.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

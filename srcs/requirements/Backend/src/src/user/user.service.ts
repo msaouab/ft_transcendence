@@ -5,6 +5,10 @@ import { Passport, Profile } from 'passport';
 import { User } from '../auth/user.decorator/user.decorator';
 import { PutUserDto } from './dto/put-user.dto';
 import { readFile,unlink } from 'fs/promises';
+import { authenticator } from 'otplib';
+import { toDataURL,toString } from 'qrcode';
+import { TfaDto } from './dto/Tfa.dto';
+
 
 @Injectable()
 export class UserService {
@@ -137,6 +141,46 @@ export class UserService {
             contentType: 'image/jpeg',
           };
     }
+
+    async getQrCode(id: string, ftuser, res) {
+
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.email != ftuser._json.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        //hash secret later
+         const otpauth = authenticator.keyuri(
+                user.email,
+                'PONG',
+                user.otp_base32,
+            );
+            // const qrCodeUrl = await toDataURL(otpauth);
+            var qrcode = require("qrcode-svg");
+            const qrCodeSvg = new qrcode({
+                content: otpauth,
+                padding: 0,
+                width: 256,
+                height: 256,
+                color: '#000000',
+                background: '#ffffff',
+                ecl: 'M',
+              }).svg();
+              res.send(qrCodeSvg);
+    }
+
+    async verify2fa(id, body, user)
+    {
+        const {sixDigits} = body.code;
+        
+    }
+
     async setStatus(id,status, ftuser) {
         const user = await this.prisma.user.findUnique({
             where: {
