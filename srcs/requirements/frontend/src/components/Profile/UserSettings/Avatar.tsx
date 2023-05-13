@@ -4,8 +4,12 @@ import { Cookies, useCookies } from "react-cookie";
 import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import AvatarImg from "../../../assets/avatar.png";
+import { GetAvatar, PostAvatar } from "../../../api/axios";
+import { useGlobalContext } from "../../../provider/AppContext";
 
 function Avatar() {
+  const { userImg, setUserImg } = useGlobalContext();
+
   const cookie = new Cookies();
   const [cookies] = useCookies(["id"]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -27,30 +31,21 @@ function Avatar() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    //id
-
-    axios
-      .post(
-        "http://localhost:3000/api/v1/user/" + cookie.get("userid") + "/avatar",
-        formData,
-        { withCredentials: true }
-      )
-      .then((response) => {
-        console.log("File uploaded successfully");
+    PostAvatar(selectedFile)
+      .then(() => {
+        GetAvatar().then((res) => {
+          setUserImg(res);
+        });
       })
       .catch((error) => {
         console.log("Error uploading file:", error);
       });
   };
 
-  console.log(cookies.id);
 
   return (
     <div className="flex flex-col items-center gap-5">
-      <img src={AvatarImg} alt="" width={200} />
+      <img src={userImg} alt="" width={200} />
       <form onSubmit={handleSubmit} className=" text-center mb-10">
         <label>
           <div className="border  rounded-md overflow-hidden h-[3rem] border-dashed border-gray-500 relative flex items-center bg-slate-300/10">

@@ -36,7 +36,7 @@ const FreindCard = () => {
   
   return (
     <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
-      <div className="image">
+      <div className="image ">
         <img src={Avatar} alt="" width={60} />
       </div>
       <div className="name text-2xl font-[800]"></div>
@@ -86,9 +86,15 @@ const AchivementCard = ({ title, description, imgPath }: any) => {
 
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
+  width: 100px;
+  aspect-ratio: 1/1;
   img {
     position: relative;
     border-radius: 50%;
+    height: 100px;
+    width: 100%;
+    object-fit: cover;
+
   }
   &:after {
     content: "";
@@ -119,7 +125,7 @@ interface friendsInterface {
 }
 
 const Home = () => {
-  const [userAvatar, setUserAvatar] = useState("");
+  const {userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
     id: '',
@@ -136,103 +142,90 @@ const Home = () => {
       rank: '',
   });
 
-  const GetAvatar = async () => {
-    await instance
-    .get("/user/" + Cookies.get("userid") + "/avatar", {
-        responseType: "blob",
-      })
-      .then((res) => {
-        setUserAvatar(URL.createObjectURL(res.data));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
-  useEffect(() => {
-    GetAvatar();
-  }, []);
 
-  useEffect(() => {
-        const apiUrl = 'http://localhost:3000/api/v1/me'
-        async function fetchData() {
-          try {
-            await axios.get(apiUrl, {
-              withCredentials: true,
-            })
-			.then(response => {
-				if (response.statusText) {
-					setData(response.data);
-				}
-                // setOnlineStat(user.status);
-			})
-		} catch (error) {
-            console.log(error);
-		}
-	}  fetchData();
-}, []);
 
-    useEffect(() => {
-      const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
-      async function fetchRankData() {
-          try {
-              await axios.get(rankUrl, {
-                withCredentials: true,
-              })
-              .then(response => {
-                if (response.statusText) {
-                  getRankData(response.data);
-                }
-          })
-          .catch(error => {
-              if (error.response.status == 401) {
-                  }
-              })
-          } 
-          catch (error) {
-            console.log(error);
-          }
-        } fetchRankData();
-      }, []);
+
+//   useEffect(() => {
+//         const apiUrl = 'http://localhost:3000/api/v1/me'
+//         async function fetchData() {
+//           try {
+//             await axios.get(apiUrl, {
+//               withCredentials: true,
+//             })
+// 			.then(response => {
+// 				if (response.statusText) {
+// 					setData(response.data);
+// 				}
+//                 // setOnlineStat(user.status);
+// 			})
+// 		} catch (error) {
+//             console.log(error);
+// 		}
+// 	}  fetchData();
+// }, []);
+
+//     useEffect(() => {
+//       const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
+//       async function fetchRankData() {
+//           try {
+//               await axios.get(rankUrl, {
+//                 withCredentials: true,
+//               })
+//               .then(response => {
+//                 if (response.statusText) {
+//                   getRankData(response.data);
+//                 }
+//           })
+//           .catch(error => {
+//               if (error.response.status == 401) {
+//                   }
+//               })
+//           } 
+//           catch (error) {
+//             console.log(error);
+//           }
+//         } fetchRankData();
+//       }, []);
       
       const [friends, setFriends] = useState<friendsInterface[]>([]);
-	useEffect(() => {
-		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
-		async function fetchData() {
-			try {
-        await axios.get(apiUrl, {
-					withCredentials: true,
-				})
-				.then(response => {
-					for (let i = 0; i < response.data.length; i++) {
-						axios.get('http://localhost:3000/api/v1/User/' + response.data[i].friendUser_id, {
-							withCredentials: true,
-						})
-						.then(responses => {
-							setFriends(friends => [...friends, {
-								login: responses.data.login,
-								Status: responses.data.status
-							}]);
-						})
-					}
-				})
-				.catch(error => {
-					if (error.response.status == 401) {
-					}
-				})
-			} catch (error) {
-				console.log(error);
-			}
-		}
-		fetchData();
-	}, []);
+// 	useEffect(() => {
+// 		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
+// 		async function fetchData() {
+// 			try {
+//         await axios.get(apiUrl, {
+// 					withCredentials: true,
+// 				})
+// 				.then(response => {
+// 					for (let i = 0; i < response.data.length; i++) {
+// 						axios.get('http://localhost:3000/api/v1/User/' + response.data[i].friendUser_id, {
+// 							withCredentials: true,
+// 						})
+// 						.then(responses => {
+// 							setFriends(friends => [...friends, {
+// 								login: responses.data.login,
+// 								Status: responses.data.status
+// 							}]);
+// 						})
+// 					}
+// 				})
+// 				.catch(error => {
+// 					if (error.response.status == 401) {
+// 					}
+// 				})
+// 			} catch (error) {
+// 				console.log(error);
+// 			}
+// 		}
+// 		fetchData();
+// 	}, []);
 
   return (
     <div className="w-full h-full flex flex-col gap-10">
       <div className="top  pb-5  flex items-center gap-10 border-b border-white/50  ">
         <Status className="" userStatus={userStatus.toLowerCase()}>
-          {userAvatar && (
-            <img src={userAvatar} alt="" width={100} className="" />
+          {userImg && (
+            <img src={userImg} alt=""  className="" />
           )}
         </Status>
         <div className="description flex flex-col  justify-center">
@@ -271,7 +264,7 @@ const Home = () => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-                {friends.map((Friend, index) => (
+                {friends &&  friends.map((Friend, index) => (
                 <FreindCarde key={index} >
                   <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
                       <div className="image">
@@ -296,8 +289,8 @@ const Home = () => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any) => (
-                <ChanelCard />
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
+                <ChanelCard key={index} />
               ))}
             </div>
           </div>
@@ -309,8 +302,8 @@ const Home = () => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any) => (
-                <GameCard />
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
+                <GameCard key={index} />
               ))}
             </div>
           </div>

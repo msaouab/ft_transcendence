@@ -67,7 +67,6 @@ function App() {
           <Route path="/settings" element={<UserSettings />} />
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />
-
           {/* <Route path="/game" element={<Game />}> */}
           {/* </Route> */}
         </Route>
