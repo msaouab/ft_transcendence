@@ -174,39 +174,12 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                                 <ChatBoxTopBar login={selectedChat.login} profileImage={selectedChat.profileImage} status={selectedChat.status} id={selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id} chatRoomId={chatRoomid} />
                                 <div className='h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60'></div>
                             </div>
-                            {/* <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id='scrollableDiv'> */}
-                            {/* <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} setState={setState} /> */}
-                            <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id="scrollableDiv">
-
-                                <InfiniteScroll
-                                    // key={selectedChat.chatRoomid}
-                                    scrollableTarget="scrollableDiv"
-                                    dataLength={messages.length}
-                                    //This is important field to render the next data
-                                    next={next}
-                                    hasMore={hasMore}
-                                    inverse={true}
-                                    loader={<h4
-                                        className="hidden"
-                                    >Loading...</h4>}
-                                >
-                                    {messages
-                                        .slice() // make a copy of the array
-                                        .reverse() // reverse the order of the array
-                                        .map((message: any) => {
-                                            const prevMessage = messages[messages.indexOf(message) - 1];
-                                            return <Message key={message.id + Math.random()} message={message} prevMessage={prevMessage} setState={setState} />;
-                                        })}
-                                </InfiniteScroll>
-
-                                {/* <SendMessageBox selectedChat={selectedChat} setState={setState} /> */}
-                            </div>
-                            {/* </div> */}
+                            <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} setState={setState} />
                             <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} />
                         </>
                     )
             }
-        </ChatBoxStyle>
+        </ChatBoxStyle >
     );
 };
 

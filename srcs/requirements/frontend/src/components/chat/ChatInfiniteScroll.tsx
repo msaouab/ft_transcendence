@@ -23,7 +23,7 @@ const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: a
                     .reverse() // reverse the order of the array
                     .map((message: any) => {
                         const prevMessage = messages[messages.indexOf(message) - 1];
-                        return <Message key={message.id + Math.random()} message={message} prevMessage={prevMessage} setState={setState} />;
+                        return <Message key={message.id} message={message} prevMessage={prevMessage} setState={setState} />;
                     })}
             </InfiniteScroll>
 
