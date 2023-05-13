@@ -58,7 +58,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
             sender_id: Cookies.get('id'),
             receiver_id: selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id
         };
-
+        console.log("hey from zone 1kp1")
         if (connected) {
             // console.log('sending the message: ', message);
             socket.current.emit('sendPrivateMessage', message);
@@ -68,7 +68,6 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
                 setNewLatestMessage(message.dateCreated)
             }
         }
-        // if 
     };
 
     return (

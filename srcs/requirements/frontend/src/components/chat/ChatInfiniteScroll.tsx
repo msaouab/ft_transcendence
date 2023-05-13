@@ -3,12 +3,10 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import Message from "./Message/Message";
 
-const ChatInfiniteScroll = ({ messages, next, hasMore }: { messages: any, next: any, hasMore: any }) => {
-
+const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: any, next: any, hasMore: any, setState: any }) => {
 
     return (
-        <div>
-
+        <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id="scrollableDiv">
             <InfiniteScroll
                 // key={selectedChat.chatRoomid}
                 scrollableTarget="scrollableDiv"
@@ -25,7 +23,7 @@ const ChatInfiniteScroll = ({ messages, next, hasMore }: { messages: any, next: 
                     .reverse() // reverse the order of the array
                     .map((message: any) => {
                         const prevMessage = messages[messages.indexOf(message) - 1];
-                        return <Message key={message.id + Math.random()} message={message} prevMessage={prevMessage} />;
+                        return <Message key={message.id + Math.random()} message={message} prevMessage={prevMessage} setState={setState} />;
                     })}
             </InfiniteScroll>
 

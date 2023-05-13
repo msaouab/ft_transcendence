@@ -121,6 +121,7 @@ const SearchBar = () => {
 
     // connection to websocket
     let socket = useRef<any>(null);
+
     useEffect(() => {
         if (socket.current) {
             socket.current.on('disconnect', () => {
@@ -347,8 +348,6 @@ const SearchBar = () => {
 
                 <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} key={tmpChatData} />
             }
-            {/* <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} /> */}
-
 
 
         </div >

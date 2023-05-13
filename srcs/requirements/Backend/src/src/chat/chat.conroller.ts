@@ -6,9 +6,14 @@ import {
     Body,
     UseGuards,
     Query,
-    Post
+    Post,
+    Delete,
+
+    Req
 } from "@nestjs/common"
 
+
+import { Request } from 'express';
 import { ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger"
 import { ChatService } from "./chat.service"
 import { GetPrivateChatMessagesDto } from "./dto/getPrivateChatRoom.dto";
@@ -22,7 +27,7 @@ export class ChatController {
         private readonly ChatService: ChatService
     ) { }
 
-
+    // this to get a privat chat room
     @Get("/private/single/:senderId/:receiverId")
     @ApiParam({ name: 'senderId', required: true, description: 'id of the sender' })
     @ApiParam({ name: 'receiverId', required: true, description: 'id of the receiver' })
@@ -49,6 +54,21 @@ export class ChatController {
         // console.log("limit: ", limit, "offset: ", offset);
         const privateChatMessages = await this.ChatService.getPrivateChatMessages(id, { limit, offset, seen, userId });
         return privateChatMessages;
+    }
+
+
+    // deleting a private chat room
+    @Delete("/private/:id")
+    @ApiParam({ name: 'id', required: true, description: 'id of the private chat room' })
+    async deletePrivateChatRoom(@Param('id') id: string, @Req() req: Request) {
+
+        const userId = req.cookies.id;
+        if (!userId) {
+            throw new Error("user not logged in or you fucked up the cookies,if that's the case then login again");
+        }
+        
+        const privateChatRoom = await this.ChatService.deletePrivateChatRoom(id, userId)
+        return privateChatRoom;
     }
 
     @Get("/group/:id")

@@ -2,6 +2,9 @@ import React from 'react'
 import Styled from 'styled-components'
 import ChatList from '../../components/chat/ChatList';
 import ChatBox from '../../components/chat/ChatBox';
+
+import { useEffect, useRef } from 'react';
+import { io } from 'socket.io-client';
 const ChatStyle = Styled.div`
   display: flex;
   flex-direction: row;
@@ -11,51 +14,76 @@ const ChatStyle = Styled.div`
   justify-content: flex-start;
   background: #1E1D18;
   gap: 2px;
+  .chat-list {
+    width: 30%;
+    height: 100%;
+  }
 
-  border: 1px solid #fff;
-
-    .chat-box {
+  .chat-box-wrapper {
     margin-top: 20px;
     height: 95%;
-}
-
-
-  @media (max-width: 768px) {
-    height: 100vh;
+    width: 63%;
   }
-  
 
+  @media screen and (max-width: 724px) {
+    // border: 1px solid red;
+    .chat-box-wrapper {
+      width: 100%;
+      justify-content: center;
+
+  }
+  // starting from 724 to 1200 
+  @media screen and (min-width: 724px) and (max-width:1200px) {
+    .chat-box-wrapper {
+      width: 55%;
+    }
+    
+    .chat-list {
+      width: 45%;
+    }
+  
+}
 `;
 
-// import Loader from '../../components/common/Loader';
 
 
 import { PrivateMessage } from '../../types/message';
+import SideBar from '../../components/common/SideBar';
 const Chat = () => {
-  //  add default chatbox later 
-  // passing a prop to ChatList, to get event when a user is clicked and pass it to ChatBox
+  let chatSocket = useRef(null);
+  const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
-  // const [updatList, setUpdatList] = React.useState<string>('');
   const [newLatestMessage, setNewLatestMessage] = React.useState<string>('');
+
+
+  useEffect(() => {
+    // socket connection
+    if (!connected) {
+      chatSocket.current = io('http://localhost:3000/chat');
+      setConnected(true);
+      console.log('connected to the server')
+    }
+  }, []);
 
 
   return (
     <ChatStyle>
-      <div className="side-bar w-1/7 h-full bg-gray-500">
-        <h1>Side Bar</h1>
+      <div className="side-bar w-[100px]">
+        <SideBar />
       </div>
-      <div className="chat-list w-[30%] h-full
-  
-        ">
+      <div className="chat-list">
         <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       </div>
-      <div className="chat-box w-[63%] h-full">
-        <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="rgba(217, 217, 217, 0.3)" setNewLatestMessage={setNewLatestMessage} />
+      <div className="chat-box-wrapper">
+   
+        <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="big" setNewLatestMessage={setNewLatestMessage}
+          chatSocket={chatSocket} connected={connected}
+        />
+
+        {/* } */}
       </div>
     </ChatStyle >
   )
 }
-
-
 
 export default Chat

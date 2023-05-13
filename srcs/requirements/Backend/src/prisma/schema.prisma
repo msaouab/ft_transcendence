@@ -118,7 +118,7 @@ model PrivateMessage {
   sender_id   String
   receiver_id String
   receiver    User            @relation("privateChatRoomRelationReceiver", fields: [receiver_id], references: [id])
-  chatRoom    PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
+  chatRoom    PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id], onDelete: Cascade)
   // chatRoom PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
 }
 
@@ -144,9 +144,10 @@ model BlockTab {
 model ChannelsJoinTab {
   user_id      String
   user         User      @relation("channelsJoinTabRelation", fields: [user_id], references: [id])
-  channel_id   String    
+  channel_id   String
   channel_name String
   role         ChanRoles
+
   @@unique([user_id, channel_id])
 }
 

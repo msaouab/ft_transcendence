@@ -31,18 +31,7 @@ body {
 body {
   width: 100vw;
   height: 100vh;
-
+  position: fixed;
   min-height: 100vh;
-
-}
-
-
-html {
-  min-height: 100vh;
-  border: red solid 1px;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
 
 }

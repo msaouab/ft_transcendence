@@ -31,6 +31,7 @@ export class FriendsController {
         return friends;
     }
 
+    
     @Delete(":id/friends")
     @UseGuards(AuthenticatedGuard)
     async deleteFriends(@Body() DeleteFriendshipDto: DeleteFriendshipDto, @Param('id') id: string) {

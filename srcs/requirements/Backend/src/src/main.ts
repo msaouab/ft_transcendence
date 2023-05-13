@@ -17,7 +17,14 @@ import { SocketAdapter } from './socket.adapter';
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule,
+    {
+      // cors: {
+      //   credentials: true,
+      //   origin: "*",
+      // }
+    }
+  );
 
   //ejs temp front end
   app.useStaticAssets(join('/', 'app', 'public'));
@@ -58,8 +65,10 @@ async function bootstrap() {
   //passport end
 
   app.enableCors(
+
     {
-      origin: "*"
+      credentials: true,
+      origin: "http://localhost:5173"
     }
   )
 

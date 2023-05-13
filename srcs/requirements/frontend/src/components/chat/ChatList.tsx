@@ -9,12 +9,12 @@ import { PrivateMessage } from '../../types/message';
 import { SearchOptions } from '../../types/search';
 const ChatListStyle = styled.div`
     background: transparent;
-    border: 1 solid #fff;
+    // border: 1 solid #fff;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     padding: 20px;
     gap: 10px;
     & > *:first-child {
@@ -22,46 +22,54 @@ const ChatListStyle = styled.div`
     }
 
     & > *:nth-child(1) {
-        height: 35%;
+        height: auto;
     }
     & > *:nth-child(2) {
-        height: 55%; 
+        height: auto;
     }
+    & > *:nth-child(3) {
+        height:  auto;
+    }
+
+
 
     @media (max-width: 768px) {
+        align-self: start;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
-        width: 100vw;
-        height: 100vh;
-        border: black 1px solid;
-
-        & > *:first-child {
-            width: 90%;
-
-        }
-        & > *:nth-child(2) {
-            // height: 35%;
-            width: 90%;
-
-        }
-        & > *:nth-child(3) {
-            width: 90%;
-
-        }
+        width: 20%;
+        height: 100%;
 
     }
 
-    `;
+
+
+`;
+
+const ChatListWrapperStyle = styled.div`
+   @media (max-width: 768px) {
+        // border: 1px solid #fff;
+        width: 90vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        item-align: center;
+   }
+    `
 
 const ChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {
     return (
-        <ChatListStyle>
-            <SearchBar />
-            <GroupChatList />
-            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
-        </ChatListStyle>
+
+        <ChatListWrapperStyle>
+            <ChatListStyle>
+                <SearchBar />
+                <GroupChatList />
+                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+            </ChatListStyle>
+        </ChatListWrapperStyle>
     );
 };
 

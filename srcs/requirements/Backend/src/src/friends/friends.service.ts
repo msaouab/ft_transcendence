@@ -14,6 +14,7 @@ export class FriendsService {
     constructor(private prisma: PrismaService,
         private readonly UserService: UserService
     ) { }
+    
     async getFriends(id: string): Promise<FriendsTab[]> {
 
         await this.UserService.getUser(id);

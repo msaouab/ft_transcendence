@@ -48,14 +48,46 @@ export class ChatService {
         if (!privateChatRoom) {
             throw new HttpException("Private chat already exist", 409);
         }
-        // let privateRoom = await this.joinPrivateChatRoom(client, payload);
-
-
-        // console.log("Private chat room created: ", privateRoom);
-        // server.to(privateRoom.id).emit('privateChatRoomCreated', privateRoom);
-
-        // client.emit('privateChatRoomCreated', privateChatRoom);
         return privateChatRoom;
+    }
+
+
+    async deletePrivateChatRoom(id: string, userId: string) {
+        /*
+            error handling:
+                * if the private chat room doesn't exist
+                * if the user is not authorized to delete the private chat room (not the sender or receiver)
+        */
+        // try {
+
+        const privateChatRoom = await this.prisma.privateChatRoom.findUnique(
+            {
+                where: {
+                    id: id
+                }
+            }
+        );
+        if (!privateChatRoom) {
+            throw new HttpException("Private chat room not found", 404);
+        }
+        if (privateChatRoom.sender_id != userId && privateChatRoom.receiver_id != userId) {
+            throw new HttpException("Unauthorized", 401);
+        }
+        // we're using cascade delete, so we don't need to delete the messages manually
+        const deletedPrivateChatRoom = await this.prisma.privateChatRoom.delete({
+            where: {
+                id: id
+
+            },
+        });
+        return deletedPrivateChatRoom;
+
+
+
+
+
+
+
     }
 
     // async CreatePrivateChatRoom(client: Socket, payload: {
