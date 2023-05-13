@@ -6,7 +6,7 @@ import { User } from '../auth/user.decorator/user.decorator';
 import { PutUserDto } from './dto/put-user.dto';
 import { readFile,unlink } from 'fs/promises';
 import { authenticator } from 'otplib';
-import { toDataURL,toString } from 'qrcode';
+import { toDataURL } from 'qrcode';
 import { TfaDto } from './dto/Tfa.dto';
 
 
@@ -175,10 +175,37 @@ export class UserService {
               res.send(qrCodeSvg);
     }
 
-    async verify2fa(id, body, user)
+    async verify2fa(id, sixDigits: string, ft_user)
     {
-        const {sixDigits} = body.code;
-        
+        const userToken = sixDigits;
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        if (user.email != ft_user._json.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        const delta = authenticator.checkDelta(userToken, user.otp_base32);
+        if(delta > 0) {
+            throw new BadRequestException('Wrong code');
+        }
+        await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                tfa: !user.tfa,
+                otp_verified: true,
+            },
+        });
+        return {
+            message: '2FA enabled',
+        };
+   
     }
 
     async setStatus(id,status, ftuser) {
