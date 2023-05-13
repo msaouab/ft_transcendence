@@ -28,9 +28,11 @@ const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
     /* width: 100vw; */
-    display: grid;
-    grid-template-columns: 1fr 11fr;
-    padding: 1rem 2rem;
+    display: flex;
+    
+    /* display: grid; */
+    /* grid-template-columns: 1fr 11fr; */
+    /* padding: 1rem 2rem; */
   `;
 
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
@@ -45,10 +47,12 @@ const index = () => {
   return (
     <LayoutStyle>
       {/* {JSON.stringify(userAvatar)} */}
-      <div className="side-bar ">
-        <SideBar />
+      <div className="w-[4%]">
+        <div className="side-bar absolute top-0 left-0 w-full h-full ">
+          <SideBar />
+        </div>
       </div>
-      <div className="main-content">
+      <div className="main-content  w-[96%] ">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]">
           <div className="search">
             <CustomInput

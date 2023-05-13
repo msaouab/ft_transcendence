@@ -115,7 +115,6 @@ const Status = styled.div<{ userStatus: string }>`
     width: 15%;
     height: 15%;
     border-radius: 50%;
-    z-index: 10;
   }
 `;
 
