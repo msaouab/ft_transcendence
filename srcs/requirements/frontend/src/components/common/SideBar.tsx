@@ -234,11 +234,16 @@ const SideBar = () => {
     async function fetchData() {
       try {
         await instance
-          .get("/me", {
-            //  withCredentials: true,
-          })
+          .get("/me")
           .then((response) => {
+            if (response?.data?.tfa == true && response.data.otp_verified == false)
+            {
+              // alert("Please enable two factor authentication");
+              navigate("/login/two-factor-authentication");
+
+            }
             if (response.statusText) {
+
             }
             Cookies.set("userid", response.data.id);
             // setOnlineStat(user.status);
