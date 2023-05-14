@@ -47,12 +47,12 @@ const index = () => {
   return (
     <LayoutStyle>
       {/* {JSON.stringify(userAvatar)} */}
-      <div className="w-[4%]">
+      <div className="w-[5rem]">
         <div className="side-bar absolute top-0 left-0 w-full h-full ">
           <SideBar />
         </div>
       </div>
-      <div className="main-content  w-[96%] ">
+      <div className="main-content w-full  px-4   ">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]">
           <div className="search">
             <CustomInput
