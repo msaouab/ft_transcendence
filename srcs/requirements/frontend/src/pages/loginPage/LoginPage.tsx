@@ -186,7 +186,7 @@ function	LoginPage() {
 			<div className='whiteBoard'>
 				<img src={logoBlack} alt="Logo" className='logo'/>
 				{/* <Link to="localhost:3000/api/v1/login/42" className={`ftauth`}> */}
-					<a href="http://localhost:3000/api/v1/login/42"  rel="noreferrer">
+					<a href="http://localhost:3000/api/v1/login/42" rel="noreferrer">
 					<div className='ftbutton'>
 
 							<img src={ftlogo} alt="42logo" className='ftlogo' />

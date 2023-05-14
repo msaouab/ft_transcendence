@@ -24,9 +24,11 @@ export class AuthService {
             if (find_user) {
                 return this.login(user,res);
             }
+            const Cryptr = require('cryptr');
+            const cryptr = new Cryptr(process.env.SECRET )
             const secret = authenticator.generateSecret();
-            const token = authenticator.generate(secret);
-        //hash secret later
+            const encryptedString = cryptr.encrypt(secret);
+            const token = authenticator.generate(encryptedString);
             const createUser = await this.prisma.user.create({
                 data: {
                     login: user.username,
@@ -35,7 +37,7 @@ export class AuthService {
                     lastName:  user.name.familyName,
                     avatar: './public/default.png',
                     status: 'Online',
-                    otp_base32: secret,
+                    otp_base32: encryptedString,
                 },
             })
             const createUserRankingData = await this.prisma.rankingData.create({
@@ -66,6 +68,7 @@ export class AuthService {
                 },
                 data: {
                     status: 'Offline',
+                    otp_verified: false,
                 },
             })
             res.clearCookie('id');
@@ -111,40 +114,28 @@ export class AuthService {
         }
     }
 
-    async delete(user,res) {
-        try  {
-            const find_user = await this.prisma.user.findUnique({
-                where: {
-                    email: user._json.email,
-                },
-            })
-            if (find_user) {
-                const deleteUser = await this.prisma.user.delete({
-                    where: {
-                        id: find_user.id,
-                    },
-                })
-               res.clearCookie('id');
-                // return deleteUser;
-            }
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }
-    
-    // async return_user(user) {
-        //     const find_user = await this.prisma.user.findUnique({
-    //         where: {
-    //             login: user.username,
-    //         },
-    //     })
-    //     return find_user;
+    // async delete(user,res) {
+    //     try  {
+    //         const find_user = await this.prisma.user.findUnique({
+    //             where: {
+    //                 email: user._json.email,
+    //             },
+    //         })
+    //         if (find_user) {
+    //             const deleteUser = await this.prisma.user.delete({
+    //                 where: {
+    //                     id: find_user.id,
+    //                 },
+    //             })
+    //            res.clearCookie('id');
+    //             // return deleteUser;
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.log(e);
+    //     }
     // }
-    
-    async twoFactor(user) {
-        
-    }
+
 
     async set2fa(id, body: TfaDto, user)
     {
