@@ -35,7 +35,7 @@ export class AuthService {
                     email:  user._json.email,
                     firstName:  user.name.givenName,
                     lastName:  user.name.familyName,
-                    avatar: './public/default.png',
+                    avatar: '/app/public/default.png',
                     status: 'Online',
                     otp_base32: encryptedString,
                 },
@@ -98,7 +98,7 @@ export class AuthService {
                     },
                 })
                 res.cookie('id', find_user.id, {
-                    httpOnly: true,
+                    // httpOnly: true,
                     secure: false,
                 })
             

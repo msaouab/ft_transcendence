@@ -89,8 +89,24 @@ export class InvitesService {
         }
 
         // check if the invite is to a user that is already a friend
-        // for later when friendships are implemented
+        const friendshipExists = await this.prisma.friendsTab.findFirst({
+            where: {
+                OR: [
+                    {
+                        user_id: sender_id,
+                        friendUser_id: receiver_id,
+                    },
+                    {
+                        user_id: receiver_id,
+                        friendUser_id: sender_id,
+                    },
+                ],
 
+            },
+        });
+        if (friendshipExists) {
+            throw new ConflictException('User is already a friend');
+        }
 
         // create the invite
         return this.prisma.friendshipInvites.create({

@@ -48,7 +48,7 @@ const index = () => {
     <LayoutStyle>
       {/* {JSON.stringify(userAvatar)} */}
       <div className="w-[5rem]">
-        <div className="side-bar absolute top-0 left-0 w-full h-full ">
+        <div className="side-bar absolute top-0 left-0  ">
           <SideBar />
         </div>
       </div>

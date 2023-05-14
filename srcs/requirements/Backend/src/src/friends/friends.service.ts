@@ -14,6 +14,7 @@ export class FriendsService {
     constructor(private prisma: PrismaService,
         private readonly UserService: UserService
     ) { }
+    
     async getFriends(id: string): Promise<FriendsTab[]> {
 
         await this.UserService.getUser(id);
@@ -76,6 +77,17 @@ export class FriendsService {
         }
         // delete friendship
         return await this.prisma.friendsTab.delete({
+            where: {
+                user_id_friendUser_id: {
+                    user_id: user_id,
+                    friendUser_id: friendUser_id,
+                },
+            },
+        });
+    }
+
+    async getFriendship(user_id: string, friendUser_id: string): Promise<FriendsTab> {
+        return await this.prisma.friendsTab.findUnique({
             where: {
                 user_id_friendUser_id: {
                     user_id: user_id,

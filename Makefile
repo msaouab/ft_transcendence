@@ -6,8 +6,8 @@ YELLOW = \033[1;33m
 BLUE = \033[1;34m
 ED = \033[0m
 
-all: credit env up
-# all: env up
+# all: credit env up
+all: env up
 
 credit:
 	@echo "${GREEN}"
@@ -47,6 +47,7 @@ start:
 clean: stop 
 	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
 	@docker rm backend postgres frontend adminer || true
+	@docker rmi backend frontend adminer || true
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"

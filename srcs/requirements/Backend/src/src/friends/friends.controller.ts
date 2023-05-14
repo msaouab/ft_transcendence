@@ -5,16 +5,18 @@ import {
     Get,
     Delete,
     Param,
-    Body
+    Body,
+    UseGuards
 } from "@nestjs/common"
 
 import { FriendsService } from "./friends.service"
 
 import { DeleteFriendshipDto } from "./dto/delete-friendship.dto";
 import { ApiTags } from "@nestjs/swagger"
+import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
 
 @ApiTags('User')
-@Controller('User')
+@Controller('user')
 
 export class FriendsController {
 
@@ -23,14 +25,18 @@ export class FriendsController {
     ) { }
 
     @Get(":id/friends")
+    @UseGuards(AuthenticatedGuard)
     async getFriends(@Param('id') id: string) {
         const friends = await this.FriendsService.getFriends(id);
         return friends;
     }
 
+    
     @Delete(":id/friends")
+    @UseGuards(AuthenticatedGuard)
     async deleteFriends(@Body() DeleteFriendshipDto: DeleteFriendshipDto, @Param('id') id: string) {
         const friends = await this.FriendsService.deleteFriendship(DeleteFriendshipDto, id);
         return friends;
     }
+
 }

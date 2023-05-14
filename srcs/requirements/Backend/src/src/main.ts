@@ -3,12 +3,15 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import * as passport from 'passport';
-import { Body, VersioningType } from '@nestjs/common';
+import { Body, ValidationPipe, VersioningType } from '@nestjs/common';
 import bodyParser from 'body-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as session from 'express-session';
-import * as cookieParser from 'cookie-parser';
 
+// importing cors
+import * as cors from 'cors';
+import * as cookieParser from 'cookie-parser';
+import { SocketAdapter } from './socket.adapter';
 
 
 // const APP_ROUTE_PREFIX = 'api';
@@ -34,7 +37,7 @@ async function bootstrap() {
   // .addTag('pong')
   .build();
   // this is the line that enables versioning
-  // api versioning is /api/v1/... so if shit happens later on you can just /api/v2/...
+  // api versioning is /api/v1/... so if shit happens moving on you can just /api/v2/...
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v',
@@ -45,17 +48,16 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`api/v${process.env.API_VERSION}/docs`, app, document);
   // express session
-  app.use(session({ 
-                    resave: false,
-                    saveUninitialized: false,
-                    secret: 'secret',
-                    store: new session.MemoryStore(),
-                    cookie: { maxAge: 24 * 60 * 60 * 1000}
-                  }),
-    );
-    app.use(cookieParser());
-    // app.use(cookieParser());
-    //secret from .env
+  app.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: 'secret',
+    store: new session.MemoryStore(),
+    cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  }),
+  );
+  app.use(cookieParser());
+  //secret from .env
 
   //passport start
   app.use(passport.initialize());
@@ -63,6 +65,9 @@ async function bootstrap() {
   //passport end
 
 
+
+  app.useWebSocketAdapter(new SocketAdapter(app));
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 
