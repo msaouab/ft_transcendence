@@ -13,6 +13,7 @@ import LoginPage from "./pages/loginPage/LoginPage";
 import Profile from "./pages/user/Profile";
 import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
+import VerifyPage from "./pages/loginPage/VerifyPage";
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/tfa" element={<VerifyPage />} />
         <Route path="" element={<Layout />}>
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Home />} />

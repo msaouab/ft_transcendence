@@ -84,9 +84,9 @@ export class UserController {
     
     }
     @Put(':id/2fa/verify')
-    @UseGuards(AuthenticatedGuard)
-    async verify2fa(@Param('id') id: string, @Body() body , @User() user: Profile) {
-      return await this.userService.verify2fa(id, body.number, user);
+    // @UseGuards(AuthenticatedGuard)
+    async verify2fa(@Param('id') id: string, @Body() body , @User() user: Profile, @Res() res) {
+      return await this.userService.verify2fa(id, body.number, user,res);
     }
 
     @Put(':id/:status')
