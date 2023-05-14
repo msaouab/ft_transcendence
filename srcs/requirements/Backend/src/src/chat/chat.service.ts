@@ -32,12 +32,7 @@ export class ChatService {
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
         const { senderId, receiverId } = postreatePrivateChatRoomDto;
-
-        console.log("senderId: ", senderId);
-        console.log("receiverId: ", receiverId);
         const hashedRoomName = await this.getRoomId(senderId, receiverId);
-        console.log("hashedRoomName: ", hashedRoomName);
-        // try {
         let privateChatRoom = await this.prisma.privateChatRoom.create({
             data: {
                 id: hashedRoomName,
@@ -144,7 +139,7 @@ export class ChatService {
         //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
         // }
 
-        console.log("We've got the event to join a private room");
+        // console.log("We've got the event to join a private room");
         const { senderId, receiverId } = payload;
         // try {
         const privateChatRoom = await this.prisma.privateChatRoom.findUnique({
@@ -210,7 +205,7 @@ export class ChatService {
             content: payload.content
         }
 
-        console.log("Subpayload: ", subPayload);
+        // console.log("Subpayload: ", subPayload);
         // const privateRoom = await this.CreatePrivateChatRoom(client, subPayload);
         // return "ok";
 

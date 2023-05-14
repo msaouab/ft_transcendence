@@ -78,8 +78,8 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
 
 
     const handleDelete = (id: string) => {
-        console.log("im trying to delete message with id: ", id);
-        console.log("im trying to delete message with chatRoomId: ", chatRoomId);
+        // console.log("im trying to delete message with id: ", id);
+        // console.log("im trying to delete message with chatRoomId: ", chatRoomId);
         axios.delete(
             `http://localhost:3000/api/v1/chatrooms/private/${chatRoomId}/message/${id}`,
             { withCredentials: true }

@@ -78,7 +78,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
     const menuRef = useRef(null);
     useEffect(() => {
-        console.log("clicked outside");
+        // console.log("clicked outside");
         const handleClickOutside = (e) => {
             // here we check if the target of the click isn't the menuRef
             if (menuRef.current && !menuRef.current.contains(e.target)) {

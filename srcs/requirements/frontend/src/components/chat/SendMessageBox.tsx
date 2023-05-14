@@ -63,10 +63,16 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
             // console.log('sending the message: ', message);
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
-            // if (setNewLatestMessage) {
-            //     // console.log("hey from zone 1kp2")
-            //     setNewLatestMessage(message.dateCreated)
-            // }
+            if (setNewLatestMessage) {
+                // console.log("hey from zone 1kp2")
+                setNewLatestMessage(
+                    {
+                        chatRoomId: selectedChat.chatRoomid,
+                        message: message.content
+                    }
+                )
+                // setNewLatestMessage(message.content);
+            }
         }
     };
 

@@ -22,7 +22,7 @@ const UsersChatListStyle = styled.div`
 
 `;
 
-const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {
+const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
 
     const [privateChatRooms, setPrivateChatRooms] = useState([]);
 
@@ -85,7 +85,22 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
 
     useEffect(() => {
         getPrivateChats('5', '1')
-    }, [newLatestMessage]);
+        // 
+    }, []);
+
+
+    useEffect(() => {
+        const newPrivateChatRooms = [...privateChatRooms];
+        const index = newPrivateChatRooms.findIndex((chat: PrivateMessage) => chat.chatRoomid === newLatestMessage.chatRoomId);
+        if (index === -1) return;
+        const newChat = newPrivateChatRooms[index];
+        newChat.lastMessage = newLatestMessage.message
+        newPrivateChatRooms.splice(index, 1);
+        newPrivateChatRooms.unshift(newChat);
+        setPrivateChatRooms(newPrivateChatRooms);
+
+    }, [newLatestMessage])
+
 
     useEffect(() => {
         privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
@@ -122,7 +137,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                                 <div key={props.chatRoomid} onClick={() => {
                                     setSelectedChat(props);
                                 }} >
-                                    <ChatTab {...props} key={props.chatRoomid} />
+                                    <ChatTab privateMessage={props} key={props.chatRoomid} />
                                     {/* seperator should show under all compontes excpet the last one */}
                                     {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?
                                         <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 opacity-60'></div> : null}

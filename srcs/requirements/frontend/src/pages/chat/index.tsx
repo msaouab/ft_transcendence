@@ -53,7 +53,7 @@ const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
-  const [newLatestMessage, setNewLatestMessage] = React.useState<string>('');
+  const [newLatestMessage, setNewLatestMessage] = React.useState<{ chatRoomId: string, message: string }>({} as { chatRoomId: string, message: string });
 
 
   useEffect(() => {
@@ -66,10 +66,7 @@ const Chat = () => {
 
     chatSocket.current.on('connect', () => {
       console.log("socket id: ", chatSocket.current.id);
-
       // if there's a selected chat, join the room
-
-
     });
     return () => {
       chatSocket.current.disconnect();

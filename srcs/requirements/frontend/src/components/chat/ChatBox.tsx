@@ -56,7 +56,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
-    console.log("hey ");
+    // console.log("hey ");
     // const [connected, setConnected] = useState<boolean>(false);
     // const chatSocket = useRef(null);
 
@@ -99,7 +99,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
 
     useEffect(() => {
         if (connected) {
-            console.log("im registering to the newPrivateMessage event");
+            // console.log("im registering to the newPrivateMessage event");
             chatSocket.current.on('newPrivateMessage', (message: any) => {
 
                 console.log("a new message detected from the server: ", message);
@@ -158,7 +158,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     const next = () => {
-        console.log("next function called");
+        // console.log("next function called");
 
         getMessages().then((newMessages) => {
             setState((prevState) => ({
@@ -172,7 +172,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     useEffect(() => {
-        console.log("selected chat changed");
+        // console.log("selected chat changed");
         getMessages().then((messages) => {
             if (messages.length == 0
                 || (messages[0] && selectedChat.chatRoomid !== messages[0].chatRoom_id)) {

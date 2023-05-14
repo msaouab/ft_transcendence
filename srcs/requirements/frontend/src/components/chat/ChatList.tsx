@@ -60,7 +60,8 @@ const ChatListWrapperStyle = styled.div`
    }
     `
 
-const ChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: string }) => {
+const ChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string }
+ }) => {
     return (
 
         <ChatListWrapperStyle>

@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import { Link } from "react-router-dom";
 // components
 import MessageDate from './SeenDate';
-
+import { useEffect } from "react";
 const ChatTabStyle = styled.div`
     background: transparent; 
     width: 100%;
@@ -53,9 +53,19 @@ const ChatTabStyle = styled.div`
 
 
 
-const ChatTab = (props: PrivateMessage) => {
+const ChatTab = ({ privateMessage, newLatestMessage }:
+    {
+        privateMessage: PrivateMessage,
+        // newLatestMessage: string
+    }
+) => {
 
-    let otherUserId = props.sender_id === Cookies.get('id') ? props.receiver_id : props.sender_id;
+    // useEffect(() => {
+    //     console.log('newLatestMessage', newLatestMessage);
+    //     privateMessage.lastMessage = newLatestMessage;
+    // }, [newLatestMessage]);
+
+    let otherUserId = privateMessage.sender_id === Cookies.get('id') ? privateMessage.receiver_id : privateMessage.sender_id;
     return (
         <ChatTabStyle>
             <div className="chat-tab__image">
@@ -66,14 +76,14 @@ const ChatTab = (props: PrivateMessage) => {
             <div className="chat-tab__info">
                 {/* <div className="chat-tab__info__name font-black "> */}
                 <Link to={`/user/${otherUserId}`} className="chat-tab__info__name font-black hover:underline">
-                    {props.login}
+                    {privateMessage.login}
                 </Link>
                 {/* </div> */}
                 <div className="chat-tab__info__last-message text-xs font-thin opacity-50">
-                    {props.lastMessage.length > 25 ? props.lastMessage.slice(0, 25) + '...' : props.lastMessage}
+                    {privateMessage.lastMessage.length > 25 ? privateMessage.lastMessage.slice(0, 25) + '...' : privateMessage.lastMessage}
                 </div>
             </div>
-            <MessageDate {...props} />
+            <MessageDate {...privateMessage} />
         </ChatTabStyle>
     );
 };
