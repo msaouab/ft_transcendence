@@ -25,13 +25,12 @@ const ChatBoxStyle = styled.div`
     // }
     
 
-
-
 `;
 
 
 // import InfiniteScroll from 'react-infinite-scroll-component';
 // types
+import { io } from 'socket.io-client';
 import { PrivateMessage } from '../../types/message';
 import { singleMessage } from '../../types/message';
 // components
@@ -48,6 +47,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     setNewLatestMessage?: any,
     chatSocket: any,
     connected: boolean
+
 }) => {
     let initialState = {
         messages: [] as singleMessage[],
@@ -57,22 +57,65 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     console.log("hey ");
+    // const [connected, setConnected] = useState<boolean>(false);
+    // const chatSocket = useRef(null);
+
+    // useEffect(() => {
+    //     // socket connection
+    //     if (!connected) {
+    //         chatSocket.current = io('http://localhost:3000/chat');
+    //         setConnected(true);
+    //         console.log('connected to the server')
+    //     }
+
+    //     // print the socket id
+    //     chatSocket.current.on('connect', () => {
+
+    //         console.log("socket id: ", chatSocket.current.id);
+    //     });
+
+    //     // if (connected) {
+    //     //     console.log("im registering to the newPrivateMessage event");
+    //     //     chatSocket.current.on('newPrivateMessage', (message: any) => {
+
+    //     //         console.log("a new message detected from the server: ", message);
+    //     //         setState((prevState: any) => ({
+    //     //             ...prevState,
+    //     //             messages: [message, ...prevState.messages]
+    //     //         }));
+    //     //     })
+    //     // }
+    //     // else {
+    //     //     console.log("not connected to the server");
+    //     // }
+    //     return () => {
+
+    //         // chatSocket.current.off('newPrivateMessage');
+    //         chatSocket.current.disconnect();
+    //     }
+
+    // }, []);
+
 
     useEffect(() => {
-
-
         if (connected) {
+            console.log("im registering to the newPrivateMessage event");
             chatSocket.current.on('newPrivateMessage', (message: any) => {
+
                 console.log("a new message detected from the server: ", message);
                 setState((prevState: any) => ({
                     ...prevState,
                     messages: [message, ...prevState.messages]
                 }));
             })
-        } else {
-            console.log("not connected to the server");
         }
-    }, []);
+        // else {
+        //     console.log("not connected to the server");
+        // }
+        return () => {
+            chatSocket.current.off('newPrivateMessage');
+        }
+    }, [connected]);
 
 
 
@@ -129,6 +172,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     useEffect(() => {
+        console.log("selected chat changed");
         getMessages().then((messages) => {
             if (messages.length == 0
                 || (messages[0] && selectedChat.chatRoomid !== messages[0].chatRoom_id)) {

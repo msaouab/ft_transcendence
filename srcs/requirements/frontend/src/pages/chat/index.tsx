@@ -63,7 +63,66 @@ const Chat = () => {
       setConnected(true);
       console.log('connected to the server')
     }
+
+    chatSocket.current.on('connect', () => {
+      console.log("socket id: ", chatSocket.current.id);
+
+      // if there's a selected chat, join the room
+
+
+    });
+    return () => {
+      chatSocket.current.disconnect();
+      setConnected(false);
+    }
+
   }, []);
+
+  useEffect(() => {
+    if (selectedChat.chatRoomid) {
+      console.log("joining the room");
+      const payload = {
+        senderId: selectedChat.sender_id,
+        receiverId: selectedChat.receiver_id
+      }
+      chatSocket.current.emit('joinRoom', payload);
+    } else {
+      console.log("no selected chat");
+    }
+
+    return () => {
+      if (selectedChat.chatRoomid) {
+        console.log("leaving the room");
+        const payload = {
+          senderId: selectedChat.sender_id,
+          receiverId: selectedChat.receiver_id
+        }
+        chatSocket.current.emit('leaveRoom', payload);
+      }
+    }
+  }, [selectedChat]);
+
+
+  //   useEffect(() => {
+  //     if (connected) {
+  //         console.log("im registering to the newPrivateMessage event");
+  //         chatSocket.current.on('newPrivateMessage', (message: any) => {
+
+  //             console.log("a new message detected from the server: ", message);
+  //             setState((prevState: any) => ({
+  //                 ...prevState,
+  //                 messages: [message, ...prevState.messages]
+  //             }));
+  //         })
+  //     }
+  //     // else {
+  //     //     console.log("not connected to the server");
+  //     // }
+  //     return () => {
+  //         chatSocket.current.off('newPrivateMessage');
+  //     }
+  // }, [connected]);
+
 
 
   return (
@@ -75,9 +134,10 @@ const Chat = () => {
         <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       </div>
       <div className="chat-box-wrapper">
-   
+
         <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="big" setNewLatestMessage={setNewLatestMessage}
           chatSocket={chatSocket} connected={connected}
+
         />
 
         {/* } */}

@@ -38,13 +38,14 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         if (!id) return;
         try {
 
-            const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);    
+            const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
             await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
                 const { id } = room;
 
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
+
                 let user;
                 try {
                     if (message.data[0] === 0) return;

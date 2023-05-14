@@ -138,6 +138,12 @@ export class ChatService {
         senderId: string,
         receiverId: string
     }) {
+        // if (!client.rooms.has(privateRoom.id)) {
+        //     console.log("You're not in the private chat room");
+        //     // throw new HttpException("You're not in the private chat room", 403);
+        //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
+        // }
+
         console.log("We've got the event to join a private room");
         const { senderId, receiverId } = payload;
         // try {
@@ -218,11 +224,11 @@ export class ChatService {
             // console.log("Private room: ", privateRoom);
             // if client socket is not joined to the private chat room, throw an exception
             // join cli
-            if (!client.rooms.has(privateRoom.id)) {
-                console.log("You're not in the private chat room");
-                // throw new HttpException("You're not in the private chat room", 403);
-                await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
-            }
+            // if (!client.rooms.has(privateRoom.id)) {
+            //     console.log("You're not in the private chat room");
+            //     // throw new HttpException("You're not in the private chat room", 403);
+            //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
+            // }
 
             console.log("we're creating the private message");
             // create a new private message, and adds it to the private chat room
