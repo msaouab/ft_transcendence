@@ -11,14 +11,22 @@ module.exports = withMT({
 export default {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    // colors: {
-    //   transparent: "transparent",
-    //   current: "currentColor",
-    //   black: "#000",
-    //   white: "#fff",
-    //   mygray: '#808080',
-    //   bggray: '#b4b4b460',
-    // },
+    screens: {
+      '2xl': {'max': '1535px'},
+      // => @media (max-width: 1535px) { ... }
+
+      'xl': {'max': '1279px'},
+      // => @media (max-width: 1279px) { ... }
+
+      'lg': {'max': '1023px'},
+      // => @media (max-width: 1023px) { ... }
+
+      'md': {'max': '767px'},
+      // => @media (max-width: 767px) { ... }
+
+      'sm': {'max': '639px'},
+      // => @media (max-width: 639px) { ... }
+    },
     extend: {},
   },
   plugins: [],

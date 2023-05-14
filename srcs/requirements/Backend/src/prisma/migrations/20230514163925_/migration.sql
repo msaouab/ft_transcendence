@@ -26,20 +26,23 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
-    "avatar" TEXT NOT NULL DEFAULT '<ralative_path>',
-    "status" "Status" NOT NULL,
+    "avatar" TEXT NOT NULL DEFAULT '/app/public/default.png',
+    "status" "Status" NOT NULL DEFAULT 'Online',
+    "tfa" BOOLEAN NOT NULL DEFAULT false,
+    "otp_verified" BOOLEAN NOT NULL DEFAULT false,
+    "otp_base32" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "FrindshipInvites" (
+CREATE TABLE "FriendshipInvites" (
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
-    "status" "InviteStatus" NOT NULL DEFAULT 'Pending'
+    "status" "InviteStatus" NOT NULL DEFAULT 'Pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -52,12 +55,23 @@ CREATE TABLE "FriendsTab" (
 CREATE TABLE "PrivateMessage" (
     "id" TEXT NOT NULL,
     "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "sender_id" TEXT NOT NULL,
-    "receiver_id" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "seen" BOOLEAN NOT NULL DEFAULT false,
+    "chatRoom_id" TEXT NOT NULL,
+    "sender_id" TEXT NOT NULL,
+    "receiver_id" TEXT NOT NULL,
 
     CONSTRAINT "PrivateMessage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PrivateChatRoom" (
+    "id" TEXT NOT NULL,
+    "sender_id" TEXT NOT NULL,
+    "receiver_id" TEXT NOT NULL,
+    "lastUpdatedTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PrivateChatRoom_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -204,7 +218,7 @@ CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FrindshipInvites_sender_id_receiver_id_key" ON "FrindshipInvites"("sender_id", "receiver_id");
+CREATE UNIQUE INDEX "FriendshipInvites_sender_id_receiver_id_key" ON "FriendshipInvites"("sender_id", "receiver_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "FriendsTab_user_id_friendUser_id_key" ON "FriendsTab"("user_id", "friendUser_id");
@@ -213,10 +227,7 @@ CREATE UNIQUE INDEX "FriendsTab_user_id_friendUser_id_key" ON "FriendsTab"("user
 CREATE UNIQUE INDEX "BlockTab_user_id_blockedUser_id_key" ON "BlockTab"("user_id", "blockedUser_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "ChannelsJoinTab_channel_id_key" ON "ChannelsJoinTab"("channel_id");
-
--- CreateIndex
-CREATE INDEX "channel_id" ON "ChannelsJoinTab"("channel_id");
+CREATE UNIQUE INDEX "ChannelsJoinTab_user_id_channel_id_key" ON "ChannelsJoinTab"("user_id", "channel_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Channel_name_key" ON "Channel"("name");
@@ -243,13 +254,25 @@ CREATE UNIQUE INDEX "GameInvites_sender_id_receiver_id_key" ON "GameInvites"("se
 CREATE UNIQUE INDEX "RankingData_user_id_key" ON "RankingData"("user_id");
 
 -- AddForeignKey
-ALTER TABLE "FrindshipInvites" ADD CONSTRAINT "FrindshipInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "FriendshipInvites" ADD CONSTRAINT "FriendshipInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FriendsTab" ADD CONSTRAINT "FriendsTab_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PrivateMessage" ADD CONSTRAINT "PrivateMessage_sender_id_receiver_id_fkey" FOREIGN KEY ("sender_id", "receiver_id") REFERENCES "FriendsTab"("user_id", "friendUser_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "PrivateMessage" ADD CONSTRAINT "PrivateMessage_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PrivateMessage" ADD CONSTRAINT "PrivateMessage_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PrivateMessage" ADD CONSTRAINT "PrivateMessage_chatRoom_id_fkey" FOREIGN KEY ("chatRoom_id") REFERENCES "PrivateChatRoom"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PrivateChatRoom" ADD CONSTRAINT "PrivateChatRoom_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PrivateChatRoom" ADD CONSTRAINT "PrivateChatRoom_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "BlockTab" ADD CONSTRAINT "BlockTab_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

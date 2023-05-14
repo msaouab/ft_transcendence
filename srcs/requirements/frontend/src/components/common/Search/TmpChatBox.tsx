@@ -28,6 +28,8 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
         const sender_id = Cookies.get('id') || '';
         const receiver_id = user.id;
         console.log("heeeelo");
+        console.log("sender_id", sender_id);
+        console.log("receiver_id", receiver_id);
         axios.get(`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
             .then((res) => {
                 if (res.data.length !== 0) {
@@ -53,7 +55,6 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                     })
                         .then((res) => {
                             console.log('chat room created', res);
-
                             setDummySelectedChat({
                                 chatRoomid: res.data.id,
                                 messageId: '',
@@ -72,7 +73,6 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                         }
                         )
                 }
-
             })
     }, [user]);
 

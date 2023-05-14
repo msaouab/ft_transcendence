@@ -1,10 +1,14 @@
 import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException, Redirect } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Response } from 'express';
-import passport, { Passport } from 'passport';
+import { PassportStrategy } from '@nestjs/passport';
 import { writeFileSync } from 'fs';
 import * as rawbody from 'raw-body';
 import { TfaDto } from 'src/user/dto/Tfa.dto';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
+import { Strategy } from 'passport-otp';
+
 
 @Injectable()
 export class AuthService {
@@ -20,14 +24,20 @@ export class AuthService {
             if (find_user) {
                 return this.login(user,res);
             }
+            const Cryptr = require('cryptr');
+            const cryptr = new Cryptr(process.env.SECRET )
+            const secret = authenticator.generateSecret();
+            const encryptedString = cryptr.encrypt(secret);
+            const token = authenticator.generate(encryptedString);
             const createUser = await this.prisma.user.create({
                 data: {
                     login: user.username,
                     email:  user._json.email,
                     firstName:  user.name.givenName,
                     lastName:  user.name.familyName,
-                    avatar: './public/default.png',
+                    avatar: '/app/public/default.png',
                     status: 'Online',
+                    otp_base32: encryptedString,
                 },
             })
             const createUserRankingData = await this.prisma.rankingData.create({
@@ -58,6 +68,7 @@ export class AuthService {
                 },
                 data: {
                     status: 'Offline',
+                    otp_verified: false,
                 },
             })
             res.clearCookie('id');
@@ -87,7 +98,7 @@ export class AuthService {
                     },
                 })
                 res.cookie('id', find_user.id, {
-                    httpOnly: true,
+                    // httpOnly: true,
                     secure: false,
                 })
             
@@ -103,44 +114,32 @@ export class AuthService {
         }
     }
 
-    async delete(user,res) {
-        try  {
-            const find_user = await this.prisma.user.findUnique({
-                where: {
-                    email: user._json.email,
-                },
-            })
-            if (find_user) {
-                const deleteUser = await this.prisma.user.delete({
-                    where: {
-                        id: find_user.id,
-                    },
-                })
-               res.clearCookie('id');
-                // return deleteUser;
-            }
-        }
-        catch (e) {
-            console.log(e);
-        }
-    }
-
-    // async return_user(user) {
-    //     const find_user = await this.prisma.user.findUnique({
-    //         where: {
-    //             login: user.username,
-    //         },
-    //     })
-    //     return find_user;
+    // async delete(user,res) {
+    //     try  {
+    //         const find_user = await this.prisma.user.findUnique({
+    //             where: {
+    //                 email: user._json.email,
+    //             },
+    //         })
+    //         if (find_user) {
+    //             const deleteUser = await this.prisma.user.delete({
+    //                 where: {
+    //                     id: find_user.id,
+    //                 },
+    //             })
+    //            res.clearCookie('id');
+    //             // return deleteUser;
+    //         }
+    //     }
+    //     catch (e) {
+    //         console.log(e);
+    //     }
     // }
-    
-    async twoFactor(user) {
-        
-    }
 
-    async set2fa(id, TfaDto: TfaDto, user)
+
+    async set2fa(id, body: TfaDto, user)
     {
-        const status = TfaDto.IsActive;
+        const Digitsinput = body.sixDigits; 
         const find_user = await this.prisma.user.findUnique({
             where: {
                 id: id,
@@ -152,12 +151,16 @@ export class AuthService {
             throw new ForbiddenException('Not allowed');
         }
         if (find_user) {
+            
+              
+            
             const updateUser = await this.prisma.user.update({
                 where: {
                     id: find_user.id,
                 },
                 data: {
-                    tfa: status === 'true' ? true : false,
+                    tfa: !find_user.tfa,
+                    otp_verified: true,
                 },
             })
             return updateUser;
@@ -174,3 +177,6 @@ export class AuthService {
     //     console.log(verify);
     //     // res.render('restaurants',{  });}
 }
+
+
+  

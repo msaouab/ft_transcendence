@@ -47,7 +47,7 @@ const Routes = [
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setUserStatus } = useGlobalContext();
-  const [menuIndex, setMenuIndex] = useState<number>(0);
+  const [menuIndex, setMenuIndex] = useState<number>(2);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
