@@ -71,10 +71,22 @@ export class UserController {
       res.send(imageData.buffer);
     }
 
-    @Put(':id/2fa')
+    @Put(':id/2fa/setup')
     @UseGuards(AuthenticatedGuard)
-    async set2fa(@Param('id') id: string, @Query() TfaDto: TfaDto, @User() user: Profile) {
-      return this.authService.set2fa(id, TfaDto, user);
+    async set2fa(@Param('id') id: string, @Body() body: TfaDto , @User() user: Profile) {
+      return await this.authService.set2fa(id, body, user);
+    }
+
+    @Get(':id/2fa/qrcode')
+    @UseGuards(AuthenticatedGuard)
+    async getQrCode(@Param('id') id: string, @User() user: Profile, @Res() res) {
+      return await this.userService.getQrCode(id, user, res);
+    
+    }
+    @Put(':id/2fa/verify')
+    // @UseGuards(AuthenticatedGuard)
+    async verify2fa(@Param('id') id: string, @Body() body , @User() user: Profile, @Res() res) {
+      return await this.userService.verify2fa(id, body.number, user,res);
     }
 
     @Put(':id/:status')

@@ -7,11 +7,24 @@ const instance = axios.create({
 });
 
 export const GetAvatar = async () => {
-  await instance.get("/user/" + Cookies.get("userid") + "/avatar", {
-	responseType: "blob",
-  }).then((res) => {
-    return res;
+  const res = await instance.get("/user/" + Cookies.get("userid") + "/avatar", {
+    responseType: "blob",
   });
+  return URL.createObjectURL(res.data);
+};
+
+export const PostAvatar = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  await instance
+    .post("/user/" + Cookies.get("userid") + "/avatar", formData)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.log("Error uploading file:", error);
+    });
 };
 
 export default instance;

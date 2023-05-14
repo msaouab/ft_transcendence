@@ -50,12 +50,7 @@ import { ApiTags } from '@nestjs/swagger';
       return this.authService.logout(user, res);
     }
 
-    @Get('delete')
-    @UseGuards(AuthenticatedGuard)
-    @Redirect('logout')
-    async delete(@User() user: Profile, @Res() res: Response) {
-      return this.authService.delete(user,res);
-    }
+   
 
     @Get('me')
     @UseGuards(AuthenticatedGuard)
@@ -74,12 +69,7 @@ import { ApiTags } from '@nestjs/swagger';
     //   return this.authService.update(user);
     // }
 
-    @Get('2fa')
-    @UseGuards(AuthenticatedGuard)
-    @Render('2fa')
-    async twoFactor(@User() user: Profile) {
-        this.authService.twoFactor(user);
-    }
+   
 
     // @Get('verify2fa')
     // @UseGuards(AuthenticatedGuard)

@@ -1,14 +1,7 @@
-import styled from "styled-components";
 import Data from "../../components/Profile/UserSettings/Data";
 import Avatar from "../../components/Profile/UserSettings/Avatar";
 import CheckMark from "../../components/Profile/UserSettings/CheckMark";
-import { Button } from "@material-tailwind/react";
 
-const UserSettingsContainer = styled.div`
-  .main {
-    //height: 100%;
-  }
-`;
 
 const UserSettings = () => {
   return (
