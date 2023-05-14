@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "PrivateChatRoom" ADD COLUMN     "lastUpdatedTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;
