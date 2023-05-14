@@ -157,7 +157,7 @@ export class AuthService {
                     id: find_user.id,
                 },
                 data: {
-                    tfa: status === 'true' ? 'true' : 'false',
+                    tfa: status === 'true' ? true : false,
                 },
             })
             return updateUser;

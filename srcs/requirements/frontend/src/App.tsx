@@ -16,7 +16,7 @@ import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 
 function App() {
-  const [bgColor, setBgColor] = useState("#2B3A55");
+  const [bgColor, setBgColor] = useState("#1E1E1E");
   const [textColor, setTextColor] = useState("#ffffff");
   const handelBgChange = (e: any) => {
     setBgColor(e.target.value);
@@ -33,7 +33,7 @@ function App() {
     <>
       <GlobalStyle background={bgColor} textColor={textColor} />
       {/* <SearchIcon className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-2xl" /> */}
-      <div
+      {/* <div
         className={`absolute w-[35rem] rounded-lg text-white bg-slate-400 flex items-center gap-3 p-2 ${
           isPaletteOpen ? "left-2/4" : "left-[32rem] "
         } transition-all ease-in-out duration-300 z-50`}
@@ -58,7 +58,7 @@ function App() {
           }`}
           onClick={() => setIsPaletteOpen(!isPaletteOpen)}
         />
-      </div>
+      </div> */}
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />

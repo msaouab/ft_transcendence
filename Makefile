@@ -47,6 +47,7 @@ start:
 clean: stop 
 	@echo "$(GREEN)████████████████████ Remove Containers ████████████████████$(ED)"
 	@docker rm backend postgres frontend adminer || true
+	@docker rmi backend frontend adminer || true
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"

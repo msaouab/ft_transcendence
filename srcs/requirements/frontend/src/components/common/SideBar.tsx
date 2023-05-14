@@ -18,11 +18,6 @@ import { CgClose } from "react-icons/cg";
 
 const Routes = [
   {
-    name: "home",
-    icon: <Home />,
-    link: "/",
-  },
-  {
     name: "chat",
     icon: <Chat />,
     link: "/chat",
@@ -104,11 +99,11 @@ const SideBar = () => {
   };
 
   return (
-    <div className=" w-screen h-screen relative z-50">
+    <div className="  bg-red-400">
       <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/20 absolute top-0 left-0 z-40`}
+        } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
       ></div>
 
       <div

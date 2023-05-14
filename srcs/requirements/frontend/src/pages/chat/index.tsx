@@ -65,7 +65,7 @@ const Chat = () => {
     }
 
     chatSocket.current.on('connect', () => {
-      console.log("socket id: ", chatSocket.current.id);
+      /* console.log("socket id: ", chatSocket.current.id); */
       // if there's a selected chat, join the room
     });
     return () => {
@@ -123,10 +123,9 @@ const Chat = () => {
 
 
   return (
-    <ChatStyle>
-      <div className="side-bar w-[100px]">
-        <SideBar />
-      </div>
+   
+     <ChatStyle>
+    
       <div className="chat-list">
         <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       </div>
@@ -136,8 +135,6 @@ const Chat = () => {
           chatSocket={chatSocket} connected={connected}
 
         />
-
-        {/* } */}
       </div>
     </ChatStyle >
   )
