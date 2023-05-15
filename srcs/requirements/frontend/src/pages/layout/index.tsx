@@ -26,13 +26,8 @@ const DropDown = styled.div`
 const index = () => {
   const { userImg } = useGlobalContext();
   const LayoutStyle = styled.div`
-    height: 100vh;
-    /* width: 100vw; */
     display: flex;
-    
-    /* display: grid; */
-    /* grid-template-columns: 1fr 11fr; */
-    /* padding: 1rem 2rem; */
+    height: 100vh;
   `;
 
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
@@ -47,14 +42,12 @@ const index = () => {
   return (
     <LayoutStyle>
       {/* {JSON.stringify(userAvatar)} */}
-      <div className="w-[5rem]">
-        <div className="side-bar absolute top-0 left-0  ">
-          <SideBar />
-        </div>
+      <div className="md:w-[5rem] ">
+        <SideBar />
       </div>
-      <div className="main-content w-full  px-4   ">
-        <div className="header flex justify-end  gap-8 items-center  h-[10%]">
-          <div className="search">
+      <div className="main-content  w-full px-4  flex  flex-col ">
+        <div className="header py-4 flex justify-end  gap-8 items-center ">
+          <div className="search hidden md:block">
             <CustomInput
               placeHolder="Search"
               type="text"
@@ -91,7 +84,7 @@ const index = () => {
             </div>
           </div>
         </div>
-        <div className="content  h-[90%]">
+        <div className="content  flex-1">
           <Outlet />
         </div>
       </div>

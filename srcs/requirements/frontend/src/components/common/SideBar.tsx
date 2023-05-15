@@ -100,11 +100,11 @@ const SideBar = () => {
 
   return (
     <div className="  bg-red-400">
-      <div
+      {/* <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
         } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
-      ></div>
+      ></div> */}
 
       <div
         className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
@@ -113,7 +113,7 @@ const SideBar = () => {
             : "md:w-20   transition-all duration-300 ease-out "
         }`}
       >
-        <div className="burger text-white text-3xl  mb-10 flex justify-center py-2">
+        <div className="burger text-white text-3xl  mb-10 flex justify-center ">
           {isSidebarOpen ? (
             <CgClose
               onClick={handleToggleSidebar}
@@ -124,7 +124,7 @@ const SideBar = () => {
           )}
         </div>
         <div
-          className={`routes mt- flex flex-col gap-5  h-screen relative ${
+          className={`routes mt- flex flex-col gap-5  relative ${
             isSidebarOpen ? "" : "md:flex flex-col gap-5 hidden "
           } `}
         >
@@ -134,8 +134,6 @@ const SideBar = () => {
                 to={route.link}
                 key={index}
                 className={`${
-                  route.name == "logout" ? "absolute bottom-36" : ""
-                } ${
                   isSidebarOpen
                     ? "flex justify-start items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"
                     : "flex justify-center items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"

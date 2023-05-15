@@ -83,7 +83,7 @@ const ChalengerCard = (props: ChalengerCardProps) => {
       </div>
       <div className="name text-2xl font-[800]">{name}</div>
       <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-        <button className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2">
+        <button className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md">
           challenge <img src={PlayWithMe} alt="" width={20} />
         </button>
         {/* <div className="dot w-3 h-3 bg-green-500 rounded-full"></div> */}
@@ -92,58 +92,72 @@ const ChalengerCard = (props: ChalengerCardProps) => {
   );
 };
 
+const GameCard = () => {
+  return <div className="flex flex-col gap-5  h-full "></div>;
+};
+
 const GameDashboard = () => {
   return (
-    <div className="grid grid-cols-12 gap-10   h-full">
-      <div className="col-span-4 row-span-1 max-h-[50%] flex justify-center items-center gap-4">
-        <Link
-          to="/game/10"
-          className="  left flex-1 h-[80%] w-full flex flex-col justify-center items-center  "
-        >
-          <GameTypeCard
-            title="Round Table"
-            description="Play Aainst "
-            imgPath={RoundTable}
-          />
-        </Link>
-        <Link
-          to="/game/10"
-          className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center"
-        >
-          <GameTypeCard
-            title="Timing Table"
-            description="Play Aainst "
-            imgPath={TimingTable}
-          />
-        </Link>
-      </div>
-      <div className="col-span-8 max-h-[50%] flex justify-between items-center gap-4 rounded-lg border border-gray-300 p-4">
-        <div className="left  h-full flex gap-5 flex-1">
-          <div className="left flex-1 ">
-            <div className="title text-white font-semibold text-xl flex gap-4 items-center mb-4">
-              <img src={GetChallenge} alt="" width={50} />
-              Get your challenge
-            </div>
-            <div className="description text-white  h-[80%] overflow-y-scroll flex flex-col gap-3">
-              {chalenger.map((chalenger, index) => (
-                <ChalengerCard key={index} name={chalenger.name} />
-              ))}
-            </div>
+    <div className="flex  flex-col gap-5  h-full ">
+      <div className="h-[30rem]  w-full flex gap-5 pt-5 ">
+        <div className=" h-full  w-[25%]  flex flex-col ">
+          <div className="title text-white font-semibold text-xl flex gap-4 items-center mb-4">
+            <img src={GetChallenge} alt="" width={50} />
+            Choose your game type
           </div>
-          <div className="right flex-1 ">
-            <div className="title text-white font-semibold text-xl flex gap-4 items-center mb-4">
-              <img src={GetChallenge} alt="" width={50} />
-              Get your challenge
+          <div className="flex-1 flex items-center gap-5  ">
+            <Link
+              to="/game/10"
+              className="  left flex-1 h-[80%] w-full flex flex-col justify-center items-center  cursor-pointer "
+            >
+              <GameTypeCard
+                title="Round Table"
+                description="Play Aainst "
+                imgPath={RoundTable}
+              />
+            </Link>
+            <Link
+              to="/game/10"
+              className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center cursor-pointer"
+            >
+              <GameTypeCard
+                title="Timing Table"
+                description="Play Aainst "
+                imgPath={TimingTable}
+              />
+            </Link>
+          </div>
+        </div>
+        <div className="flex-1  flex justify-between items-center gap-4 rounded-lg  ">
+          <div className="left  h-full flex gap-5 flex-1">
+            <div className="left flex-1 ">
+              <div className="title text-white font-semibold text-xl flex gap-4 items-center mb-4">
+                <img src={GetChallenge} alt="" width={50} />
+                Get your challenge
+              </div>
+              <div className="description text-white  h-[80%] overflow-y-scroll flex flex-col gap-3 p-2">
+                {chalenger.map((chalenger, index) => (
+                  <ChalengerCard key={index} name={chalenger.name} />
+                ))}
+              </div>
             </div>
-            <div className="description text-white  h-[80%] overflow-y-scroll flex flex-col gap-3">
-              {chalenger.map((chalenger, index) => (
-                <ChalengerCard key={index} name={chalenger.name} />
-              ))}
+            <div className="right flex-1 ">
+              <div className="title text-white font-semibold text-xl flex gap-4 items-center mb-4">
+                <img src={GetChallenge} alt="" width={50} />
+                Who challenge you
+              </div>
+              <div className="description text-white  h-[80%] overflow-y-scroll flex flex-col gap-3 p-2">
+                {chalenger.map((chalenger, index) => (
+                  <ChalengerCard key={index} name={chalenger.name} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <ReusableCardStyle className="col-span-12 row-span-1"></ReusableCardStyle>
+      <div className="flex-1 bg-red-200 p-2">
+        
+      </div>
     </div>
   );
 };

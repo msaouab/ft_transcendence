@@ -24,29 +24,31 @@
   --fontFamily: 'Oxanium';
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
 }
 
-
-
-body {
-  font-family: 'Oxanium', cursive;
-// font-family: 'Ubuntu', sans-serif;
-  // background-color: var(--backColor);
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the track */
+  border-radius: 8px;
 }
 
-
-body{
-  // width: 100vw;
-  height: 100%;
-  max-width: 100%;
-  // position: fixed;
-  min-height: 100vh;
-  
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scroll handle */
+  border-radius: 8px;
 }
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the scroll handle on hover */
+  border-radius: 8px;
+}
+
 
 .debug {
   border: 1px solid red !important;
