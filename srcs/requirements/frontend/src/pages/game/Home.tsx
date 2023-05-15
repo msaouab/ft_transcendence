@@ -211,9 +211,35 @@ const Home = () => {
   // 		fetchData();
   // 	}, []);
 
+  const Main = styled.div`
+    @media (max-width: 1200px) {
+      flex-direction: column;
+      .stats {
+        height: unset;
+        min-height: fit-content;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        & > div {
+          max-width: 70%;
+          min-width: 300px;
+          max-height: 500px;
+        }
+      }
+      .achievements {
+        background-color: red;
+        /* height: 500px; */
+        .achiv-container {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+  `;
+
   return (
-    <div className=" h-[100%] w-[100%] flex flex-col gap-5 ">
-      <div className="top   h-[6rem]  flex items-center  gap-10 border-b border-white/50 pb-2 ">
+    <div className="  w-[100%] flex flex-col gap-5 ">
+      {/* <div className="top   h-[6rem]  flex items-center  gap-10 border-b border-white/50 pb-2 ">
         <Status className="" userStatus={userStatus.toLowerCase()}>
           {userImg && <img src={userImg} alt="" className="" />}
         </Status>
@@ -222,8 +248,7 @@ const Home = () => {
             {user.firstName} {user.lastName}
           </div>
           <div className="name  font-[400] ">{user.login}</div>
-          <div className="flex gap-10 items-center ">
-          </div>
+          <div className="flex gap-10 items-center "></div>
         </div>
         <div className="gamesInfo  h-full justify-self-stretch flex-1 flex justify-around  gap-2  ">
           <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
@@ -243,34 +268,45 @@ const Home = () => {
             Lose: {rankData.loses}
           </div>
         </div>
-      </div>
-      <div className="midel flex-1  flex flex-col gap-4 items-center  ">
-        <div className="stats  flex gap-6 h-[25rem] w-full ">
-          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] ">
+      </div> */}
+      <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
+        <div className="stats  flex gap-6 h-[25rem] w-full   ">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] min-h-[20rem]">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FriendsImg} alt="" width={50} />
                 Friends
               </div>
             </div>
-            <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {friends &&
-                friends.map((Friend, index) => (
-                  <FreindCarde key={index}>
-                    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
-                      <div className="image">
-                        <img src={Avatar} alt="" width={60} />
+            <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2 ">
+              {friends.length ? (
+                <div>
+                  {friends.map((Friend, index) => (
+                    <FreindCarde key={index}>
+                      <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem] ">
+                        <div className="image">
+                          <img src={Avatar} alt="" width={60} />
+                        </div>
+                        <div className="name text-2xl font-[800]">
+                          {Friend.login}
+                        </div>
+                        <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
+                          {Friend.Status}
+                          <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
                       </div>
-                      <div className="name text-2xl font-[800]">
-                        {Friend.login}
-                      </div>
-                      <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-                        {Friend.Status}
-                        <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
-                      </div>
-                    </div>
-                  </FreindCarde>
-                ))}
+                    </FreindCarde>
+                  ))}
+                </div>
+              ) : (
+                <div className=" h-full flex justify-center items-center text-3xl">
+                  No friends
+                </div>
+              )}
+              {/* {friends &&
+                
+                )
+                } */}
             </div>
           </div>
           <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
@@ -304,7 +340,7 @@ const Home = () => {
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
             Achievement
           </div>
-          <div className="flex gap-10 w-[80%] m-auto">
+          <div className="achiv-container flex gap-10 w-[80%] m-auto">
             <AchivementCard
               title="Achivement 1"
               description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
@@ -327,7 +363,7 @@ const Home = () => {
             />
           </div>
         </div>
-      </div>
+      </Main>
     </div>
   );
 };
