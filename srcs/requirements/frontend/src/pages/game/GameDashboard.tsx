@@ -5,6 +5,9 @@ import TimingTable from "../../assets/timeTable.png";
 import GetChallenge from "../../assets/getChallenge.png";
 import Avatar from "../../assets/avatar.png";
 import PlayWithMe from "../../assets/playWithMe.png";
+import SwiperComponent from "../../components/common/Slider";
+import AchivementImg1 from "../../assets/achivement1.png";
+import AchivementImg2 from "../../assets/achivement2.png";
 
 const chalenger = [
   {
@@ -92,8 +95,28 @@ const ChalengerCard = (props: ChalengerCardProps) => {
   );
 };
 
-const GameCard = () => {
-  return <div className="flex flex-col gap-5  h-full "></div>;
+interface GameCardProps {
+  title: string;
+  description: string;
+  imgPath: string;
+}
+
+const GameCard = (props: GameCardProps) => {
+  const { title, description, imgPath } = props;
+  return (
+    <div className="h-full p-5 flex justify-center">
+      <div className="w-[70%] bg-white  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
+        <div className="image">
+          <img src={imgPath} alt="" width={150} />
+        </div>
+        <div className="flex justify-between  w-[80%] text-xl font-bold">
+          Moha
+          <span>1 - 2</span>
+          Ilyass
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const GameDashboard = () => {
@@ -155,8 +178,22 @@ const GameDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex-1 bg-red-200 p-2">
-        
+      <div className="flex-1  p-2 w-[70%] m-auto">
+        <h1 className=" text-2xl font-bold text-center mb-2   ">
+
+          Live Games
+        </h1>
+        <div className="h-[90%] border border-white/50 rounded-xl shadow-sm shadow-white">
+          <SwiperComponent
+            slides={Array(10).fill(
+              <GameCard
+                title="Achivement 1"
+                description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
+                imgPath={AchivementImg1}
+              />
+            )}
+          ></SwiperComponent>
+        </div>
       </div>
     </div>
   );
