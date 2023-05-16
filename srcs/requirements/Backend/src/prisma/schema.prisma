@@ -38,9 +38,10 @@ enum GameStatus {
 
 enum Rank {
   Novice
-  Intermediate
-  Advanced
+  Veteran
+  Rif_Rebellion
   Master
+  Sahara_Tuareg
 }
 
 enum MemeberStatusTime {
@@ -261,6 +262,7 @@ model Achievements {
   achievement_id           Int                       @id @default(autoincrement())
   name                     String
   description              String
+  image                    String                   
   achievements_assignement AchievementsAssignement[] @relation("achievementsAssignementRelation")
 }
 

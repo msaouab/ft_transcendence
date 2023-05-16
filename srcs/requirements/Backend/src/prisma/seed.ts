@@ -2,6 +2,7 @@
 import { PrismaClient, User } from '@prisma/client'
 const prisma = new PrismaClient()
 import { createHash } from 'crypto';
+import e from 'express';
 // {
 //     login: 'ren-nasr',
 //     email: 'ren-nasr@student.1337.ma',
@@ -209,6 +210,56 @@ async function main() {
         })
         console.log(`Created private message with id: ${privateMessage.id}`)
     }
+        //create an array of object each object contains name and description attributes
+        const achievements = [
+            {
+                name: 'Here We Go',
+                description: 'Played your first game.',
+                image: "",
+
+            },
+            {
+                name: 'Ace',
+                description: 'Win a game with a perfect score.',
+                image: "",
+            },
+            {
+                name: 'Atlas Athlete',
+                description: 'Score 50 pts',
+                image: "",
+            },
+            {
+                name: 'Kasbah King',
+                description: 'Win five 5 games in a row.',
+                image: "",
+            },
+            {
+                name: 'Intouchable',
+                description: 'Win 5 games without losing or draw in any game',
+                image: "",
+            },
+            {
+                name: 'Kang the conqueror',
+                description: 'Win 20 games without losing or draw in any game',
+                image: "",
+            },
+            {
+                name: 'Are u okay ?',
+                description: 'Just checking after your mediocre performance.',
+                image: "",
+            }
+        ]
+        for (let index = 0; index < achievements.length; index++) {
+            const element = achievements[index];
+            await prisma.achievements.create({
+                data: {
+                    name: element.name,
+                    description: element.description,
+                    image: element.image,
+                }
+            })
+            
+        }
 
     // creatigng channels
 
