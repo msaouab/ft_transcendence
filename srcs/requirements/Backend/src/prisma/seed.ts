@@ -215,38 +215,38 @@ async function main() {
             {
                 name: 'Here We Go',
                 description: 'Played your first game.',
-                image: "",
+                image: "/app/public/achievements/here_we_go.png",
 
             },
             {
                 name: 'Ace',
                 description: 'Win a game with a perfect score.',
-                image: "",
+                image: "/app/public/achievements/ace.png",
             },
             {
                 name: 'Atlas Athlete',
                 description: 'Score 50 pts',
-                image: "",
+                image: "/app/public/achievements/Atlas_athlete.jpeg",
             },
             {
                 name: 'Kasbah King',
                 description: 'Win five 5 games in a row.',
-                image: "",
+                image: "/app/public/achievements/Kasbah_king.jpeg",
             },
             {
                 name: 'Intouchable',
                 description: 'Win 5 games without losing or draw in any game',
-                image: "",
+                image: "/app/public/achievements/Intouchable.png",
             },
             {
                 name: 'Kang the conqueror',
                 description: 'Win 20 games without losing or draw in any game',
-                image: "",
+                image: "/app/public/achievements/kang.jpg",
             },
             {
                 name: 'Are u okay ?',
                 description: 'Just checking after your mediocre performance.',
-                image: "",
+                image: "/app/public/achievements/ok.png",
             }
         ]
         for (let index = 0; index < achievements.length; index++) {

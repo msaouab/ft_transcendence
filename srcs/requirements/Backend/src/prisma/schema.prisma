@@ -250,10 +250,14 @@ model GameInvites {
 model RankingData {
   user_id                  String                    @unique
   user                     User                      @relation("rankingDataRelation", fields: [user_id], references: [id])
+  games                    Int                       @default(0)
   wins                     Int                       @default(0)
   loses                    Int                       @default(0)
   draws                    Int                       @default(0)
-  level                    Int                       @default(0)
+  xp                       Float                     @default(0)
+  winning_streak           Int                       @default(0)
+  losing_streak            Int                       @default(0)
+  points                   Int                       @default(0)
   rank                     Rank                      @default(Novice)
   achievements_assignement AchievementsAssignement[]
 }
