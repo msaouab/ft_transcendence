@@ -27,14 +27,20 @@ import { TfaDto } from "../user/dto/Tfa.dto";
 import { ChatService } from "src/chat/chat.service";
 import { Inject, forwardRef } from "@nestjs/common";
 import { UserExistsGuard } from "src/guards/user-exists.guard";
+import { PostGameDto } from "./dto/post.game.dto";
+import { AchvService } from "./achv.service";
 
 @ApiTags("achivements")
 @Controller("achivements")
 export class AchvController {
   constructor(
     private readonly userService: UserService,
-    private readonly authService: AuthService,
+    private readonly achvService: AchvService,
   ) {}
 
+  @Post('achievements')
+  testAchievements(@Body() body: PostGameDto) {
+    return this.achvService.testAchievements(body);
+  }
+  }
  
-}

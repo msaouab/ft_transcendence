@@ -276,7 +276,7 @@ model AchievementsAssignement {
   player_id      String
   player         RankingData  @relation(fields: [player_id], references: [user_id])
 
-  @@id([achievement_id, player_id])
+  @@unique([achievement_id, player_id])
 }
 
 model GameHistoryTab {

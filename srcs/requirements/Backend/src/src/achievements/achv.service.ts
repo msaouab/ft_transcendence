@@ -1,13 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable, NotAcceptableException, NotFoundException, Redirect, UnauthorizedException } from '@nestjs/common';
+import {  Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
-import { Response } from 'express';
-import { Passport, Profile } from 'passport';
-import { User } from '../auth/user.decorator/user.decorator';
-import { ChanRoles, Prisma } from '@prisma/client';
-import { log } from 'console';
-import { readFile,unlink } from 'fs/promises';
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
+import { PostGameDto } from './dto/post.game.dto';
+import { use } from 'passport';
+
 
 export enum Rank {
     Novice = 'Novice',
@@ -16,6 +11,10 @@ export enum Rank {
     Master = 'Master',
     Sahara_Tuareg = 'Sahara_Tuareg',
   }
+  type MyUser = {
+    id: string;
+    pts: number;
+  };
 
 @Injectable()
 export class AchvService {
@@ -46,7 +45,8 @@ export class AchvService {
             return Rank.Sahara_Tuareg
     }
     async CheckAchv(one_id: string, two_id: string, pts_one: number, pts_two : number)
-    {   var isdraw = false;
+    {
+       var isdraw = false;
         var winner_id, loser_id, winner_pts, loser_pts;
         if (pts_one > pts_two)
         {
@@ -56,19 +56,24 @@ export class AchvService {
             loser_pts = pts_two;
         }
         else if (pts_one == pts_two)
-            isdraw = true;
-        await this.Here_We_Go(winner_id);
-        await this.Here_We_Go(loser_id);
-        await this.update_data(winner_id, loser_id, winner_pts, loser_pts, isdraw);
-        if (isdraw == false){
-            await this.Ace(winner_id, winner_pts, loser_pts);
-            await this.Kasbah_King(winner_id);
-            await this.Intouchable(winner_id);
-            await this.Kang_the_conqueror(winner_id);
-            await this.Are_u_okay(loser_id, loser_pts);
+        {    isdraw = true;
+            winner_id = two_id;
+            loser_id = one_id;
+            winner_pts = pts_two;
+            loser_pts = pts_one;
         }
-        await this.Atlas_Athlete(winner_id, loser_id, winner_pts, loser_pts);
-        // check the rank
+            await this.update_data(winner_id, loser_id, winner_pts, loser_pts, isdraw);
+            await this.Here_We_Go(winner_id);
+            await this.Here_We_Go(loser_id);
+            if (isdraw == false){
+                await this.Ace(winner_id, winner_pts, loser_pts);
+                await this.Kasbah_King(winner_id);
+                await this.Intouchable(winner_id);
+                await this.Kang_the_conqueror(winner_id);
+                await this.Are_u_okay(loser_id, loser_pts);
+            }
+            await this.Atlas_Athlete(winner_id, loser_id, winner_pts, loser_pts);
+        
     }
     async Here_We_Go(user_id: string)
     {
@@ -80,7 +85,13 @@ export class AchvService {
         if (!user) {
             throw new NotFoundException("No ranking found for this user");
         }
-        if (!user.games)
+        var find_achv = await this.prisma.achievementsAssignement.findFirst({
+            where: {
+                player_id: user_id,
+                achievement_id: 1,
+            },
+        });
+        if (user.games == 1 && !find_achv)
         {
             await this.prisma.achievementsAssignement.create({
                 data: {
@@ -88,21 +99,22 @@ export class AchvService {
                     achievement_id: 1,
                 }
             })
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id: user_id,
+                },
+                data: {
+                    xp: user.xp + 5,
+                }
+            })
         }
     }
     async Atlas_Athlete(winner_id: string, loser_id: string, winner_pts: number, loser_pts: number)
     {
-       const users =  [
-            {
-                id: winner_id,
-                pts: winner_pts,
-            },
-            {
-                id: loser_id,
-                pts: loser_pts,
-            }
-
-        ]
+        const users: MyUser[] = [
+            { id: winner_id, pts: winner_pts },
+            { id: loser_id, pts: loser_pts },
+          ];
         for (let i = 0; i < users.length; i++) {
 
             const winner = await this.prisma.rankingData.findFirst({
@@ -119,7 +131,7 @@ export class AchvService {
                     achievement_id: 3,
                 },
             });
-            if (users[i].pts >= 50 && !find_achv)
+            if (winner.points >= 50 && !find_achv)
             {
                 await this.prisma.achievementsAssignement.create({
                     data: {
@@ -127,21 +139,23 @@ export class AchvService {
                         achievement_id: 3,
                     }
                 })
+                await this.prisma.rankingData.update({
+                    where: {
+                        user_id: users[i].id,
+                    },
+                    data: {
+                        xp: winner.xp + 5,
+                    }
+                })
             }
         }
     }
     async update_data(winner_id: string, loser_id: string, winner_pts: number, loser_pts: number, isdraw: boolean)
     {
-        const users =  [
-            {
-                id: winner_id,
-                pts: winner_pts,
-            },
-            {
-                id: loser_id,
-                pts: loser_pts,
-            }
-        ]
+        const users: MyUser[] = [
+            { id: winner_id, pts: winner_pts },
+            { id: loser_id, pts: loser_pts },
+          ];
         for (let i = 0; i < users.length; i++) {
             const user = users[i];
             const to_update = await this.prisma.rankingData.findFirst({
@@ -169,6 +183,8 @@ export class AchvService {
                 });
             }
         }
+        if (isdraw == false)
+        {
         const winner = await this.prisma.rankingData.findFirst({
             where: {
                 user_id: winner_id,
@@ -196,7 +212,7 @@ export class AchvService {
                 rank: this.checkRank(winner.xp + 3 + (winner_pts * 0.5) - (loser_pts * 0.25))
             },
         });
-        await this.prisma.rankingData.update({
+        const l = await this.prisma.rankingData.update({
             where: {
                 user_id: loser_id,
             },
@@ -204,18 +220,31 @@ export class AchvService {
                 games: loser.games + 1,
                 loses: loser.loses + 1,
                 points: loser.points + loser_pts,
-                xp: loser.xp - 1 + (loser_pts * 0.5) - (winner_pts * 0.25),
+                xp: loser.xp - 1 + (loser_pts * 0.5) - (winner_pts * 0.5),
                 winning_streak: 0,
                 losing_streak: loser.losing_streak + 1,
                 rank: this.checkRank(loser.xp - 1 + (loser_pts * 0.5) - (winner_pts * 0.25))
             },
         });
         
+        if (l.xp < 0)
+        {
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id: loser_id,
+                },
+                data: {
+                    xp: 0,
+                },
+            });
+        }
+
+    }
 
     }
     async Ace(winner_id: string, winner_pts: number, loser_pts: number)
     {
-        if(loser_pts == 0)
+        if(!loser_pts)
         {
             const user = await this.prisma.rankingData.findFirst({
                 where: {
@@ -237,6 +266,14 @@ export class AchvService {
                     data: {
                         player_id: winner_id,
                         achievement_id: 2,
+                    }
+                })
+                await this.prisma.rankingData.update({
+                    where: {
+                        user_id: winner_id,
+                    },
+                    data: {
+                        xp: user.xp + 5,
                     }
                 })
             }
@@ -267,6 +304,14 @@ export class AchvService {
                     achievement_id: 6,
                 }
             })
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id:winner_id,
+                },
+                data: {
+                    xp: user.xp + 5,
+                }
+            })
         }
 
 
@@ -293,6 +338,14 @@ export class AchvService {
                 data: {
                     player_id: winner_id,
                     achievement_id: 4,
+                }
+            })
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id: winner_id
+                },
+                data: {
+                    xp: user.xp + 5,
                 }
             })
         }
@@ -322,6 +375,14 @@ export class AchvService {
                     achievement_id: 5,
                 }
             })
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id: winner_id,
+                },
+                data: {
+                    xp: user.xp + 5,
+                }
+            })
         }
     }
     async Are_u_okay(loser_id: string, loser_pts: number)
@@ -348,7 +409,21 @@ export class AchvService {
                     achievement_id: 7,
                 }
             })
+            await this.prisma.rankingData.update({
+                where: {
+                    user_id: loser_id,
+                },
+                data: {
+                    xp: user.xp + 5,
+                }
+            })
         }
+    }
+
+    async testAchievements(body: PostGameDto)
+    {
+        const {playerOne, playerTwo, playeOne_pts, playeTwo_pts} = body;
+        return await this.CheckAchv(playerOne, playerTwo, playeOne_pts, playeTwo_pts)
     }
 
 
