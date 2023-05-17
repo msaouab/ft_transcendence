@@ -20,14 +20,38 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
             setConnected(true);
             console.log('connected to the server')
         }
+
     }, []);
 
-    
+
+    useEffect(() => {
+        if (dummySelectedChat && dummySelectedChat.chatRoomid) {
+            console.log("joining the room");
+            const payload = {
+                senderId: dummySelectedChat.sender_id,
+                receiverId: dummySelectedChat.receiver_id
+            }
+            chatSocket.current.emit('joinRoom', payload);
+        } else {
+            console.log("no selected chat");
+        }
+
+        return () => {
+            if (dummySelectedChat && dummySelectedChat.chatRoomid) {
+                console.log("leaving the room");
+                const payload = {
+                    senderId: dummySelectedChat.sender_id,
+                    receiverId: dummySelectedChat.receiver_id
+                }
+                chatSocket.current.emit('leaveRoom', payload);
+            }
+        }
+    }, [dummySelectedChat]);
 
     useEffect(() => {
         const sender_id = Cookies.get('id') || '';
         const receiver_id = user.id;
-        console.log("heeeelo");
+        // console.log("heeeelo");
         axios.get(`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
             .then((res) => {
                 if (res.data.length !== 0) {
@@ -72,7 +96,6 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                         }
                         )
                 }
-
             })
     }, [user]);
 
@@ -83,7 +106,9 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
             absolute bottom-0 right-10 z-50 rounded-tl-lg rounded-tr-lg shadow-2xl w-80 h-96
             transition-all duration-300 ease-in-out rounded-b-n ">
                 {dummySelectedChat &&
-                    <ChatBox size="small" selectedChat={dummySelectedChat} key={user} chatSocket={chatSocket} connected={connected} />
+                    <ChatBox size="small" selectedChat={dummySelectedChat} key={user}
+                        chatSocket={chatSocket} connected={connected}
+                    />
                 }
             </div>
         )

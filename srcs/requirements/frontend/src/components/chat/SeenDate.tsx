@@ -37,6 +37,11 @@ const MessageDateStyle = styled.div`
     gap: 5px;
     color: #fff;
     
+
+
+    // @media (max-width: 768px) {
+    //     opacity: 0;
+    // }
     `;
 
 

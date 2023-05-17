@@ -8,39 +8,46 @@ import { io } from 'socket.io-client';
 const ChatStyle = Styled.div`
   display: flex;
   flex-direction: row;
-  height: 100vh;
-  width: 100vw;
-  padding: 10px;
+  height: 100%;
+  width: 100%;
+  // border: 1px solid red;
+
   justify-content: flex-start;
-  background: #1E1D18;
-  gap: 2px;
+
   .chat-list {
-    width: 30%;
+    width: 40%;
     height: 100%;
   }
 
   .chat-box-wrapper {
-    margin-top: 20px;
+    // margin-top: 20px;
+    
     height: 95%;
-    width: 63%;
+    width: 60%;
   }
 
-  @media screen and (max-width: 724px) {
-    // border: 1px solid red;
+
+  @media screen and (max-width: 766px) {
+
+    flex-direction: column;
+
+    padding: 0;
+
+    .chat-list {
+      width: 100%;
+      height: auto;
+      max-height: 40%;
+      padding: 0;
+    }
+
+
     .chat-box-wrapper {
       width: 100%;
-      justify-content: center;
-
-  }
-  // starting from 724 to 1200 
-  @media screen and (min-width: 724px) and (max-width:1200px) {
-    .chat-box-wrapper {
-      width: 55%;
+      height: 100%;
     }
     
-    .chat-list {
-      width: 45%;
-    }
+  }
+
   
 }
 `;
@@ -72,7 +79,6 @@ const Chat = () => {
       chatSocket.current.disconnect();
       setConnected(false);
     }
-
   }, []);
 
   useEffect(() => {
@@ -100,6 +106,7 @@ const Chat = () => {
   }, [selectedChat]);
 
 
+
   //   useEffect(() => {
   //     if (connected) {
   //         console.log("im registering to the newPrivateMessage event");
@@ -123,9 +130,9 @@ const Chat = () => {
 
 
   return (
-   
-     <ChatStyle>
-    
+
+    <ChatStyle>
+
       <div className="chat-list">
         <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       </div>

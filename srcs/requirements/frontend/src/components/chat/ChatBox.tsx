@@ -3,12 +3,13 @@ import React from 'react';
 // import socket from '../../socket';
 import { useRef, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Message from './Message/Message';
 const ChatBoxStyle = styled.div`
     background: transparent;
     width: 100%;
+    // height: ${(props) => props.size === 'small' ? '100%' : '90%'};
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -30,7 +31,7 @@ const ChatBoxStyle = styled.div`
 
 // import InfiniteScroll from 'react-infinite-scroll-component';
 // types
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 import { PrivateMessage } from '../../types/message';
 import { singleMessage } from '../../types/message';
 // components
@@ -99,7 +100,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
 
     useEffect(() => {
         if (connected) {
-            // console.log("im registering to the newPrivateMessage event");
+            console.log("im registering to the newPrivateMessage event");
             chatSocket.current.on('newPrivateMessage', (message: any) => {
 
                 console.log("a new message detected from the server: ", message);

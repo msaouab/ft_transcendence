@@ -39,7 +39,7 @@ const ChatTabStyle = styled.div`
     }
 
     & > *:nth-child(3) {
-        width: 26%;
+        width: 40%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -48,6 +48,10 @@ const ChatTabStyle = styled.div`
         font-size: 0.6rem;
         color: #fff;
     }
+
+
+
+
 `;
 
 
@@ -83,6 +87,7 @@ const ChatTab = ({ privateMessage, newLatestMessage }:
                     {privateMessage.lastMessage.length > 25 ? privateMessage.lastMessage.slice(0, 25) + '...' : privateMessage.lastMessage}
                 </div>
             </div>
+
             <MessageDate {...privateMessage} />
         </ChatTabStyle>
     );

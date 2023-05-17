@@ -70,7 +70,6 @@ function App() {
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />
           <Route path="/chat" element={<Chat />} />
-
           {/* <Route path="/game" element={<Game />}> */}
           {/* </Route> */}
         </Route>

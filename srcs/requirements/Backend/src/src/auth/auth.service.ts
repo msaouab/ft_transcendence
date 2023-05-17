@@ -18,14 +18,14 @@ export class AuthService {
                 },
             })
             if (find_user) {
-                return this.login(user,res);
+                return this.login(user, res);
             }
             const createUser = await this.prisma.user.create({
                 data: {
                     login: user.username,
-                    email:  user._json.email,
-                    firstName:  user.name.givenName,
-                    lastName:  user.name.familyName,
+                    email: user._json.email,
+                    firstName: user.name.givenName,
+                    lastName: user.name.familyName,
                     avatar: './public/default.png',
                     status: 'Online',
                 },
@@ -35,39 +35,39 @@ export class AuthService {
                     user_id: createUser.id,
                 },
             })
-            }
+        }
         catch (e) {
             console.log(e);
         }
-        return this.login(user,res);
+        return this.login(user, res);
     }
 
-    async logout(user,res) {
+    async logout(user, res) {
         if (!user)
             throw new NotFoundException('User not found');
         try {
-        const find_user = await this.prisma.user.findUnique({
-            where: {
-                email: user._json.email,
-            },
-        })
-        if (find_user) {
-            const updateUser = await this.prisma.user.update({
+            const find_user = await this.prisma.user.findUnique({
                 where: {
-                    id: find_user.id,
-                },
-                data: {
-                    status: 'Offline',
+                    email: user._json.email,
                 },
             })
-            res.clearCookie('id');
-            return updateUser;
-        }
+            if (find_user) {
+                const updateUser = await this.prisma.user.update({
+                    where: {
+                        id: find_user.id,
+                    },
+                    data: {
+                        status: 'Offline',
+                    },
+                })
+                res.clearCookie('id');
+                return updateUser;
+            }
         }
         catch (e) {
             console.log(e);
         }
-        
+
     }
 
     async login(user, res) {
@@ -87,15 +87,15 @@ export class AuthService {
                     },
                 })
                 res.cookie('id', find_user.id, {
-                    httpOnly: true,
+                    // httpOnly: true,
                     secure: false,
                 })
-            
+
                 return updateUser;
             }
 
             else {
-                return this.signup(user,res);
+                return this.signup(user, res);
             }
         }
         catch (e) {
@@ -103,8 +103,8 @@ export class AuthService {
         }
     }
 
-    async delete(user,res) {
-        try  {
+    async delete(user, res) {
+        try {
             const find_user = await this.prisma.user.findUnique({
                 where: {
                     email: user._json.email,
@@ -116,7 +116,7 @@ export class AuthService {
                         id: find_user.id,
                     },
                 })
-               res.clearCookie('id');
+                res.clearCookie('id');
                 // return deleteUser;
             }
         }
@@ -133,13 +133,12 @@ export class AuthService {
     //     })
     //     return find_user;
     // }
-    
+
     async twoFactor(user) {
-        
+
     }
 
-    async set2fa(id, TfaDto: TfaDto, user)
-    {
+    async set2fa(id, TfaDto: TfaDto, user) {
         const status = TfaDto.IsActive;
         const find_user = await this.prisma.user.findUnique({
             where: {
@@ -163,7 +162,7 @@ export class AuthService {
             return updateUser;
         }
     }
-    
+
     // async twoFactorverify(body, user,req) {
     //     var st = await this.twoFactor(user);
     //     var verify = speakeasy.totp.verify({

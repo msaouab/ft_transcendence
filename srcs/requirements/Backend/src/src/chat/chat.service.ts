@@ -269,6 +269,7 @@ export class ChatService {
                 id: await this.getRoomId(senderId, receiverId)
             }
         });
+        console.log("privat chat room doesn't exist");
         // if (!privatChatRoom) {
         //     console.log("Private chat room doesn't exist, from the backend");
         //     throw new HttpException("Private chat doesn't exist", 404);

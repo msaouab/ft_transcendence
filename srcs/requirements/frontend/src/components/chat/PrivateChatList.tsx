@@ -113,9 +113,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     People
                 </h1>
                 {/* add newmessage action later */}
-                <div className='flex justify-end items-center'>
-                    <CiEdit className='text-2xl text-white' />
-                </div>
+
 
             </div>
             <div className='h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60'></div>

@@ -147,7 +147,6 @@ const SearchBar = () => {
         if (event.key === "k" && event.metaKey) {
             setFullScreenDropdown(true);
             setDropdown(false);
-
         }
         if (event.key === "Escape") {
             setShowTempChat(false);
