@@ -10,44 +10,60 @@ const ChatStyle = Styled.div`
   flex-direction: row;
   height: 100%;
   width: 100%;
-  // border: 1px solid red;
 
-  justify-content: flex-start;
+  justify-content: flex-start;  
 
   .chat-list {
+    max-width: 500px;
     width: 40%;
     height: 100%;
   }
 
   .chat-box-wrapper {
-    // margin-top: 20px;
-    
+    margin-top: 20px;
+    max-width: 1000px;    
     height: 95%;
     width: 60%;
   }
 
 
   @media screen and (max-width: 766px) {
-
+    height: 100%;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
-    padding: 0;
-
+    padding-right: 30px;
+    padding-bottom: 10px;
+    @media screen and (min-width: 720px) and (max-width: 770px) {
+      padding-left: 30px;
+    } 
     .chat-list {
       width: 100%;
       height: auto;
       max-height: 40%;
-      padding: 0;
+      // padding: 0;
+      margin: 0 auto;
     }
-
 
     .chat-box-wrapper {
       width: 100%;
       height: 100%;
+      margin-top: 0;
     }
-    
+
+
+
+  }
+  @media screen and (max-width: 684px) {
+    margin-right: -20px;
   }
 
+  @media screen and (min-width: 1500px) {
+    justify-content: center;
+  }
+
+  }
   
 }
 `;
@@ -105,30 +121,6 @@ const Chat = () => {
     }
   }, [selectedChat]);
 
-
-
-  //   useEffect(() => {
-  //     if (connected) {
-  //         console.log("im registering to the newPrivateMessage event");
-  //         chatSocket.current.on('newPrivateMessage', (message: any) => {
-
-  //             console.log("a new message detected from the server: ", message);
-  //             setState((prevState: any) => ({
-  //                 ...prevState,
-  //                 messages: [message, ...prevState.messages]
-  //             }));
-  //         })
-  //     }
-  //     // else {
-  //     //     console.log("not connected to the server");
-  //     // }
-  //     return () => {
-  //         chatSocket.current.off('newPrivateMessage');
-  //     }
-  // }, [connected]);
-
-
-
   return (
 
     <ChatStyle>
@@ -137,7 +129,6 @@ const Chat = () => {
         <ChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
       </div>
       <div className="chat-box-wrapper">
-
         <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="big" setNewLatestMessage={setNewLatestMessage}
           chatSocket={chatSocket} connected={connected}
 

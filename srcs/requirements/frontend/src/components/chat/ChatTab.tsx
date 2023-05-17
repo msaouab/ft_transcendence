@@ -17,7 +17,21 @@ const ChatTabStyle = styled.div`
     justify-content: space-between;
     gap: 10px;
     padding: 10px;
+    
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
+    ${(props: { selected: boolean }) => props.selected ? `
+        background: rgba(217, 217, 217, 0.3);
+        // it shoudl move a litte up
+        transform: translateY(-1px);
+        shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        transition: all 0.2s ease-in-out;
+        duration: 0.1s;
+    ` : ``}
+    
     &:hover {
         background: rgba(217, 217, 217, 0.3);
         // it shoudl move a litte up 
@@ -51,27 +65,27 @@ const ChatTabStyle = styled.div`
 
 
 
+    @media (max-width: 360px) {
+        & > *:nth-child(3) {
+            display: none;
+        }
+    }
 
 `;
 
 
 
 
-const ChatTab = ({ privateMessage, newLatestMessage }:
+const ChatTab = ({ privateMessage, selected }:
     {
         privateMessage: PrivateMessage,
-        // newLatestMessage: string
+        selected: boolean
     }
 ) => {
 
-    // useEffect(() => {
-    //     console.log('newLatestMessage', newLatestMessage);
-    //     privateMessage.lastMessage = newLatestMessage;
-    // }, [newLatestMessage]);
-
     let otherUserId = privateMessage.sender_id === Cookies.get('id') ? privateMessage.receiver_id : privateMessage.sender_id;
     return (
-        <ChatTabStyle>
+        <ChatTabStyle selected={selected}>
             <div className="chat-tab__image">
                 {/* uncomment later */}
                 {/* <img src={props.profileImage} alt="profile" className="rounded-full" /> */}

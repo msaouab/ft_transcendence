@@ -31,6 +31,8 @@ const ChatBoxTopBarStyle = styled.div`
         color: #fff;
         margin-right: 0;
     }
+
+    
 `;
 
 // const ChatBoxTopBarPopUpStyle = styled(animated.div)`

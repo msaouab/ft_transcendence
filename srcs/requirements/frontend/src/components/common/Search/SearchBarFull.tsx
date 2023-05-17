@@ -34,23 +34,115 @@ const DropdownSeachStyle = styled.div`
     overflow-y: scroll;
     overflow-x: hidden;
 
+    @media (max-width: 800px) {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        input {
+            width: 100%;
+        }
+    
+        width: 80%;
+        max-width: 100%;
+        height: 35%;
+        max-height: 100%;
+        top: 35%;
+        left: 50%;
+        
+
+
+    }
+
+
 
 `;
 
-import { SearchBarStyle } from "./SearchBar";
+
+const SearchBarStyle = styled.div`
+background:  rgba(217, 217, 217, 0.3);
+border-radius: 10px;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+
+height: 45px;
+max-height: 45px;
+padding: 10px;
+width: ${(props) => props.$width}%;
+margin: 0 auto;
+color: #fff;
+input {
+background-color: transparent;
+border: none;
+flex: 1;
+margin-left: 10px;
+}
+input:focus {
+outline: none;
+}
+// flex flex-row items-center gap-4 w-full border-zinc-900
+
+.search-icon {
+// width: 30px;
+align-self: center;
+color: #ffff;
+cursor: pointer;
+opacity: 0.5;
+min-width: 30px;
+}
+
+.shortcuts-icons {
+display: flex;
+justify-content: center;
+
+align-self: center;
+color: #ffff;
+cursor: pointer;
+margin-left: 10px;
+width: auto;
+    img.cmdkey-icon {
+    width: 23px;
+    height: 23px;
+}
+
+img.kkey-icon {
+    width: 20px;
+    height: 20px;
+}
+opacity: 0.5;
+
+@media (max-width: 768px) {
+
+    margin-left: 0;
+
+    gap: 5px;
+    padding: 0;
+    .search-bar-search-icon {
+        width: 30px;
+
+        margin-left: 0;
+    }
+    input {
+        padding-left: 0;
+        width: 100%;
+    }
+    .search-icon {
+    
+    }
+    
+
+
+}
+
+}
+
+
+`;
 
 const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { fullScreenDropdown: boolean, searchBarRef: any, handleTempChat: any }) => {
-
-    // console.log(searchResults);
     const [search, setSearch] = useState<string>('');
-    // const [dropdown, setDropdown] = useState<boolean>(false);
-    // const searchBarRef = useRef<HTMLDivElement>(null);
-    // const [fullScreenDropdown, setFullScreenDropdown] = useState<boolean>(false);
     let [searchConnected, setSearchConnected] = useState<boolean>(false);
     let [searchResults, setSearchResults] = useState<any[]>([]);
-
-
-    // connection to websocket
     let socket = useRef<any>(null);
     useEffect(() => {
         if (socket.current) {
@@ -96,7 +188,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
         setSearch(searchProp);
         socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
     };
-    const navigate = useNavigate();
+
 
 
 
@@ -107,10 +199,11 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
         fullScreenDropdown && (
             <DropdownSeachStyle className="full-screen-dropdown-search" ref={searchBarRef}>
                 <SearchBarStyle className="full-screen-search-bar w-full">
-                    <div className="search-bar-container flex flex-row items-center gap-4 w-full border-zinc-900">
+                    {/* <div className="search-bar-container  "> */}
                         <div className="search-bar-icon">
                         </div>
-                        <div className="search-bar-input flex flex-row items-center gap-4 w-full">
+                        <div className="search-bar-input flex flex-row items-center gap-4 w-full 
+                        ">
                             <div className="search-bar-search-icon">
                                 <CiSearch
                                     className="search-icon"
@@ -135,7 +228,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                             />
 
 
-                        </div>
+                        {/* </div> */}
                     </div>
 
                 </SearchBarStyle>

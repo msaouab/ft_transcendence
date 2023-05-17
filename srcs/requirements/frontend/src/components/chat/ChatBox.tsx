@@ -16,16 +16,10 @@ const ChatBoxStyle = styled.div`
     background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
-    padding: 20px;
-
-    // @media (max-width: 768px) {
-    //     // if size is big chatbox should be hidden
-    //     visibility: ${(props) => props.size === 'small' ? 'visible' : 'hidden'};
-    //     width: 100%;
-    //     height: 100%;
-    // }
-    
-
+    padding: 20px; 
+    @media (max-width: 768px) {
+        padding: 10px;
+    }
 `;
 
 
@@ -57,52 +51,10 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
-    // console.log("hey ");
-    // const [connected, setConnected] = useState<boolean>(false);
-    // const chatSocket = useRef(null);
-
-    // useEffect(() => {
-    //     // socket connection
-    //     if (!connected) {
-    //         chatSocket.current = io('http://localhost:3000/chat');
-    //         setConnected(true);
-    //         console.log('connected to the server')
-    //     }
-
-    //     // print the socket id
-    //     chatSocket.current.on('connect', () => {
-
-    //         console.log("socket id: ", chatSocket.current.id);
-    //     });
-
-    //     // if (connected) {
-    //     //     console.log("im registering to the newPrivateMessage event");
-    //     //     chatSocket.current.on('newPrivateMessage', (message: any) => {
-
-    //     //         console.log("a new message detected from the server: ", message);
-    //     //         setState((prevState: any) => ({
-    //     //             ...prevState,
-    //     //             messages: [message, ...prevState.messages]
-    //     //         }));
-    //     //     })
-    //     // }
-    //     // else {
-    //     //     console.log("not connected to the server");
-    //     // }
-    //     return () => {
-
-    //         // chatSocket.current.off('newPrivateMessage');
-    //         chatSocket.current.disconnect();
-    //     }
-
-    // }, []);
-
-
     useEffect(() => {
         if (connected) {
             console.log("im registering to the newPrivateMessage event");
             chatSocket.current.on('newPrivateMessage', (message: any) => {
-
                 console.log("a new message detected from the server: ", message);
                 setState((prevState: any) => ({
                     ...prevState,
@@ -110,30 +62,10 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 }));
             })
         }
-        // else {
-        //     console.log("not connected to the server");
-        // }
         return () => {
             chatSocket.current.off('newPrivateMessage');
         }
     }, [connected]);
-
-
-
-    // useEffect(() => {
-    //     if (connected) {
-    //         chatSocket.current.on('newPrivateMessage', (message: any) => {
-    //             // console.log("im inside chat box and i got a new message from the server: ", message);
-    //             console.log("a new message detected from the server: ", message);
-    //             setState((prevState: any) => ({
-    //                 ...prevState,
-    //                 messages: [message, ...prevState.messages]
-    //             }));
-    //         });
-    //     }
-
-    // }, [chatSocket.current]);
-
 
 
     const { chatRoomid } = selectedChat;
@@ -141,14 +73,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     const [state, setState] = React.useState(initialState);
     const { messages, hasMore, offset } = state;
     let limit = 9;
-
-    // useEffect(() => {
-    //     console.log("hasMore: ", hasMore);
-    //     console.log("offset: ", offset);
-    //     console.log("totalMessages: ", totalMessages);
-    //     // console.log("messages: ", messages);
-    // }, [state]);
-
 
 
     const getMessages = async () => {
@@ -159,8 +83,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     const next = () => {
-        // console.log("next function called");
-
         getMessages().then((newMessages) => {
             setState((prevState) => ({
                 ...prevState,
@@ -191,11 +113,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     offset: prevState.offset + messages.length,
                     hasMore: true,
                 }));
-
-
-
-
-                // add the message as the last 
             }
 
         });
@@ -220,7 +137,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                                 <div className='h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60'></div>
                             </div>
                             <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} setState={setState} />
-                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} />
+                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} size={size} />
                         </>
                     )
             }

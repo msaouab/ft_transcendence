@@ -14,7 +14,7 @@ import TmpChatBox from './TmpChatBox';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
-    border-radius: 10px; 
+    border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -22,7 +22,6 @@ export const SearchBarStyle = styled.div`
     max-height: 45px;
     padding: 10px;
     width: ${(props) => props.$width}%;
-
     margin: 0 auto;
     color: #fff;
     input {
@@ -40,6 +39,7 @@ input:focus {
     color: #ffff;
     cursor: pointer;
     opacity: 0.5;
+    min-width: 30px;
 }
 
 .shortcuts-icons {
@@ -50,17 +50,53 @@ input:focus {
     color: #ffff;
     cursor: pointer;
     margin-left: 10px;
-
-    img.cmdkey-icon {
-        width: 19px;
-        height: 19px;
+    width: auto;
+        img.cmdkey-icon {
+        width: 23px;
+        height: 23px;
     }
 
     img.kkey-icon {
-        width: 16px;
-        height: 16px;
+        width: 20px;
+        height: 20px;
     }
     opacity: 0.5;
+}
+
+    @media (max-width: 768px) {
+
+        width: 40px;
+        height: 40px;
+        margin-left: 0;
+        padding: 0;
+        background-color: white;
+        font-weight: bold;
+        input {
+
+    
+
+            width: 100%;
+            &::placeholder {
+                opacity: 0;
+            }
+        }
+        .search-icon {
+            display: flex;
+            justify-content: center;
+            align-self: center;
+            color: #000;
+            cursor: pointer;
+            margin: 0 auto;
+            margin-left: 10px;
+        }
+        
+        .shortcuts-icons {
+            display: none;
+        }
+
+
+    }
+
 
 
 `;
@@ -98,6 +134,11 @@ const SearchResultsStyle = styled.div`
     width: 100%;   
     height: 100%;
     overflow-y: scroll;
+
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 
@@ -213,7 +254,9 @@ const SearchBar = () => {
             <div className="flex flex-col justify-center items-center gap-4 w-full max-w-3xl relative ">
                 <SearchBarStyle $width={90} className="search-bar" ref={searchBarRef}>
 
-                    <CiSearch className="search-icon" size={30} />
+                    <CiSearch className="search-icon" size={30}
+                        onClick={() => window.innerWidth < 768 ? setFullScreenDropdown(true) : setDropdown(true)}
+                    />
                     <form className="flex flex-row justify-between w-full" onSubmit={(e) => {
                         e.preventDefault();
                         navigate(`/search?entity=all&keyword=${search}`);
@@ -224,7 +267,7 @@ const SearchBar = () => {
                     {
                         dropdown && (
                             <InlineDropdownSeachStyle $width={90} className="dropdown-search" ref={searchBarRef}>
-                                <SearchResultsStyle>
+                                <SearchResultsStyle >
                                     {
                                         !searchResults['users'] && !searchResults['channels'] && (
                                             <div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">

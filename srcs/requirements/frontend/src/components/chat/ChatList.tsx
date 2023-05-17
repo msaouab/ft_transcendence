@@ -33,16 +33,6 @@ const ChatListStyle = styled.div`
 
 
 
-    // @media (max-width: 768px) {
-    //     align-self: start;
-    //     display: flex;
-    //     flex-direction: column;
-    //     justify-content: flex-start;
-    //     align-items: center;
-    //     width: 20%;
-    //     height: 100%;
-
-    // }
 
 
 

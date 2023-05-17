@@ -25,24 +25,29 @@ const DropDown = styled.div`
 const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
-    // position: fixed;
     // width: 100vw; 
     display: grid;
     grid-template-columns: 1fr 11fr;
     padding: 1rem 2rem;
 
-    @media (max-width: 768px) {
-   
+    @media (max-width: 500px) {
       
+      padding: 0;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
+    }
+
+
+    @media (max-width: 768px) {
+      
+      padding: 0; 
       .header {
       
       
         margin-right: 0;
         margin-top: 0;
     }
-      .search {
-        display: none;
-     }
+    
 
       
 

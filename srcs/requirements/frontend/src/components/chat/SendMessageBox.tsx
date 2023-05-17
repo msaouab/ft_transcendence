@@ -9,6 +9,7 @@ import axios from 'axios';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     height: 8%;
+    max-height: 60px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -17,7 +18,7 @@ const SendMessageBoxStyle = styled.div`
     border-radius: 25px;
     padding: 20px;
     color: #fff;
-
+    
     input {
         background-color: transparent;
         border: none;
@@ -38,10 +39,34 @@ const SendMessageBoxStyle = styled.div`
         color: #ffff;
         cursor: pointer;
     }
+
+
+    @media (max-width: 768px) {
+        ${(props: { size: any }) => props.size === 'big' ? `
+            padding: 10px; 
+        ` : ``}
+    }
+
+    @media (max-width: 400px) {
+        ${(props: { size: any }) => props.size === 'big' ? `
+        padding: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+    
+
+        .message-icon {
+            display: none;
+        }
+        input {
+            margin-left: 0px;
+        }
+        ` : ``}
+       
+    }
 `;
 
 
-const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any }) => {
+const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, size }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any, size: string }) => {
     const [message, setMessage] = useState<string>('');
 
 
@@ -77,7 +102,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
     };
 
     return (
-        <SendMessageBoxStyle>
+        <SendMessageBoxStyle size={size}>
             <div className='message-icon text-white'>
                 <CiChat1 size={30} color='#ffff' />
             </div>

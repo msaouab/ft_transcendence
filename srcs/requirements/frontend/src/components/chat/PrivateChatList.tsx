@@ -19,6 +19,7 @@ const UsersChatListStyle = styled.div`
     flex-direction: column;
     gap: 20px;
 
+   
 
 `;
 
@@ -30,19 +31,17 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
         const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
         return user.data;
-    }
+}
 
     const getPrivateChats = async (limitRoom: string, limitMsg: string) => {
         const Tabs: any = [];
         let id = Cookies.get('id');
         if (!id) return;
         try {
-
             const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
             await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
                 const { id } = room;
-
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
 
@@ -82,7 +81,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         }
     }
 
-
     useEffect(() => {
         getPrivateChats('5', '1')
         // 
@@ -106,6 +104,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
     }, [privateChatRooms])
 
+    const [selected, setSelected] = useState<string>('');
     return (
         <UsersChatListStyle >
             <div className='flex justify-between'>
@@ -113,11 +112,9 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     People
                 </h1>
                 {/* add newmessage action later */}
-
-
             </div>
             <div className='h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60'></div>
-            <div className='overflow-y-scroll scrollbar-hide h-[100%] mt-2 flex flex-col gap-2'>
+            <div className=''>
                 {privateChatRooms.length === 0 ?
                     <div className='flex flex-col items-center justify-center h-full text-center ' >
                         <div className='
@@ -134,11 +131,21 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                             return (
                                 <div key={props.chatRoomid} onClick={() => {
                                     setSelectedChat(props);
+                                    setSelected(props.chatRoomid);
+
                                 }} >
-                                    <ChatTab privateMessage={props} key={props.chatRoomid} />
+                                    {/* if the chat is currently selected , show the selected style
+                                    else show the normal style
+
+                                     */}
+                                     
+                                    
+                                    <ChatTab privateMessage={props} key={props.chatRoomid} selected={props.chatRoomid === selected} />
+                                    {/* <ChatTab privateMessage={props} key={props.chatRoomid} selected={false} /> */}
                                     {/* seperator should show under all compontes excpet the last one */}
                                     {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?
-                                        <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 opacity-60'></div> : null}
+                                        <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 mb-1.5
+                                         opacity-60'></div> : null}
 
                                 </div>
                             )
@@ -150,5 +157,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         </UsersChatListStyle >
     );
 };
+
 
 export default UsersChatList;
