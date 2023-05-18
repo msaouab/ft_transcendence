@@ -29,13 +29,14 @@ const index = () => {
   const LayoutStyle = styled.div`
     display: flex;
     height: 100vh;
-    @media (max-width: 1200px) {
+    /* @media (max-width: 1200px) {
       height: 100%;
-    }
+    } */
   `;
 
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
   const handelDropDown = () => {
+    console.log("clicked");
     setIsDropDownOpen(!isDropDownOpen);
   };
 

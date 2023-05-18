@@ -1,4 +1,4 @@
-import { ReusableCardStyle } from "./Home";
+import { ReusableCardStyle } from "./Profile";
 import { Link } from "react-router-dom";
 import RoundTable from "../../assets/roundTable.png";
 import TimingTable from "../../assets/timeTable.png";
@@ -120,9 +120,7 @@ const GameCard = (props: GameCardProps) => {
   );
 };
 
-
 const GameDashboard = () => {
-  
   return (
     <div className="flex    flex-col gap-5  h-full ">
       <div className="h-[30rem]  w-full flex gap-5 pt-5 ">
@@ -182,10 +180,7 @@ const GameDashboard = () => {
         </div>
       </div>
       <div className="flex-1  p-2 w-[70%] max-w-[1000px] m-auto">
-        <h1 className=" text-2xl font-bold text-center mb-2   ">
-
-          Live Games
-        </h1>
+        <h1 className=" text-2xl font-bold text-center mb-2   ">Live Games</h1>
         <div className="h-[90%] max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
           <SwiperComponent
             slides={Array(10).fill(

@@ -138,79 +138,144 @@ const Home = () => {
     rank: "",
   });
 
-  //   useEffect(() => {
-  //         const apiUrl = 'http://localhost:3000/api/v1/me'
-  //         async function fetchData() {
-  //           try {
-  //             await axios.get(apiUrl, {
-  //               withCredentials: true,
-  //             })
-  // 			.then(response => {
-  // 				if (response.statusText) {
-  // 					setData(response.data);
-  // 				}
-  //                 // setOnlineStat(user.status);
-  // 			})
-  // 		} catch (error) {
-  //             console.log(error);
-  // 		}
-  // 	}  fetchData();
-  // }, []);
+  useEffect(() => {
+    const apiUrl = "http://localhost:3000/api/v1/me";
+    async function fetchData() {
+      try {
+        await axios
+          .get(apiUrl, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.statusText) {
+              setData(response.data);
+            }
+            // setOnlineStat(user.status);
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, []);
 
-  //     useEffect(() => {
-  //       const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
-  //       async function fetchRankData() {
-  //           try {
-  //               await axios.get(rankUrl, {
-  //                 withCredentials: true,
-  //               })
-  //               .then(response => {
-  //                 if (response.statusText) {
-  //                   getRankData(response.data);
-  //                 }
-  //           })
-  //           .catch(error => {
-  //               if (error.response.status == 401) {
-  //                   }
-  //               })
-  //           }
-  //           catch (error) {
-  //             console.log(error);
-  //           }
-  //         } fetchRankData();
-  //       }, []);
+  useEffect(() => {
+    const rankUrl =
+      "http://localhost:3000/api/v1/User/" +
+      Cookies.get("userid") +
+      "/rankData";
+    async function fetchRankData() {
+      try {
+        await axios
+          .get(rankUrl, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            if (response.statusText) {
+              getRankData(response.data);
+            }
+          })
+          .catch((error) => {
+            if (error.response.status == 401) {
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchRankData();
+  }, []);
 
   const [friends, setFriends] = useState<friendsInterface[]>([]);
-  // 	useEffect(() => {
-  // 		const apiUrl = 'http://localhost:3000/api/v1/User/' + Cookies.get('userid') + '/friends';
-  // 		async function fetchData() {
-  // 			try {
-  //         await axios.get(apiUrl, {
-  // 					withCredentials: true,
-  // 				})
-  // 				.then(response => {
-  // 					for (let i = 0; i < response.data.length; i++) {
-  // 						axios.get('http://localhost:3000/api/v1/User/' + response.data[i].friendUser_id, {
-  // 							withCredentials: true,
-  // 						})
-  // 						.then(responses => {
-  // 							setFriends(friends => [...friends, {
-  // 								login: responses.data.login,
-  // 								Status: responses.data.status
-  // 							}]);
-  // 						})
-  // 					}
-  // 				})
-  // 				.catch(error => {
-  // 					if (error.response.status == 401) {
-  // 					}
-  // 				})
-  // 			} catch (error) {
-  // 				console.log(error);
-  // 			}
-  // 		}
-  // 		fetchData();
-  // 	}, []);
+  useEffect(() => {
+    const apiUrl =
+      "http://localhost:3000/api/v1/User/" + Cookies.get("userid") + "/friends";
+    async function fetchData() {
+      try {
+        await axios
+          .get(apiUrl, {
+            withCredentials: true,
+          })
+          .then((response) => {
+            for (let i = 0; i < response.data.length; i++) {
+              axios
+                .get(
+                  "http://localhost:3000/api/v1/User/" +
+                    response.data[i].friendUser_id,
+                  {
+                    withCredentials: true,
+                  }
+                )
+                .then((responses) => {
+                  setFriends((friends) => [
+                    ...friends,
+                    {
+                      login: responses.data.login,
+                      Status: responses.data.status,
+                    },
+                  ]);
+                });
+            }
+          })
+          .catch((error) => {
+            if (error.response.status == 401) {
+            }
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const Status = styled.div<{ userStatus: string }>`
+  position: relative;
+  /* width: 100px; */
+  /* aspect-ratio: 1/1; */
+  height: 100%;
+  img {
+    position: relative;
+    border-radius: 50%;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    @media (max-width: 1200px) {
+      height: 70px;
+      width: 70px;
+    }
+  }
+  &:after {
+    content: "";
+    position: absolute;
+    bottom: 5px;
+    right: 10%;
+    background-color: ${({ userStatus }) =>
+      userStatus === "online"
+        ? "#00ff00"
+        : userStatus === "offline"
+        ? "#6a6a6a"
+        : userStatus === "donotdisturb"
+        ? "#ff0000"
+        : userStatus === "ingame"
+        ? "#011c77"
+        : "#ffcc00"};
+    border: 1px solid #ececec;
+    width: 15%;
+    height: 15%;
+    border-radius: 50%;
+  }
+`;
+
+  const Top = styled.div`
+    @media (max-width: 1200px) {
+      display: unset;
+      height: fit-content;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+    }
+  `;
 
   const Main = styled.div`
     @media (max-width: 1200px) {
@@ -228,7 +293,6 @@ const Home = () => {
         }
       }
       .achievements {
-        background-color: red;
         /* height: 500px; */
         .achiv-container {
           display: flex;
@@ -239,20 +303,20 @@ const Home = () => {
   `;
 
   return (
-    <div className="  w-[100%] flex flex-col gap-5 ">
-      {/* <div className="top   h-[6rem]  flex items-center  gap-10 border-b border-white/50 pb-2 ">
+    <div className="  w-[100%] flex flex-col gap-5  ">
+      <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
         <Status className="" userStatus={userStatus.toLowerCase()}>
           {userImg && <img src={userImg} alt="" className="" />}
         </Status>
-        <div className="description flex flex-col  justify-center">
-          <div className="name text-4xl font-[800] ">
+        <div className="description flex flex-col  text-center justify-center ">
+          <div className="name md:text-4xl text-xl  font-[800] ">
             {user.firstName} {user.lastName}
           </div>
           <div className="name  font-[400] ">{user.login}</div>
           <div className="flex gap-10 items-center "></div>
         </div>
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex justify-around  gap-2  ">
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
+          <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
             <img src={Dice} alt="" width={50} />
             Games : {rankData.wins + rankData.loses + rankData.draws}
           </div>
@@ -269,10 +333,10 @@ const Home = () => {
             Lose: {rankData.loses}
           </div>
         </div>
-      </div> */}
+      </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
-          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] min-h-[20rem]">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] min-h-[25rem] ">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FriendsImg} alt="" width={50} />
@@ -304,13 +368,9 @@ const Home = () => {
                   No friends
                 </div>
               )}
-              {/* {friends &&
-                
-                )
-                } */}
             </div>
           </div>
-          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
+          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={ChatImg} alt="" width={50} />
@@ -323,7 +383,7 @@ const Home = () => {
               ))}
             </div>
           </div>
-          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full ">
+          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={GameImg} alt="" width={50} />

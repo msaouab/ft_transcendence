@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import AboutPage from "./pages/landingPage/AboutPage";
 // import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from "./pages/landingPage/LandingPage";
-import Home from "./pages/game/Home";
+import Home from "./pages/game/Profile";
 import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";
@@ -16,7 +16,6 @@ import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
-
 
 function App() {
   const [bgColor, setBgColor] = useState("#1E1E1E");
