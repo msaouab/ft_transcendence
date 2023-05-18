@@ -6,6 +6,8 @@ interface AppContextType {
   setUserStatus: React.Dispatch<React.SetStateAction<string>>;
   userImg: string ;
   setUserImg: React.Dispatch<React.SetStateAction<string>>;
+  privateChatRooms: any[];
+  setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -17,13 +19,17 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState(DefaultAvatar);
+  // chat context 
+  const [privateChatRooms, setPrivateChatRooms] = useState([]);
 
   const value = {
     userStatus,
     setUserStatus,
     userImg,
     setUserImg,
-  };
+    privateChatRooms,
+    setPrivateChatRooms,
+  }
 
   return (
     <AppContext.Provider value={value}>

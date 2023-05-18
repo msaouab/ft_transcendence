@@ -3,19 +3,19 @@
 
 
  - [x] filter messages by date( add param queiries)
- - [ ] test deleting a friend of another user.
- - [ ] ask bing about the fact if the session is global and apply to all users, or if its specific to each user.
+
  - [x] add queiries to get unseen messages
- - [ ] add new message action when not message are there (search for add newmessage action later)
- - [ ] add a default open chatbox when chat page is loaded (search for add default chatbox later)
- - [ ] make the frontend wait for the backend in the docker-compose config 
+ - [x] add new message action when not message are there (search for add newmessage action later)
+ - [x] add a default open chatbox when chat page is loaded (search for add default chatbox later)
  - [x] make the message component maxwidth 50%
  - [x] make the message preview in list users  
  - [x] show date at last message only + show only first message as rounded with dot
  - [ ] add searches endpoint it should takes query params and return
- - [ ] add tmp chat component to full screen search box
- - [ ] the dot , date thing doesn't work!!! do you understand that my friend!!!!
 
+ - [ ] the dot , date thing doesn't work!!! do you understand that my friend!!!!
+ - [x] when a surfing to another page and then back to chat a problem, messages disaparead
  
+
+
 # Notes
 - webapp is crashing in logout ()

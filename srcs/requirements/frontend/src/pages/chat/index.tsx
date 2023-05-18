@@ -26,7 +26,6 @@ const ChatStyle = Styled.div`
     width: 60%;
   }
 
-
   @media screen and (max-width: 766px) {
     height: 100%;
     flex-direction: column;
@@ -42,7 +41,6 @@ const ChatStyle = Styled.div`
       width: 100%;
       height: auto;
       max-height: 40%;
-      // padding: 0;
       margin: 0 auto;
     }
 
@@ -51,9 +49,6 @@ const ChatStyle = Styled.div`
       height: 100%;
       margin-top: 0;
     }
-
-
-
   }
   @media screen and (max-width: 684px) {
     margin-right: -20px;
@@ -62,22 +57,20 @@ const ChatStyle = Styled.div`
   @media screen and (min-width: 1500px) {
     justify-content: center;
   }
-
   }
-  
 }
 `;
 
 
 
 import { PrivateMessage } from '../../types/message';
-import SideBar from '../../components/common/SideBar';
+import { useGlobalContext } from '../../provider/AppContext';
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
   const [newLatestMessage, setNewLatestMessage] = React.useState<{ chatRoomId: string, message: string }>({} as { chatRoomId: string, message: string });
-
+  const {privateChatRooms} = useGlobalContext(  );
 
   useEffect(() => {
     // socket connection
@@ -86,11 +79,8 @@ const Chat = () => {
       setConnected(true);
       console.log('connected to the server')
     }
-
-    chatSocket.current.on('connect', () => {
-      /* console.log("socket id: ", chatSocket.current.id); */
-      // if there's a selected chat, join the room
-    });
+    // chatSocket.current.on('connect', () => {
+    // });
     return () => {
       chatSocket.current.disconnect();
       setConnected(false);
@@ -105,10 +95,7 @@ const Chat = () => {
         receiverId: selectedChat.receiver_id
       }
       chatSocket.current.emit('joinRoom', payload);
-    } else {
-      console.log("no selected chat");
-    }
-
+    } 
     return () => {
       if (selectedChat.chatRoomid) {
         console.log("leaving the room");
@@ -121,6 +108,21 @@ const Chat = () => {
     }
   }, [selectedChat]);
 
+  useEffect(() => {
+    let chatDeleted = true;
+    if (privateChatRooms.length === 0) {
+      setSelectedChat({} as PrivateMessage);
+      return;
+    }
+    privateChatRooms.forEach((chat) => {
+      if (chat.chatRoomid === selectedChat.chatRoomid) {
+        chatDeleted = false ;
+      }}
+    )
+    if (!chatDeleted) {
+      setSelectedChat({} as PrivateMessage);
+    }
+  }, [privateChatRooms]);
   return (
 
     <ChatStyle>

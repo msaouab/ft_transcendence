@@ -13,7 +13,8 @@ import { Socket, Server } from 'socket.io';
 import { createHash } from 'crypto';
 import {
     PrivateChatRoom,
-    PrivateMessage
+    PrivateMessage,
+    BlockTab
 } from '@prisma/client';
 
 
@@ -234,7 +235,7 @@ export class ChatService {
                     seen: payload.seen,
                     sender_id: payload.sender_id,
                     receiver_id: payload.receiver_id,
-                    chatRoom_id: payload.chatRoom_id,
+                chatRoom_id: payload.chatRoom_id,
                 }
             });
             if (!message) {
@@ -269,11 +270,10 @@ export class ChatService {
                 id: await this.getRoomId(senderId, receiverId)
             }
         });
-        console.log("privat chat room doesn't exist");
-        // if (!privatChatRoom) {
-        //     console.log("Private chat room doesn't exist, from the backend");
-        //     throw new HttpException("Private chat doesn't exist", 404);
-        // }
+        if (!privatChatRoom) {
+            throw new HttpException("Private chat doesn't exist", 404);
+        }
+        
         return privatChatRoom;
     }
 

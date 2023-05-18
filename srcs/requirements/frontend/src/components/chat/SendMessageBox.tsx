@@ -5,7 +5,8 @@ import { useState } from 'react';
 
 import Cookies from 'js-cookie';
 import { dateToStr } from '../common/CommonFunc';
-import axios from 'axios';
+
+import { useGlobalContext } from '../../provider/AppContext';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     height: 8%;
@@ -70,8 +71,14 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
     const [message, setMessage] = useState<string>('');
 
 
-
+    const {setPrivateChatRooms} = useGlobalContext();
     const sendMessage = (messageProp: string) => {
+
+        // if the user is blocked, don't send the message
+        console.log(selectedChat);
+        if (selectedChat.blocked) {
+            console.log('blocked');
+        }
         if (messageProp === '') {
             return;
         }
@@ -83,21 +90,34 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
             sender_id: Cookies.get('id'),
             receiver_id: selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id
         };
-        // console.log("hey from zone 1kp1")
         if (connected) {
-            // console.log('sending the message: ', message);
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
             if (setNewLatestMessage) {
-                // console.log("hey from zone 1kp2")
                 setNewLatestMessage(
                     {
                         chatRoomId: selectedChat.chatRoomid,
                         message: message.content
                     }
                 )
-                // setNewLatestMessage(message.content);
             }
+            const newPrivateChatRoom = {
+                ...selectedChat,
+                lastMessage: message.content,
+                lastMessageDate: Date.now(),
+            }
+            setPrivateChatRooms(prev => {   
+                const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
+                if (index === -1) {
+                    return [...prev, newPrivateChatRoom];
+                }
+                else {
+                    prev[index] = newPrivateChatRoom;
+                    return [...prev];   
+                }
+            }
+            )
+
         }
     };
 

@@ -1,16 +1,13 @@
 import styled from 'styled-components';
 import { CiSearch, CiFaceMeh, CiLollipop, CiChat2, CiCircleRemove } from 'react-icons/ci';
-import { SearchOptions } from '../../../types/search';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import cmdKeyIcon from '../../../assets/cmdkey.png'
 import kKeyIcon from '../../../assets/kkey.png'
 import { Link, useNavigate } from 'react-router-dom';
 import SearchBarFull from './SearchBarFull';
-import ChatBox from '../../chat/ChatBox';
-import Chat from '../../../pages/chat';
 import TmpChatBox from './TmpChatBox';
-
+import Cookies from 'js-cookie';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
@@ -154,7 +151,6 @@ const SearchBar = () => {
     const [showTempChat, setShowTempChat] = useState<boolean>(false);
 
     const handleTempChat = (user: any) => {
-        console.log("handle temp chat");
         setShowTempChat(true);
         setTmpChatData(user);
     }
@@ -321,15 +317,16 @@ const SearchBar = () => {
                                                                 </div>
                                                             </Link>
                                                         </div>
+                                                        { user.id === Cookies.get('id') ? null :
                                                         <div className="chat-button flex justify-center items-center mr-1">
                                                             <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
                                                                 e.preventDefault();
-                                                                console.log("chat button clicked");
                                                                 handleTempChat(user);
                                                             }}>
                                                                 <CiChat2 className="chat-icon " size={30} />
                                                             </a>
                                                         </div>
+                                            }
 
                                                     </div>
                                                 )

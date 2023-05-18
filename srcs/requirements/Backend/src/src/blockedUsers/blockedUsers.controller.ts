@@ -28,14 +28,20 @@ export class BlockedUsersController {
 
     @Post(":id/blockedusers")
     async postBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
+        console.log("postBlockedUsers");
         const blockedUsers = await this.BlockedUsersService.createBlockedUser(BlockedUserDto, id);
         return blockedUsers;
     }
 
     @Delete(":id/blockedusers")
     async deleteBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
+        console.log("deleteBlockedUsers");
+
+        console.log(BlockedUserDto);
         const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(BlockedUserDto, id);
         return blockedUsers;
+        // console.log("deleteBlockedUsers");
+        // console.log(BlockedUserDto);
     }
 
 }

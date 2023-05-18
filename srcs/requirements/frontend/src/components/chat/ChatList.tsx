@@ -1,12 +1,10 @@
 import styled from 'styled-components';
-import SearchBar from '../common/Search/SearchBar';
-
 import GroupChatList from './GroupsChatList';
 import UsersChatList from './PrivateChatList';
 
 
 import { PrivateMessage } from '../../types/message';
-import { SearchOptions } from '../../types/search';
+
 const ChatListStyle = styled.div`
     background: transparent;
     // border: 1 solid #fff;
@@ -31,11 +29,6 @@ const ChatListStyle = styled.div`
         height:  auto;
     }
 
-
-
-
-
-
 `;
 
 const ChatListWrapperStyle = styled.div`
@@ -55,13 +48,13 @@ const ChatList = ({ setSelectedChat, newLatestMessage }: {
 }) => {
     return (
 
-        <ChatListWrapperStyle>
+        // <ChatListWrapperStyle>
             <ChatListStyle>
                 {/* <SearchBar /> */}
                 <GroupChatList />
                 <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
             </ChatListStyle>
-        </ChatListWrapperStyle>
+        // </ChatListWrapperStyle>
     );
 };
 

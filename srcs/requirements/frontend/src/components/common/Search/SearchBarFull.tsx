@@ -6,8 +6,8 @@ import styled from "styled-components";
 import { CiSearch, CiCircleRemove, CiLollipop, CiFaceMeh, CiChat2 } from "react-icons/ci";
 import { Link } from "react-router-dom";
 
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 const DropdownSeachStyle = styled.div`
     background: rgba(217, 217, 217, 0.3);
@@ -296,7 +296,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                                                         >{user.firstName} {user.lastName}</p>
                                                     </div>
                                                 </div>
-                                                <div className="chat-button flex justify-center items-center mr-1">
+                                                { user.id === Cookies.get('id') ? null :
+
+                                                    <div className="chat-button flex justify-center items-center mr-1">
                                                     <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={
                                                         (e) => {
                                                             e.preventDefault();
@@ -308,7 +310,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                                                     </a>
 
                                                 </div>
-
+                                                }
                                             </Link>
                                         </div>
                                     </div>

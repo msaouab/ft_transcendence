@@ -169,7 +169,7 @@ const Home = () => {
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FreindsImg} alt="" width={50} />
-                Freinds
+                Friends
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">

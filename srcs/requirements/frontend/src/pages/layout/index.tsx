@@ -22,6 +22,7 @@ const DropDown = styled.div`
   z-index: 10;
 `;
 
+
 const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
@@ -47,9 +48,7 @@ const index = () => {
         margin-right: 0;
         margin-top: 0;
     }
-    
-
-      
+  
 
     }
 
@@ -57,9 +56,9 @@ const index = () => {
 
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
 
-  const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-  };
+  // const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log(e.target.value);
+  // };
 
   return (
     <LayoutStyle>
@@ -70,13 +69,6 @@ const index = () => {
         <div className="header flex justify-end  gap-8 items-center  h-[10%]  
         ">
           <div className="search">
-            {/* <CustomInput
-              placeHolder="Search"
-              type="text"
-              onChange={handelOnchange}
-              icon={<BiSearch className="text-[#1E1D19]" />}
-            /> */}
-
             <SearchBar />
           </div>
           <div className="notification relative">
@@ -91,6 +83,7 @@ const index = () => {
               className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
               onClick={() => setIsDropDownOpen(!isDropDownOpen)}
             />
+          
             <div
               className={`settings bg-slate-50 h-[8rem] flex flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${isDropDownOpen ? "block" : "hidden"
                 } transition-all duration-200 absolute top-12 right-0 z-10`}

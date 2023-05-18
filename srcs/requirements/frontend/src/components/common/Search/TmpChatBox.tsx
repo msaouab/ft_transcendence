@@ -8,19 +8,21 @@ import { useRef } from 'react';
 import { io } from "socket.io-client";
 
 import styled from "styled-components";
+import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
     position: absolute;
     bottom: 0;
     right: 10px;
     z-index: 50;
     width: max-content;
-    height: 500px;
+    height: 350px;
     transition: all 300ms ease-in-out;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px; 
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background: #fff;
     overflow: hidden;
-
+    
     &.hidden {
         transform: translateY(100%);
     }
@@ -30,11 +32,10 @@ const TmpChatStyle = styled.div`
     @media (max-width: 400px) {
         right: 0;
         }
-
-
     
 `;
 const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }) => {
+
     const [dummySelectedChat, setDummySelectedChat] = useState<PrivateMessage | null>(null);
     if (!showTempChat) {
         return null;
@@ -61,9 +62,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                 receiverId: dummySelectedChat.receiver_id
             }
             chatSocket.current.emit('joinRoom', payload);
-        } else {
-            console.log("no selected chat");
-        }
+        } 
 
         return () => {
             if (dummySelectedChat && dummySelectedChat.chatRoomid) {
@@ -95,7 +94,8 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                         lastMessage: '',
                         lastMessageDate: '',
                         seen: false,
-                        status: user.status
+                        status: user.status,
+                    
                     });
                 }
                 else {
@@ -106,7 +106,6 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                     })
                         .then((res) => {
                             console.log('chat room created', res);
-
                             setDummySelectedChat({
                                 chatRoomid: res.data.id,
                                 messageId: '',
@@ -131,7 +130,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
 
     return (
         showTempChat && (
-            <TmpChatStyle className=" rounded-b-n  rounded-b-n rounded-tr-lg shadow-2xl  " >
+            <TmpChatStyle className="rounded-b-n rounded-b-n rounded-tr-lg shadow-2xl  " >
                 {dummySelectedChat &&
                     <ChatBox size="small" selectedChat={dummySelectedChat} key={user}
                         chatSocket={chatSocket} connected={connected}

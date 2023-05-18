@@ -2,12 +2,12 @@
 import styled from 'styled-components';
 
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import {useEffect, useState } from 'react';
 
 import Cookies from 'js-cookie'
 import ChatTab from './ChatTab';
-import { PrivateMessage, UserMessage } from '../../types/message';
-import { CiEdit } from 'react-icons/ci';
+import { PrivateMessage } from '../../types/message';
+import { useGlobalContext } from '../../provider/AppContext';
 const UsersChatListStyle = styled.div`
 
     width: 100%;
@@ -24,14 +24,14 @@ const UsersChatListStyle = styled.div`
 `;
 
 const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
-
-    const [privateChatRooms, setPrivateChatRooms] = useState([]);
+    // privatChatroom context
+    const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
 
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
         const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
         return user.data;
-}
+    }
 
     const getPrivateChats = async (limitRoom: string, limitMsg: string) => {
         const Tabs: any = [];
@@ -40,7 +40,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         try {
             const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
-            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
+            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean, blocked: boolean }) => {
                 const { id } = room;
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
@@ -66,15 +66,18 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     seen: message.data[1][0].seen,
                     login: user.login,
                     profileImage: user.profileImage,
+                    blocked: room.blocked, 
                     status: user.status
                 }
+
                 Tabs.push(data);
             }));
             // filter tabs by date
             Tabs.sort((a: any, b: any) => {
                 return new Date(b.lastMessageDate).getTime() - new Date(a.lastMessageDate).getTime();
             });
-            setPrivateChatRooms(Tabs)
+            setPrivateChatRooms(Tabs);
+
 
         } catch (error) {
             console.error(error);
@@ -98,7 +101,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         setPrivateChatRooms(newPrivateChatRooms);
 
     }, [newLatestMessage])
-
 
     useEffect(() => {
         privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
