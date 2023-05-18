@@ -23,20 +23,21 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
-  const [userImg, setUserImg] = useState(DefaultAvatar);
+  const [userImg, setUserImg] = useState("");
+  const [isAuth, setIsAuth] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const res = await GetAvatar();
-        setUserImg(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAvatar = async () => {
+  //     try {
+  //       const res = await GetAvatar();
+  //       setUserImg(res);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    fetchAvatar();
-  }, []);
+  //   fetchAvatar();
+  // }, []);
 
   const value = {
     userStatus,

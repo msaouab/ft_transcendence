@@ -52,42 +52,43 @@ const SideBar = () => {
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  
   const navigate = useNavigate();
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        await instance
-          .get("/me")
-          .then((response) => {
-            if (
-              response?.data?.tfa == true &&
-              response.data.otp_verified == false
-            ) {
-              // alert("Please enable two factor authentication");
-              navigate("/login/two-factor-authentication");
-            }
-            if (response.statusText) {
-            }
-            Cookies.set("userid", response.data.id);
-            // setOnlineStat(user.status);
-            setUserStatus(response.data.status);
-          })
-          .catch((error) => {
-            if (error.response.status == 401 || error.response.status == 403) {
-              navigate("/login");
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchData() {
+  //     try {
+  //       await instance
+  //         .get("/me")
+  //         .then((response) => {
+  //           if (
+  //             response?.data?.tfa == true &&
+  //             response.data.otp_verified == false
+  //           ) {
+  //             // alert("Please enable two factor authentication");
+  //             navigate("/tfa");
+  //           }
+  //           if (response.statusText) {
+  //           }
+  //           Cookies.set("userid", response.data.id);
+  //           // setOnlineStat(user.status);
+  //           setUserStatus(response.data.status);
+  //         })
+  //         .catch((error) => {
+  //           if (error.response.status == 401 || error.response.status == 403) {
+  //             navigate("/login");
+  //           }
+  //         });
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  //   fetchData();
+  // }, []);
   const handleLogout = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
-          if (error.response.status == 401) {
+          if (error.response.status == 401 || error.response.status == 403) {
             navigate("/login");
           }
         });

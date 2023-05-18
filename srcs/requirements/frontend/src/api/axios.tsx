@@ -27,4 +27,29 @@ export const PostAvatar = async (file: File) => {
     });
 };
 
+export const fetchRankData = async () => {
+  const res = await instance.get(
+    "/User/" + Cookies.get("userid") + "/rankData"
+  );
+  return res.data;
+};
+
+export const fetchUserData = async () => {
+  const res = await instance.get("/me");
+  return res.data;
+};
+
+export const FetchUsersFriends = async () => {
+  const res = await instance.get("/user/" + Cookies.get("userid") + "/friends");
+  return res.data;
+};
+
+export const Logout = async () => {
+  await instance.get("/logout").catch((error) => {
+    if (error.response.status == 401) {
+      navigate("/login");
+    }
+  });
+};
+
 export default instance;

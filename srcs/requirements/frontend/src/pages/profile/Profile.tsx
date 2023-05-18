@@ -15,7 +15,11 @@ import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useState } from "react";
-import instance from "../../api/axios";
+import instance, {
+  FetchUsersFriends,
+  fetchRankData,
+  fetchUserData,
+} from "../../api/axios";
 import Cookies from "js-cookie";
 import axios from "axios";
 
@@ -138,133 +142,78 @@ const Home = () => {
     rank: "",
   });
 
-  useEffect(() => {
-    const apiUrl = "http://localhost:3000/api/v1/me";
-    async function fetchData() {
-      try {
-        await axios
-          .get(apiUrl, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.statusText) {
-              setData(response.data);
-            }
-            // setOnlineStat(user.status);
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const rankUrl =
-      "http://localhost:3000/api/v1/User/" +
-      Cookies.get("userid") +
-      "/rankData";
-    async function fetchRankData() {
-      try {
-        await axios
-          .get(rankUrl, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.statusText) {
-              getRankData(response.data);
-            }
-          })
-          .catch((error) => {
-            if (error.response.status == 401) {
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchRankData();
-  }, []);
-
   const [friends, setFriends] = useState<friendsInterface[]>([]);
+
   useEffect(() => {
-    const apiUrl =
-      "http://localhost:3000/api/v1/User/" + Cookies.get("userid") + "/friends";
-    async function fetchData() {
+    const FetchRank = async () => {
       try {
-        await axios
-          .get(apiUrl, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            for (let i = 0; i < response.data.length; i++) {
-              axios
-                .get(
-                  "http://localhost:3000/api/v1/User/" +
-                    response.data[i].friendUser_id,
-                  {
-                    withCredentials: true,
-                  }
-                )
-                .then((responses) => {
-                  setFriends((friends) => [
-                    ...friends,
-                    {
-                      login: responses.data.login,
-                      Status: responses.data.status,
-                    },
-                  ]);
-                });
-            }
-          })
-          .catch((error) => {
-            if (error.response.status == 401) {
-            }
-          });
+        const response = await fetchRankData();
+        getRankData(response);
       } catch (error) {
         console.log(error);
       }
-    }
-    fetchData();
+    };
+    const FetchUserData = async () => {
+      try {
+        const response = await fetchUserData();
+        setData(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const FetchFriends = async () => {
+      try {
+        const response = await FetchUsersFriends();
+        setFriends(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+      FetchRank();
+      FetchUserData();
+      FetchFriends();
+      console.log("friends");
   }, []);
 
   const Status = styled.div<{ userStatus: string }>`
-  position: relative;
-  /* width: 100px; */
-  /* aspect-ratio: 1/1; */
-  height: 100%;
-  img {
     position: relative;
-    border-radius: 50%;
+    /* width: 100px; */
+    /* aspect-ratio: 1/1; */
     height: 100%;
-    width: 100%;
-    object-fit: cover;
-    @media (max-width: 1200px) {
-      height: 70px;
-      width: 70px;
+    img {
+      position: relative;
+      border-radius: 50%;
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      @media (max-width: 1200px) {
+        height: 70px;
+        width: 70px;
+      }
     }
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    bottom: 5px;
-    right: 10%;
-    background-color: ${({ userStatus }) =>
-      userStatus === "online"
-        ? "#00ff00"
-        : userStatus === "offline"
-        ? "#6a6a6a"
-        : userStatus === "donotdisturb"
-        ? "#ff0000"
-        : userStatus === "ingame"
-        ? "#011c77"
-        : "#ffcc00"};
-    border: 1px solid #ececec;
-    width: 15%;
-    height: 15%;
-    border-radius: 50%;
-  }
-`;
+    &:after {
+      content: "";
+      position: absolute;
+      bottom: 5px;
+      right: 10%;
+      background-color: ${({ userStatus }) =>
+        userStatus === "online"
+          ? "#00ff00"
+          : userStatus === "offline"
+          ? "#6a6a6a"
+          : userStatus === "donotdisturb"
+          ? "#ff0000"
+          : userStatus === "ingame"
+          ? "#011c77"
+          : "#ffcc00"};
+      border: 1px solid #ececec;
+      width: 15%;
+      height: 15%;
+      border-radius: 50%;
+    }
+  `;
 
   const Top = styled.div`
     @media (max-width: 1200px) {
@@ -273,7 +222,6 @@ const Home = () => {
       display: flex;
       flex-direction: column;
       justify-content: center;
-
     }
   `;
 
