@@ -54,9 +54,10 @@ const GameType = () => {
   return (
     <div className="h-full w-full  flex flex-col items-center ">
       <div className="game-type w-[60%] flex justify-between m-auto min-h-[25rem]">
-        {Games.map((item) => (
+        {Games.map((item, index) => (
           <Link
-			to={`/game/${item.id}`}
+            key={index}
+			to={`/game/10`}
 		   className="w-[18rem]">
             <GameTypeCard
               title={item.name}
