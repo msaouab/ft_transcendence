@@ -42,5 +42,9 @@ export class AchvController {
   testAchievements(@Body() body: PostGameDto) {
     return this.achvService.testAchievements(body);
   }
+  @Get(':id')
+  @UseGuards(AuthenticatedGuard)
+  getAchievements(@Param('id') id: string) {
+    return this.achvService.getUserAchievements(id);
   }
- 
+}

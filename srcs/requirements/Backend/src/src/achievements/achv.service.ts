@@ -426,6 +426,26 @@ export class AchvService {
         return await this.CheckAchv(playerOne, playerTwo, playeOne_pts, playeTwo_pts)
     }
 
+    async getUserAchievements(id) {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                id: id,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException("No user found");
+        }
+        const achievements = await this.prisma.achievementsAssignement.findMany({
+            where: {
+                player_id: id,
+            },
+        });
+        if (!achievements) {
+            throw new NotFoundException("No achievements found");
+        }
+        return achievements;
+        
+    }
 
 }
     
