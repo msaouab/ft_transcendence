@@ -29,6 +29,7 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 const FreindCarde = styled.div``;
+
 const FreindCard = () => {
   return (
     <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">

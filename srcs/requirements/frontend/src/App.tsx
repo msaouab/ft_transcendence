@@ -15,6 +15,7 @@ import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
+import GameType from "./pages/game/GameType";
 
 
 function App() {
@@ -73,6 +74,7 @@ function App() {
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/game-type" element={<GameType />} />
         </Route>
       </Routes>
     </>

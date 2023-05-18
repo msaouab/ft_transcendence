@@ -10,6 +10,7 @@ import SideBar from "../../components/common/SideBar";
 import { useEffect, useState } from "react";
 import { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
+import { Link } from "react-router-dom";
 
 const DropDown = styled.div`
   position: absolute;
@@ -77,13 +78,13 @@ const index = () => {
               onClick={handelDropDown}
             />
             <div
-              className={`settings bg-slate-50  bg-white flex transition duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${
-                isDropDownOpen ? "h-[8rem]" : "h-0"
+              className={`settings bg-slate-50  bg-white flex  duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 h-[8rem] rounded-md transition-all ${
+                isDropDownOpen ? "block transition-all" : "hidden transition-all"
               } `}
             >
-              {/* <div className="setting-item">Profile</div>
+              <Link to='/profile' className="setting-item">Profile</Link>
               <div className="setting-item">Logout</div>
-              <div className="setting-item">Status</div> */}
+              <div className="setting-item">Status</div>
             </div>
           </div>
         </div>

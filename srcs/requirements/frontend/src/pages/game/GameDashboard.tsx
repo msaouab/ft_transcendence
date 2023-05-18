@@ -133,7 +133,7 @@ const GameDashboard = () => {
           </div>
           <div className="flex-1 flex items-center gap-5  ">
             <Link
-              to="/game/10"
+              to="/game-type"
               className="  left flex-1 h-[80%] w-full flex flex-col justify-center items-center  cursor-pointer "
             >
               <GameTypeCard
@@ -143,7 +143,7 @@ const GameDashboard = () => {
               />
             </Link>
             <Link
-              to="/game/10"
+              to="/game-type"
               className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center cursor-pointer"
             >
               <GameTypeCard
