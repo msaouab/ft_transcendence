@@ -1,14 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
-import { Socket, io } from 'socket.io-client';
-
-interface PingPongProps {
-	width: number;
-	height: number;
-}
+import { Socket } from 'socket.io-client';
 
 const PlayGround = styled.div`
-	border: 1px solid green;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -16,116 +10,203 @@ const PlayGround = styled.div`
 `;
 
 const ScoreContainter = styled.div`
-	border: 1px solid blue;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	width: 50%;
 	.score {
-		font-size: 6rem;
+		font-size: 5rem;
 		font-weight: bolder;
 		color: white;
 	}
 `;
 
-const PingPong = ({ width, height }: PingPongProps) => {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const [player1Y, setPlayer1Y] = useState<number>(height / 2);
-	const [player2Y, setPlayer2Y] = useState<number>(height / 2);
-	const [mysocket, setSocket] = useState<Socket>();
+interface PingPongProps {
+	width: number;
+	height: number;
+	socket: Socket;
+}
+
+type PlayerState = {
+	width: number;
+	height: number;
+	x: number;
+	y: number;
+};
+
+type BallState = {
+	x: number;
+	y: number;
+	r: number;
+	c: string;
+	vx: number;
+	vy: number;
+};
+
+let ctx: CanvasRenderingContext2D | null;
+
+const drawPlayer = (player: PlayerState) => {
+	console.log('player: ', player);
+	if (ctx) {
+		ctx.fillStyle = '#fff';
+		ctx.fillRect(player.x, player.y, player.width, player.height);
+		ctx.fill();
+	}
+};
+
+const drawBall = (ball: BallState) => {
+	if (ctx) {
+		ctx.beginPath();
+		ctx.fillStyle = ball.c; // ball color
+		ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true); // draw ball
+		ctx.fillStyle = '#fff';
+		ctx.fill();
+		ctx.closePath();
+	}
+};
+
+const PingPong = ({ width, height, socket }: PingPongProps) => {
+	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const [score, setScore] = useState({ player1: 0, player2: 0 });
+	const [player1X, setPlayer1X] = useState<PlayerState>({
+		width: 80,
+		height: 10,
+		x: width / 2 - 40,
+		y: height - 20,
+	});
+	const [player2X, setPlayer2X] = useState<PlayerState>({
+		width: 80,
+		height: 10,
+		x: width / 2 - 40,
+		y: 10,
+	});
+	const [ball, setBall] = useState({
+		x: width / 2,
+		y: height / 2,
+		r: 10,
+		c: '#fff',
+		vx: 0.7,
+		vy: 0.7,
+	});
 
 	useEffect(() => {
-		const socket = io('http://localhost:3000/game');
-		setSocket(socket);
-		socket.on('connect', () => {
-			console.log(socket);
-			console.log('connected to server');
+		socket.on("connect", () => {
+			// socket.emit("joinRoom", "0ki");
+			socket.emit("ball", "0ki");
+			// socket.player
 		});
-		socket.on('disconnected', () => {
-			console.log('disconnected from server');
+		socket.on('addRoom', (room: string) => {
+			console.log('roomtest: ', room);
 		});
-		socket.on('paddleUpdate', ({ player1Y, y }) => {
-			setPlayer1Y(y);
-		});
-		return () => {
-			socket.disconnect();
-		};
-	}, []);
+		console.log('socket: ', socket);
+		// socket.on('responseKeys', (Player) => {
+		// 	console.log('responseKeys: ', Player);
+		// 	setPlayer1X(Player);
+		// });
+		// animate();
+	}, [socket]);
 
-	useEffect(() => {
+	const updateBall = () => {
+		let { x, y, r, vx, vy } = ball;
+		const newX = x + vx;
+		const newY = y + vy;
+		if (newX - r <= 0 || newX + r >= width)	// wall collision
+			vx = -vx;
+		if (newY - r <= 0 || newY + r >= height)	// wall collision
+			vy = -vy;
+		if (newY + r >= player1X.y && newX >= player1X.x && newX <= player1X.x + player1X.width)	// player1 collision
+			vy = -Math.abs(vy);
+		if (newY - r <= player2X.y + player2X.height && newX >= player2X.x && newX <= player2X.x + player2X.width)	// player2 collision
+			vy = Math.abs(vy);
+		else if (newY + r >= player1X.y + player1X.height) {	// player1 score
+			setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
+			vx = -0.7;
+			vy = -0.7;
+			x = width / 2;
+			y = height / 2;
+		}
+		if (newY - r <= player2X.y) {	// player2 score
+			setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
+			vx = 0.7;
+			vy = 0.7;
+			x = width / 2;
+			y = height / 2;
+		}
+		setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
+	};
+
+	const draw = () => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
-			const context = canvas.getContext('2d');
-			if (context) {
-				context.beginPath();
-				context.fillStyle = '#000';
-				context.fillRect(0, 0, width, height);
-				context.fill();
-
-				const paddleWidth = 10;
-				const paddleHeight = 80;
-
-				context.fillStyle = '#fff';
-				context.fillRect(
-					20,
-					player1Y - paddleHeight / 2,
-					paddleWidth,
-					paddleHeight
-				);
-
-				context.fillStyle = '#fff';
-				context.fillRect(
-					width - paddleWidth - 20,
-					player2Y - (paddleHeight / 2),
-					paddleWidth,
-					paddleHeight
-				);
-
-				context.fillStyle = '#fff';
-				context.setLineDash([10, 10]);
-				context.strokeStyle = '#fff';
-				context.moveTo(width / 2, 0);
-				context.lineTo(width / 2, height);
-				context.stroke();
-
-				const ball = {
-					x: width / 2,
-					y: height / 2,
-					r: 10,
-					c: '#fff'
-				};
-				context.fillStyle = ball.c;
-				context.beginPath();
-				context.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true);
-				context.closePath();
-				context.fill();
+			ctx = canvas.getContext('2d');
+			if (ctx) {
+				ctx.beginPath();
+				ctx.fillStyle = '#000';
+				ctx.fillRect(0, 0, width, height);
+				ctx.fill();
+				// midline
+				ctx.setLineDash([10, 15]);
+				ctx.moveTo(0, height / 2);
+				ctx.lineTo(width, height / 2);
+				ctx.strokeStyle = '#fff';
+				ctx.stroke();
+				ctx.closePath();
+				// player
+				drawPlayer(player1X);
+				drawPlayer(player2X);
+				// ball
+				drawBall(ball);
 			}
 		}
-	}, [player1Y, player2Y, width, height]);
+	};
+
+	
+
 
 	useEffect(() => {
-		const handlekeyDown = (e: KeyboardEvent) => {
-			const movement = { playerId: 1, y: player1Y };
+		draw();
+	}, [player1X, player2X, ball]);
+	// const animate = () => {
+	// 	draw();
+	// 	updateBall();
+	// };
 
-			if (e.key === 'ArrowUp' && player1Y > 47) {
-				movement.y -= 10;
-			} else if (e.key === 'ArrowDown' && player1Y < height - 47) {
-				movement.y += 10;
-			}
-			mysocket.emit('move', movement);
-		};
-		window.addEventListener('keydown', handlekeyDown);
-		return () => {
-			window.removeEventListener('keydown', handlekeyDown);
-		};
-	}, [player1Y, mysocket]);
+	// useEffect(() => {
+	// 	let intervalId = setInterval(() => {
+	// 		animate();
+	// 	}, 1);
+	// 	return () => {
+	// 		clearInterval(intervalId);
+	// 	}
+	// }, [socket, ball, player1X, player2X]);
 
+	// setTimeout(() => {
+	// 	console.log('animate');
+	// animate();
+	// }, 1000 / 1000);
+
+	useEffect(() => {
+		window.addEventListener('keydown', (e) => {
+			const { key } = e;
+			console.log('key: ', key);
+			console.log(socket)
+			socket.emit('requesteKey', key, height, width, player1X);
+			socket.on('responseKeys', (Player) => {
+				console.log('responseKeys: ', Player);
+				console.log("hhhhhhhhhhhhhhhhhhhhh")
+				setPlayer1X(Player);
+				// drawPlayer(Player);
+			});
+		});
+
+		return () => window.removeEventListener('keydown', () => { });
+	}, [socket]);
 
 	return (
-		<PlayGround>
+		<PlayGround className=''>
 			<ScoreContainter>
-				<div className='score'>0</div>
-				<div className='score'>0</div>
+				<div className='score'>{score.player1}</div>
+				<div className='score'>{score.player2}</div>
 			</ScoreContainter>
 			<canvas ref={canvasRef} width={width} height={height} />
 		</PlayGround>
@@ -133,3 +214,90 @@ const PingPong = ({ width, height }: PingPongProps) => {
 }
 
 export default PingPong;
+
+
+// useEffect(() => {
+// 	window.addEventListener('mousemove', (e) => {
+// 		const { clientX, clientY } = e;
+// 		const canvas = canvasRef.current;
+// 		if (!canvas) return;
+// 		const rect = canvas.getBoundingClientRect();
+// 		const x = clientX - rect.left;
+// 		const y = clientY - rect.top;
+// 		if (y > 0 && x > 0 && y < height / 2 && x < width - 80) {
+// 			setPlayer2X((prev) => ({ ...prev, x }));
+// 		}
+// 		if (y > 0 && x > 0 && y > height / 2 && y < height && x < width - 80) {
+// 			setPlayer1X((prev) => ({ ...prev, x }));
+// 		}
+// 	});
+
+// 	return () => window.removeEventListener('mousemove', () => { });
+// }, []);
+
+
+	// useEffect(() => {
+	// 	//	initialize Game Menu
+	// 	if (canvasRef.current) {
+	// 		const canvas = canvasRef.current;
+	// 		ctx = canvas.getContext('2d');
+	// 		if (ctx) {
+	// 			ctx.beginPath();
+	// 			ctx.fillStyle = '#000';
+	// 			ctx.fillRect(0, 0, width, height);
+	// 			ctx.fill();
+	// 			// midline
+	// 			ctx.setLineDash([10, 10]);
+	// 			ctx.moveTo(0, height / 2);
+	// 			ctx.lineTo(width, height / 2);
+	// 			ctx.strokeStyle = '#fff';
+	// 			ctx.stroke();
+	// 			// draw players
+	// 			drawPlayer(player1X);
+	// 			drawPlayer(player2X);
+	// 			// draw ball
+	// 			drawBall(ball);
+	// 			const updateBall = () => {
+	// 				setBall((prev) => {
+	// 					const { x, y, r, vx, vy } = prev;
+	// 					const newX = x + vx;
+	// 					const newY = y + vy;
+	// 					if (newX < r || newX > width - r) {
+	// 						return {
+	// 							...prev,
+	// 							vx: -vx,
+	// 						};
+	// 					}
+	// 					if (newY < r || newY > height - r) {
+	// 						return {
+	// 							...prev,
+	// 							vy: -vy,
+	// 						};
+	// 					}
+	// 					return {
+	// 						...prev,
+	// 						x: newX,
+	// 						y: newY,
+	// 					};
+	// 				});
+	// 			};
+	// 			updateBall();
+	// 		}
+	// 		window.addEventListener('mousemove', (e) => {
+	// 			const { clientX, clientY } = e;
+	// 			const rect = canvas.getBoundingClientRect();
+	// 			const x = clientX - rect.left;
+	// 			const y = clientY - rect.top;
+	// 			if (y > 0 && x > 0 && y < height / 2 && x < width - 80) {
+	// 				setPlayer2X((prev) => ({ ...prev, x }));
+	// 			}
+	// 			if (y > 0 && x > 0 && y > height / 2 && y < height && x < width - 80) {
+	// 				setPlayer1X((prev) => ({ ...prev, x }));
+	// 			}
+	// 		});
+	// 		return () => {
+	// 			if (canvasRef.current)
+	// 				removeEventListener('mousemove', () => { });
+	// 		};
+	// 	}
+	// }, [player1X, player2X, ball]);

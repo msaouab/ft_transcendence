@@ -1,6 +1,10 @@
 // import { useState, useRef } from 'react'
-import PingPong from './Canvas';
-import styled from 'styled-components';
+import PingPong from "./Canvas";
+import styled from "styled-components";
+import { GameProvider, useAppContext } from "../../provider/GameProvider";
+import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import Cookies from "js-cookie";
 
 const CanvasContainer = styled.div`
 	display: flex;
@@ -9,12 +13,55 @@ const CanvasContainer = styled.div`
 	border: 1px solid red;
 `;
 
+//	joinRoom: (payload: { id: string; type: string; mode: string }) => void;
+//  leaveRoom: (payload: { id: string; type: string; mode: string }) => void;
+//	ball
+// 	player
+
 const Game = () => {
+	const { setTypeRoom, typeRoom } = useAppContext();
+	const [mysocket, setMySocket] = useState<Socket>();
+
+	const payload = {
+		type: typeRoom,
+		mode: "random",
+	};
+
+	useEffect(() => {
+		const socket = io("http://localhost:3000/game", {query: {userId: Cookies.get('id')}});
+		setMySocket(socket);
+		socket.on("connect", () => {
+			console.log(socket.id, "connected to server");
+			socket.emit("joinRoom", payload);
+		});
+		socket.on("disconnect", () => {
+			console.log(socket.id, "disconnected from server");
+			socket.emit("leaveRoom", payload);
+		});
+		socket.on("joinedRoom", (payload) => {
+			console.log("joinedRoom: ", payload);
+		});
+
+		return () => {
+			socket.disconnect();
+		};
+	}, []);
+
+	useEffect(() => {
+		const RoomType = localStorage.getItem("typeRoom");
+		if (RoomType) setTypeRoom(RoomType);
+	}, [typeRoom, mysocket]);
+	console.log("socket", mysocket);
+
 	return (
 		<CanvasContainer>
-			<PingPong width={1160} height={700} />
+			{mysocket ? (
+				<PingPong width={700} height={1000} socket={mysocket} />
+			) : (
+				<p>Loading...</p>
+			)}
 		</CanvasContainer>
-	)
-}
+	);
+};
 
-export default Game
+export default Game;

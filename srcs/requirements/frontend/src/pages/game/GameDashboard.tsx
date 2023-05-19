@@ -9,6 +9,8 @@ import AchivementImg1 from "../../assets/achivement1.png";
 import AchivementImg2 from "../../assets/achivement2.png";
 import PlayWithMe from "../../assets/playWithMe.png";
 import GameImg from "../../assets/gameImg.png";
+import { useContext } from "react";
+import { useAppContext } from "../../provider/GameProvider"
 
 const chalenger = [
   {
@@ -121,6 +123,13 @@ const GameCard = (props: GameCardProps) => {
 };
 
 const GameDashboard = () => {
+
+  const { setTypeRoom, typeRoom } = useAppContext();
+	const handleLinkClick = (table: string) => {
+		// localStorage.setItem("typeRoom", table);
+		setTypeRoom(table);
+	};
+
   return (
     <div className="flex    flex-col gap-5  h-full ">
       <div className="h-[30rem]  w-full flex gap-5 pt-5 ">
@@ -133,6 +142,7 @@ const GameDashboard = () => {
             <Link
               to="/game-type"
               className="  left flex-1 h-[80%] w-full flex flex-col justify-center items-center  cursor-pointer "
+              onClick={() => handleLinkClick("Round")}
             >
               <GameTypeCard
                 title="Round Table"
@@ -143,6 +153,7 @@ const GameDashboard = () => {
             <Link
               to="/game-type"
               className="left flex-1 h-[80%] w-full flex flex-col justify-center items-center cursor-pointer"
+              onClick={() => handleLinkClick("Time")}
             >
               <GameTypeCard
                 title="Timing Table"

@@ -47,6 +47,6 @@ import { AchvModule } from "./achievements/achv.module";
   ],
 
   controllers: [AppController, UserController, GameController],
-  providers: [AuthService, UserService, GameService],
+  providers: [AuthService, UserService],
 })
 export class AppModule {}

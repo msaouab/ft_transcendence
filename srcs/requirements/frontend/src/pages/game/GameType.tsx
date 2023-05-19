@@ -2,6 +2,7 @@ import React from "react";
 import GameImg from "../../assets/gameImg.png";
 import Avatar from "../../assets/avatar.png";
 import { Link } from "react-router-dom";
+import { useAppContext } from "../../provider/GameProvider"
 
 const Games = [
   {
@@ -51,13 +52,20 @@ const FreindCard = ({ img, name, points, rank }: any) => {
 };
 
 const GameType = () => {
+
+  const { setModeRoom, modeRoom } = useAppContext();
+	const handleModeGame = (benome: string) => {
+		// localStorage.setItem("typeRoom", benome);
+		setModeRoom(benome);
+	};
   return (
     <div className="h-full w-full  flex flex-col items-center ">
       <div className="game-type w-[60%] flex justify-between m-auto min-h-[25rem]">
         {Games.map((item) => (
           <Link
-			to={`/game/${item.id}`}
-		   className="w-[18rem]">
+			to={`/game/10`}
+		   className="w-[18rem]"
+       onClick={handleModeGame(item.name)}>
             <GameTypeCard
               title={item.name}
               description={item.name}
