@@ -100,17 +100,15 @@ export class GameGateway
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
 		if (data.x >= 0 && data.x <= data.width && data.y <= data.height && data.y >= data.height / 2) {
-			if (data.player1X.x >= data.x) {
-				data.player1X.x -= 10;
+			if (data.player1X.x - 10 >= data.x) {
+				data.player1X.x -= 7;
+				this.server.emit("responseMouse", data);
 			}
-			else if (data.player1X.x <= data.x) {
-				data.player1X.x += 10;
+			else if (data.player1X.x <= data.x && data.player1X.x + 80 <= data.width) {
+				data.player1X.x += 7;
+				this.server.emit("responseMouse", data);
 			}
-
-			// data.player1X.x = data.x;
-			console.log("key:", data.x, 'old_x:', data.player1X.x);
 		}
-		this.server.emit("responseMouse", data);
 	}
 
 	AvailableRoom(client: any, roomMap: any, payload: any): boolean {

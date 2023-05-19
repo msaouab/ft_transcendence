@@ -137,6 +137,13 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		}
 		setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
 	};
+	
+	useEffect(() => {
+		const intervalId = setInterval(() => {
+			updateBall();
+		}, 1000 / 60);
+		return () => clearInterval(intervalId);
+	}, [ball]);
 
 	const draw = () => {
 		if (canvasRef.current) {
@@ -163,23 +170,6 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		}
 	};
 
-	useEffect(() => {
-		draw();
-	}, [player1X, player2X, ball]);
-
-	// useEffect(() => {
-	// 	window.addEventListener('keydown', (e) => {
-	// 		const { key } = e;
-	// 		socket.emit('requesteKey', key, height, width, player1X);
-	// 		socket.on('responseKeys', (Player) => {
-	// 			console.log('responseKeys: ', Player);
-	// 			setPlayer1X(Player);
-	// 		});
-	// 	});
-
-	// 	return () => window.removeEventListener('keydown', () => { });
-	// }, [socket]);
-
 	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		const clientX = e.clientX;
 		const clientY = e.clientY;
@@ -188,7 +178,6 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		const rect = canvas.getBoundingClientRect();
 		const x = clientX - rect.left;
 		const y = clientY - rect.top;
-
 		// Send mouse coordinates to the backend
 		const data = {
 			x: x,
@@ -196,7 +185,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 			height: height,
 			width: width,
 			player1X: player1X,
-		}
+		};
 		// console.log("clientX: ", x, "clientY: ", y)
 		socket.emit("requesteMouse", data);
 		socket.on("responseMouse", (data) => {
@@ -207,20 +196,13 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	};
 
 	useEffect(() => {
-		socket.on("responseKeys", (data) => {
-			const newValue = data.newValue;
-		});
-		return () => {
-			socket.off("responseKeys");
-		};
-	}, []);
-
-	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
+		draw();
+		updateBall();
 		return () => {
 			document.removeEventListener("mousemove", handleMouseMove);
 		};
-	});
+	}, [player1X]);
 
 	return (
 		<PlayGround className="">
