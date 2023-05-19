@@ -100,15 +100,68 @@ export class GameGateway
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
 		if (data.x >= 0 && data.x <= data.width && data.y <= data.height && data.y >= data.height / 2) {
+			let oldX;
 			if (data.player1X.x - 10 >= data.x) {
 				data.player1X.x -= 7;
 				this.server.emit("responseMouse", data);
+				oldX = data.x;
 			}
 			else if (data.player1X.x <= data.x && data.player1X.x + 80 <= data.width) {
 				data.player1X.x += 7;
 				this.server.emit("responseMouse", data);
 			}
+			else if (data.x <= 40 && data.x >= oldX) {
+				data.player1X.x = 0;
+				this.server.emit("responseMouse", data);
+				oldX = data.x;
+			}
 		}
+	}
+
+	@SubscribeMessage("requesteBall")
+	async handleBall(client: Socket, data: any) {
+		const { ball, player1X, player2X, width, height, setScore } = data;
+		console.log("data:", ball);
+		// let { x, y, r, vx, vy } = ball;
+		const newX = ball.x + ball.vx;
+		const newY = ball.y + ball.vy;
+		if (newX - ball.r <= 0 || newX + ball.r >= width)
+			// wall collision
+			ball.vx = -ball.vx;
+		if (newY - ball.r <= 0 || newY + ball.r >= height)
+			// wall collision
+			ball.vy = -ball.vy;
+		if (
+			newY + ball.r >= player1X.y &&
+			newX >= player1X.x &&
+			newX <= player1X.x + player1X.width
+		)
+			// player1 collision
+			ball.vy = -Math.abs(ball.vy);
+		if (
+			newY - ball.r <= player2X.y + player2X.height &&
+			newX >= player2X.x &&
+			newX <= player2X.x + player2X.width
+		)
+			// player2 collision
+			ball.vy = Math.abs(ball.vy);
+		else if (newY + ball.r >= player1X.y + player1X.height) {
+			// player1 score
+			// setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
+			ball.vx = -2;
+			ball.vy = -2;
+			ball.x = width / 2;
+			ball.y = height / 2;
+		}
+		if (newY - ball.r <= player2X.y) {
+			// player2 score
+			// setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
+			ball.vx = 2;
+			ball.vy = 2;
+			ball.x = width / 2;
+			ball.y = height / 2;
+		}
+		this.server.emit("responseBall", ball);
 	}
 
 	AvailableRoom(client: any, roomMap: any, payload: any): boolean {

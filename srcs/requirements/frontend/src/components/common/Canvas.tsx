@@ -84,8 +84,8 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		y: height / 2,
 		r: 10,
 		c: "#fff",
-		vx: 0.7,
-		vy: 0.7,
+		vx: 2,
+		vy: 2,
 	});
 
 	useEffect(() => {
@@ -95,55 +95,59 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		socket.on("addRoom", (room: string) => {});
 	}, [socket]);
 
-	const updateBall = () => {
+	const updateBall = (ball: BallState) => {
 		let { x, y, r, vx, vy } = ball;
-		const newX = x + vx;
-		const newY = y + vy;
-		if (newX - r <= 0 || newX + r >= width)
-			// wall collision
-			vx = -vx;
-		if (newY - r <= 0 || newY + r >= height)
-			// wall collision
-			vy = -vy;
-		if (
-			newY + r >= player1X.y &&
-			newX >= player1X.x &&
-			newX <= player1X.x + player1X.width
-		)
-			// player1 collision
-			vy = -Math.abs(vy);
-		if (
-			newY - r <= player2X.y + player2X.height &&
-			newX >= player2X.x &&
-			newX <= player2X.x + player2X.width
-		)
-			// player2 collision
-			vy = Math.abs(vy);
-		else if (newY + r >= player1X.y + player1X.height) {
-			// player1 score
-			setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
-			vx = -0.7;
-			vy = -0.7;
-			x = width / 2;
-			y = height / 2;
-		}
-		if (newY - r <= player2X.y) {
-			// player2 score
-			setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
-			vx = 0.7;
-			vy = 0.7;
-			x = width / 2;
-			y = height / 2;
-		}
+		// const newX = x + vx;
+		// const newY = y + vy;
+		// if (newX - r <= 0 || newX + r >= width)
+		// 	// wall collision
+		// 	vx = -vx;
+		// if (newY - r <= 0 || newY + r >= height)
+		// 	// wall collision
+		// 	vy = -vy;
+		// if (
+		// 	newY + r >= player1X.y &&
+		// 	newX >= player1X.x &&
+		// 	newX <= player1X.x + player1X.width + ball.r
+		// )
+		// 	// player1 collision
+		// 	vy = -Math.abs(vy);
+		// if (
+		// 	newY - r <= player2X.y + player2X.height &&
+		// 	newX >= player2X.x &&
+		// 	newX <= player2X.x + player2X.width + ball.r
+		// )
+		// 	// player2 collision
+		// 	vy = Math.abs(vy);
+		// else if (newY + r >= player1X.y + player1X.height) {
+		// 	// player1 score
+		// 	setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
+		// 	vx = -2;
+		// 	vy = -2;
+		// 	x = width / 2;
+		// 	y = height / 2;
+		// }
+		// if (newY - r <= player2X.y) {
+		// 	// player2 score
+		// 	setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
+		// 	vx = 2;
+		// 	vy = 2;
+		// 	x = width / 2;
+		// 	y = height / 2;
+		// }
 		setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
+		socket.emit("requesteBall", ball, player1X, width, height);
 	};
-	
-	useEffect(() => {
-		const intervalId = setInterval(() => {
-			updateBall();
-		}, 100);
-		return () => clearInterval(intervalId);
-	}, [ball]);
+
+	// useEffect(() => {
+	// 	const intervalId = setInterval(() => {
+	// 		socket.on("responseBall", (ball: BallState) => {
+	// 			updateBall(ball);
+	// 			drawBall(ball);
+	// 		});
+	// 	}, 10);
+	// 	return () => clearInterval(intervalId);
+	// }, [ball]);
 
 	const draw = () => {
 		if (canvasRef.current) {
@@ -194,11 +198,30 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 			setPlayer1X(updatedPlayer1X);
 		});
 	};
+	useEffect(() => {
+		const dataObj = {
+			ball: ball,
+			player1X: player1X,
+			player2X: player2X,
+			width: width,
+			height: height,
+			setScore: setScore,
+		};
+		draw();
+		socket.emit("requesteBall", dataObj);
+		const intervalId = setInterval(() => {
+			socket.on("responseBall", (ball: BallState) => {
+				let { x, y, r, vx, vy } = ball;
+				setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
+				// updateBall(ball);
+				drawBall(ball);
+			});
+		}, 10);
+		return () => clearInterval(intervalId);
+	}, [player1X, player2X, ball]);
 
 	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
-		draw();
-		updateBall();
 		return () => {
 			document.removeEventListener("mousemove", handleMouseMove);
 		};
