@@ -29,6 +29,10 @@ const ChatListStyle = styled.div`
         height:  auto;
     }
 
+    @media (max-width: 768px) {
+        padding: 10px;
+    }
+
 `;
 
 const ChatListWrapperStyle = styled.div`

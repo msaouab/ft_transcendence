@@ -8,7 +8,11 @@ const ChatBoxStyle = styled.div`
     background: transparent;
     width: 100%;
     // height: ${(props) => props.size === 'small' ? '100%' : '90%'};
-    height: 100%;
+    // height: 100%;
+    height: 95%;
+   
+    
+    
     display: flex;
     flex-direction: column;
     background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
@@ -16,6 +20,7 @@ const ChatBoxStyle = styled.div`
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px; 
     @media (max-width: 768px) {
+        max-height: 74vh;
         padding: 10px;
     }
 `;
@@ -63,7 +68,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     const [totalMessages, setTotalMessages] = React.useState(0);
     const [state, setState] = React.useState(initialState);
     const { messages, hasMore, offset } = state;
-    let limit = 9;
+    let limit = 14;
 
 
     const getMessages = async (currentChat: any) => {

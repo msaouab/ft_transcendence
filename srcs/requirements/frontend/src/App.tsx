@@ -7,10 +7,8 @@ import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";
 import { useState } from "react";
-import { MdDoubleArrow } from "react-icons/md";
-// import { ReactComponent as SearchIcon } from '../src/assets/icons/searchIcon.svg'
+
 import LoginPage from "./pages/loginPage/LoginPage";
-import Profile from "./pages/user/Profile";
 import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
@@ -25,7 +23,7 @@ function App() {
     setTextColor(e.target.value);
   };
 
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  // const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
   // const L  inkStyle: string = " hover:bg-cyan-700 hover:text-white flex-1  text-center transition-all ease-linear duration-200 py-2 px-4 text-2xl "
 
@@ -64,6 +62,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="" element={<Layout />}>
+  
           <Route path="/home" element={<Home />} />
           <Route path="/profile" element={<Home />} />
           <Route path="/settings" element={<UserSettings />} />
@@ -71,8 +70,8 @@ function App() {
           <Route path="/game/10" element={<Game />} />
           <Route path="/chat" element={<Chat />} />
           {/* <Route path="/game" element={<Game />}> */}
-          {/* </Route> */}
-        </Route>
+          </Route>
+        {/* </Route> */}
       </Routes>
     </>
   );

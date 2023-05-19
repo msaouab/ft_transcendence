@@ -14,7 +14,7 @@
 
  - [ ] the dot , date thing doesn't work!!! do you understand that my friend!!!!
  - [x] when a surfing to another page and then back to chat a problem, messages disaparead
- 
+ - [ ] font doesn't seem to work
 
 
 # Notes

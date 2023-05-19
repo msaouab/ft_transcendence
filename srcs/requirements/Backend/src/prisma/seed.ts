@@ -2,14 +2,15 @@
 import { PrismaClient, User } from '@prisma/client'
 const prisma = new PrismaClient()
 import { createHash } from 'crypto';
-// {
-//     login: 'ren-nasr',
-//     email: 'ren-nasr@student.1337.ma',
-//     firstName: 'rida',
-//     lastName: 'ennasry',
-//     password: 'ren-nasr',
-// },
+
 const users = [
+    {
+            login: 'ren-nasr',
+            email: 'ren-nasr@student.1337.ma',
+            firstName: 'rida',
+            lastName: 'ennasry',
+            password: 'ren-nasr',
+        },
     {
         login: 'ichoukri',
         email: 'ichoukri@student.1337.ma',
@@ -27,21 +28,18 @@ const users = [
         email: 'ren-nasr@student.1337.ma',
         firstName: 'rida',
         lastName: 'ennasry',
-        password: 'ren-nasr'
     },
     {
         login: 'mbehhar',
         email: 'mbehhar@student.1337.ma',
         firstName: 'Mohamed',
         lastName: 'Behhar',
-        password: 'mbehhar',
     },
     {
         login: 'rbenjell',
         email: 'rbenjell@student.1337.ma',
         firstName: 'Reda',
         lastName: 'Benjelloun',
-        password: 'rbenjell',
     },
 ]
 
@@ -87,13 +85,13 @@ const messages = [
 
 
 
-class FriendshipInvites {
-    id: string;
-    sender_id: string;
-    receiver_id: string;
-    status: string;
-    created_at: Date;
-}
+// class FriendshipInvites {
+//     id: string;
+//     sender_id: string;
+//     receiver_id: string;
+//     status: string;
+//     created_at: Date;
+// }
 
 
 const getRoomId = async (senderId: string, receiverId: string) => {
@@ -138,25 +136,26 @@ async function main() {
             data: user,
         })
 
-
-        // add id to users arr 
-        await prisma.channel.create({
-            data: {
-                name: `channel-${Math.floor(Math.random() * 100)}`,
-                chann_type: 'Public',
-                owner_id: userCreate.id,
-                limit_members: 10,
-            },
-        })
-
-        console.log(`Created user with id: ${userCreate.id}`)
     }
 
-    let user = await prisma.user.findUnique({
-        where: {
-            login: 'ren-nasr',
-        },
-    })
+    //     // add id to users arr 
+    //     await prisma.channel.create({
+    //         data: {
+    //             name: `channel-${Math.floor(Math.random() * 100)}`,
+    //             chann_type: 'Public',
+    //             owner_id: userCreate.id,
+    //             limit_members: 10,
+    //         },
+    //     })
+
+    //     console.log(`Created user with id: ${userCreate.id}`)
+    // }
+
+    // let user = await prisma.user.findUnique({
+    //     where: {
+    //         login: 'ren-nasr',
+    //     },
+    // })
 
 
 
@@ -166,7 +165,7 @@ async function main() {
     // creating 10 private chat rooms two rooms for each user, each rooms should have ren-nasr as a member
     // then at each room we create 50 messages, while selecting a random user to be the sender or the receiver from the room members
     // for (let i = 0; i < 5; i++) {
-    let newArr = users.filter((user) => user.login !== 'ren-nasr')
+    // let newArr = users.filter((user) => user.login !== 'ren-nasr')
     let user1 = await prisma.user.findUnique({
         where: {
             // login: newArr[i].login,
@@ -175,11 +174,11 @@ async function main() {
     })
 
 
-    // while (user1.login === 'ren-nasr') {
-    //     user1 = await getRandomUser(    
-    // }
+    // // while (user1.login === 'ren-nasr') {
+    // //     user1 = await getRandomUser(    
+    // // }
 
-    // user 2 should be ren-nasr
+    // // user 2 should be ren-nasr
 
     const user2 = await prisma.user.findUnique({
         where: {
@@ -187,6 +186,8 @@ async function main() {
         },
     })
 
+    console.log(user1)
+    console.log(user2)
     const privateChatRoom = await prisma.privateChatRoom.create({
         data: {
             id: await getRoomId(user1.id, user2.id),
@@ -194,7 +195,7 @@ async function main() {
 
         },
     })
-    console.log(`Created private chat room with id: ${privateChatRoom.id}`)
+    // console.log(`Created private chat room with id: ${privateChatRoom.id}`)
     for (let j = 0; j < 50; j++) {
         let sender = Math.random() >= 0.5 ? user1 : user2
         let receiver = sender.id === user1.id ? user2 : user1

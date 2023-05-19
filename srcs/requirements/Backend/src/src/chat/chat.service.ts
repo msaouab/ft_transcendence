@@ -270,10 +270,6 @@ export class ChatService {
                 id: await this.getRoomId(senderId, receiverId)
             }
         });
-        if (!privatChatRoom) {
-            throw new HttpException("Private chat doesn't exist", 404);
-        }
-        
         return privatChatRoom;
     }
 

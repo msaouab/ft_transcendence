@@ -25,8 +25,10 @@ const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: a
                         const prevMessage = messages[messages.indexOf(message) - 1];
                         
                         // change the key to the message id later it's the problem
-                        return <Message key={Math.random()
-                        } message={message} prevMessage={prevMessage} setState={setState} />;
+                        return <Message 
+                        // key={Math.random()} 
+                        key={message.id}
+                        message={message} prevMessage={prevMessage} setState={setState} />;
                     })}
             </InfiniteScroll>
 

@@ -10,7 +10,7 @@ const ChatStyle = Styled.div`
   flex-direction: row;
   height: 100%;
   width: 100%;
-
+  max-height: 100vh;
   justify-content: flex-start;  
 
   .chat-list {
@@ -28,16 +28,16 @@ const ChatStyle = Styled.div`
 
   @media screen and (max-width: 766px) {
     height: 100%;
+    max-height: 100vh;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
     padding-right: 30px;
     padding-bottom: 10px;
     @media screen and (min-width: 720px) and (max-width: 770px) {
       padding-left: 30px;
     } 
     .chat-list {
+
       width: 100%;
       height: auto;
       max-height: 40%;

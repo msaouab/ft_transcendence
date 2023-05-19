@@ -34,7 +34,6 @@
 
 body {
   font-family: 'Oxanium', cursive;
-  // font-family: 'Ubuntu', sans-serif;
   // background-color: var(--backColor);
 }
 
@@ -45,6 +44,8 @@ body {
   max-width: 100%;
   // position: fixed;
   min-height: 100vh;
+  max-height: 100vh;
+  overflow-x: hidden !important;
 
 
 }

@@ -107,6 +107,7 @@ export class BlockedUsersService {
                 throw new Error("Failed to update private chatroom");
             }
         }
+        return block;
     }
 
 }
