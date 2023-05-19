@@ -100,13 +100,13 @@ export class GameGateway
 	@SubscribeMessage("requesteKey")
 	async handleKey(client: Socket, key: any) {
 		console.log("key:", key[0], key[1], key[2], key[3])
-		if (key[0] === 'ArrowLeft' && key[3].x >= 0) {
+		if (key[0] === 'ArrowLeft' && key[3].x >= 12) {
 			console.log('left', key[3].x);
 			key[3].x -= 10;
 			console.log("key:", key[3].x);
 			this.server.emit("responseKeys", key[3]);
 		}
-		else if (key[0] === 'ArrowRight' && key[3].x <= key[2] - 80) {
+		else if (key[0] === 'ArrowRight' && key[3].x <= key[2] - 90) {
 			console.log('right', key[3].x);
 			key[3].x += 10;
 			console.log("key:", key[3].x);
