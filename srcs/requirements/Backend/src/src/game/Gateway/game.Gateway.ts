@@ -97,23 +97,20 @@ export class GameGateway
 		console.log("WebSocket server initialized");
 	}
 	// key: { width: 80, height: 10, x: 310, y: 980 }
-	@SubscribeMessage("requesteKey")
-	async handleKey(client: Socket, key: any) {
-		console.log("key:", key[0], key[1], key[2], key[3])
-		if (key[0] === 'ArrowLeft' && key[3].x >= 12) {
-			console.log('left', key[3].x);
-			key[3].x -= 10;
-			console.log("key:", key[3].x);
-			this.server.emit("responseKeys", key[3]);
+	@SubscribeMessage("requesteMouse")
+	async handleKey(client: Socket, data: any) {
+		if (data.x >= 0 && data.x <= data.width && data.y <= data.height && data.y >= data.height / 2) {
+			if (data.player1X.x >= data.x) {
+				data.player1X.x -= 10;
+			}
+			else if (data.player1X.x <= data.x) {
+				data.player1X.x += 10;
+			}
+
+			// data.player1X.x = data.x;
+			console.log("key:", data.x, 'old_x:', data.player1X.x);
 		}
-		else if (key[0] === 'ArrowRight' && key[3].x <= key[2] - 90) {
-			console.log('right', key[3].x);
-			key[3].x += 10;
-			console.log("key:", key[3].x);
-			this.server.emit("responseKeys", key[3]);
-		}
-		else
-		return;
+		this.server.emit("responseMouse", data);
 	}
 
 	AvailableRoom(client: any, roomMap: any, payload: any): boolean {

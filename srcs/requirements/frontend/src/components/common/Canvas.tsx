@@ -180,12 +180,29 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	// 	return () => window.removeEventListener('keydown', () => { });
 	// }, [socket]);
 
-	const handleKeyPress = (e: KeyboardEvent) => {
-		const { key } = e;
-		socket.emit("requesteKey", key, height, width, player1X);
-		socket.on("responseKeys", (Player) => {
-			console.log("responseKeys: ", Player);
-			setPlayer1X(Player);
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		const clientX = e.clientX;
+		const clientY = e.clientY;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const rect = canvas.getBoundingClientRect();
+		const x = clientX - rect.left;
+		const y = clientY - rect.top;
+
+		// Send mouse coordinates to the backend
+		const data = {
+			x: x,
+			y: y,
+			height: height,
+			width: width,
+			player1X: player1X,
+		}
+		// console.log("clientX: ", x, "clientY: ", y)
+		socket.emit("requesteMouse", data);
+		socket.on("responseMouse", (data) => {
+			console.log("responseMouse: ", data.x);
+			const updatedPlayer1X = data.player1X;
+			setPlayer1X(updatedPlayer1X);
 		});
 	};
 
@@ -199,9 +216,9 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	}, []);
 
 	useEffect(() => {
-		document.addEventListener("keydown", handleKeyPress);
+		document.addEventListener("mousemove", handleMouseMove);
 		return () => {
-			document.removeEventListener("keydown", handleKeyPress);
+			document.removeEventListener("mousemove", handleMouseMove);
 		};
 	});
 
