@@ -141,7 +141,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	useEffect(() => {
 		const intervalId = setInterval(() => {
 			updateBall();
-		}, 1000 / 60);
+		}, 100);
 		return () => clearInterval(intervalId);
 	}, [ball]);
 
