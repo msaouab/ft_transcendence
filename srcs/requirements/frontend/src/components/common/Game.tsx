@@ -1,7 +1,7 @@
 // import { useState, useRef } from 'react'
 import PingPong from "./Canvas";
 import styled from "styled-components";
-import { GameProvider, useAppContext } from "../../provider/GameProvider";
+import { useAppContext } from "../../provider/GameProvider";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
@@ -19,12 +19,13 @@ const CanvasContainer = styled.div`
 // 	player
 
 const Game = () => {
-	const { setTypeRoom, typeRoom } = useAppContext();
+	const { setTypeRoom, typeRoom, setModeRoom, modeRoom } = useAppContext();
 	const [mysocket, setMySocket] = useState<Socket>();
 
+	console.log("typeRoom1", typeRoom, "modeRoom1", modeRoom)
 	const payload = {
 		type: typeRoom,
-		mode: "random",
+		mode: modeRoom,
 	};
 
 	useEffect(() => {
@@ -49,7 +50,11 @@ const Game = () => {
 
 	useEffect(() => {
 		const RoomType = localStorage.getItem("typeRoom");
+		const RoomMode = localStorage.getItem("modeRoom");
 		if (RoomType) setTypeRoom(RoomType);
+		if (RoomMode) setModeRoom(RoomMode);
+
+		console.log("typeRoom", typeRoom, "modeRoom", modeRoom);
 	}, [typeRoom, mysocket]);
 	console.log("socket", mysocket);
 

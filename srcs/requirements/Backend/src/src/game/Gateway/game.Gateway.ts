@@ -99,13 +99,14 @@ export class GameGateway
 	// key: { width: 80, height: 10, x: 310, y: 980 }
 	@SubscribeMessage("requesteKey")
 	async handleKey(client: Socket, key: any) {
-		if (key[0] === 'ArrowLeft' && key[3].x >= 0 && key[3].x <= key[2]) {
+		console.log("key:", key[0], key[1], key[2], key[3])
+		if (key[0] === 'ArrowLeft' && key[3].x >= 0) {
 			console.log('left', key[3].x);
 			key[3].x -= 10;
 			console.log("key:", key[3].x);
 			this.server.emit("responseKeys", key[3]);
 		}
-		else if (key[0] === 'ArrowRight' && key[3].x >= 0 && key[3].x <= key[2]) {
+		else if (key[0] === 'ArrowRight' && key[3].x <= key[2] - 80) {
 			console.log('right', key[3].x);
 			key[3].x += 10;
 			console.log("key:", key[3].x);
@@ -134,9 +135,6 @@ export class GameGateway
 						value.mode = payload.mode;
 					}
 					client.join(key);
-					this.IPlayer.roomId = key;
-					this.IPlayer.player2.id = client.handshake.query.userId.toString();
-					this.IPlayer.player2.name = client.handshake.query.userName.toString();
 					this.server.emit("joinedRoom", key, this.IPlayer);
 					this.CreateRoom(value.player1.id, value.player2.id, value.type, value.mode);
 					AvailableRoom = false;
@@ -150,6 +148,7 @@ export class GameGateway
 	async handleJoinRoom(client: Socket, payload: any) {
 		let avialableRoom: boolean = this.AvailableRoom(client, this.roomMap, payload);
 		console.log("avialableRoom:", avialableRoom);
+		console.log("payload:", payload);
 		if (avialableRoom && payload.type && payload.mode) {
 			console.log('payload:', payload);
 			const key = createHash("sha256").update(Date.now().toString()).digest("hex");

@@ -55,24 +55,27 @@ const GameType = () => {
 
   const { setModeRoom, modeRoom } = useAppContext();
 	const handleModeGame = (benome: string) => {
-		// localStorage.setItem("typeRoom", benome);
+    localStorage.setItem("typeRoom", benome);
 		setModeRoom(benome);
 	};
   return (
     <div className="h-full w-full  flex flex-col items-center ">
       <div className="game-type w-[60%] flex justify-between m-auto min-h-[25rem]">
-        {Games.map((item) => (
+        {Games.map(item =>
           <Link
-			to={`/game/10`}
-		   className="w-[18rem]"
-       onClick={handleModeGame(item.name)}>
-            <GameTypeCard
-              title={item.name}
-              description={item.name}
-              imgPath={GameImg}
-            />
-          </Link>
-        ))}
+          key={item.id}
+          to={`/game/10`}
+          className="w-[18rem]"
+          onClick={() => handleModeGame(item.name)}
+        >
+          <GameTypeCard
+            title={item.name}
+            description={item.name}
+            imgPath={GameImg}
+            key={item.id}
+          />
+        </Link>
+        )}
       </div>
       <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
         <div className="border rounded-2xl flex-1 p-4 h-full">

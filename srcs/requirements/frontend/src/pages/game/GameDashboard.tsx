@@ -124,9 +124,9 @@ const GameCard = (props: GameCardProps) => {
 
 const GameDashboard = () => {
 
-  const { setTypeRoom, typeRoom } = useAppContext();
+  const { setTypeRoom } = useAppContext();
 	const handleLinkClick = (table: string) => {
-		// localStorage.setItem("typeRoom", table);
+		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);
 	};
 
