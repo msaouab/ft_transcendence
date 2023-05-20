@@ -59,7 +59,6 @@ input:focus {
     }
     opacity: 0.5;
 }
-
     @media (max-width: 768px) {
 
         width: 40px;
@@ -69,9 +68,6 @@ input:focus {
         background-color: white;
         font-weight: bold;
         input {
-
-    
-
             width: 100%;
             &::placeholder {
                 opacity: 0;
@@ -90,11 +86,7 @@ input:focus {
         .shortcuts-icons {
             display: none;
         }
-
-
     }
-
-
 
 `;
 
@@ -155,7 +147,6 @@ const SearchBar = () => {
         setTmpChatData(user);
     }
 
-
     // connection to websocket
     let socket = useRef<any>(null);
 
@@ -169,7 +160,7 @@ const SearchBar = () => {
 
 
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
-            socket.current = io('http://localhost:3000/search');
+            socket.current = io(`http://localhost:3000/search`);
 
             socket.current.on('connect', () => {
                 setSearchConnected(true);
@@ -289,19 +280,19 @@ const SearchBar = () => {
                                     <div className="search-results">
                                         {
                                             searchResults['users'] && searchResults['users'].length > 0 ? (
-                                                <div className="search-results-header flex flex-row items-center w-full">
-                                                    <h1 className="text-base font-bold text-zinc-800 w-9/12 text-left justify-between" > People</h1>
-                                                    <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                                        <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4" >See more</a>
+                                                <div className="search-results-header flex flex-row items-center w-full justify-between">
+                                                    <h1 className="text-base font-bold text-zinc-800 w-auto text-left justify-between" > People</h1>
+                                                    <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900 w-auto">
+                                                        <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline mr-1 " >See more</a>
                                                     </div>
                                                 </div>
 
                                             ) : null
                                         }
                                         {
-                                            searchResults['users'] && searchResults['users'].map((user: any) => {
+                                            searchResults['users'] && searchResults['users'].map((user: any, index: number) => {
                                                 return (
-                                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg">
+                                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
                                                                 {/* change later */}
@@ -334,19 +325,19 @@ const SearchBar = () => {
                                         }
                                         {
                                             searchResults['channels'] && searchResults['channels'].length > 0 ? (
-                                                <div className="search-results-header mt-3 flex flex-row items-center w-ful justify-between">
+                                                <div className="search-results-header mt-3 flex flex-row items-center w-full justify-between">
                                                     <h1 className='text-base font-bold text-zinc-800 w-9/12 text-left' >Channels</h1>
 
                                                     <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                                        <Link to={`/search?entity=channels&keyword=${search}`} className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4" >See more</Link>
+                                                        <Link to={`/search?entity=channels&keyword=${search}`} className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-1" >See more</Link>
                                                     </div>
                                                 </div>
                                             ) : null
                                         }
                                         {
-                                            searchResults['channels'] && searchResults['channels'].map((channel: any) => {
+                                            searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
                                                 return (
-                                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg">
+                                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
                                                                 <div className="search-result-avatar">

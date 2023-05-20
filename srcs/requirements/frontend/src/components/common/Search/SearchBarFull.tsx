@@ -164,7 +164,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
         }
         if ((fullScreenDropdown) && !searchConnected) {
             // console.log("connecting");
-            socket.current = io('http://localhost:3000/search');
+            socket.current = io(`http://localhost:3000/search`);
             socket.current.on('connect', () => {
                 setSearchConnected(true);
                 // console.log("connected");
@@ -275,11 +275,11 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                         }
                         {
 
-                            searchResults['users'] && searchResults['users'].map((user: any) => {
+                            searchResults['users'] && searchResults['users'].map((user: any, index: number) => {
                                 return (
 
-                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg">
-                                        <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
+                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
+                                        <div className="search-result-avatar w-full flex flex-row rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                             <Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
                                                 {/* change later */}
                                                 {/* <img src={user.avatar} alt="avatar" /> */}
@@ -296,7 +296,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                                                         >{user.firstName} {user.lastName}</p>
                                                     </div>
                                                 </div>
-                                                { user.id === Cookies.get('id') ? null :
+                                                
+                                            </Link>
+                                            { user.id === Cookies.get('id') ? null :
 
                                                     <div className="chat-button flex justify-center items-center mr-1">
                                                     <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={
@@ -311,7 +313,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 
                                                 </div>
                                                 }
-                                            </Link>
                                         </div>
                                     </div>
                                 )
@@ -339,10 +340,10 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                             ) : null
                         }
                         {
-                            searchResults['channels'] && searchResults['channels'].map((channel: any) => {
+                            searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
                                 return (
 
-                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg">
+                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                             <Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
                                                 <div className="search-result-avatar">

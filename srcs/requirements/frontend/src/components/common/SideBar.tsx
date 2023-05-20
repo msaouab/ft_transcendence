@@ -74,7 +74,9 @@ const SideBar = () => {
           })
           .catch((error) => {
             if (error.response.status == 401 || error.response.status == 403) {
+              console.log("url: ", error.response.config.url);
               navigate("/login");
+              
             }
           });
       } catch (error) {
@@ -87,6 +89,7 @@ const SideBar = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
+
           if (error.response.status == 401) {
             navigate("/login");
           }

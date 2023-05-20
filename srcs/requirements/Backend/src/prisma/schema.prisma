@@ -134,8 +134,9 @@ model BlockTab {
   user_id        String
   user           User   @relation("blockTabRelation", fields: [user_id], references: [id])
   blockedUser_id String
-
-  @@unique([user_id, blockedUser_id])
+  uuid           String @unique  @default(uuid())
+  // we need to change the blocktab pk , as a user can block user while he is blocked by him
+  
 }
 
 model ChannelsJoinTab {

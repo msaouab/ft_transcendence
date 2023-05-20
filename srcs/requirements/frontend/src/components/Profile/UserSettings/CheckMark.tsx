@@ -18,7 +18,7 @@ function CheckMark() {
     };
     axios
       .put(
-        "http://localhost:3000/api/v1/user/" +
+        `http://localhost:3000/api/v1/user/` +
           Cookies.get("userid") +
           "/2fa" +
           "?IsActive=" +

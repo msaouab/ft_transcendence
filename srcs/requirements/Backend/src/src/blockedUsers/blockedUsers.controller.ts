@@ -22,6 +22,8 @@ export class BlockedUsersController {
 
     @Get(":id/blockedusers")
     async getBlockedUsers(@Param('id') id: string) {
+        console.log("getBlockedUsers");
+
         const blockedUsers = await this.BlockedUsersService.getBlockedUsers(id);
         return blockedUsers;
     }
@@ -33,13 +35,10 @@ export class BlockedUsersController {
         return blockedUsers;
     }
 
-    @Delete(":id/blockedusers")
-    async deleteBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
-        console.log("deleteBlockedUsers");
-
-        console.log(BlockedUserDto);
-        const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(BlockedUserDto, id);
-        return blockedUsers;
+    @Delete(":id/blockedusers/:idBlockedUser")
+    async deleteBlockedUsers(@Param('id') id: string, @Param('idBlockedUser') blockedUserId: string) {
+        const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(id, blockedUserId);
+        return blockedUsers
         // console.log("deleteBlockedUsers");
         // console.log(BlockedUserDto);
     }

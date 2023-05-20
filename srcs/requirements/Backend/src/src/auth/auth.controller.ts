@@ -18,10 +18,11 @@ export class AuthController {
 
   @Get('42/return')
   @UseGuards(FtOauthGuard)
+  // make the redirect url dynamic
   @Redirect('http://localhost:5173/home')
+  // @Redirect(`${process.env.FRONTEND_URL}/home`)
   ftAuthCallback(@User() user: Profile, @Res() res: Response) {
     return this.authService.login(user, res);
-  
   }
 
 

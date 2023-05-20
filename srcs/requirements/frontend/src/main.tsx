@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
 import axios from "axios";
-import App from "./App.tsx";
 import "./index.scss";
+import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
 import { AppProvider } from "./provider/AppContext.tsx";
 

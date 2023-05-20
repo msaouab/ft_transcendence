@@ -17,11 +17,15 @@ export class BlockedUsersService {
 
     async getBlockedUsers(id: string): Promise<BlockTab[]> {
         await this.UserService.getUser(id);
-        return await this.prisma.blockTab.findMany({
+        const blocks = await this.prisma.blockTab.findMany({
             where: {
                 user_id: id,
+
             },
         });
+        console.log('blocks :>> ', blocks);
+        return blocks;
+
     }
 
     async getRoomId(senderId: string, receiverId: string): Promise<string> {
@@ -73,22 +77,43 @@ export class BlockedUsersService {
     }
 
 
-    async deleteBlockedUser(BlockedUserDto: BlockedUserDto, id: string): Promise<BlockTab> {
+    async deleteBlockedUser(id: string, blockedUserId: string): Promise<BlockTab> {
+        console.log("The blocker is : ", id);
+        console.log("The blocked is : ", blockedUserId);
+        if (!id || !blockedUserId) {
+            throw new Error("Missing id or blockedUserId");
+        }
+        if (id === blockedUserId) {
+            throw new Error("you want to unblock yourself? try a rope");
+        }
         await this.UserService.getUser(id);
-        await this.UserService.getUser(BlockedUserDto.blockedUser_id);
-        const block =  await this.prisma.blockTab.delete({
+        await this.UserService.getUser(blockedUserId);
+        // if the user is not the blocker 
+        // const key = id + blockedUserId + '1'
+        const blockTab = await this.prisma.blockTab.findFirst({
             where: {
-                user_id_blockedUser_id: {
-                    user_id: id,
-                    blockedUser_id: BlockedUserDto.blockedUser_id,
-                },
+                AND: [
+                    { user_id: id },
+                    { blockedUser_id: blockedUserId },
+                ],
             },
         });
+
+        if (!blockTab) {
+            throw new Error("You are not blocking this user");
+        }
+
+        const block =  await this.prisma.blockTab.delete({
+            where: {
+                uuid: blockTab.uuid,
+            },
+        });
+        
         if (!block) {
             throw new Error("Failed to unblock user");
         }
         // update private chatroom if ex
-        const roomName = await this.getRoomId(id, BlockedUserDto.blockedUser_id);
+        const roomName = await this.getRoomId(id, blockedUserId);
         const room = await this.prisma.privateChatRoom.findUnique({
             where: {
                 id: roomName,

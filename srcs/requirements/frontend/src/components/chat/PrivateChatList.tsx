@@ -25,7 +25,10 @@ const UsersChatListStyle = styled.div`
 
 const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
     // privatChatroom context
+
+
     const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
+    const [selected, setSelected] = useState<string>('');
 
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
@@ -48,7 +51,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                 let user;
                 try {
                     if (message.data[0] === 0) return;
-
                     user = await getUser(message.data[1][0].sender_id, message.data[1][0].receiver_id)
 
                 } catch (error) {
@@ -69,7 +71,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     blocked: room.blocked, 
                     status: user.status
                 }
-
                 Tabs.push(data);
             }));
             // filter tabs by date
@@ -85,8 +86,8 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
     }
 
     useEffect(() => {
-        getPrivateChats('5', '1')
-        // 
+        getPrivateChats('5', '1');
+ 
     }, []);
 
 
@@ -104,9 +105,10 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
 
     useEffect(() => {
         privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
+        setSelected(privateChatRooms[0]?.chatRoomid);
     }, [privateChatRooms])
 
-    const [selected, setSelected] = useState<string>('');
+    
     return (
         <UsersChatListStyle >
             <div className='flex justify-between'>
@@ -140,8 +142,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                                     else show the normal style
 
                                      */}
-                                     
-                                    
                                     <ChatTab privateMessage={props} key={props.chatRoomid} selected={props.chatRoomid === selected} />
                                     {/* <ChatTab privateMessage={props} key={props.chatRoomid} selected={false} /> */}
                                     {/* seperator should show under all compontes excpet the last one */}

@@ -8,8 +8,7 @@ const users = [
             login: 'ren-nasr',
             email: 'ren-nasr@student.1337.ma',
             firstName: 'rida',
-            lastName: 'ennasry',
-            password: 'ren-nasr',
+            lastName: 'ennasry'  
         },
     {
         login: 'ichoukri',

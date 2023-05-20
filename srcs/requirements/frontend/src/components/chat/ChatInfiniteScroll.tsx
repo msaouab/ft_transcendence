@@ -6,8 +6,8 @@ import Message from "./Message/Message";
 const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: any, next: any, hasMore: any, setState: any }) => {
 
     return (
-        <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full" id="scrollableDiv">
-            <InfiniteScroll
+        <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full max-h-[100%]" id="scrollableDiv">
+            <InfiniteScroll className=" "
                 // key={selectedChat.chatRoomid}
                 scrollableTarget="scrollableDiv"
                 dataLength={messages.length} //This is important field to render the next data

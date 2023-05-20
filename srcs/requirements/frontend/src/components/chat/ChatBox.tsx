@@ -7,11 +7,7 @@ import Cookies from 'js-cookie';
 const ChatBoxStyle = styled.div`
     background: transparent;
     width: 100%;
-    // height: ${(props) => props.size === 'small' ? '100%' : '90%'};
-    // height: 100%;
-    height: 95%;
-   
-    
+    height: ${(props) => props.size === 'small' ? '100%' : '95%'};
     
     display: flex;
     flex-direction: column;
@@ -21,6 +17,7 @@ const ChatBoxStyle = styled.div`
     padding: 20px; 
     @media (max-width: 768px) {
         max-height: 74vh;
+        // height: 100%;
         padding: 10px;
     }
 `;
@@ -68,13 +65,14 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     const [totalMessages, setTotalMessages] = React.useState(0);
     const [state, setState] = React.useState(initialState);
     const { messages, hasMore, offset } = state;
-    let limit = 14;
+    let limit = 16;
 
 
     const getMessages = async (currentChat: any) => {
         if (!selectedChat.chatRoomid) {
             return [];
         } 
+        // making the url dynamic
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         return responseMessages.data[1];
@@ -92,6 +90,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     };
 
     useEffect(() => {
+        console.log("a new chat was selected with id", selectedChat.chatRoomid);
         getMessages(selectedChat).then((messages) => {
             if (messages.length == 0
                 || (messages[0] && selectedChat.chatRoomid !== messages[0].chatRoom_id)) {
@@ -109,6 +108,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     offset: prevState.offset + messages.length,
                     hasMore: true,
                 }));
+                console.log("messages", messages);
             }
 
         });
@@ -135,7 +135,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                                 <div className='h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60'></div>
                             </div>
                             <ChatInfiniteScroll messages={messages} next={next} hasMore={hasMore} setState={setState} />
-                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} size={size} />
+                            <SendMessageBox selectedChat={selectedChat} socket={chatSocket} connected={connected} setNewLatestMessage={setNewLatestMessage} size={size}/>
                         </>
                     )
             }

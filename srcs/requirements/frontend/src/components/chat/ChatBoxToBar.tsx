@@ -66,16 +66,48 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
         actionName: "Delete",
         confirm: () => handleDeleteChat(props.chatRoomId),
     }
-    console.log("props: ", props.blocked);
+    // update the state when the user is blocked 
 
+    // console.log("props: ", props.blocked);
+    const [UserIsBlocker, setUserIsBlocker] = useState(false);
 
-
+``
+    
     const {setPrivateChatRooms} = useGlobalContext();
     const [showConfirm, setshowConfirm] = useState(confirmData);
     const [showMore, setShowMore] = useState(false);
 
 
     const menuRef = useRef(null);
+
+    useEffect(() => {
+        // getting request to check if the user is blocked
+        if (!props.blocked) {
+            return;
+        }
+
+        axios.get(`http://localhost:3000/api/v1/user/${Cookies.get('id')}/blockedusers`,
+            { withCredentials: true }
+        )
+            .then(res => {
+                console.log("blocked users: ", res.data);
+                for (let i = 0; i < res.data.length; i++) {
+                    if (res.data[i].blockedUser_id === props.id) {
+                        setUserIsBlocker(true);
+                        console.log("user is a blocker");
+                        return;
+                    }
+                }
+                console.log("user is not a blocker");
+                setUserIsBlocker(false);
+            })
+            .catch(err => {
+                console.log("error getting blocked users: ", err);
+            })
+    }, [])
+
+
+                
     useEffect(() => {
         // console.log("clicked outside");
         const handleClickOutside = (e: any) => {
@@ -92,13 +124,13 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
 
 
+
     const handleDeleteChat = (chatRoomId: string) => {
         axios.delete(`http://localhost:3000/api/v1/chatrooms/private/${chatRoomId}`,
             { withCredentials: true }
         )
             .then(res => {
                 setshowConfirm({ ...showConfirm, show: false });
-                // const newPrivateChatRooms = 
                 setPrivateChatRooms((prev: any) => {
                     return prev.filter((chatRoom: any) => {
                         return chatRoom.chatRoomid !== res.data.id;
@@ -113,10 +145,8 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
     const handleBlockUser = () => {
         const meId = Cookies.get("id");
         const blockedUserId = props.id;
-        
         console.log("meId: ", meId);
         console.log("blockedUserId: ", blockedUserId);
-
         axios.post(`http://localhost:3000/api/v1/user/${meId}/blockedusers/`,     
         {
             blockedUser_id: blockedUserId,
@@ -125,34 +155,47 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             .then(res => {
                 console.log("blocked user: ", res);
                 setshowConfirm({ ...showConfirm, show: false });
-                window.location.href = "/chat";
+                setPrivateChatRooms((prev: any) => {
+                   // set blocked to true
+                    return prev.map((chatRoom: any) => {
+                        if (chatRoom.chatRoomid === props.chatRoomId) {
+                            return { ...chatRoom, blocked: true };
+                        }
+                        return chatRoom;
+                    })})
+                setUserIsBlocker(true);
             })
             .catch(err => {
                 console.log("error blocking user: ", err);
             })
-
     }
 
     const handleUnblockUser = () => {
-      
-        // const meId = Cookies.get("id");
-        // const blockedUserId = props.id;
-        // axios.delete(`http://localhost:3000/api/v1/user/${meId}/blockedusers/`,
-        //     {
-        //         data: {
-        //             blockedUser_id: blockedUserId,
-        //             withCredentials: true
-        //         }
-        //     })
+        const meId = Cookies.get("id");
+        const blockedUserId = props.id;
+        axios.delete(`http://localhost:3000/api/v1/user/${meId}/blockedusers/${blockedUserId}`,
+            {
+                    withCredentials: true
+            })
 
-        //     .then(res => {
-        //         console.log("unblocked user: ", res);
-        //         setshowConfirm({ ...showConfirm, show: false });
-        //         window.location.href = "/chat";
-        //     })
-        //     .catch(err => {
-        //         console.log("error unblocking user: ", err);
-        //     })
+            .then(res => {
+                console.log("unblocked user: ", res);
+                setshowConfirm({ ...showConfirm, show: false });
+                setPrivateChatRooms((prev: any) => {
+                    // set blocked to false
+                    return prev.map((chatRoom: any) => {
+                        if (chatRoom.chatRoomid === props.chatRoomId) {
+                            return { ...chatRoom, blocked: false };
+                        }
+                        return chatRoom;
+                    }
+                    )
+                })
+                setUserIsBlocker(false);
+            })
+            .catch(err => {
+                console.log("error unblocking user: ", err);
+            })
 
 
 
@@ -218,7 +261,40 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
                         </div>
                         <div className="flex flex-row justify-center items-center w-full h-1/2 hover:bg-[#27272a] hover:text-white  cursor-pointer hover:rounded-b-md">
-                            { props.blocked === false ? (
+                            
+                            {props.blocked
+                            ? 
+                            // if me the blocker 
+                            (UserIsBlocker ?
+                            (
+                                <>
+                                <a className="text-sm font-bold" onClick={() => {
+                                    setshowConfirm({
+                                        show: true,
+                                        title: "Unblock User",
+                                        message: "Are you sure you want to unblock this user?",
+                                        actionName: "Unblock",
+                                        confirm: () => handleUnblockUser(),
+                                    })
+                                }} > Unblock User</a>
+                                <CiCirclePlus size={20} className="ml-2" /> 
+                                </>
+                                ) : (
+                                    <>
+                                <a className="text-sm font-bold"
+                                    onClick={() => {
+                                        setshowConfirm({
+                                            show: true,
+                                            title: "Block User",
+                                            message: "Are you sure you want to block this user?",
+                                            actionName: "Block",
+                                            confirm: () => handleBlockUser(),
+                                        })
+                                    }} > Block User</a>
+                                    <CiCircleRemove size={20} className="ml-2" />     
+                                    </>
+                                )
+                            ) : (
                                 <>
                                 <a className="text-sm font-bold" onClick={() => {
                                     setshowConfirm({
@@ -229,23 +305,9 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
                                         confirm: () => handleBlockUser(),
                                     })
                                 }} > Block User</a>
-                                <CiCircleRemove size={20} className="ml-2" /> 
+                                <CiCircleRemove size={20} className="ml-2" />
                                 </>
-                                ) : (
-                                    <>
-                                <a className="text-sm font-bold"
-                                    onClick={() => {
-                                        setshowConfirm({
-                                            show: true,
-                                            title: "Unblock User",
-                                            message: "Are you sure you want to unblock this user?",
-                                            actionName: "Unblock",
-                                            confirm: () => handleUnblockUser(),
-                                        })
-                                    }} > Unblock User</a>
-                                    <CiCirclePlus size={20} className="ml-2" />     
-                                    </>
-                                )
+                            )
                             }
                         </div>
                     </div>
@@ -253,7 +315,6 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
 }
 </div>
-
             {
                 showConfirm.show &&
                 <ConfirmDelete setShow={setshowConfirm} id={props.chatRoomId} confirmData={showConfirm} />

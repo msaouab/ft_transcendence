@@ -7,6 +7,8 @@ import Cookies from 'js-cookie';
 import { dateToStr } from '../common/CommonFunc';
 
 import { useGlobalContext } from '../../provider/AppContext';
+import ConfirmDelete from '../common/ConfirmDelete';
+
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     height: 8%;
@@ -67,21 +69,59 @@ const SendMessageBoxStyle = styled.div`
 `;
 
 
-const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, size }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any, size: string }) => {
+const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, size }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any, size: string}) => {
     const [message, setMessage] = useState<string>('');
 
+    const [confirmData, setConfirmData] = useState<any>({
+        show: false,
+        title: 'Message not sent',
+        message: 'you cannot send a message to this user at the moment',
+        actionName: '',
+        confirm: () => {
+            setConfirmData({
+                ...confirmData,
+                show: false
+            });
+        }
+    }
+    );
 
     const {setPrivateChatRooms} = useGlobalContext();
+    
+    // let initData = {
+    //     show: false,
+    //     title: 'Message not sent',
+    //     message: 'you cannot send a message to this user at the moment',
+    //     actionName: 'Ok',
+    //     confirm: () => {
+    //         setConfirmData({
+    //             ...confirmData,
+    //             show: false
+    //         });
+    
+    //     }
+    // };
+
     const sendMessage = (messageProp: string) => {
+
 
         // if the user is blocked, don't send the message
         console.log(selectedChat);
         if (selectedChat.blocked) {
-            console.log('blocked');
+           console.log('blocked');
+             
+
+        setConfirmData({
+            ...confirmData,
+            show: true
+        });
+        setMessage('');      
+       return ;
         }
         if (messageProp === '') {
             return;
         }
+      
         let message = {
             dateCreated: dateToStr(new Date()),
             content: messageProp,
@@ -135,6 +175,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
                     <CiPaperplane size={30} color='#ffff' />
                 </a>
             </div>
+            {confirmData.show && <ConfirmDelete setShow={setConfirmData} confirmData={confirmData} id={''} />}
         </SendMessageBoxStyle>
     );
 };

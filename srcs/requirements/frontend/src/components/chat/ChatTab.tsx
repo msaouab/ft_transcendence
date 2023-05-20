@@ -83,12 +83,13 @@ const ChatTab = ({ privateMessage, selected }:
     }
 ) => {
 
+    
     let otherUserId = privateMessage.sender_id === Cookies.get('id') ? privateMessage.receiver_id : privateMessage.sender_id;
     return (
         <ChatTabStyle selected={selected}>
             <div className="chat-tab__image">
                 {/* uncomment later */}
-                {/* <img src={props.profileImage} alt="profile" className="rounded-full" /> */}
+                {/* <img src={privateMessage.profileImage} alt="profile" className="rounded-full" /> */}
                 <img src="https://picsum.photos/200" alt="profile" className="rounded-full w-10 h-10" />
             </div>
             <div className="chat-tab__info">

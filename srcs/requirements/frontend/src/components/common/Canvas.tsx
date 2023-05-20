@@ -35,7 +35,7 @@ const PingPong = ({ width, height }: PingPongProps) => {
 	const [mysocket, setSocket] = useState<Socket>();
 
 	useEffect(() => {
-		const socket = io('http://localhost:3000/game');
+		const socket = io(`http://localhost:3000/game`);
 		setSocket(socket);
 		socket.on('connect', () => {
 			console.log(socket);

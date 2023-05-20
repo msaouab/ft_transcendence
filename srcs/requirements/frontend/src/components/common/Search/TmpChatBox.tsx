@@ -12,7 +12,7 @@ import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
     position: absolute;
     bottom: 0;
-    right: 10px;
+    right: 5%;
     z-index: 50;
     width: max-content;
     height: 350px;
@@ -23,15 +23,13 @@ const TmpChatStyle = styled.div`
     background: #fff;
     overflow: hidden;
     
+
     &.hidden {
         transform: translateY(100%);
     }
     &.show {
         transform: translateY(0);
     }
-    @media (max-width: 400px) {
-        right: 0;
-        }
     
 `;
 const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }) => {
@@ -45,7 +43,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
 
     useEffect(() => {
         if (!connected) {
-            chatSocket.current = io('http://localhost:3000/chat');
+            chatSocket.current = io(`http://localhost:3000/chat`);
             setConnected(true);
             console.log('connected to the server')
         }

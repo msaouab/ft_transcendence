@@ -10,9 +10,8 @@ const ChatStyle = Styled.div`
   flex-direction: row;
   height: 100%;
   width: 100%;
-  max-height: 100vh;
-  justify-content: flex-start;  
-
+  max-height: 90vh;
+  justify-content: flex-start;   
   .chat-list {
     max-width: 500px;
     width: 40%;
@@ -22,7 +21,8 @@ const ChatStyle = Styled.div`
   .chat-box-wrapper {
     margin-top: 20px;
     max-width: 1000px;    
-    height: 95%;
+    height: 100%;
+    // min-height: 80%;
     width: 60%;
   }
 
@@ -59,6 +59,7 @@ const ChatStyle = Styled.div`
   }
   }
 }
+
 `;
 
 
@@ -70,12 +71,12 @@ const Chat = () => {
   const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>({} as PrivateMessage);
   const [newLatestMessage, setNewLatestMessage] = React.useState<{ chatRoomId: string, message: string }>({} as { chatRoomId: string, message: string });
-  const {privateChatRooms} = useGlobalContext(  );
+  const {privateChatRooms} = useGlobalContext();
 
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io('http://localhost:3000/chat');
+      chatSocket.current = io(`http://localhost:3000/chat`);
       setConnected(true);
       console.log('connected to the server')
     }
@@ -109,20 +110,36 @@ const Chat = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    let chatDeleted = true;
-    if (privateChatRooms.length === 0) {
-      setSelectedChat({} as PrivateMessage);
+
+    if (!selectedChat.chatRoomid) {
+      console.log("no chat room selected from global context");
       return;
     }
-    privateChatRooms.forEach((chat) => {
-      if (chat.chatRoomid === selectedChat.chatRoomid) {
-        chatDeleted = false ;
-      }}
-    )
-    if (!chatDeleted) {
+    for (let i = 0; i < privateChatRooms.length; i++) {
+      if (privateChatRooms[i].chatRoomid === selectedChat.chatRoomid) {
+        return;
+      }
+    }
+    
+    // if there are available chat rooms, select the closest one by date
+    if (privateChatRooms.length > 0) {
+      let closestChatRoom = privateChatRooms[0];
+      let closestDate = new Date(closestChatRoom.latest_message_date);
+      for (let i = 1; i < privateChatRooms.length; i++) {
+        let date = new Date(privateChatRooms[i].latest_message_date);
+        if (date > closestDate) {
+          closestChatRoom = privateChatRooms[i];
+          closestDate = date;
+        }
+      }
+      console.log("selecting the closest chat room");
+      setSelectedChat(closestChatRoom);
+      return;
+    }
+    else {
       setSelectedChat({} as PrivateMessage);
     }
-  }, [privateChatRooms]);
+  }, [privateChatRooms.length]);
   return (
 
     <ChatStyle>
@@ -133,7 +150,6 @@ const Chat = () => {
       <div className="chat-box-wrapper">
         <ChatBox selectedChat={selectedChat} key={selectedChat.chatRoomid} size="big" setNewLatestMessage={setNewLatestMessage}
           chatSocket={chatSocket} connected={connected}
-
         />
       </div>
     </ChatStyle >

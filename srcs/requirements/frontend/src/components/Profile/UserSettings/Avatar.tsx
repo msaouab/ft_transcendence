@@ -34,7 +34,7 @@ function Avatar() {
 
     axios
       .post(
-        "http://localhost:3000/api/v1/user/" + cookie.get("userid") + "/avatar",
+        `http://localhost:3000/api/v1/user/` + cookie.get("userid") + "/avatar",
         formData,
         { withCredentials: true }
       )

@@ -26,8 +26,11 @@ const DropDown = styled.div`
 const index = () => {
   const LayoutStyle = styled.div`
     height: 100vh;
-    // width: 100vw; 
+    width: 100vw;
+    max-height: 100vh;
+    width: 100vw; 
     display: grid;
+    // display: flex;
     grid-template-columns: 1fr 11fr;
     padding: 1rem 2rem;
 
@@ -43,8 +46,6 @@ const index = () => {
       
       padding: 0; 
       .header {
-      
-      
         margin-right: 0;
         margin-top: 0;
     }
@@ -66,7 +67,7 @@ const index = () => {
         <SideBar />
       </div>
       <div className="main-content w-full ">
-        <div className="header flex justify-end  gap-8 items-center  h-[10%]  
+        <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
         ">
           <div className="search">
             <SearchBar />
@@ -94,7 +95,7 @@ const index = () => {
             </div>
           </div>
         </div>
-        <div className="content  h-[90%]">
+        <div className="content max-h-[90%] h-[100%]">
           <Outlet />
         </div>
       </div>

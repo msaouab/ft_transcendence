@@ -53,7 +53,7 @@ const MessageDate = (props: PrivateMessage) => {
     // move getNumberOfNotSeeMessages inside the component and use props parameter
     const getNumberOfNotSeeMessages = async () => {
         let count = await axios.get(
-            `http://localhost:${3000}/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
+            `http://localhost:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
         );
         return count.data;
     };

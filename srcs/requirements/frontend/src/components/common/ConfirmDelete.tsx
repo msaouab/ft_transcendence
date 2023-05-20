@@ -38,9 +38,6 @@ const ConfirmDeleteStyle = styled.div`
 
 
 
-
-
-
 const ConfirmDelete = (
     { setShow, id, confirmData }: {
         setShow: any,
@@ -61,13 +58,18 @@ const ConfirmDelete = (
                                 '>{confirmData.title}</p>
                         <p className='text-lg font-semibold text-center opacity-50 text-black
                                 '> {confirmData.message}</p>
+                            {/* if now actionName is give add cancel only */}
                         <div className='btns-cont flex flex-row justify-center items-center w-full h-full'>
                             <button className=' text-black rounded-lg px-4 py-2 m-2 bg-gray-200'
                                 onClick={() => setShow(false)}
                                 >Cancel</button>
+                            {
+                                confirmData.actionName === '' ? null :
+                            
                             <button className='bg-red-500 text-white rounded-lg px-4 py-2 m-2'
                                 onClick={() => confirmData.confirm(id)}
                                 >{confirmData.actionName}</button>
+                            }
                         </div>
                     </div>
                 </div>

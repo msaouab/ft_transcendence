@@ -13,6 +13,8 @@ import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 
+
+
 function App() {
   const [bgColor, setBgColor] = useState("#1E1E1E");
   const [textColor, setTextColor] = useState("#ffffff");
