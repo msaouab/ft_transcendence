@@ -45,28 +45,11 @@ type BallState = {
 
 let ctx: CanvasRenderingContext2D | null;
 
-const drawPlayer = (player: PlayerState) => {
-	if (ctx) {
-		ctx.fillStyle = "#fff";
-		ctx.fillRect(player.x, player.y, player.width, player.height);
-		ctx.fill();
-	}
-};
-
-const drawBall = (ball: BallState) => {
-	if (ctx) {
-		ctx.beginPath();
-		ctx.fillStyle = ball.c; // ball color
-		ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true); // draw ball
-		ctx.fillStyle = "#fff";
-		ctx.fill();
-		ctx.closePath();
-	}
-};
 
 const PingPong = ({ width, height, socket }: PingPongProps) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
+	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
 		width: 80,
 		height: 10,
@@ -84,19 +67,135 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		y: height / 2,
 		r: 10,
 		c: "#fff",
-		vx: 2,
-		vy: 2,
+		vx: 1,
+		vy: 1,
 	});
+	
+	const draw = () => {
+		if (canvasRef.current) {
+			const canvas = canvasRef.current;
+			ctx = canvas.getContext("2d");
+			if (ctx) {
+				ctx.beginPath();
+				ctx.fillStyle = "#000";
+				ctx.fillRect(0, 0, width, height);
+				ctx.fill();
+				// midline
+				ctx.setLineDash([10, 15]);
+				ctx.moveTo(0, height / 2);
+				ctx.lineTo(width, height / 2);
+				ctx.strokeStyle = "#fff";
+				ctx.stroke();
+				ctx.closePath();
+				// player
+				drawPlayer(player1X);
+				drawPlayer(player2X);
+				// ball
+				drawBall(ball);
+			}
+		}
+	};
+	
+	const drawPlayer = (player: PlayerState) => {
+		if (ctx) {
+			ctx.fillStyle = "#fff";
+			ctx.fillRect(player.x, player.y, player.width, player.height);
+			ctx.fill();
+		}
+	};
+	
+	const drawBall = (ball: BallState) => {
+		if (ctx) {
+			ctx.beginPath();
+			ctx.fillStyle = ball.c; // ball color
+			ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true); // draw ball
+			ctx.fillStyle = "#fff";
+			ctx.fill();
+			ctx.closePath();
+		}
+	};
+
+	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		const clientX = e.clientX;
+		const clientY = e.clientY;
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const rect = canvas.getBoundingClientRect();
+		const x = clientX - rect.left;
+		const y = clientY - rect.top;
+		setMousePosition({ x, y });
+		// Send mouse coordinates to the backend
+		const data = {
+			x: x,
+			y: y,
+			height: height,
+			width: width,
+			player1X: player1X,
+		};
+		// console.log("clientX: ", x, "clientY: ", y)
+		socket.emit("requesteMouse", data);
+		socket.on("responseMouse", (data) => {
+			console.log("responseMouse: ", data.x);
+			const updatedPlayer1X = data.player1X;
+			setPlayer1X(updatedPlayer1X);
+		});
+	};
+	useEffect(() => {
+		const dataObj = {
+			ball: ball,
+			player1X: player1X,
+			player2X: player2X,
+			width: width,
+			height: height,
+			setScore: setScore,
+		};
+		draw();
+		socket.emit("requesteBall", dataObj);
+		// const intervalId = setInterval(() => {
+			socket.on("responseBall", (ball: BallState) => {
+				let { x, y, r, vx, vy } = ball;
+				setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
+				// updateBall(ball);
+				drawBall(ball);
+			});
+		// }, 10);
+		// return () => clearInterval(intervalId);
+	}, [ball]);
 
 	useEffect(() => {
-		socket.on("connect", () => {
-			socket.emit("ball", "0ki");
-		});
-		socket.on("addRoom", (room: string) => {});
-	}, [socket]);
+		document.addEventListener("mousemove", handleMouseMove);
+		return () => {
+			document.removeEventListener("mousemove", handleMouseMove);
+		};
+	}, [player1X]);
 
-	const updateBall = (ball: BallState) => {
-		let { x, y, r, vx, vy } = ball;
+	return (
+		<PlayGround className="">
+			<ScoreContainter>
+				<div className="score">{score.player1}</div>
+				<div className="score">{score.player2}</div>
+			</ScoreContainter>
+			<canvas ref={canvasRef} width={width} height={height} />
+		</PlayGround>
+	);
+};
+
+export default PingPong;
+
+	// useEffect(() => {
+	// 	socket.on("connect", () => {
+	// 		socket.emit("ball", "0ki");
+	// 	});
+	// 	socket.on("addRoom", (room: string) => {});
+	// }, [socket]);
+
+	// const updateBall = (ball: BallState) => {
+	// 	let { x, y, r, vx, vy } = ball;
+
+	// 	setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
+	// 	socket.emit("requesteBall", ball, player1X, width, height);
+	// };
+
 		// const newX = x + vx;
 		// const newY = y + vy;
 		// if (newX - r <= 0 || newX + r >= width)
@@ -135,9 +234,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		// 	x = width / 2;
 		// 	y = height / 2;
 		// }
-		setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
-		socket.emit("requesteBall", ball, player1X, width, height);
-	};
+
 
 	// useEffect(() => {
 	// 	const intervalId = setInterval(() => {
@@ -148,97 +245,6 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	// 	}, 10);
 	// 	return () => clearInterval(intervalId);
 	// }, [ball]);
-
-	const draw = () => {
-		if (canvasRef.current) {
-			const canvas = canvasRef.current;
-			ctx = canvas.getContext("2d");
-			if (ctx) {
-				ctx.beginPath();
-				ctx.fillStyle = "#000";
-				ctx.fillRect(0, 0, width, height);
-				ctx.fill();
-				// midline
-				ctx.setLineDash([10, 15]);
-				ctx.moveTo(0, height / 2);
-				ctx.lineTo(width, height / 2);
-				ctx.strokeStyle = "#fff";
-				ctx.stroke();
-				ctx.closePath();
-				// player
-				drawPlayer(player1X);
-				drawPlayer(player2X);
-				// ball
-				drawBall(ball);
-			}
-		}
-	};
-
-	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		const clientX = e.clientX;
-		const clientY = e.clientY;
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const rect = canvas.getBoundingClientRect();
-		const x = clientX - rect.left;
-		const y = clientY - rect.top;
-		// Send mouse coordinates to the backend
-		const data = {
-			x: x,
-			y: y,
-			height: height,
-			width: width,
-			player1X: player1X,
-		};
-		// console.log("clientX: ", x, "clientY: ", y)
-		socket.emit("requesteMouse", data);
-		socket.on("responseMouse", (data) => {
-			console.log("responseMouse: ", data.x);
-			const updatedPlayer1X = data.player1X;
-			setPlayer1X(updatedPlayer1X);
-		});
-	};
-	useEffect(() => {
-		const dataObj = {
-			ball: ball,
-			player1X: player1X,
-			player2X: player2X,
-			width: width,
-			height: height,
-			setScore: setScore,
-		};
-		draw();
-		socket.emit("requesteBall", dataObj);
-		const intervalId = setInterval(() => {
-			socket.on("responseBall", (ball: BallState) => {
-				let { x, y, r, vx, vy } = ball;
-				setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
-				// updateBall(ball);
-				drawBall(ball);
-			});
-		}, 10);
-		return () => clearInterval(intervalId);
-	}, [player1X, player2X, ball]);
-
-	useEffect(() => {
-		document.addEventListener("mousemove", handleMouseMove);
-		return () => {
-			document.removeEventListener("mousemove", handleMouseMove);
-		};
-	}, [player1X]);
-
-	return (
-		<PlayGround className="">
-			<ScoreContainter>
-				<div className="score">{score.player1}</div>
-				<div className="score">{score.player2}</div>
-			</ScoreContainter>
-			<canvas ref={canvasRef} width={width} height={height} />
-		</PlayGround>
-	);
-};
-
-export default PingPong;
 
 // useEffect(() => {
 // 	window.addEventListener('mousemove', (e) => {

@@ -121,7 +121,7 @@ export class GameGateway
 	@SubscribeMessage("requesteBall")
 	async handleBall(client: Socket, data: any) {
 		const { ball, player1X, player2X, width, height, setScore } = data;
-		console.log("data:", ball);
+		// console.log("data:", ball);
 		// let { x, y, r, vx, vy } = ball;
 		const newX = ball.x + ball.vx;
 		const newY = ball.y + ball.vy;
@@ -145,19 +145,19 @@ export class GameGateway
 		)
 			// player2 collision
 			ball.vy = Math.abs(ball.vy);
-		else if (newY + ball.r >= player1X.y + player1X.height) {
+		if (newY + ball.r >= player1X.y + player1X.height) {
 			// player1 score
 			// setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
-			ball.vx = -2;
-			ball.vy = -2;
+			ball.vx = -3;
+			ball.vy = -3;
 			ball.x = width / 2;
 			ball.y = height / 2;
 		}
 		if (newY - ball.r <= player2X.y) {
 			// player2 score
 			// setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
-			ball.vx = 2;
-			ball.vy = 2;
+			ball.vx = 3;
+			ball.vy = 3;
 			ball.x = width / 2;
 			ball.y = height / 2;
 		}
