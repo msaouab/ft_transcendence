@@ -11,7 +11,7 @@ import {
 } from "../../assets/icons";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import instance from "../../api/axios";
+import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
@@ -46,7 +46,7 @@ const Routes = [
 
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus } = useGlobalContext();
+  const { setUserStatus, setUserImg } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
 
   const handleToggleSidebar = () => {
@@ -70,7 +70,7 @@ const SideBar = () => {
             }
             Cookies.set("userid", response.data.id);
             // setOnlineStat(user.status);
-            setUserStatus(response.data.status);
+            setUserStatus((response.data.status).tolowoerCase());
           })
           .catch((error) => {
             if (error.response.status == 401 || error.response.status == 403) {
@@ -81,6 +81,15 @@ const SideBar = () => {
         console.log(error);
       }
     }
+    const fetchAvatar = async () => {
+      try {
+        const res = await GetAvatar();
+        setUserImg(res);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAvatar();
     fetchData();
   }, []);
   const handleLogout = () => {
@@ -99,12 +108,12 @@ const SideBar = () => {
   };
 
   return (
-    <div className="  bg-red-400">
-      {/* <div
+    <div className=" ">
+      <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
-      ></div> */}
+        } transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+      ></div>
 
       <div
         className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
@@ -113,7 +122,7 @@ const SideBar = () => {
             : "md:w-20   transition-all duration-300 ease-out "
         }`}
       >
-        <div className="burger text-white text-3xl  mb-10 flex justify-center ">
+        <div className="burger cursor-pointer text-white text-3xl  mb-10 flex justify-center ">
           {isSidebarOpen ? (
             <CgClose
               onClick={handleToggleSidebar}

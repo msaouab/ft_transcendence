@@ -25,18 +25,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState(DefaultAvatar);
 
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const res = await GetAvatar();
-        setUserImg(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchAvatar();
-  }, []);
 
   const value = {
     userStatus,

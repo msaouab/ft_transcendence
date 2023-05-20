@@ -29,12 +29,9 @@ const LoginContainer = styled.div`
       }
     }
     .whiteBoard {
-      /* height: 100%; */
       background-color: white;
       display: grid;
-      /* grid-template-columns: repeat(3, 1fr); */
-      /* grid-column-gap: 10rem; */
-      /* grid-template-rows: [first content-start] 1fr [content-end sidebar-start] 700px [lastline]; */
+
       .logo {
         display: block;
         margin: 20rem auto;
@@ -140,20 +137,9 @@ const LoginContainer = styled.div`
         .logo {
           filter: blur(0px);
           margin: 3rem auto;
-          /* margin-bottom: 15rem; */
         }
-        .ftbutton {
-          /* margin-top: -2rem;
-          margin-bottom: 5rem; */
-        }
-        .prvs {
-          /* margin-top: -5rem;
-          margin-bottom: 7rem; */
-        }
-        .terms {
-          /* padding-top: 30rem; */
-        }
-        font-weight: bolder;
+
+        font-weight: 500;
       }
     }
   }

@@ -100,7 +100,7 @@ const Status = styled.div<{ userStatus: string }>`
     right: 10%;
     background-color: ${({ userStatus }) =>
       userStatus === "online"
-        ? "#00ff00"
+        ? "#01d101"
         : userStatus === "offline"
         ? "#6a6a6a"
         : userStatus === "donotdisturb"
@@ -288,7 +288,7 @@ const Home = () => {
         flex-wrap: wrap;
         & > div {
           max-width: 70%;
-          min-width: 300px;
+          min-width: 360px;
           max-height: 500px;
         }
       }
@@ -336,7 +336,7 @@ const Home = () => {
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
-          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] min-h-[25rem] ">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] h-[25rem] ">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FriendsImg} alt="" width={50} />
@@ -370,7 +370,7 @@ const Home = () => {
               )}
             </div>
           </div>
-          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
+          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={ChatImg} alt="" width={50} />
@@ -383,7 +383,7 @@ const Home = () => {
               ))}
             </div>
           </div>
-          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
+          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={GameImg} alt="" width={50} />

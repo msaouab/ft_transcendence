@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import AboutPage from "./pages/landingPage/AboutPage";
 // import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from "./pages/landingPage/LandingPage";
-import Home from "./pages/game/Profile";
+import Home from "./pages/profile/Profile";
 import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";

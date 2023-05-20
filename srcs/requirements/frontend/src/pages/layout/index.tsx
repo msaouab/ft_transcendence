@@ -5,12 +5,12 @@ import styled from "styled-components";
 import { BiSearch } from "react-icons/bi";
 import { MdOutlineNotifications } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
-import { BsChevronDown } from "react-icons/bs";
 import SideBar from "../../components/common/SideBar";
 import { useEffect, useState } from "react";
 import { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { Link } from "react-router-dom";
+import DropDownMenu from "../../components/common/DropDownMenu";
 
 const DropDown = styled.div`
   position: absolute;
@@ -34,11 +34,7 @@ const index = () => {
     } */
   `;
 
-  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-  const handelDropDown = () => {
-    console.log("clicked");
-    setIsDropDownOpen(!isDropDownOpen);
-  };
+  
 
   const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(e.target.value);
@@ -74,19 +70,7 @@ const index = () => {
                 className="w-[40px] h-[40px] rounded-[50%]"
               />
             )}
-            <BsChevronDown
-              className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
-              onClick={handelDropDown}
-            />
-            <div
-              className={`settings bg-slate-50  bg-white flex  duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 h-[8rem] rounded-md transition-all ${
-                isDropDownOpen ? "block transition-all" : "hidden transition-all"
-              } `}
-            >
-              <Link to='/profile' className="setting-item">Profile</Link>
-              <div className="setting-item">Logout</div>
-              <div className="setting-item">Status</div>
-            </div>
+            <DropDownMenu />
           </div>
         </div>
         <div className="content  flex-1">
