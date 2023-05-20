@@ -53,45 +53,42 @@ const SideBar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   const navigate = useNavigate();
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        await instance
-          .get("/me")
-          .then((response) => {
-            if (
-              response?.data?.tfa == true &&
-              response.data.otp_verified == false
-            ) {
-              // alert("Please enable two factor authentication");
-              navigate("/login/two-factor-authentication");
-            }
-            if (response.statusText) {
-            }
-            Cookies.set("userid", response.data.id);
-            // setOnlineStat(user.status);
-            setUserStatus((response.data.status).tolowoerCase());
-          })
-          .catch((error) => {
-            if (error.response.status == 401 || error.response.status == 403) {
-              navigate("/login");
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
+
+  async function fetchData() {
+    try {
+      await instance
+        .get("/me")
+        .then((response) => {
+          if (
+            response?.data?.tfa == true &&
+            response.data.otp_verified == false
+          ) {
+            // alert("Please enable two factor authentication");
+            navigate("/login/two-factor-authentication");
+          }
+          if (response.statusText) {
+          }
+          Cookies.set("userid", response.data.id);
+          console.log(response.data);
+          // setOnlineStat(user.status);
+          setUserStatus(response.data.status.tolowoerCase());
+        })
+        .catch((error) => {
+          if (error.response.status == 401 || error.response.status == 403) {
+            navigate("/login");
+          }
+        });
+      const res = await GetAvatar();
+      setUserImg(res);
+    } catch (error) {
+      console.log(error);
     }
-    const fetchAvatar = async () => {
-      try {
-        const res = await GetAvatar();
-        setUserImg(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchAvatar();
+  }
+
+  useEffect(() => {
     fetchData();
   }, []);
+
   const handleLogout = () => {
     async function logout() {
       try {

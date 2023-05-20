@@ -31,6 +31,14 @@ export class FriendsController {
         return friends;
     }
 
+
+    @Get(":id/friends/info")
+    @UseGuards(AuthenticatedGuard)
+    async getFriendsInfo(@Param('id') id: string) {
+        const friends = await this.FriendsService.getFriendsInfo(id);
+        return friends;
+    }
+
     
     @Delete(":id/friends")
     @UseGuards(AuthenticatedGuard)

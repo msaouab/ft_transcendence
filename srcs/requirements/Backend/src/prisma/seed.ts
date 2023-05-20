@@ -29,12 +29,12 @@ const users = [
         firstName: 'rida',
         lastName: 'ennasry',
     },
-    {
-        login: 'mbehhar',
-        email: 'mbehhar@student.1337.ma',
-        firstName: 'Mohamed',
-        lastName: 'Behhar',
-    },
+    // {
+    //     login: 'mbehhar',
+    //     email: 'mbehhar@student.1337.ma',
+    //     firstName: 'Mohamed',
+    //     lastName: 'Behhar',
+    // },
     {
         login: 'rbenjell',
         email: 'rbenjell@student.1337.ma',
