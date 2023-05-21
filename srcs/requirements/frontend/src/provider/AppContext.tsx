@@ -42,6 +42,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     fetchAvatar();
   }, []);
 
+  
   const value = {
     userStatus,
     setUserStatus,

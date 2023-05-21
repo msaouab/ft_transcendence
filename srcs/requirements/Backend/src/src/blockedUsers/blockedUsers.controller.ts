@@ -35,6 +35,7 @@ export class BlockedUsersController {
         return blockedUsers;
     }
 
+
     @Delete(":id/blockedusers/:idBlockedUser")
     async deleteBlockedUsers(@Param('id') id: string, @Param('idBlockedUser') blockedUserId: string) {
         const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(id, blockedUserId);
