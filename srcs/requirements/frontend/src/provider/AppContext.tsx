@@ -21,7 +21,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userImg, setUserImg] = useState(DefaultAvatar);
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
-
+  
   const value = {
     userStatus,
     setUserStatus,

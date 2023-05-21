@@ -70,9 +70,6 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
     // console.log("props: ", props.blocked);
     const [UserIsBlocker, setUserIsBlocker] = useState(false);
-
-``
-    
     const {setPrivateChatRooms} = useGlobalContext();
     const [showConfirm, setshowConfirm] = useState(confirmData);
     const [showMore, setShowMore] = useState(false);
@@ -134,6 +131,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
                 setPrivateChatRooms((prev: any) => {
                     return prev.filter((chatRoom: any) => {
                         return chatRoom.chatRoomid !== res.data.id;
+                        
                     })
                 })
             })

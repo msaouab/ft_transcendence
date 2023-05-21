@@ -46,7 +46,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
-
     useEffect(() => {
         if (connected) {  
             chatSocket.current.on('newPrivateMessage', (message: any) => {
