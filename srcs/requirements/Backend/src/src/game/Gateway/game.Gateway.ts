@@ -50,7 +50,7 @@ export class GameGateway
 		status: "waiting" | "OnGoing" | "Finished";
 		type: "Time" | "Round";
 		mode: "random" | "friend";
-	}
+	};
 	handleConnection(client) {
 		console.log(`Client connected: ${client.id}`);
 	}
@@ -58,7 +58,10 @@ export class GameGateway
 	handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
 		this.roomMap.forEach((value, key) => {
-			if (value.player1.id === client.handshake.query.userId || value.player2.id === client.handshake.query.userId) {
+			if (
+				value.player1.id === client.handshake.query.userId ||
+				value.player2.id === client.handshake.query.userId
+			) {
 				value.members--;
 				const index = value.socket.indexOf(client);
 				if (index !== -1) {
@@ -66,114 +69,107 @@ export class GameGateway
 					client.leave(client.id);
 					if (value.members === 0) {
 						this.roomMap.delete(key);
-					}
-					else if (value.members === 1) {
+					} else if (value.members === 1) {
 						if (value.player1.id === client.handshake.query.userId.toString())
 							value.player1 = { id: "" };
-						else
-							value.player2 = { id: "" };
+						else value.player2 = { id: "" };
 						value.status = "Finished";
 					}
 				}
 			}
-			if (value.status === 'Finished')
-				this.roomMap.delete(key);
+			if (value.status === "Finished") this.roomMap.delete(key);
 		});
-		console.log('room disconnected: ', this.roomMap);
+		console.log("room disconnected: ", this.roomMap);
 	}
 
 	private IPlayer: {
-		roomId: string,
+		roomId: string;
 		player1: {
-			id: string,
-			name: string,
-		},
+			id: string;
+			name: string;
+		};
 		player2: {
-			id: string,
-			name: string,
-		},
+			id: string;
+			name: string;
+		};
 	};
 	afterInit(server: any) {
 		console.log("WebSocket server initialized");
 	}
+
+	async getRoom(userId: string): Promise<string | undefined> {
+		let roomId: string | undefined;
+		this.roomMap.forEach((value, key) => {
+			if (value.player1.id === userId || value.player2.id === userId)
+				roomId = key;
+		});
+		return roomId;
+	}
 	// key: { width: 80, height: 10, x: 310, y: 980 }
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
-		if (data.x >= 0 && data.x <= data.width && data.y <= data.height && data.y >= data.height / 2) {
-			let oldX;
-			if (data.player1X.x - 10 >= data.x) {
-				data.player1X.x -= 7;
-				this.server.emit("responseMouse", data);
-				oldX = data.x;
-			}
-			else if (data.player1X.x <= data.x && data.player1X.x + 80 <= data.width) {
-				data.player1X.x += 7;
-				this.server.emit("responseMouse", data);
-			}
-			else if (data.x <= 40 && data.x >= oldX) {
-				data.player1X.x = 0;
-				this.server.emit("responseMouse", data);
-				oldX = data.x;
+		const userId = client.handshake.query.userId.toString();
+		const roomId = await this.getRoom(userId);
+		if (
+			!roomId ||
+			(this.roomMap.get(roomId).player1.id === '' ||
+			this.roomMap.get(roomId).player2.id === '')
+		)
+			return;
+		const room = this.roomMap.get(roomId);
+		if (
+			data.x >= 0 &&
+			data.x <= data.width &&
+			data.y <= data.height &&
+			data.y >= data.height / 2
+		) {
+			if (data.player1X.x >= data.x) {
+				data.player1X.x -= 12;
+				data.player2X.x = data.player1X.x;
+				this.server.to(client.id).emit("responseMouse", data.player1X);
+				const opponentSocketId = client.id === room.socket[0].id ? room.socket[1].id : room.socket[0].id;
+				this.server.to(opponentSocketId).emit("responsePlayer2", data.player2X);
+			} else if (
+				data.player1X.x <= data.x - 50 &&
+				data.player1X.x <= data.width
+			) {
+				data.player1X.x += 12;
+				data.player2X.x = data.player1X.x;
+				this.server.to(client.id).emit("responseMouse", data.player1X);
+				const opponentSocketId = client.id === room.socket[0].id ? room.socket[1].id : room.socket[0].id;
+				this.server.to(opponentSocketId).emit("responsePlayer2", data.player2X);
 			}
 		}
 	}
 
 	@SubscribeMessage("requesteBall")
 	async handleBall(client: Socket, data: any) {
-		const { ball, player1X, player2X, width, height, setScore } = data;
-		// console.log("data:", ball);
-		// let { x, y, r, vx, vy } = ball;
-		const newX = ball.x + ball.vx;
-		const newY = ball.y + ball.vy;
-		if (newX - ball.r <= 0 || newX + ball.r >= width)
-			// wall collision
-			ball.vx = -ball.vx;
-		if (newY - ball.r <= 0 || newY + ball.r >= height)
-			// wall collision
-			ball.vy = -ball.vy;
-		if (
-			newY + ball.r >= player1X.y &&
-			newX >= player1X.x &&
-			newX <= player1X.x + player1X.width
-		)
-			// player1 collision
-			ball.vy = -Math.abs(ball.vy);
-		if (
-			newY - ball.r <= player2X.y + player2X.height &&
-			newX >= player2X.x &&
-			newX <= player2X.x + player2X.width
-		)
-			// player2 collision
-			ball.vy = Math.abs(ball.vy);
-		if (newY + ball.r >= player1X.y + player1X.height) {
-			// player1 score
-			// setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
-			ball.vx = -3;
-			ball.vy = -3;
-			ball.x = width / 2;
-			ball.y = height / 2;
-		}
-		if (newY - ball.r <= player2X.y) {
-			// player2 score
-			// setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
-			ball.vx = 3;
-			ball.vy = 3;
-			ball.x = width / 2;
-			ball.y = height / 2;
-		}
-		this.server.emit("responseBall", ball);
+		// console.log("data", data);
+		const userId = client.handshake.query.userId.toString();
+		const roomId = await this.getRoom(userId);
+		if ( !roomId || !this.roomMap.get(roomId).player1 || !this.roomMap.get(roomId).player2) return;
+		const room = this.roomMap.get(roomId);
+
+		data.ball.x += data.ball.dx;
+
+		this.server.to(client.id).emit("responseBall", data);
+		const opponentSocketId = client.id === room.socket[0].id ? room.socket[1].id : room.socket[0].id;
+		this.server.to(opponentSocketId).emit("responseBall", data);
 	}
 
 	AvailableRoom(client: any, roomMap: any, payload: any): boolean {
 		let AvailableRoom: boolean = true;
-		console.log("roomMap:", roomMap.size, 'socket.id', client.id);
+		console.log("roomMap:", roomMap.size, "socket.id", client.id);
 		if (roomMap.size > 0) {
 			roomMap.forEach((value, key) => {
-				if (value.members < 2 && value.type === payload.type && value.mode === payload.mode) {
-					if (value.player1.id === '') {
+				if (
+					value.members < 2 &&
+					value.type === payload.type &&
+					value.mode === payload.mode
+				) {
+					if (value.player1.id === "") {
 						value.player1 = { id: client.handshake.query.userId.toString() };
-					}
-					else if (value.player2.id === '') {
+					} else if (value.player2.id === "") {
 						value.player2 = { id: client.handshake.query.userId.toString() };
 						value.status = "OnGoing";
 						value.members++;
@@ -184,7 +180,12 @@ export class GameGateway
 					}
 					client.join(key);
 					this.server.emit("joinedRoom", key, this.IPlayer);
-					this.CreateRoom(value.player1.id, value.player2.id, value.type, value.mode);
+					this.CreateRoom(
+						value.player1.id,
+						value.player2.id,
+						value.type,
+						value.mode
+					);
 					AvailableRoom = false;
 				}
 			});
@@ -194,12 +195,18 @@ export class GameGateway
 
 	@SubscribeMessage("joinRoom")
 	async handleJoinRoom(client: Socket, payload: any) {
-		let avialableRoom: boolean = this.AvailableRoom(client, this.roomMap, payload);
+		let avialableRoom: boolean = this.AvailableRoom(
+			client,
+			this.roomMap,
+			payload
+		);
 		console.log("avialableRoom:", avialableRoom);
 		console.log("payload:", payload);
-		if (avialableRoom && payload.type && payload.mode) {
-			console.log('payload:', payload);
-			const key = createHash("sha256").update(Date.now().toString()).digest("hex");
+		if (avialableRoom && payload.type && payload.mode && payload.mode !== 'play vs player') {
+			console.log("payload:", payload);
+			const key = createHash("sha256")
+				.update(Date.now().toString())
+				.digest("hex");
 			this.roomObj = {
 				members: 1,
 				socket: [client],
@@ -209,38 +216,33 @@ export class GameGateway
 				status: "waiting",
 				type: payload.type,
 				mode: payload.mode,
-			}
+			};
 			this.roomMap.set(key, this.roomObj);
 			client.join(key);
 			this.server.emit("joinedRoom", key);
 		}
 		this.roomMap.forEach((value, key) => {
-			if (value.status === 'Finished') {
+			if (value.status === "Finished") {
 				this.roomMap.delete(key);
 			}
 		});
 		console.log("roomMap => :", this.roomMap);
-		// console.log("roomArr:", this.roomArr);
-		// const room = "testRoom";
-		// client.join(room);
-		// const adapter = this.server.adapter as any;
-		// const roomsize = adapter.rooms?.get(room) // .size ?? 0;
-		// console.log("roomsize: ", roomsize);
-		// console.log(client.handshake.query);
 	}
 
 	async CreateRoom(userId1, userId2, type: string, mode: string) {
 		try {
 			const Benome = await this.UserService.getUser(userId2);
-			if (!Benome) { throw new BadRequestException("User not found") }
+			if (!Benome) {
+				throw new BadRequestException("User not found");
+			}
 			const player = await this.UserService.getUser(userId1);
 			await this.prisma.user.update({
 				where: { id: player.id },
-				data: { status: 'InGame' },
+				data: { status: "InGame" },
 			});
 			await this.prisma.user.update({
 				where: { id: Benome.id },
-				data: { status: 'InGame' },
+				data: { status: "InGame" },
 			});
 			const newRoom = await this.prisma.game.create({
 				data: {
@@ -250,12 +252,13 @@ export class GameGateway
 					player1_pts: 0,
 					player2_pts: 0,
 					gameStatus: "OnGoing",
-				}
+				},
 			});
 			const roomId = newRoom.id;
 			return newRoom;
+		} catch (e) {
+			throw new BadRequestException(e.message);
 		}
-		catch (e) { throw new BadRequestException(e.message) }
 	}
 
 	@SubscribeMessage("Move")

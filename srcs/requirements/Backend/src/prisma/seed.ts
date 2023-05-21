@@ -17,12 +17,12 @@ const users = [
         firstName: 'Ismail',
         lastName: 'Choukri',
     },
-    {
-        login: 'msaouab',
-        email: 'msaouab@student.1337.ma',
-        firstName: 'mohamed',
-        lastName: 'saouab',
-    },
+    // {
+    //     login: 'msaouab',
+    //     email: 'msaouab@student.1337.ma',
+    //     firstName: 'mohamed',
+    //     lastName: 'saouab',
+    // },
     {
         login: 'ren-nasr',
         email: 'ren-nasr@student.1337.ma',

@@ -1,6 +1,12 @@
-import { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
+import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+
+interface PingPongProps {
+	width: number;
+	height: number;
+	socket: Socket;
+}
 
 const PlayGround = styled.div`
 	display: flex;
@@ -21,12 +27,6 @@ const ScoreContainter = styled.div`
 	}
 `;
 
-interface PingPongProps {
-	width: number;
-	height: number;
-	socket: Socket;
-}
-
 type PlayerState = {
 	width: number;
 	height: number;
@@ -45,11 +45,10 @@ type BallState = {
 
 let ctx: CanvasRenderingContext2D | null;
 
-
 const PingPong = ({ width, height, socket }: PingPongProps) => {
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
+	const [mousePosition, setMousePosition] = useState(0);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
-	const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
 		width: 80,
 		height: 10,
@@ -70,8 +69,8 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		vx: 1,
 		vy: 1,
 	});
-	
-	const draw = () => {
+
+	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
 			ctx = canvas.getContext("2d");
@@ -94,8 +93,8 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				drawBall(ball);
 			}
 		}
-	};
-	
+	}, [player1X, player2X, ball]);
+
 	const drawPlayer = (player: PlayerState) => {
 		if (ctx) {
 			ctx.fillStyle = "#fff";
@@ -103,7 +102,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 			ctx.fill();
 		}
 	};
-	
+
 	const drawBall = (ball: BallState) => {
 		if (ctx) {
 			ctx.beginPath();
@@ -115,65 +114,44 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		}
 	};
 
-	const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		const clientX = e.clientX;
-		const clientY = e.clientY;
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const rect = canvas.getBoundingClientRect();
-		const x = clientX - rect.left;
-		const y = clientY - rect.top;
-		setMousePosition({ x, y });
-		// Send mouse coordinates to the backend
-		const data = {
-			x: x,
-			y: y,
-			height: height,
-			width: width,
-			player1X: player1X,
-		};
-		// console.log("clientX: ", x, "clientY: ", y)
-		socket.emit("requesteMouse", data);
-		socket.on("responseMouse", (data) => {
-			console.log("responseMouse: ", data.x);
-			const updatedPlayer1X = data.player1X;
-			setPlayer1X(updatedPlayer1X);
-		});
-	};
 	useEffect(() => {
-		const dataObj = {
-			ball: ball,
-			player1X: player1X,
-			player2X: player2X,
-			width: width,
-			height: height,
-			setScore: setScore,
+		const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+			const clientX = e.clientX - 40;
+			const clientY = e.clientY;
+			const canvas = canvasRef.current;
+			if (!canvas) return;
+			const rect = canvas.getBoundingClientRect();
+			const x = clientX - rect.left;
+			const y = clientY - rect.top;
+			const data = {
+				x: x,
+				y: y,
+				height: height,
+				width: width,
+				player1X: player1X,
+				player2X: player2X,
+			};
+			socket.emit("requesteMouse", data);
 		};
-		draw();
-		socket.emit("requesteBall", dataObj);
-		// const intervalId = setInterval(() => {
-			socket.on("responseBall", (ball: BallState) => {
-				let { x, y, r, vx, vy } = ball;
-				setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
-				// updateBall(ball);
-				drawBall(ball);
-			});
-		// }, 10);
-		// return () => clearInterval(intervalId);
-	}, [ball]);
-
-	useEffect(() => {
 		document.addEventListener("mousemove", handleMouseMove);
+		socket.on("responseMouse", (playerPosition) => {
+			setMousePosition(playerPosition);
+			setPlayer1X(playerPosition);
+			// setPlayer2X(data.player2X);
+		});
+		socket.on("responsePlayer2", (playerPosition) => {
+			setPlayer2X(playerPosition);
+		});
 		return () => {
 			document.removeEventListener("mousemove", handleMouseMove);
 		};
-	}, [player1X]);
+	}, [player1X, player2X]);
 
 	return (
 		<PlayGround className="">
 			<ScoreContainter>
-				<div className="score">{score.player1}</div>
-				<div className="score">{score.player2}</div>
+				{/* <div className="score">{score.player1}</div>
+				<div className="score">{score.player2}</div> */}
 			</ScoreContainter>
 			<canvas ref={canvasRef} width={width} height={height} />
 		</PlayGround>
@@ -181,152 +159,3 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 };
 
 export default PingPong;
-
-	// useEffect(() => {
-	// 	socket.on("connect", () => {
-	// 		socket.emit("ball", "0ki");
-	// 	});
-	// 	socket.on("addRoom", (room: string) => {});
-	// }, [socket]);
-
-	// const updateBall = (ball: BallState) => {
-	// 	let { x, y, r, vx, vy } = ball;
-
-	// 	setBall({ ...ball, x: x + vx, y: y + vy, vx, vy });
-	// 	socket.emit("requesteBall", ball, player1X, width, height);
-	// };
-
-		// const newX = x + vx;
-		// const newY = y + vy;
-		// if (newX - r <= 0 || newX + r >= width)
-		// 	// wall collision
-		// 	vx = -vx;
-		// if (newY - r <= 0 || newY + r >= height)
-		// 	// wall collision
-		// 	vy = -vy;
-		// if (
-		// 	newY + r >= player1X.y &&
-		// 	newX >= player1X.x &&
-		// 	newX <= player1X.x + player1X.width + ball.r
-		// )
-		// 	// player1 collision
-		// 	vy = -Math.abs(vy);
-		// if (
-		// 	newY - r <= player2X.y + player2X.height &&
-		// 	newX >= player2X.x &&
-		// 	newX <= player2X.x + player2X.width + ball.r
-		// )
-		// 	// player2 collision
-		// 	vy = Math.abs(vy);
-		// else if (newY + r >= player1X.y + player1X.height) {
-		// 	// player1 score
-		// 	setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
-		// 	vx = -2;
-		// 	vy = -2;
-		// 	x = width / 2;
-		// 	y = height / 2;
-		// }
-		// if (newY - r <= player2X.y) {
-		// 	// player2 score
-		// 	setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
-		// 	vx = 2;
-		// 	vy = 2;
-		// 	x = width / 2;
-		// 	y = height / 2;
-		// }
-
-
-	// useEffect(() => {
-	// 	const intervalId = setInterval(() => {
-	// 		socket.on("responseBall", (ball: BallState) => {
-	// 			updateBall(ball);
-	// 			drawBall(ball);
-	// 		});
-	// 	}, 10);
-	// 	return () => clearInterval(intervalId);
-	// }, [ball]);
-
-// useEffect(() => {
-// 	window.addEventListener('mousemove', (e) => {
-// 		const { clientX, clientY } = e;
-// 		const canvas = canvasRef.current;
-// 		if (!canvas) return;
-// 		const rect = canvas.getBoundingClientRect();
-// 		const x = clientX - rect.left;
-// 		const y = clientY - rect.top;
-// 		if (y > 0 && x > 0 && y < height / 2 && x < width - 80) {
-// 			setPlayer2X((prev) => ({ ...prev, x }));
-// 		}
-// 		if (y > 0 && x > 0 && y > height / 2 && y < height && x < width - 80) {
-// 			setPlayer1X((prev) => ({ ...prev, x }));
-// 		}
-// 	});
-
-// 	return () => window.removeEventListener('mousemove', () => { });
-// }, []);
-
-// useEffect(() => {
-// 	//	initialize Game Menu
-// 	if (canvasRef.current) {
-// 		const canvas = canvasRef.current;
-// 		ctx = canvas.getContext('2d');
-// 		if (ctx) {
-// 			ctx.beginPath();
-// 			ctx.fillStyle = '#000';
-// 			ctx.fillRect(0, 0, width, height);
-// 			ctx.fill();
-// 			// midline
-// 			ctx.setLineDash([10, 10]);
-// 			ctx.moveTo(0, height / 2);
-// 			ctx.lineTo(width, height / 2);
-// 			ctx.strokeStyle = '#fff';
-// 			ctx.stroke();
-// 			// draw players
-// 			drawPlayer(player1X);
-// 			drawPlayer(player2X);
-// 			// draw ball
-// 			drawBall(ball);
-// 			const updateBall = () => {
-// 				setBall((prev) => {
-// 					const { x, y, r, vx, vy } = prev;
-// 					const newX = x + vx;
-// 					const newY = y + vy;
-// 					if (newX < r || newX > width - r) {
-// 						return {
-// 							...prev,
-// 							vx: -vx,
-// 						};
-// 					}
-// 					if (newY < r || newY > height - r) {
-// 						return {
-// 							...prev,
-// 							vy: -vy,
-// 						};
-// 					}
-// 					return {
-// 						...prev,
-// 						x: newX,
-// 						y: newY,
-// 					};
-// 				});
-// 			};
-// 			updateBall();
-// 		}
-// 		window.addEventListener('mousemove', (e) => {
-// 			const { clientX, clientY } = e;
-// 			const rect = canvas.getBoundingClientRect();
-// 			const x = clientX - rect.left;
-// 			const y = clientY - rect.top;
-// 			if (y > 0 && x > 0 && y < height / 2 && x < width - 80) {
-// 				setPlayer2X((prev) => ({ ...prev, x }));
-// 			}
-// 			if (y > 0 && x > 0 && y > height / 2 && y < height && x < width - 80) {
-// 				setPlayer1X((prev) => ({ ...prev, x }));
-// 			}
-// 		});
-// 		return () => {
-// 			if (canvasRef.current)
-// 				removeEventListener('mousemove', () => { });
-// 		};
-// 	}
-// }, [player1X, player2X, ball]);
