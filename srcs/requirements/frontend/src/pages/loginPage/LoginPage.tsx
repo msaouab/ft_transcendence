@@ -21,7 +21,6 @@ const LoginContainer = styled.div`
     .loginPagePicture {
       width: 100%;
       height: 100%;
-      background-color: #25bb00;
       img {
         height: 100%;
         width: 100%;

@@ -47,4 +47,5 @@ export class AchvController {
   getAchievements(@Param('id') id: string) {
     return this.achvService.getUserAchievements(id);
   }
+
 }

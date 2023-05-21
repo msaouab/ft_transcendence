@@ -1,23 +1,25 @@
-import PadelSvg from "../../assets/icons/PadelSvg";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import Avatar from "../../assets/avatar.png";
-import PlayWithMe from "../../assets/playWithMe.svg";
+import { Link, useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
-import AchivementImg2 from "../../assets/achivement2.png";
-import AchivementImg3 from "../../assets/achivement3.png";
-import AchivementImg4 from "../../assets/achivement4.png";
+
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useState } from "react";
-import instance, { getChannels, getFriendsInfo } from "../../api/axios";
+import { useEffect, useId, useState } from "react";
+import instance, {
+  getAchivements,
+  getChannels,
+  getFriendsInfo,
+  getRankData,
+  getUserInfo,
+} from "../../api/axios";
 import Cookies from "js-cookie";
-import axios from "axios";
+import SwiperComponent from "../../components/common/Slider";
+import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -29,85 +31,14 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 
-const CheckStatus = (stats: string) => {
-  const status = stats?.toLowerCase();
-  if (status == "online") {
-    return "bg-green-500";
-  } else if (status == "offline") {
-    return "bg-red-500";
-  } else if (status == "busy") {
-    return "bg-yellow-500";
-  } else if (status == "ingame") {
-    return "bg-blue-500";
-  }
-};
 
-const FreindCard = ({ avatar, firstName, lastName, status }: any) => {
-  return (
-    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]">
-      <div className="image ">
-        <img src={avatar} alt="" width={60} />
-      </div>
-      <div className="name text-xl font-[500]">
-        {firstName} {lastName}
-      </div>
-      <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-        {status}
-        <div
-          className={`dot w-3 h-3 ${CheckStatus(status)} rounded-full`}
-        ></div>
-      </div>
-    </div>
-  );
-};
 
-const GameCard = () => {
-  return (
-    <div className="flex justify-center mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[4rem]	">
-      <div className="flex items-center gap-7">
-        <div className="firstAdversary text-xl">Lala dodo</div>
-        <div className="result text-xl font-bold text-red-400">1 - 0</div>
-        <div className="secondAdversary text-xl">Koko Nani</div>
-      </div>
-    </div>
-  );
-};
 
-const ChanelCard = ({ channel_name, role, channel_id }: any) => {
-  return (
-    <Link to={`/chat/${channel_id}`}>
-      <div className="flex justify-around flex-wrap  mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]">
-        <div className="chanelname  font-[500]">
-          <span className="">Name: </span>
-          <span className="text-[#a5842f] text-xl capitalize">
-            {channel_name}
-          </span>
-        </div>
-        <div className="chanelname  font-[500]">
-          <span className="">Role: </span>
-          <span className="text-[#a5842f] text-xl capitalize">
-            {role}
-          </span>
-        </div>
-        
-      </div>
-    </Link>
-  );
-};
 
-const AchivementCard = ({ title, description, imgPath }: any) => {
-  return (
-    <div className="bg-white  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
-      <div className="image">
-        <img src={imgPath} alt="" width={150} />
-      </div>
-      <div className="title text-center font-bold text-xl  text-red-500">
-        {title}
-      </div>
-      <div className="description text-center">{description}</div>
-    </div>
-  );
-};
+
+
+
+
 
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
@@ -148,7 +79,10 @@ interface friendsInterface {
   Status: string;
 }
 
-const Home = () => {
+interface ProfileInterface {
+  isAnotherUser?: boolean;
+}
+const Profile = (props: ProfileInterface) => {
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -158,7 +92,7 @@ const Home = () => {
     lastName: "",
     status: "",
   });
-  const [rankData, getRankData] = useState({
+  const [rankData, setRankData] = useState({
     wins: "",
     loses: "",
     draws: "",
@@ -166,67 +100,51 @@ const Home = () => {
     rank: "",
   });
 
-  useEffect(() => {
-    const apiUrl = "http://localhost:3000/api/v1/me";
-    async function fetchData() {
-      try {
-        await axios
-          .get(apiUrl, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.statusText) {
-              setData(response.data);
-            }
-            // setOnlineStat(user.status);
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const rankUrl =
-      "http://localhost:3000/api/v1/User/" +
-      Cookies.get("userid") +
-      "/rankData";
-    async function fetchRankData() {
-      try {
-        await axios
-          .get(rankUrl, {
-            withCredentials: true,
-          })
-          .then((response) => {
-            if (response.statusText) {
-              getRankData(response.data);
-            }
-          })
-          .catch((error) => {
-            if (error.response.status == 401) {
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchRankData();
-  }, []);
-
   const [friends, setFriends] = useState<friendsInterface[]>([]);
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
-  useEffect(() => {
+  const [achivements, setAchivements] = useState<friendsInterface[]>([]);
+  const [userId, setUserId] = useState(Cookies.get("userid") || "");
+
+
+  const getAllData = () => {
     const friendsData = async () => {
-      const data = await getFriendsInfo(Cookies.get("userid") || "");
+      const data = await getFriendsInfo(userId);
       setFriends(data);
     };
     const joinedChannelData = async () => {
-      const data = await getChannels(Cookies.get("userid") || "");
+      const data = await getChannels(userId);
       setJoinedChannel(data);
     };
+    const achivementsData = async () => {
+      const data = await getAchivements(userId);
+      setAchivements(data);
+    };
+
+    const rankData = async () => {
+      const data = await getRankData(userId);
+      setRankData(data);
+    };
+
+    const getUserData = async () => {
+      const data = await getUserInfo(userId);
+      setData(data);
+    };
+
     friendsData();
     joinedChannelData();
+    achivementsData();
+    rankData();
+    getUserData();
+  };
+  const { id } = useParams(); // Extract the user ID from the URL params
+
+  useEffect(() => {
+    if (props.isAnotherUser) {
+      console.log("id", id);
+      setUserId(id || "");
+    }
+
+    getAllData();
   }, []);
 
   const Status = styled.div<{ userStatus: string }>`
@@ -294,6 +212,7 @@ const Home = () => {
       }
       .achievements {
         /* height: 500px; */
+        width: 100%;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -416,31 +335,24 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="achievements    h-[40%]  ">
+        <div className="achievements border border-gray-300-100 rounded-xl p-4   h-[40%]  w-[70%] m-auto">
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
-            Achievement
+            Achievements
           </div>
-          <div className="achiv-container flex gap-10 w-[80%] m-auto">
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg2}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg3}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg4}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg4}
-            />
+          <div className="achiv-container flex gap-10   m-auto ">
+            {achivements.length ? (
+              <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
+                <SwiperComponent
+                  slides={achivements.map((achivement, index) => (
+                    <AchivementCard key={index} {...achivement} />
+                  ))}
+                ></SwiperComponent>
+              </div>
+            ) : (
+              <div className=" h-full flex justify-center items-center text-3xl text-center">
+                No Achivements
+              </div>
+            )}
           </div>
         </div>
       </Main>
@@ -448,4 +360,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Profile;

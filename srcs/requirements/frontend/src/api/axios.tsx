@@ -47,4 +47,36 @@ export const getChannels = async (id:string) => {
   }
 }
 
+export const getAchivements = async (id:string) => {
+  try {
+    const res = await instance.get("/achivements/" + id);
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
+
+
+export const getRankData = async (id:string) => {
+  try {
+    const res = await instance.get("/user/" + id + "/rankData");
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
+export const getUserInfo = async (id:string) => {
+  try {
+    const res = await instance.get("/User/" + id );
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
 export default instance;

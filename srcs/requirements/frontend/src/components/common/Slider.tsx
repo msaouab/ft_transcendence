@@ -8,10 +8,16 @@ import styled from "styled-components";
 
 // Styled component for the swiper container
 const SwiperContainer = styled(Swiper)`
-  /* width: 100%; */
-  height: 100%;
+  /* width: 350px; */
+  height: 350px;
   display: flex;
   justify-content: center;
+  .swiper-slide{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
 
 `;
 
@@ -33,7 +39,7 @@ const SwiperComponent: React.FC<SwiperProps> = ({ slides }) => {
     // onSwiper: (swiper : any) => console.log(swiper),
     // onSlideChange: () => console.log("slide change"),
     module: [Navigation, Pagination, Scrollbar, A11y],
-    spaceBetween: 0,
+    spaceBetween: 10,
     slidesPerView: 2,
 	centeredSlides: true,
     onSwiper: (swiper: any) => console.log(swiper),

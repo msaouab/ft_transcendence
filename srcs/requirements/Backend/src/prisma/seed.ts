@@ -11,12 +11,12 @@ import e from 'express';
 //     password: 'ren-nasr',
 // },
 const users = [
-    {
-        login: 'ichoukri',
-        email: 'ichoukri@student.1337.ma',
-        firstName: 'Ismail',
-        lastName: 'Choukri',
-    },
+    // {
+    //     login: 'ichoukri',
+    //     email: 'ichoukri@student.1337.ma',
+    //     firstName: 'Ismail',
+    //     lastName: 'Choukri',
+    // },
     {
         login: 'msaouab',
         email: 'msaouab@student.1337.ma',
@@ -215,38 +215,38 @@ async function main() {
             {
                 name: 'Here We Go',
                 description: 'Played your first game.',
-                image: "/app/public/achievements/here_we_go.png",
+                image: "/achievements/here_we_go.png",
 
             },
             {
                 name: 'Ace',
                 description: 'Win a game with a perfect score.',
-                image: "/app/public/achievements/ace.png",
+                image: "/achievements/ace.png",
             },
             {
                 name: 'Atlas Athlete',
                 description: 'Score 50 pts',
-                image: "/app/public/achievements/Atlas_athlete.jpeg",
+                image: "/achievements/Atlas_athlete.jpeg",
             },
             {
                 name: 'Kasbah King',
                 description: 'Win five 5 games in a row.',
-                image: "/app/public/achievements/Kasbah_king.jpeg",
+                image: "/achievements/Kasbah_king.jpeg",
             },
             {
                 name: 'Intouchable',
                 description: 'Win 5 games without losing or draw in any game',
-                image: "/app/public/achievements/Intouchable.png",
+                image: "/achievements/Intouchable.png",
             },
             {
                 name: 'Kang the conqueror',
                 description: 'Win 20 games without losing or draw in any game',
-                image: "/app/public/achievements/kang.jpg",
+                image: "/achievements/kang.jpg",
             },
             {
                 name: 'Are u okay ?',
                 description: 'Just checking after your mediocre performance.',
-                image: "/app/public/achievements/ok.png",
+                image: "/achievements/ok.png",
             }
         ]
         for (let index = 0; index < achievements.length; index++) {
