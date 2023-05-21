@@ -74,7 +74,6 @@ function	Game() {
 
 	// useEffect(() => {
 	// 	setLoading(true);
-    //     // const apiUrl = 'http://localhost:3000/api/v1/Game'
 	// 	async function fetchData() {
 	// 	try {
 	// 		await axios.get(apiUrl, {

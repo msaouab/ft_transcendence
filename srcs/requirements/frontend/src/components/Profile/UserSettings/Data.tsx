@@ -28,7 +28,7 @@ function Form() {
     lastName: "",
   });
   useEffect(() => {
-    const apiUrl = "http://localhost:3000/api/v1/me";
+    const apiUrl = `http://localhost:3000/api/v1/me`;
     async function fetchData() {
       try {
         await axios
@@ -68,7 +68,7 @@ function Form() {
 
     axios
       .put(
-        "http://localhost:3000/api/v1/user/" +
+        `http://localhost:3000/api/v1/user/` +
           Cookies.get("userid") +
           "/update",
         defaultFormData,

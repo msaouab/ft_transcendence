@@ -21,7 +21,6 @@ const LoginContainer = styled.div`
 				max-width: 100%;
 				width: 100%;
 				box-sizing: border-box;
-
 			}
 		}
 		.whiteBoard {
@@ -162,7 +161,7 @@ const LoginContainer = styled.div`
 
 
 function	LoginPage() {
-	const [activeLink,setActiveLink] = useState<string>('http://localhost:3000/api/v1/login/42');
+	const [activeLink,setActiveLink] = useState<string>(`http://localhost:3000/api/v1/login/42`);
 		useEffect(() => {
 			const storedLink = localStorage.getItem('activeLink');
 			if (storedLink) {
@@ -207,8 +206,8 @@ function	LoginPage() {
 					</p>
 					<div className="rectangle"></div>
 					<p>NOT ON PONG YET?</p>
-					<Link to="http://localhost:3000/api/v1/login/42" className={`ftauth`}
-        				onClick={() => handleLinkClick('http://localhost:3000/api/v1/login/42')}>
+					<Link to={`http://localhost:3000/api/v1/login/42`} className={`ftauth`}
+        				onClick={() => handleLinkClick(`http://localhost:3000/api/v1/login/42`)}>
 							SIGN UP NOW!
 					</Link>
 				</div>

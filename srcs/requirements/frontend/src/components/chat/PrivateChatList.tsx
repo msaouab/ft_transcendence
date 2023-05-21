@@ -2,12 +2,12 @@
 import styled from 'styled-components';
 
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import {useEffect, useState } from 'react';
 
 import Cookies from 'js-cookie'
 import ChatTab from './ChatTab';
-import { PrivateMessage, UserMessage } from '../../types/message';
-import { CiEdit } from 'react-icons/ci';
+import { PrivateMessage } from '../../types/message';
+import { useGlobalContext } from '../../provider/AppContext';
 const UsersChatListStyle = styled.div`
 
     width: 100%;
@@ -19,12 +19,16 @@ const UsersChatListStyle = styled.div`
     flex-direction: column;
     gap: 20px;
 
+   
 
 `;
 
 const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
+    // privatChatroom context
 
-    const [privateChatRooms, setPrivateChatRooms] = useState([]);
+
+    const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
+    const [selected, setSelected] = useState<string>('');
 
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
@@ -37,19 +41,16 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         let id = Cookies.get('id');
         if (!id) return;
         try {
-
             const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
-            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean }) => {
+            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean, blocked: boolean }) => {
                 const { id } = room;
-
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
 
                 let user;
                 try {
                     if (message.data[0] === 0) return;
-
                     user = await getUser(message.data[1][0].sender_id, message.data[1][0].receiver_id)
 
                 } catch (error) {
@@ -67,6 +68,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     seen: message.data[1][0].seen,
                     login: user.login,
                     profileImage: user.profileImage,
+                    blocked: room.blocked, 
                     status: user.status
                 }
                 Tabs.push(data);
@@ -75,17 +77,17 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
             Tabs.sort((a: any, b: any) => {
                 return new Date(b.lastMessageDate).getTime() - new Date(a.lastMessageDate).getTime();
             });
-            setPrivateChatRooms(Tabs)
+            setPrivateChatRooms(Tabs);
+
 
         } catch (error) {
             console.error(error);
         }
     }
 
-
     useEffect(() => {
-        getPrivateChats('5', '1')
-        // 
+        getPrivateChats('5', '1');
+ 
     }, []);
 
 
@@ -101,11 +103,12 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
 
     }, [newLatestMessage])
 
-
     useEffect(() => {
         privateChatRooms.length > 0 ? setSelectedChat(privateChatRooms[0]) : null;
+        setSelected(privateChatRooms[0]?.chatRoomid);
     }, [privateChatRooms])
 
+    
     return (
         <UsersChatListStyle >
             <div className='flex justify-between'>
@@ -113,13 +116,9 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     People
                 </h1>
                 {/* add newmessage action later */}
-                <div className='flex justify-end items-center'>
-                    <CiEdit className='text-2xl text-white' />
-                </div>
-
             </div>
             <div className='h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60'></div>
-            <div className='overflow-y-scroll scrollbar-hide h-[100%] mt-2 flex flex-col gap-2'>
+            <div className=''>
                 {privateChatRooms.length === 0 ?
                     <div className='flex flex-col items-center justify-center h-full text-center ' >
                         <div className='
@@ -136,11 +135,19 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                             return (
                                 <div key={props.chatRoomid} onClick={() => {
                                     setSelectedChat(props);
+                                    setSelected(props.chatRoomid);
+
                                 }} >
-                                    <ChatTab privateMessage={props} key={props.chatRoomid} />
+                                    {/* if the chat is currently selected , show the selected style
+                                    else show the normal style
+
+                                     */}
+                                    <ChatTab privateMessage={props} key={props.chatRoomid} selected={props.chatRoomid === selected} />
+                                    {/* <ChatTab privateMessage={props} key={props.chatRoomid} selected={false} /> */}
                                     {/* seperator should show under all compontes excpet the last one */}
                                     {props.chatRoomid !== privateChatRooms[privateChatRooms.length - 1].chatRoomid ?
-                                        <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 opacity-60'></div> : null}
+                                        <div className='h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 mb-1.5
+                                         opacity-60'></div> : null}
 
                                 </div>
                             )
@@ -152,5 +159,6 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         </UsersChatListStyle >
     );
 };
+
 
 export default UsersChatList;

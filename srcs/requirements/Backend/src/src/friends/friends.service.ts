@@ -24,7 +24,6 @@ export class FriendsService {
                     {
                         user_id: id,
                     },
-
                     {
                         friendUser_id: id,
                     },
