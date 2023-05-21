@@ -35,10 +35,9 @@ function	Ldata() {
 	});
 	const navigate = useNavigate();
     
-//http://localhost:3000/api/v1/user/c9e8fb46-65d1-488f-a2af-0db0832c1926/file
 	useEffect(() => {
 		setLoading(true);
-        const apiUrl = 'http://localhost:3000/api/v1/me'
+        const apiUrl = `http://localhost:3000/api/v1/me`
 		async function fetchData() {
 		try {
 			await axios.get(apiUrl, {
@@ -248,7 +247,6 @@ export	default Ldata
 
 
 // function	LoginPage() {
-// 	const [activeLink,setActiveLink] = useState<string>('localhost:3000/api/v1/login/42');
 // 		useEffect(() => {
 // 			const storedLink = localStorage.getItem('activeLink');
 // 			if (storedLink) {
@@ -271,8 +269,8 @@ export	default Ldata
 // 			</div>
 // 			<div className='whiteBoard'>
 // 				<img src={logoBlack} alt="Logo" className='logo'/>
-// 				<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}>
-// 					<a href="localhost:3000/api/v1/login/42" target="_blank" rel="noreferrer">
+// 				<Link to="localho3t:4000/api/v1/login/42" className={`ftauth`}>
+// 					<a href="locfalhost:3000/api/v1/login/42" target="_blank" rel="noreferrer">
 // 					<div className='ftbutton'>
 
 // 							<img src={ftlogo} alt="42logo" className='ftlogo' />
@@ -292,8 +290,8 @@ export	default Ldata
 // 						Privacy Policy</a></p>
 // 						<div className="rectangle"></div>
 // 						<p>NOT ON PONG YET?</p>
-// 						<Link to="localhost:3000/api/v1/login/42" className={`ftauth`}
-//         				onClick={() => handleLinkClick('localhost:3000/api/v1/login/42')}>
+// 						<Link to="locaflhost:3000/api/v1/login/42" className={`ftauth`}
+//         				onClick={() => handleLinkClick('locaflhost:3000/api/v1/login/42')}>
 // 							SIGN UP NOW!
 // 					</Link>
 // 				</div>

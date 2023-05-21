@@ -7,9 +7,8 @@ import { MdOutlineNotifications } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { BsChevronDown } from "react-icons/bs";
 import SideBar from "../../components/common/SideBar";
-import { useEffect, useState } from "react";
-import { GetAvatar } from "../../api/axios";
-import { useGlobalContext } from "../../provider/AppContext";
+import { useState } from "react";
+import SearchBar from "../../components/common/Search/SearchBar";
 
 const DropDown = styled.div`
   position: absolute;
@@ -23,16 +22,38 @@ const DropDown = styled.div`
   z-index: 10;
 `;
 
+
 const index = () => {
   const { userImg } = useGlobalContext();
   const LayoutStyle = styled.div`
     height: 100vh;
-    /* width: 100vw; */
-    display: flex;
-    
-    /* display: grid; */
-    /* grid-template-columns: 1fr 11fr; */
-    /* padding: 1rem 2rem; */
+    width: 100vw;
+    max-height: 100vh;
+    width: 100vw; 
+    display: grid;
+    // display: flex;
+    grid-template-columns: 1fr 11fr;
+    padding: 1rem 2rem;
+
+    @media (max-width: 500px) {
+      
+      padding: 0;
+      padding-right: 1rem;
+      padding-bottom: 1rem;
+    }
+
+
+    @media (max-width: 768px) {
+      
+      padding: 0; 
+      .header {
+        margin-right: 0;
+        margin-top: 0;
+    }
+  
+
+    }
+
   `;
 
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
@@ -40,9 +61,9 @@ const index = () => {
     setIsDropDownOpen(!isDropDownOpen);
   };
 
-  const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-  };
+  // const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log(e.target.value);
+  // };
 
   return (
     <LayoutStyle>
@@ -52,15 +73,11 @@ const index = () => {
           <SideBar />
         </div>
       </div>
-      <div className="main-content w-full  px-4   ">
-        <div className="header flex justify-end  gap-8 items-center  h-[10%]">
+      <div className="main-content w-full ">
+        <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
+        ">
           <div className="search">
-            <CustomInput
-              placeHolder="Search"
-              type="text"
-              onChange={handelOnchange}
-              icon={<BiSearch className="text-[#1E1D19]" />}
-            />
+            <SearchBar />
           </div>
           <div className="notification relative">
             <div className="notif-count absolute z-10 text-white bg-red-500 rounded-[50%] w-[15px] h-[15px] text-xs p-0 m-0 flex justify-center items-center top-0 right-0">
@@ -80,10 +97,10 @@ const index = () => {
               className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
               onClick={handelDropDown}
             />
+          
             <div
-              className={`settings bg-slate-50  bg-white flex transition duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${
-                isDropDownOpen ? "h-[8rem]" : "h-0"
-              } `}
+              className={`settings bg-slate-50 h-[8rem] flex flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${isDropDownOpen ? "block" : "hidden"
+                } transition-all duration-200 absolute top-12 right-0 z-10`}
             >
               {/* <div className="setting-item">Profile</div>
               <div className="setting-item">Logout</div>
@@ -91,7 +108,7 @@ const index = () => {
             </div>
           </div>
         </div>
-        <div className="content  h-[90%]">
+        <div className="content max-h-[90%] h-[100%]">
           <Outlet />
         </div>
       </div>

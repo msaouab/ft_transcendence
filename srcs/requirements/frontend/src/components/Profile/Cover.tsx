@@ -134,7 +134,7 @@ function	Cover() {
 
 	useEffect(() => {
 		setLoading(true);
-        const apiUrl = 'http://localhost:3000/api/v1/me'
+        const apiUrl = `http://localhost:3000/api/v1/me`
 		async function fetchData() {
             try {
                 await axios.get(apiUrl, {
@@ -161,7 +161,7 @@ function	Cover() {
     }, []);
 
     useEffect(() => {
-        const avatarUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/avatar';
+        const avatarUrl = `http://localhost:3000/api/v1/user/` + Cookies.get('userid') + '/avatar';
         async function fetchAvatar() {
             try {
                 await axios.get(avatarUrl, {
@@ -187,7 +187,7 @@ function	Cover() {
 }, []);
     
     useEffect(() => {
-    const rankUrl = 'http://localhost:3000/api/v1/user/' + Cookies.get('userid') + '/rankData';
+    const rankUrl = `http://localhost:3000/api/v1/user/` + Cookies.get('userid') + '/rankData';
     async function fetchRankData() {
         try {
             await axios.get(rankUrl, {

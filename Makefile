@@ -27,6 +27,7 @@ env:
 	# @echo "HOSTNAME="$(hostname) >> ./srcs/requirements/frontend/.env.example
 	@cp ./srcs/env-example ./srcs/.env
 	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env
+	@cp ./srcs/requirements/frontend/.env.example ./srcs/requirements/frontend/.env
 
 build:
 	@echo "$(GREEN)█████████████████████ Build Images ████████████████████$(ED)"

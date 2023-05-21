@@ -102,15 +102,15 @@ const Status = styled.div<{ userStatus: string }>`
     bottom: 5px;
     right: 10%;
     background-color: ${({ userStatus }) =>
-      userStatus === "online"
-        ? "#00ff00"
-        : userStatus === "offline"
+    userStatus === "online"
+      ? "#00ff00"
+      : userStatus === "offline"
         ? "#6a6a6a"
         : userStatus === "donotdisturb"
-        ? "#ff0000"
-        : userStatus === "ingame"
-        ? "#011c77"
-        : "#ffcc00"};
+          ? "#ff0000"
+          : userStatus === "ingame"
+            ? "#011c77"
+            : "#ffcc00"};
     border: 1px solid #ececec;
     width: 15%;
     height: 15%;
