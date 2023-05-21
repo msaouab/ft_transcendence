@@ -12,6 +12,7 @@ const ChatStyle = Styled.div`
   width: 100%;
   max-height: 90vh;
   justify-content: flex-start;   
+  
   .chat-list {
     max-width: 500px;
     width: 40%;

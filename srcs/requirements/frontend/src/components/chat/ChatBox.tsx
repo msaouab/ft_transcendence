@@ -8,19 +8,20 @@ const ChatBoxStyle = styled.div`
     background: transparent;
     width: 100%;
     height: ${(props) => props.size === 'small' ? '100%' : '95%'};
-    
     display: flex;
     flex-direction: column;
     background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px; 
+   
     @media (max-width: 768px) {
         max-height: 74vh;
         // height: 100%;
         padding: 10px;
     }
 `;
+
 
 import { PrivateMessage } from '../../types/message';
 import { singleMessage } from '../../types/message';
@@ -29,7 +30,6 @@ import ChatBoxTopBar from './ChatBoxToBar';
 import SendMessageBox from './SendMessageBox';
 import axios from 'axios';
 import ChatInfiniteScroll from './ChatInfiniteScroll';
-
 
 
 const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connected }: {
@@ -46,7 +46,27 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
+    const updateSeenStatus = (messages: singleMessage[]) => {
+        messages.forEach((message: any) => {
+            if (message.seen === false && message.sender_id !== Cookies.get('id')) {
+                axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
+                    seen: true
+                }).then((response) => {
 
+                    if (response.status !== 200) {
+                        alert("error updating the seen status of the messages");
+                    }
+
+                }
+                ).catch((error) => {
+                    console.log("error", error);
+                }
+                );
+            }
+        });
+    }
+
+                
     useEffect(() => {
         if (connected) {  
             chatSocket.current.on('newPrivateMessage', (message: any) => {
@@ -54,6 +74,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     ...prevState,
                     messages: [message, ...prevState.messages]
                 }));
+                updateSeenStatus([message]);
             })
         }
         return () => {
@@ -65,7 +86,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     const [totalMessages, setTotalMessages] = React.useState(0);
     const [state, setState] = React.useState(initialState);
     const { messages, hasMore, offset } = state;
-    let limit = 16;
+    let limit = 20;
 
 
     const getMessages = async (currentChat: any) => {
@@ -75,8 +96,28 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         // making the url dynamic
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
+        updateSeenStatus(responseMessages.data[1]);
+        // responseMessages.data[1].forEach((message: any) => {
+        //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
+        //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
+        //             seen: true
+        //         }).then((response) => {
+        //             if (response.status !== 200) {
+        //                 alert("error updating the seen status of the messages");
+        //             }
+
+        //         }
+        //         ).catch((error) => {
+        //             console.log("error", error);
+        //         }
+        //         );
+        //     }
+        // });
+
         return responseMessages.data[1];
     };
+
+
 
     const next = () => {
         getMessages(selectedChat).then((newMessages) => {
@@ -87,10 +128,11 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 hasMore: totalMessages > prevState.offset + newMessages.length
             }));
         })
+
+
     };
 
     useEffect(() => {
-        console.log("a new chat was selected with id", selectedChat.chatRoomid);
         getMessages(selectedChat).then((messages) => {
             if (messages.length == 0
                 || (messages[0] && selectedChat.chatRoomid !== messages[0].chatRoom_id)) {
@@ -102,13 +144,36 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 });
             }
             else {
+                  // update the seen status of the messages  (seen = true) to the viewed messages
+                // messages are viewed when the user opens the chat box
+                // console.log("messages", messages);
+                // if (messages.length === 0) {
+                //    console.log("no messages");
+                // }
+                // messages.forEach((message: any) => {
+                //     // console.log("message", message);
+
+                //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
+                //         console.log("the message we're updating", message);
+                //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
+                //             seen: true
+                //         }).then((response) => {
+
+                //             console.log("response", response);
+                //         }
+                //         ).catch((error) => {
+                //             console.log("error", error);
+                //         }
+                //         );
+                //     }
+                // });
                 setState((prevState) => ({
                     ...prevState,
                     messages: [...prevState.messages, ...messages],
                     offset: prevState.offset + messages.length,
                     hasMore: true,
                 }));
-                console.log("messages", messages);
+
             }
 
         });
@@ -119,7 +184,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         <ChatBoxStyle size={size} id='chat-box'>
             {
                 selectedChat.sender_id === undefined && selectedChat.receiver_id === undefined ? (
-
                     <div className='flex flex-col items-center justify-center h-full'>
                         <div className='text-2xl text-white'>nothing to see here</div>
                         <div className='text-xl text-white'>try selecting a chat</div>

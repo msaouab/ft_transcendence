@@ -21,7 +21,6 @@ import {
 // dto's
 import { createMessageDto } from './message/message.dto';
 import { PostPrivateChatRoomDto } from './dto/postPrivateChatRoom';
-import { isInstance } from 'class-validator';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
@@ -29,7 +28,6 @@ export class ChatService {
     constructor(private prisma: PrismaService,
         // private MessageService: MessageService
     ) { }
-
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
         const { senderId, receiverId } = postreatePrivateChatRoomDto;
@@ -217,18 +215,14 @@ export class ChatService {
                     id: await this.getRoomId(payload.sender_id, payload.receiver_id),
                 },
             })
-            // console.log("Private room: ", privateRoom);
-            // if client socket is not joined to the private chat room, throw an exception
-            // join cli
-            // if (!client.rooms.has(privateRoom.id)) {
-            //     console.log("You're not in the private chat room");
-            //     // throw new HttpException("You're not in the private chat room", 403);
-            //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
-            // }
-
-            console.log("we're creating the private message");
+ 
             // create a new private message, and adds it to the private chat room
-            // let privateMessage = await this.MessageService.createPrivateChatMessage(payload);
+    
+            // if both sockets are connected, set seen to true
+            if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
+                payload.seen = true;
+            }
+            
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,
@@ -317,9 +311,12 @@ export class ChatService {
         }
         // return all the private messages in the private chat room, sorted by date
         // if seen is passed, get all the messages that seen if (true) or not seen if (false)
-        if (seen) {
+        if (seen == 'true' || seen == 'false') {
+            console.log("Seen: ", seen);
+        }
 
-            return await this.prisma.$transaction([
+        if (seen) {
+            const transaction =  await this.prisma.$transaction([
                 // get count of all the messages in the private chat room
                 this.prisma.privateMessage.count({
                     where: {
@@ -339,6 +336,7 @@ export class ChatService {
                     }
                 })
             ]);
+            console.log("Transaction: ", transaction);
         }
 
         if (isNaN(Number(offset))) {

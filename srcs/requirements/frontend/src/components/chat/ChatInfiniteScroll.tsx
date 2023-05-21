@@ -3,10 +3,13 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import Message from "./Message/Message";
 
-const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: any, next: any, hasMore: any, setState: any }) => {
 
+const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: any, next: any, hasMore: any, setState: any }) => {
+    // when 
     return (
-        <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full max-h-[100%]" id="scrollableDiv">
+        <div className="flex flex-col-reverse overflow-y-auto gap-2 mt-2 w-full h-full max-h-[100%]
+    
+        " id="scrollableDiv">
             <InfiniteScroll className=" "
                 // key={selectedChat.chatRoomid}
                 scrollableTarget="scrollableDiv"
@@ -23,8 +26,6 @@ const ChatInfiniteScroll = ({ messages, next, hasMore, setState }: { messages: a
                     .reverse() // reverse the order of the array
                     .map((message: any) => {
                         const prevMessage = messages[messages.indexOf(message) - 1];
-                        
-                        // change the key to the message id later it's the problem
                         return <Message 
                         // key={Math.random()} 
                         key={message.id}
