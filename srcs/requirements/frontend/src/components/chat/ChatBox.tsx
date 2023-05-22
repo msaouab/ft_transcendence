@@ -56,7 +56,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     if (response.status !== 200) {
                         alert("error updating the seen status of the messages");
                     }
-
                 }
                 ).catch((error) => {
                     console.log("error", error);
@@ -97,23 +96,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         updateSeenStatus(responseMessages.data[1]);
-        // responseMessages.data[1].forEach((message: any) => {
-        //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
-        //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
-        //             seen: true
-        //         }).then((response) => {
-        //             if (response.status !== 200) {
-        //                 alert("error updating the seen status of the messages");
-        //             }
-
-        //         }
-        //         ).catch((error) => {
-        //             console.log("error", error);
-        //         }
-        //         );
-        //     }
-        // });
-
+        
         return responseMessages.data[1];
     };
 
@@ -144,29 +127,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 });
             }
             else {
-                  // update the seen status of the messages  (seen = true) to the viewed messages
-                // messages are viewed when the user opens the chat box
-                // console.log("messages", messages);
-                // if (messages.length === 0) {
-                //    console.log("no messages");
-                // }
-                // messages.forEach((message: any) => {
-                //     // console.log("message", message);
-
-                //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
-                //         console.log("the message we're updating", message);
-                //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
-                //             seen: true
-                //         }).then((response) => {
-
-                //             console.log("response", response);
-                //         }
-                //         ).catch((error) => {
-                //             console.log("error", error);
-                //         }
-                //         );
-                //     }
-                // });
                 setState((prevState) => ({
                     ...prevState,
                     messages: [...prevState.messages, ...messages],

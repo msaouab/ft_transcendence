@@ -204,10 +204,6 @@ export class ChatService {
             content: payload.content
         }
 
-        // console.log("Subpayload: ", subPayload);
-        // const privateRoom = await this.CreatePrivateChatRoom(client, subPayload);
-        // return "ok";
-
         // check if privatchatroom exist.
         try {
             const privateRoom = await this.prisma.privateChatRoom.findUnique({
@@ -215,14 +211,15 @@ export class ChatService {
                     id: await this.getRoomId(payload.sender_id, payload.receiver_id),
                 },
             })
+            console.log("Private chat room exist: ", privateRoom);
  
             // create a new private message, and adds it to the private chat room
     
             // if both sockets are connected, set seen to true
-            if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
-                payload.seen = true;
-            }
-            
+            // if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
+            //     payload.seen = true;
+            // }
+            console.log("seen is set to: ", payload.seen);
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,
