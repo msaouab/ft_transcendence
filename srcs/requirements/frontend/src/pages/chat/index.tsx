@@ -108,7 +108,7 @@ const Chat = () => {
         chatSocket.current.emit('leaveRoom', payload);
       }
     }
-  }, [selectedChat]);
+  }, [selectedChat.chatRoomid]);
 
   useEffect(() => {
 

@@ -24,7 +24,7 @@ const DropDown = styled.div`
 
 
 const index = () => {
-  const { userImg } = useGlobalContext();
+  // const { userImg } = useGlobalContext();
   const LayoutStyle = styled.div`
     height: 100vh;
     width: 100vw;
@@ -86,13 +86,13 @@ const index = () => {
             <MdOutlineNotifications className="text-4xl text-white font-bold" />
           </div>
           <div className="user flex justify-center items-center  relative">
-            {userImg && (
+            {/* {userImg && (
               <img
                 src={userImg}
                 alt="user"
                 className="w-[40px] h-[40px] rounded-[50%]"
               />
-            )}
+            )} */}
             <BsChevronDown
               className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
               onClick={handelDropDown}

@@ -91,7 +91,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendPrivateMessage')
     async handleChat(client: Socket, payload: createMessageDto) {
-        console.log("We've got the event");
+        console.log("We've got the event of sending a private message");
         return await this.chatService.sendPrivateMessage(client, payload, this.server);
 
     }
