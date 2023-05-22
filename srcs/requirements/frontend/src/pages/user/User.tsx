@@ -35,7 +35,7 @@ const ProfileContainer = styled.div`
   }
 `;
 
-const Profile = () => {
+const User = () => {
 
   return (
     <ProfileContainer className="h-full w-full">
@@ -61,4 +61,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default User;

@@ -11,8 +11,10 @@ import ConfirmDelete from '../common/ConfirmDelete';
 
 const SendMessageBoxStyle = styled.div`
     width: 100%;
-    height: 8%;
-    max-height: 60px;
+    /* height: 8%; */
+    min-height: 2rem;
+
+    /* max-height: 60px; */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -44,11 +46,7 @@ const SendMessageBoxStyle = styled.div`
     }
 
 
-    @media (max-width: 768px) {
-        ${(props: { size: any }) => props.size === 'big' ? `
-            padding: 10px; 
-        ` : ``}
-    }
+
 
     @media (max-width: 400px) {
         ${(props: { size: any }) => props.size === 'big' ? `

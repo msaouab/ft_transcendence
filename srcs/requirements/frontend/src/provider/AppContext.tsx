@@ -3,18 +3,19 @@ import React, {
   useContext,
   useState,
   ReactNode,
-  useEffect,
 } from "react";
 import DefaultAvatar from "../assets/avatar.png";
-import { GetAvatar } from "../api/axios";
 
 interface AppContextType {
   userStatus: string;
   setUserStatus: React.Dispatch<React.SetStateAction<string>>;
   userImg: string;
   setUserImg: React.Dispatch<React.SetStateAction<string>>;
+  userId: string;
+  setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -25,28 +26,19 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
-  const [userImg, setUserImg] = useState(DefaultAvatar);
+  const [userImg, setUserImg] = useState("");
+  const [userId, setUserId] = useState<string>("");
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
 
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const res = await GetAvatar();
-        setUserImg(res);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchAvatar();
-  }, []);
 
   const value = {
     userStatus,
     setUserStatus,
     userImg,
     setUserImg,
+    userId,
+    setUserId,
     privateChatRooms,
     setPrivateChatRooms,
   }

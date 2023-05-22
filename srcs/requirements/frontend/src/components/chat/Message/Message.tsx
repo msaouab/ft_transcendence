@@ -9,7 +9,7 @@ const MessageStyle = styled.div`
     display: flex;
     flex-direction: column;
     align-self: ${props => props.sender_id === Cookies.get('id') ? 'flex-end' : 'flex-start'};
-
+    word-wrap: anywhere;
     // border: 1px solid #fff;
     .message__dot {
         align-self: ${props => props.sender_id === Cookies.get('id') ? 'flex-end' : 'flex-start'};

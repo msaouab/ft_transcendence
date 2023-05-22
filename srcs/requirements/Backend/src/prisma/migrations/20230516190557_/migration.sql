@@ -11,7 +11,7 @@ CREATE TYPE "ChanType" AS ENUM ('Public', 'Private', 'Secret');
 CREATE TYPE "GameStatus" AS ENUM ('OnGoing', 'Finished');
 
 -- CreateEnum
-CREATE TYPE "Rank" AS ENUM ('Novice', 'Intermediate', 'Advanced', 'Master');
+CREATE TYPE "Rank" AS ENUM ('Novice', 'Veteran', 'Rif_Rebellion', 'Master', 'Sahara_Tuareg');
 
 -- CreateEnum
 CREATE TYPE "MemeberStatusTime" AS ENUM ('Permanent', 'Temporary');
@@ -179,10 +179,14 @@ CREATE TABLE "GameInvites" (
 -- CreateTable
 CREATE TABLE "RankingData" (
     "user_id" TEXT NOT NULL,
+    "games" INTEGER NOT NULL DEFAULT 0,
     "wins" INTEGER NOT NULL DEFAULT 0,
     "loses" INTEGER NOT NULL DEFAULT 0,
     "draws" INTEGER NOT NULL DEFAULT 0,
-    "level" INTEGER NOT NULL DEFAULT 0,
+    "xp" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "winning_streak" INTEGER NOT NULL DEFAULT 0,
+    "losing_streak" INTEGER NOT NULL DEFAULT 0,
+    "points" INTEGER NOT NULL DEFAULT 0,
     "rank" "Rank" NOT NULL DEFAULT 'Novice'
 );
 
@@ -191,6 +195,7 @@ CREATE TABLE "Achievements" (
     "achievement_id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
 
     CONSTRAINT "Achievements_pkey" PRIMARY KEY ("achievement_id")
 );
@@ -198,9 +203,7 @@ CREATE TABLE "Achievements" (
 -- CreateTable
 CREATE TABLE "AchievementsAssignement" (
     "achievement_id" INTEGER NOT NULL,
-    "player_id" TEXT NOT NULL,
-
-    CONSTRAINT "AchievementsAssignement_pkey" PRIMARY KEY ("achievement_id","player_id")
+    "player_id" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -252,6 +255,9 @@ CREATE UNIQUE INDEX "GameInvites_sender_id_receiver_id_key" ON "GameInvites"("se
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RankingData_user_id_key" ON "RankingData"("user_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AchievementsAssignement_achievement_id_player_id_key" ON "AchievementsAssignement"("achievement_id", "player_id");
 
 -- AddForeignKey
 ALTER TABLE "FriendshipInvites" ADD CONSTRAINT "FriendshipInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
