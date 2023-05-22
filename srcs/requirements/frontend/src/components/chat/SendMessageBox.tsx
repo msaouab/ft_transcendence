@@ -5,10 +5,16 @@ import { useState } from 'react';
 
 import Cookies from 'js-cookie';
 import { dateToStr } from '../common/CommonFunc';
-import axios from 'axios';
+
+import { useGlobalContext } from '../../provider/AppContext';
+import ConfirmDelete from '../common/ConfirmDelete';
+
 const SendMessageBoxStyle = styled.div`
     width: 100%;
-    height: 8%;
+    /* height: 8%; */
+    min-height: 2rem;
+
+    /* max-height: 60px; */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -17,7 +23,7 @@ const SendMessageBoxStyle = styled.div`
     border-radius: 25px;
     padding: 20px;
     color: #fff;
-
+    
     input {
         background-color: transparent;
         border: none;
@@ -38,18 +44,82 @@ const SendMessageBoxStyle = styled.div`
         color: #ffff;
         cursor: pointer;
     }
+
+
+
+
+    @media (max-width: 400px) {
+        ${(props: { size: any }) => props.size === 'big' ? `
+        padding: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+    
+
+        .message-icon {
+            display: none;
+        }
+        input {
+            margin-left: 0px;
+        }
+        ` : ``}
+       
+    }
 `;
 
 
-const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any }) => {
+const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, size }: { selectedChat: any, socket: any, connected: boolean, setNewLatestMessage: any, size: string}) => {
     const [message, setMessage] = useState<string>('');
 
+    const [confirmData, setConfirmData] = useState<any>({
+        show: false,
+        title: 'Message not sent',
+        message: 'you cannot send a message to this user at the moment',
+        actionName: '',
+        confirm: () => {
+            setConfirmData({
+                ...confirmData,
+                show: false
+            });
+        }
+    }
+    );
 
+    const {setPrivateChatRooms} = useGlobalContext();
+    
+    // let initData = {
+    //     show: false,
+    //     title: 'Message not sent',
+    //     message: 'you cannot send a message to this user at the moment',
+    //     actionName: 'Ok',
+    //     confirm: () => {
+    //         setConfirmData({
+    //             ...confirmData,
+    //             show: false
+    //         });
+    
+    //     }
+    // };
 
     const sendMessage = (messageProp: string) => {
+
+
+        // if the user is blocked, don't send the message
+        console.log(selectedChat);
+        if (selectedChat.blocked) {
+           console.log('blocked');
+             
+
+        setConfirmData({
+            ...confirmData,
+            show: true
+        });
+        setMessage('');      
+       return ;
+        }
         if (messageProp === '') {
             return;
         }
+      
         let message = {
             dateCreated: dateToStr(new Date()),
             content: messageProp,
@@ -58,26 +128,39 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
             sender_id: Cookies.get('id'),
             receiver_id: selectedChat.sender_id === Cookies.get('id') ? selectedChat.receiver_id : selectedChat.sender_id
         };
-        // console.log("hey from zone 1kp1")
         if (connected) {
-            // console.log('sending the message: ', message);
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
             if (setNewLatestMessage) {
-                // console.log("hey from zone 1kp2")
                 setNewLatestMessage(
                     {
                         chatRoomId: selectedChat.chatRoomid,
                         message: message.content
                     }
                 )
-                // setNewLatestMessage(message.content);
             }
+            const newPrivateChatRoom = {
+                ...selectedChat,
+                lastMessage: message.content,
+                lastMessageDate: Date.now(),
+            }
+            setPrivateChatRooms(prev => {   
+                const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
+                if (index === -1) {
+                    return [...prev, newPrivateChatRoom];
+                }
+                else {
+                    prev[index] = newPrivateChatRoom;
+                    return [...prev];   
+                }
+            }
+            )
+
         }
     };
 
     return (
-        <SendMessageBoxStyle>
+        <SendMessageBoxStyle size={size}>
             <div className='message-icon text-white'>
                 <CiChat1 size={30} color='#ffff' />
             </div>
@@ -90,6 +173,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage }
                     <CiPaperplane size={30} color='#ffff' />
                 </a>
             </div>
+            {confirmData.show && <ConfirmDelete setShow={setConfirmData} confirmData={confirmData} id={''} />}
         </SendMessageBoxStyle>
     );
 };

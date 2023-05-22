@@ -95,6 +95,7 @@ const SideBar = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
+
           if (error.response.status == 401) {
             navigate("/login");
           }

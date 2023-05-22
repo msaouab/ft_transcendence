@@ -48,12 +48,16 @@
   background: #555; /* Color of the scroll handle on hover */
   border-radius: 8px;
 }
-
+  body {
+  font-family: 'Oxanium', cursive;
+  }
 
 .debug {
   border: 1px solid red !important;
+
   & * {
     border: 1px solid green !important;
+
     & * {
       border: 1px solid blue !important;
     }

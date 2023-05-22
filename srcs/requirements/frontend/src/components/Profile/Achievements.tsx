@@ -40,7 +40,7 @@ function	Achievements() {
 
 	// useEffect(() => {
 	// 	setLoading(true);
-    //     // const apiUrl = 'http://localhost:3000/api/v1/Achievements'
+    //     // c'
 	// 	async function fetchData() {
 	// 	try {
 	// 		await axios.get(apiUrl, {

@@ -17,7 +17,21 @@ const ChatTabStyle = styled.div`
     justify-content: space-between;
     gap: 10px;
     padding: 10px;
+    
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
+    ${(props: { selected: boolean }) => props.selected ? `
+        background: rgba(217, 217, 217, 0.3);
+        // it shoudl move a litte up
+        transform: translateY(-1px);
+        shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+        transition: all 0.2s ease-in-out;
+        duration: 0.1s;
+    ` : ``}
+    
     &:hover {
         background: rgba(217, 217, 217, 0.3);
         // it shoudl move a litte up 
@@ -39,7 +53,7 @@ const ChatTabStyle = styled.div`
     }
 
     & > *:nth-child(3) {
-        width: 26%;
+        width: 40%;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -48,29 +62,34 @@ const ChatTabStyle = styled.div`
         font-size: 0.6rem;
         color: #fff;
     }
+
+
+
+    @media (max-width: 360px) {
+        & > *:nth-child(3) {
+            display: none;
+        }
+    }
+
 `;
 
 
 
 
-const ChatTab = ({ privateMessage, newLatestMessage }:
+const ChatTab = ({ privateMessage, selected }:
     {
         privateMessage: PrivateMessage,
-        // newLatestMessage: string
+        selected: boolean
     }
 ) => {
 
-    // useEffect(() => {
-    //     console.log('newLatestMessage', newLatestMessage);
-    //     privateMessage.lastMessage = newLatestMessage;
-    // }, [newLatestMessage]);
-
+    
     let otherUserId = privateMessage.sender_id === Cookies.get('id') ? privateMessage.receiver_id : privateMessage.sender_id;
     return (
-        <ChatTabStyle>
+        <ChatTabStyle selected={selected}>
             <div className="chat-tab__image">
                 {/* uncomment later */}
-                {/* <img src={props.profileImage} alt="profile" className="rounded-full" /> */}
+                {/* <img src={privateMessage.profileImage} alt="profile" className="rounded-full" /> */}
                 <img src="https://picsum.photos/200" alt="profile" className="rounded-full w-10 h-10" />
             </div>
             <div className="chat-tab__info">
@@ -83,6 +102,7 @@ const ChatTab = ({ privateMessage, newLatestMessage }:
                     {privateMessage.lastMessage.length > 25 ? privateMessage.lastMessage.slice(0, 25) + '...' : privateMessage.lastMessage}
                 </div>
             </div>
+
             <MessageDate {...privateMessage} />
         </ChatTabStyle>
     );

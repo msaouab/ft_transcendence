@@ -1,10 +1,13 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const instance = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+
+
+const instance =  axios.create({
+  baseURL: "http://localhost:3000/api/v1", 
   withCredentials: true,
-});
+}) 
+
 
 export const GetAvatar = async (id:string) => {
   const res = await instance.get("/user/" + id + "/avatar", {

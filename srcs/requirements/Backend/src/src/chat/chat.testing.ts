@@ -6,7 +6,7 @@
 // const senderId = process.argv[2];
 // const receiverId = process.argv[3];
 
-// const socket = io('http://localhost:3000/chat');
+
 
 // socket.on('connect', () => {
 //     console.log('connected');

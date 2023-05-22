@@ -13,14 +13,14 @@ import { Socket, Server } from 'socket.io';
 import { createHash } from 'crypto';
 import {
     PrivateChatRoom,
-    PrivateMessage
+    PrivateMessage,
+    BlockTab
 } from '@prisma/client';
 
 
 // dto's
 import { createMessageDto } from './message/message.dto';
 import { PostPrivateChatRoomDto } from './dto/postPrivateChatRoom';
-import { isInstance } from 'class-validator';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 @Injectable()
@@ -28,7 +28,6 @@ export class ChatService {
     constructor(private prisma: PrismaService,
         // private MessageService: MessageService
     ) { }
-
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
         const { senderId, receiverId } = postreatePrivateChatRoomDto;
@@ -205,10 +204,6 @@ export class ChatService {
             content: payload.content
         }
 
-        // console.log("Subpayload: ", subPayload);
-        // const privateRoom = await this.CreatePrivateChatRoom(client, subPayload);
-        // return "ok";
-
         // check if privatchatroom exist.
         try {
             const privateRoom = await this.prisma.privateChatRoom.findUnique({
@@ -216,25 +211,22 @@ export class ChatService {
                     id: await this.getRoomId(payload.sender_id, payload.receiver_id),
                 },
             })
-            // console.log("Private room: ", privateRoom);
-            // if client socket is not joined to the private chat room, throw an exception
-            // join cli
-            // if (!client.rooms.has(privateRoom.id)) {
-            //     console.log("You're not in the private chat room");
-            //     // throw new HttpException("You're not in the private chat room", 403);
-            //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
-            // }
-
-            console.log("we're creating the private message");
+            console.log("Private chat room exist: ", privateRoom);
+ 
             // create a new private message, and adds it to the private chat room
-            // let privateMessage = await this.MessageService.createPrivateChatMessage(payload);
+    
+            // if both sockets are connected, set seen to true
+            // if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
+            //     payload.seen = true;
+            // }
+            console.log("seen is set to: ", payload.seen);
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,
                     seen: payload.seen,
                     sender_id: payload.sender_id,
                     receiver_id: payload.receiver_id,
-                    chatRoom_id: payload.chatRoom_id,
+                chatRoom_id: payload.chatRoom_id,
                 }
             });
             if (!message) {
@@ -269,10 +261,6 @@ export class ChatService {
                 id: await this.getRoomId(senderId, receiverId)
             }
         });
-        // if (!privatChatRoom) {
-        //     console.log("Private chat room doesn't exist, from the backend");
-        //     throw new HttpException("Private chat doesn't exist", 404);
-        // }
         return privatChatRoom;
     }
 
@@ -320,9 +308,12 @@ export class ChatService {
         }
         // return all the private messages in the private chat room, sorted by date
         // if seen is passed, get all the messages that seen if (true) or not seen if (false)
-        if (seen) {
+        if (seen == 'true' || seen == 'false') {
+            console.log("Seen: ", seen);
+        }
 
-            return await this.prisma.$transaction([
+        if (seen) {
+            const transaction =  await this.prisma.$transaction([
                 // get count of all the messages in the private chat room
                 this.prisma.privateMessage.count({
                     where: {
@@ -342,6 +333,7 @@ export class ChatService {
                     }
                 })
             ]);
+            console.log("Transaction: ", transaction);
         }
 
         if (isNaN(Number(offset))) {
