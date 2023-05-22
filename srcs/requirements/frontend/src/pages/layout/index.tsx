@@ -15,36 +15,7 @@ const index = () => {
 const LayoutStyle = styled.div`
 display: flex;
 height: 100vh;
-    /* height: 100vh;
-    width: 100vw;
-    max-height: 100vh;
-    width: 100vw; 
-    display: grid;
-    // display: flex;
-    grid-template-columns: 1fr 11fr;
-    padding: 1rem 2rem;
-
-    @media (max-width: 500px) {
-      
-      padding: 0;
-      padding-right: 1rem;
-      padding-bottom: 1rem;
-    }
-
-
-    @media (max-width: 768px) {
-      
-      padding: 0; 
-      .header {
-        margin-right: 0;
-        margin-top: 0;
-    }
-  
-
-    } */
-
   `;
-
 
 
 

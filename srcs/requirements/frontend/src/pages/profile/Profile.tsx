@@ -287,7 +287,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full  py-2 ">
-              {friends && friends.length > 0 ? (
+              {friends && friends?.length > 0 ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {friends.map((Friend, index) => (
                     <FreindCard key={index} {...Friend} />
@@ -308,7 +308,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {joinedChannel.length ? (
+              {joinedChannel && joinedChannel.length ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {joinedChannel.map((chanel, index) => (
                     <ChanelCard key={index} {...chanel} />
@@ -340,7 +340,7 @@ const Profile = (props: ProfileInterface) => {
             Achievements
           </div>
           <div className="achiv-container flex gap-10   m-auto ">
-            {achivements.length ? (
+            {achivements && achivements.length ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
