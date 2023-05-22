@@ -255,25 +255,25 @@ const Profile = (props: ProfileInterface) => {
           <div className="name md:text-4xl text-xl  font-[800] ">
             {user?.firstName || ""} {user?.lastName || ""}
           </div>
-          <div className="name  font-[400] ">{user.login}</div>
+          <div className="name  font-[400] ">{user?.login}</div>
           <div className="flex gap-10 items-center "></div>
         </div>
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
-            <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-              <img src={Dice} alt="_" width={50} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws }
+        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-6  ">
+            <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
+              <img src={Dice} alt="_" width={40} />
+              Games : {rankData?.wins + rankData?.loses + rankData?.draws || " " }
             </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={AchivementImg1} width={50} alt="_" />
-              Wins : {rankData?.wins }
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={AchivementImg1} width={40} alt="_" />
+              Wins : {rankData?.wins || " "}
             </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Draw} alt="_" width={50} />
-              Draw: {rankData?.draws }
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={Draw} alt="_" width={40} />
+              Draw: {rankData?.draws || " "}
             </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Lose} alt="_" width={50} />
-              Lose: {rankData?.loses }
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={Lose} alt="_" width={40} />
+              Lose: {rankData?.loses || " "}
             </div>
           </div>
       </Top>

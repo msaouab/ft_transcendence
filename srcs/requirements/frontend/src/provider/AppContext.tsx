@@ -31,6 +31,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
 
+  //  user auth context
+
 
   const value = {
     userStatus,

@@ -4,7 +4,7 @@ interface CustomInputProps {
   placeHolder?: string;
   type?: string;
   value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: any;
   icon?: ReactNode;
   name?:string;
   className?:string;
