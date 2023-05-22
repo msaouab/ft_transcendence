@@ -157,8 +157,6 @@ const SearchBar = () => {
             }
             );
         }
-
-
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
             socket.current = io(`http://localhost:3000/search`);
 
@@ -188,7 +186,6 @@ const SearchBar = () => {
                 socket.current.disconnect();
                 setSearchConnected(false);
             }
-
         }
 
     }, []);
@@ -268,11 +265,8 @@ const SearchBar = () => {
                                         searchResults['users'] && searchResults['users'].length === 0 &&
                                             searchResults['channels'] && searchResults['channels'].length === 0 ? (
                                             <div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
-                                                <h1
-                                                    className="text-2xl font-bold text-black-500 w-9/12 text-center"
-                                                > Nope, can't find it. Did you check under the couch. </h1>
+                                                <h1 className="text-2xl font-bold text-black-500 w-9/12 text-center"> Nope, can't find it. Did you check under the couch. </h1>
                                                 <CiFaceMeh className="face-meh-icon" size={50} />
-
                                             </div>
                                         ) : null
                                     }
@@ -295,7 +289,7 @@ const SearchBar = () => {
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
-                                                                {/* change later */}
+                                                                {/* uncomment later */}
                                                                 {/* <img src={user.avatar} alt="avatar" /> */}
                                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
 
@@ -317,7 +311,7 @@ const SearchBar = () => {
                                                                 <CiChat2 className="chat-icon " size={30} />
                                                             </a>
                                                         </div>
-                                            }
+                                             }
 
                                                     </div>
                                                 )
@@ -341,7 +335,7 @@ const SearchBar = () => {
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
                                                                 <div className="search-result-avatar">
-                                                                    {/* change later */}
+                                                                    {/* uncomment later */}
                                                                     {/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
                                                                     <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
                                                                 </div>

@@ -24,7 +24,6 @@ export class FriendsService {
                     {
                         user_id: id,
                     },
-
                     {
                         friendUser_id: id,
                     },
@@ -32,6 +31,41 @@ export class FriendsService {
             },
         }
         );
+    }
+
+    async getFriendsInfo(id: string) {
+        await this.UserService.getUser(id);
+        try{
+            const friendsId = await this.prisma.friendsTab.findMany({
+                where: {
+                    OR:[
+                        {user_id:id,},
+                        {friendUser_id: id}
+                    ]
+                }
+            });
+            const friends = [];
+            for(const friend of friendsId)
+            {
+                const user = await this.prisma.user.findFirst({
+                    where: {
+                        id: friend.user_id !== id? friend.user_id: friend.friendUser_id,
+                    },
+                    select:{
+                        id: true,
+                        login: true,
+                        firstName:true,
+                        lastName: true,
+                        avatar: true,
+                        status: true,
+                    }
+                })
+                friends.push(user);
+            }
+            return friends;
+        }catch(err) {
+            console.log(err);
+        }
     }
     async createFriendship(user_id: string, friendUser_id: string): Promise<FriendsTab> {
         /* errs:

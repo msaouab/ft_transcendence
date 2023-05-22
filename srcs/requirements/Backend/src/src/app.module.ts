@@ -22,6 +22,8 @@ import { ChannelModule } from "./channel/channel.module";
 import { ChatGateway } from "./chat/chat.gateway";
 import { SearchWebSocketModule } from "./searchWebSocket/search.module";
 import { SearchModule } from "./search/search.module";
+import { AchvModule } from "./achievements/achv.module";
+import {NotificationModule} from "./notify/notify.module";
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { SearchModule } from "./search/search.module";
     BlockedUsersModule,
     SearchWebSocketModule,
     SearchModule,
+    AchvModule,
+    NotificationModule
   ],
 
   controllers: [AppController, UserController, GameController],

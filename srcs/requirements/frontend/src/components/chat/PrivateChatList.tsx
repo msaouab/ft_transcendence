@@ -8,6 +8,7 @@ import Cookies from 'js-cookie'
 import ChatTab from './ChatTab';
 import { PrivateMessage } from '../../types/message';
 import { useGlobalContext } from '../../provider/AppContext';
+import { GetAvatar } from '../../api/axios';
 const UsersChatListStyle = styled.div`
 
     width: 100%;
@@ -25,7 +26,7 @@ const UsersChatListStyle = styled.div`
 
 const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
     // privatChatroom context
-
+    
 
     const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
     const [selected, setSelected] = useState<string>('');
@@ -33,6 +34,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
         const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+
         return user.data;
     }
 
@@ -58,6 +60,8 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     return;
                 }
 
+                // const chattingUserId = message.data[1][0].sender_id === Cookies.get('id') ? message.data[1][0].receiver_id : message.data[1][0].sender_id; 
+
                 const data: PrivateMessage = {
                     chatRoomid: id,
                     messageId: message.data[1][0].id,
@@ -67,7 +71,8 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     lastMessageDate: message.data[1][0].dateCreated,
                     seen: message.data[1][0].seen,
                     login: user.login,
-                    profileImage: user.profileImage,
+                    // profileImage: await GetAvatar(chattingUserId),
+                    profileImage: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
                     blocked: room.blocked, 
                     status: user.status
                 }

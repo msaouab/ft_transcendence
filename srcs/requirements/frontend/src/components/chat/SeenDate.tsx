@@ -9,6 +9,7 @@ import SeenIcon from '../../assets/seen.svg';
 import notSeenIcon from '../../assets/notSeen.svg';
 import { useEffect, useState } from "react";
 import { getDateChat } from "../common/CommonFunc"
+import { useGlobalContext } from "../../provider/AppContext";
 
 const SeenNotSeenIconStyle = styled.img`
     width: 17px;
@@ -16,15 +17,6 @@ const SeenNotSeenIconStyle = styled.img`
     margin-left: 10px;
     margin-top: 5px; 
 `;
-const SenderComponent = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-`;
-
-
 
 const MessageDateStyle = styled.div`
     background: transparent;
@@ -47,20 +39,37 @@ const MessageDateStyle = styled.div`
 
 // use a function expression and use props parameter
 const MessageDate = (props: PrivateMessage) => {
+
+    const {privateChatRooms} = useGlobalContext();
     // use useState hook to store count
     const [count, setCount] = useState(0);
-
+    const [seen, setSeen] = useState(props.seen);
     // move getNumberOfNotSeeMessages inside the component and use props parameter
     const getNumberOfNotSeeMessages = async () => {
+        const url = `http://localhost:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`;
+        // console.log("url: ", url);
         let count = await axios.get(
             `http://localhost:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
-        );
-        return count.data;
+        );  
+        return count.data[0];
     };
+
+    useEffect(() => {
+        // get the last message \in the chat room
+        // console.log("privateChatRooms: ", privateChatRooms);
+        const  privateChatRoom = privateChatRooms.find((chatRoom) => chatRoom.id === props.chatRoomid);
+        if (privateChatRoom) {
+
+            privateChatRoom.seen === true ? setSeen(true) : setSeen(false);
+        }
+    // lastMessage.seen === true ? setSeen(true) : setSeen(false);
+    }, [privateChatRooms]);
 
     // use useEffect hook to call getNumberOfNotSeeMessages and update count
     useEffect(() => {
+        
         getNumberOfNotSeeMessages().then((count) => {
+            // console.log("number of not seen messages: ", count.length);
             count = count.length;
             setCount(count);
         });
@@ -80,7 +89,7 @@ const MessageDate = (props: PrivateMessage) => {
 
             {getDateChat(props.lastMessageDate)}
             {
-                props.seen ? <SeenNotSeenIconStyle src={SeenIcon} alt="seen" />
+                seen ? <SeenNotSeenIconStyle src={SeenIcon} alt="seen" />
                     :
                     <SeenNotSeenIconStyle src={notSeenIcon} alt="not seen" />
             }

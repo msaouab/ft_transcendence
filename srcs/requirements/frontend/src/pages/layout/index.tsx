@@ -1,31 +1,22 @@
 import { Outlet } from "react-router-dom";
-import CustomInput from "../../components/common/CustomInput";
-// import { ReactComponent as SearchIcon } from '../../assets/icons/searchIcon.svg'
 import styled from "styled-components";
-import { BiSearch } from "react-icons/bi";
-import { MdOutlineNotifications } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
-import { BsChevronDown } from "react-icons/bs";
 import SideBar from "../../components/common/SideBar";
-import { useState } from "react";
+import DropDownMenu from "../../components/DropDownMenu";
+import Notifications from "../../components/Notifications";
 import SearchBar from "../../components/common/Search/SearchBar";
 
-const DropDown = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #fff;
-  width: 200px;
-  height: 200px;
-  border-radius: 5px;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.75);
-  z-index: 10;
-`;
-
-
+import { useEffect, useRef, useState } from "react";
+import {io} from "socket.io-client";
+import Cookies from "js-cookie";
+import { useGlobalContext } from "../../provider/AppContext";
 const index = () => {
-  const LayoutStyle = styled.div`
-    height: 100vh;
+
+
+
+const LayoutStyle = styled.div`
+display: flex;
+height: 100vh;
+    /* height: 100vh;
     width: 100vw;
     max-height: 100vh;
     width: 100vw; 
@@ -41,7 +32,6 @@ const index = () => {
       padding-bottom: 1rem;
     }
 
-
     @media (max-width: 768px) {
       
       padding: 0; 
@@ -51,19 +41,36 @@ const index = () => {
     }
   
 
-    }
+    } */
 
   `;
 
-  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
 
-  // const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   console.log(e.target.value);
-  // };
+  const notifySocket = useRef<any>(null);
+  const [connected, setConnected] = useState(false);
+  // const {setUserStatus} = useGlobalContext();
+
+  useEffect(() => {
+    if (!connected) {
+      notifySocket.current = io("http://localhost:3000");
+      setConnected(true);
+      console.log("connected to the server notify");
+    }
+  
+    notifySocket.current.on("disconnect", () => {
+      notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: 'Offline'});
+      console.log("disconnected from the server notify");
+    });
+
+  
+  }, []);
+
+
+
 
   return (
-    <LayoutStyle>
-      <div className="side-bar ">
+    <LayoutStyle className=" px-1 md:px-5">
+      <div className="md:w-[5rem] ">
         <SideBar />
       </div>
       <div className="main-content w-full ">
@@ -72,30 +79,12 @@ const index = () => {
           <div className="search">
             <SearchBar />
           </div>
-          <div className="notification relative">
-            <div className="notif-count absolute z-10 text-white bg-red-500 rounded-[50%] w-[15px] h-[15px] text-xs p-0 m-0 flex justify-center items-center top-0 right-0">
-              1
-            </div>
-            <MdOutlineNotifications className="text-4xl text-white font-bold" />
-          </div>
+          <Notifications />
           <div className="user flex justify-center items-center  relative">
-            <FaUserCircle className="text-4xl text-white font-bold mr-1" />
-            <BsChevronDown
-              className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
-              onClick={() => setIsDropDownOpen(!isDropDownOpen)}
-            />
-          
-            <div
-              className={`settings bg-slate-50 h-[8rem] flex flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${isDropDownOpen ? "block" : "hidden"
-                } transition-all duration-200 absolute top-12 right-0 z-10`}
-            >
-              <div className="setting-item">Profile</div>
-              <div className="setting-item">Logout</div>
-              <div className="setting-item">Status</div>
-            </div>
+            <DropDownMenu notifySocket={notifySocket} connected={connected} />
           </div>
         </div>
-        <div className="content max-h-[90%] h-[100%]">
+        <div className="content  flex-1">
           <Outlet />
         </div>
       </div>

@@ -38,9 +38,10 @@ enum GameStatus {
 
 enum Rank {
   Novice
-  Intermediate
-  Advanced
+  Veteran
+  Rif_Rebellion
   Master
+  Sahara_Tuareg
 }
 
 enum MemeberStatusTime {
@@ -251,10 +252,14 @@ model GameInvites {
 model RankingData {
   user_id                  String                    @unique
   user                     User                      @relation("rankingDataRelation", fields: [user_id], references: [id])
+  games                    Int                       @default(0)
   wins                     Int                       @default(0)
   loses                    Int                       @default(0)
   draws                    Int                       @default(0)
-  level                    Int                       @default(0)
+  xp                       Float                     @default(0)
+  winning_streak           Int                       @default(0)
+  losing_streak            Int                       @default(0)
+  points                   Int                       @default(0)
   rank                     Rank                      @default(Novice)
   achievements_assignement AchievementsAssignement[]
 }
@@ -263,6 +268,7 @@ model Achievements {
   achievement_id           Int                       @id @default(autoincrement())
   name                     String
   description              String
+  image                    String                   
   achievements_assignement AchievementsAssignement[] @relation("achievementsAssignementRelation")
 }
 
@@ -272,7 +278,7 @@ model AchievementsAssignement {
   player_id      String
   player         RankingData  @relation(fields: [player_id], references: [user_id])
 
-  @@id([achievement_id, player_id])
+  @@unique([achievement_id, player_id])
 }
 
 model GameHistoryTab {

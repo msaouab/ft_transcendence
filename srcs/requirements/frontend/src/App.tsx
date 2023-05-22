@@ -2,21 +2,25 @@ import { Route, Routes } from "react-router-dom";
 import AboutPage from "./pages/landingPage/AboutPage";
 // import ContactPage from './pages/landingPage/ContactPage';
 import LandingPage from "./pages/landingPage/LandingPage";
-import Home from "./pages/game/Home";
 import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";
 import { useState } from "react";
 
 import LoginPage from "./pages/loginPage/LoginPage";
+import Profile from "./pages/profile/Profile";
 import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
+import VerifyPage from "./pages/loginPage/VerifyPage";
+import GameType from "./pages/game/GameType";
+import OtherUserProfile from "./pages/profile/OtherUserProfile";
+import NotFound from "./pages/notFound/NotFound";
 
 
 
 function App() {
-  const [bgColor, setBgColor] = useState("#1E1E1E");
+  const [bgColor, setBgColor] = useState("#1e1d18");
   const [textColor, setTextColor] = useState("#ffffff");
   const handelBgChange = (e: any) => {
     setBgColor(e.target.value);
@@ -63,17 +67,17 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/tfa" element={<VerifyPage />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="" element={<Layout />}>
-  
-          <Route path="/home" element={<Home />} />
-          <Route path="/profile" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile/:id" element={<OtherUserProfile />} />
           <Route path="/settings" element={<UserSettings />} />
           <Route path="/game" element={<GameDashboard />} />
           <Route path="/game/10" element={<Game />} />
           <Route path="/chat" element={<Chat />} />
-          {/* <Route path="/game" element={<Game />}> */}
-          </Route>
-        {/* </Route> */}
+          <Route path="/game-type" element={<GameType />} />
+        </Route>
       </Routes>
     </>
   );

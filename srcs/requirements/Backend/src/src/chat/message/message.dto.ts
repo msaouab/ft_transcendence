@@ -3,7 +3,8 @@ import {
     IsString,
     IsNotEmpty,
     IsDate,
-    IsBoolean
+    IsBoolean, 
+    IsOptional
 } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -45,12 +46,14 @@ export class updateMessageDto {
     @ApiProperty()
     @IsDate()
     @IsNotEmpty()
+    @IsOptional()
     dateCreated: Date;
 
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    content: string;
+    @IsOptional()
+    content?: string;
 
 
     @ApiProperty()
