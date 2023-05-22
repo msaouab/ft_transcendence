@@ -11,13 +11,13 @@ import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useId, useState } from "react";
 import instance, {
+  GetAvatar,
   getAchivements,
   getChannels,
   getFriendsInfo,
   getRankData,
   getUserInfo,
 } from "../../api/axios";
-import Cookies from "js-cookie";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 
@@ -31,49 +31,6 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 
-
-
-
-
-
-
-
-
-
-const Status = styled.div<{ userStatus: string }>`
-  position: relative;
-  /* width: 100px; */
-  /* aspect-ratio: 1/1; */
-  height: 100%;
-  img {
-    position: relative;
-    border-radius: 50%;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    bottom: 5px;
-    right: 10%;
-    background-color: ${({ userStatus }) =>
-      userStatus === "online"
-        ? "#01d101"
-        : userStatus === "offline"
-        ? "#6a6a6a"
-        : userStatus === "donotdisturb"
-        ? "#ff0000"
-        : userStatus === "ingame"
-        ? "#011c77"
-        : "#ffcc00"};
-    border: 1px solid #ececec;
-    width: 15%;
-    height: 15%;
-    border-radius: 50%;
-  }
-`;
-
 interface friendsInterface {
   login: string;
   Status: string;
@@ -82,8 +39,7 @@ interface friendsInterface {
 interface ProfileInterface {
   isAnotherUser?: boolean;
 }
-const Profile = (props: ProfileInterface) => {
-  const { userImg } = useGlobalContext();
+const OtherUserProfile = (props: ProfileInterface) => {
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
     id: "",
@@ -103,8 +59,14 @@ const Profile = (props: ProfileInterface) => {
   const [friends, setFriends] = useState<friendsInterface[]>([]);
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [userId, setUserId] = useState(Cookies.get("userid") || "");
-
+  const [userId, setUserId] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const { id } = useParams(); // Extract the user ID from the URL params
+  //   console.log("id", id);
+  useEffect(() => {
+    setUserId(id as string);
+    getAllData();
+  }, [userId]);
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -130,22 +92,18 @@ const Profile = (props: ProfileInterface) => {
       setData(data);
     };
 
+    const getUserAvatar = async () => {
+      const data = await GetAvatar(userId);
+      setAvatar(data);
+    };
+
     friendsData();
     joinedChannelData();
     achivementsData();
     rankData();
     getUserData();
+    getUserAvatar();
   };
-  const { id } = useParams(); // Extract the user ID from the URL params
-
-  useEffect(() => {
-    if (props.isAnotherUser) {
-      console.log("id", id);
-      setUserId(id || "");
-    }
-
-    getAllData();
-  }, []);
 
   const Status = styled.div<{ userStatus: string }>`
     position: relative;
@@ -248,32 +206,37 @@ const Profile = (props: ProfileInterface) => {
   return (
     <div className="  w-[100%] flex flex-col gap-5  ">
       <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
-        <Status className="" userStatus={userStatus.toLowerCase()}>
-          {userImg && <img src={userImg} alt="" className="" />}
-        </Status>
-        <div className="description flex flex-col  text-center justify-center ">
-          <div className="name md:text-4xl text-xl  font-[800] ">
-            {user?.firstName || ""} {user?.lastName || ""}
+        {user && (
+          <Status className="" userStatus={user.status.toLowerCase()}>
+            {avatar && <img src={avatar} alt="" className="" />}
+          </Status>
+        )}
+        {user && (
+          <div className="description flex flex-col  text-center justify-center ">
+            <div className="name md:text-4xl text-xl  font-[800] capitalize ">
+              {user.firstName} {user.lastName}
+            </div>
+            <div className="name  font-[400] ">{user.login}</div>
+            <div className="flex gap-10 items-center "></div>
           </div>
-          <div className="name  font-[400] ">{user.login}</div>
-          <div className="flex gap-10 items-center "></div>
-        </div>
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
+        )}
+       
+          <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
             <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
               <img src={Dice} alt="_" width={50} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws }
+              Games : {rankData?.wins + rankData?.loses + rankData?.draws || "_"}
             </div>
             <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
               <img src={AchivementImg1} width={50} alt="_" />
-              Wins : {rankData?.wins }
+              Wins : {rankData?.wins || "_"}
             </div>
             <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
               <img src={Draw} alt="_" width={50} />
-              Draw: {rankData?.draws }
+              Draw: {rankData?.draws || "_"}
             </div>
             <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
               <img src={Lose} alt="_" width={50} />
-              Lose: {rankData?.loses }
+              Lose: {rankData?.loses || "_"}
             </div>
           </div>
       </Top>
@@ -308,7 +271,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {joinedChannel.length ? (
+              {joinedChannel && joinedChannel.length ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {joinedChannel.map((chanel, index) => (
                     <ChanelCard key={index} {...chanel} />
@@ -340,7 +303,7 @@ const Profile = (props: ProfileInterface) => {
             Achievements
           </div>
           <div className="achiv-container flex gap-10   m-auto ">
-            {achivements.length ? (
+            {achivements && achivements.length ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -360,4 +323,4 @@ const Profile = (props: ProfileInterface) => {
   );
 };
 
-export default Profile;
+export default OtherUserProfile;

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useGlobalContext } from "../../provider/AppContext";
 
 const CheckStatus = (stats: string) => {
   const status = stats?.toLowerCase();
@@ -20,16 +21,17 @@ export const FreindCard = ({
   status,
   id,
 }: any) => {
+  const { userId } = useGlobalContext();
   return (
     <Link
-      to={`/profile/${id}`}
-      className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]"
+      to={id === userId ? "/profile" : `/profile/${id}`}
+      className="flex flex-wrap mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]"
     >
       <div className="image ">
-        <img src={avatar} alt="" width={60} />
+        <img src={avatar} alt="" width={50} />
       </div>
-      <div className="name text-xl font-[500]">
-        {firstName} {lastName}
+      <div className="name text-md xl:text-xl font-[500] capitalize">
+        {firstName.slice(0, 1) + "."}{lastName}
       </div>
       <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
         {status}

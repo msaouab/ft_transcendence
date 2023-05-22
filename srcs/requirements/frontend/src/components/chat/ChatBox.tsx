@@ -12,7 +12,7 @@ const ChatBoxStyle = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
+    background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.298)'};
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px;

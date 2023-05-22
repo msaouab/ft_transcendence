@@ -6,8 +6,8 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-export const GetAvatar = async () => {
-  const res = await instance.get("/user/" + Cookies.get("userid") + "/avatar", {
+export const GetAvatar = async (id:string) => {
+  const res = await instance.get("/user/" + id + "/avatar", {
     responseType: "blob",
   });
   return URL.createObjectURL(res.data);

@@ -46,7 +46,7 @@ const Routes = [
 
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus, setUserImg } = useGlobalContext();
+  const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
 
   const handleToggleSidebar = () => {
@@ -69,6 +69,7 @@ const SideBar = () => {
           if (response.statusText) {
           }
           Cookies.set("userid", response.data.id);
+          setUserId(response.data.id);
           console.log(response.data);
           // setOnlineStat(user.status);
           setUserStatus(response.data.status.tolowoerCase());
@@ -78,16 +79,17 @@ const SideBar = () => {
             navigate("/login");
           }
         });
-      const res = await GetAvatar();
-      setUserImg(res);
     } catch (error) {
       console.log(error);
     }
+    console.log("ppppppp", userId);
+    const res = await GetAvatar(userId);
+    setUserImg(res);
   }
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [userId]);
 
   const handleLogout = () => {
     async function logout() {

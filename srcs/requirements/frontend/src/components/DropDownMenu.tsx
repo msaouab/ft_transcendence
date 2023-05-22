@@ -2,14 +2,13 @@ import { BsChevronDown } from "react-icons/bs";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Checkbox, Dialog, Radio } from "@material-tailwind/react";
-import { useGlobalContext } from "../../provider/AppContext";
-import Padel from "../../assets/padel.png";
+import { useGlobalContext } from "../provider/AppContext";
+import Padel from "../assets/padel.png";
 
 const DropDownMenu = () => {
   const { userStatus, setUserStatus } = useGlobalContext();
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
   const handelDropDown = () => {
-    console.log("clicked");
     setIsDropDownOpen(!isDropDownOpen);
   };
 
@@ -23,6 +22,8 @@ const DropDownMenu = () => {
     setUserStatus(event.target.value);
   };
 
+  const { userImg } = useGlobalContext();
+
   return (
     <div>
       <Dialog
@@ -33,7 +34,7 @@ const DropDownMenu = () => {
       >
         <div className="flex flex-col justify-center items-center">
           <img src={Padel} alt="" width={100} />
-		  <h1 className="text-3xl text-gray-700">Change your status</h1>
+          <h1 className="text-3xl text-gray-700">Change your status</h1>
         </div>
         <div className="gap-4">
           <Radio
@@ -74,21 +75,30 @@ const DropDownMenu = () => {
           />
         </div>
       </Dialog>
-      <BsChevronDown
-        className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2"
-        onClick={handelDropDown}
-      />
+      <div className="flex gap-1 justify-center items-center">
+        {userImg && (
+          <img
+            src={userImg}
+            alt="user"
+            className="w-[40px] h-[40px] rounded-[50%]"
+          />
+        )}
+        <BsChevronDown
+          className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2"
+          onClick={handelDropDown}
+        />
       <div
-        className={`settings bg-slate-50  bg-white flex  duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 h-[8rem] rounded-md transition-all ${
+        className={`settings bg-slate-50  bg-[#ffffff26] backdrop-blur-sm	 flex  duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0   p-4 font-bold text-white h-[8rem] rounded-md transition-all ${
           isDropDownOpen ? "block transition-all" : "hidden transition-all"
         } `}
       >
-        <Link to="/profile" className="setting-item">
-          Profile
-        </Link>
-        <div className="setting-item">Logout</div>
-        <div className="setting-item cursor-pointer" onClick={handelOpen}>
-          Status
+          <Link to="/profile" className="setting-item">
+            Profile
+          </Link>
+          <div className="setting-item">Logout</div>
+          <div className="setting-item cursor-pointer" onClick={handelOpen}>
+            Status
+          </div>
         </div>
       </div>
     </div>
