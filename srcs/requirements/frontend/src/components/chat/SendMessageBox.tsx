@@ -12,7 +12,9 @@ import ConfirmDelete from '../common/ConfirmDelete';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     /* height: 8%; */
-    min-height: 2rem;
+    height: ${(props: { size: any }) => props.size === 'small' ? `1rem` : `2.5rem`};
+
+    min-height: ${(props: { size: any }) => props.size === 'small' ? `1rem` : `60px`};
 
     /* max-height: 60px; */
     display: flex;
@@ -104,9 +106,9 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
 
 
         // if the user is blocked, don't send the message
-        console.log(selectedChat);
+        // console.log(selectedChat);
         if (selectedChat.blocked) {
-           console.log('blocked');
+        //    console.log('blocked');
              
 
         setConfirmData({

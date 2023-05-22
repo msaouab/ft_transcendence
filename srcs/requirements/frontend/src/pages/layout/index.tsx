@@ -5,9 +5,10 @@ import DropDownMenu from "../../components/DropDownMenu";
 import Notifications from "../../components/Notifications";
 import SearchBar from "../../components/common/Search/SearchBar";
 
-
-
-
+import { useEffect, useRef, useState } from "react";
+import {io} from "socket.io-client";
+import Cookies from "js-cookie";
+import { useGlobalContext } from "../../provider/AppContext";
 const index = () => {
 
 
@@ -31,7 +32,6 @@ height: 100vh;
       padding-bottom: 1rem;
     }
 
-
     @media (max-width: 768px) {
       
       padding: 0; 
@@ -44,6 +44,26 @@ height: 100vh;
     } */
 
   `;
+
+
+  const notifySocket = useRef<any>(null);
+  const [connected, setConnected] = useState(false);
+  // const {setUserStatus} = useGlobalContext();
+
+  useEffect(() => {
+    if (!connected) {
+      notifySocket.current = io("http://localhost:3000");
+      setConnected(true);
+      console.log("connected to the server notify");
+    }
+  
+    notifySocket.current.on("disconnect", () => {
+      notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: 'Offline'});
+      console.log("disconnected from the server notify");
+    });
+
+  
+  }, []);
 
 
 
@@ -61,7 +81,7 @@ height: 100vh;
           </div>
           <Notifications />
           <div className="user flex justify-center items-center  relative">
-            <DropDownMenu />
+            <DropDownMenu notifySocket={notifySocket} connected={connected} />
           </div>
         </div>
         <div className="content  flex-1">

@@ -52,7 +52,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
                     seen: true
                 }).then((response) => {
-
                     if (response.status !== 200) {
                         alert("error updating the seen status of the messages");
                     }
@@ -111,8 +110,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 hasMore: totalMessages > prevState.offset + newMessages.length
             }));
         })
-
-
     };
 
     useEffect(() => {
@@ -133,9 +130,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     offset: prevState.offset + messages.length,
                     hasMore: true,
                 }));
-
             }
-
         });
 
     }, [selectedChat.chatRoomid]);

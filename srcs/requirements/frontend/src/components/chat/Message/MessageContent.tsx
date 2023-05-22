@@ -84,7 +84,7 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
             `http://localhost:3000/api/v1/chatrooms/private/${chatRoomId}/message/${id}`,
             { withCredentials: true }
         ).then(res => {
-            console.log(res);
+            // console.log(res);
             if (res.status === 200) {
                 setShowDeleteModal({ ...showDeleteModal, show: false });
                 setState((prevState: any) => ({

@@ -65,6 +65,7 @@ const ChatStyle = Styled.div`
 
 import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
+import Cookies from "js-cookie";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
@@ -80,12 +81,16 @@ const Chat = () => {
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io(`http://localhost:3000/chat`);
-      setConnected(true);
-      console.log("connected to the server");
+      chatSocket.current = io(`http://localhost:3000/chat`); 
+   
     }
     // chatSocket.current.on('connect', () => {
+      
+    //   chatSocket.current.emit('alive', {id: Cookies.get("id")});
+    //   setConnected(true);
+    //   console.log("connected to the server");
     // });
+
     return () => {
       chatSocket.current.disconnect();
       setConnected(false);
@@ -96,6 +101,7 @@ const Chat = () => {
     if (selectedChat.chatRoomid) {
       console.log("joining the room");
       const payload = {
+        currentId: Cookies.get("id"),
         senderId: selectedChat.sender_id,
         receiverId: selectedChat.receiver_id,
       };
@@ -105,10 +111,12 @@ const Chat = () => {
       if (selectedChat.chatRoomid) {
         console.log("leaving the room");
         const payload = {
+          currentId: Cookies.get("id"),
           senderId: selectedChat.sender_id,
           receiverId: selectedChat.receiver_id,
         };
         chatSocket.current.emit("leaveRoom", payload);
+
       }
     };
   }, [selectedChat.chatRoomid]);

@@ -6,7 +6,6 @@ import { Injectable } from "@nestjs/common";
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
-    OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
@@ -18,12 +17,10 @@ import { Server, Socket } from "socket.io";
 import { SearchService } from "./search.service";
 
 
-// import { ChatService } from "./
 
 @Injectable()
 @WebSocketGateway({
     namespace: 'search',
-    // cors: true,
 })
 export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
 

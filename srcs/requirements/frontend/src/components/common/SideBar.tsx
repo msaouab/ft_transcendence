@@ -48,7 +48,7 @@ const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
-
+  // const 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -69,8 +69,9 @@ const SideBar = () => {
           if (response.statusText) {
           }
           Cookies.set("userid", response.data.id);
+          // setUserStatus(response.data.status);
           setUserId(response.data.id);
-          console.log(response.data);
+          // console.log(response.data);
           // setOnlineStat(user.status);
           setUserStatus(response.data.status.tolowoerCase());
         })
@@ -82,7 +83,7 @@ const SideBar = () => {
     } catch (error) {
       console.log(error);
     }
-    console.log("ppppppp", userId);
+    // console.log("ppppppp", userId);
     const res = await GetAvatar(userId);
     setUserImg(res);
   }

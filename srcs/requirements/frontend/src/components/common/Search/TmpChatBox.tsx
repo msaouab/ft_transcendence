@@ -77,9 +77,9 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
     useEffect(() => {
         const sender_id = Cookies.get('id') || '';
         const receiver_id = user.id;
-        console.log("heeeelo");
-        console.log("sender_id", sender_id);
-        console.log("receiver_id", receiver_id);
+        // console.log("heeeelo");
+        // console.log("sender_id", sender_id);
+        // console.log("receiver_id", receiver_id);
         axios.get(`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
             .then((res) => {
                 if (res.data.length !== 0) {

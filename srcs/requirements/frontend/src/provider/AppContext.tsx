@@ -5,6 +5,7 @@ import React, {
   ReactNode,
 } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+import {useRef} from "react";
 
 interface AppContextType {
   userStatus: string;
@@ -30,7 +31,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<string>("");
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
-
 
   const value = {
     userStatus,

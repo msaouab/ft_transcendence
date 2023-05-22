@@ -1,11 +1,13 @@
+
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import { BsChevronDown } from "react-icons/bs";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Checkbox, Dialog, Radio } from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
-
-const DropDownMenu = () => {
+import axios from "axios";
+const DropDownMenu = (notifySocket: any, connected : boolean) => {
   const { userStatus, setUserStatus } = useGlobalContext();
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
   const handelDropDown = () => {
@@ -21,6 +23,23 @@ const DropDownMenu = () => {
     console.log(event.target.value);
     setUserStatus(event.target.value);
   };
+  
+  useEffect(() => {
+    // console.log("userStatus", userStatus);
+    // const status  = Cookies.get('status')
+    if (userStatus !== '')
+    {
+    if (connected) 
+    {
+      notifySocket.current.on("connect", () => {
+        console.log("connected to the server notify"); 
+        notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: userStatus});
+      });
+      console.log("im here user status", userStatus);
+    }
+  }
+
+  }, [userStatus] )
 
   const { userImg } = useGlobalContext();
 
