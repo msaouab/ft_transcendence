@@ -26,6 +26,8 @@ const Game = () => {
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
+		width: 700,
+		height: 1000,
 	};
 
 	useEffect(() => {
@@ -61,7 +63,7 @@ const Game = () => {
 	return (
 		<CanvasContainer>
 			{mysocket ? (
-				<PingPong width={700} height={1000} socket={mysocket} />
+				<PingPong width={payload.width} height={payload.height} socket={mysocket} />
 			) : (
 				<p>Loading...</p>
 			)}

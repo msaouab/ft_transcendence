@@ -38,9 +38,10 @@ type BallState = {
 	x: number;
 	y: number;
 	r: number;
+	dx: number;
+	dy: number;
+	speed: number;
 	c: string;
-	vx: number;
-	vy: number;
 };
 
 let ctx: CanvasRenderingContext2D | null;
@@ -65,9 +66,10 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		x: width / 2,
 		y: height / 2,
 		r: 10,
+		dx: 1,
+		dy: 1,
+		speed: 4,
 		c: "#fff",
-		vx: 1,
-		vy: 1,
 	});
 
 	useEffect(() => {
@@ -93,24 +95,16 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				drawBall(ball);
 			}
 		}
+		return () => {
+			ctx = null;
+		};
 	}, [player1X, player2X, ball]);
 
 	const drawPlayer = (player: PlayerState) => {
 		if (ctx) {
-			ctx.fillStyle = "#fff";
+			ctx.fillStyle = ball.c;
 			ctx.fillRect(player.x, player.y, player.width, player.height);
 			ctx.fill();
-		}
-	};
-
-	const drawBall = (ball: BallState) => {
-		if (ctx) {
-			ctx.beginPath();
-			ctx.fillStyle = ball.c; // ball color
-			ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true); // draw ball
-			ctx.fillStyle = "#fff";
-			ctx.fill();
-			ctx.closePath();
 		}
 	};
 
@@ -144,8 +138,34 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		});
 		return () => {
 			document.removeEventListener("mousemove", handleMouseMove);
+			socket.off("responseMouse");
+			socket.off("responsePlayer2");
 		};
-	}, [player1X, player2X]);
+	}, [socket, player1X, player2X, height, width]);
+
+	//	render the ball and get the new position of the ball from the server
+
+	const drawBall = (ball: BallState) => {
+		if (ctx) {
+			// ctx.beginPath();
+			ctx.fillStyle = ball.c; // ball color
+			ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2, true); // draw ball
+			ctx.fill();
+			// ctx.closePath();
+		}
+	};
+
+	useEffect(() => {
+		// socket.emit("requesteBall", ball);
+		socket.on("responseBall", (ball) => {
+			setBall(ball);
+			// console.log(ball);
+			// drawBall(ball);
+		});
+		return () => {
+			socket.off("responseBall");
+		};
+	}, [ socket, ball ]);
 
 	return (
 		<PlayGround className="">
