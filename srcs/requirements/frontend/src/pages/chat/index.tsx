@@ -84,12 +84,13 @@ const Chat = () => {
       chatSocket.current = io(`http://localhost:3000/chat`); 
    
     }
-    // chatSocket.current.on('connect', () => {
-      
-    //   chatSocket.current.emit('alive', {id: Cookies.get("id")});
-    //   setConnected(true);
-    //   console.log("connected to the server");
-    // });
+
+    chatSocket.current.on('connect', () => {
+    
+      // chatSocket.current.emit('alive', {id: Cookies.get("id")});
+      setConnected(true);
+      console.log("connected to the server");
+    });
 
     return () => {
       chatSocket.current.disconnect();

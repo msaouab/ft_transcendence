@@ -8,20 +8,22 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 @Injectable()
 export class NotificationService  {
         constructor(private prisma: PrismaService) { }
-        async updateUserStatus(userId: string, userStatus: string) {
-            if (userStatus !== "Online" && userStatus !== "Offline" && userStatus !== 'Idle' 
-            && userStatus !== 'DoNotDisturb' && userStatus !== 'InGame') {
-                throw new HttpException('Invalid status', 400);
-            }
+        async updateUserStatus(userId: string, userStatus: boolean) {
+            console.log("userId : ", userId);
+
+            // if (userStatus !== "Online" && userStatus !== "Offline" && userStatus !== 'Idle' 
+            // && userStatus !== 'DoNotDisturb' && userStatus !== 'InGame') {
+            //     throw new HttpException('Invalid status', 400);
+            // }
             if (!userId || userId === '') {
                 throw new HttpException('Invalid user id', 400);
             }
             const user = await this.prisma.user.findUnique({
                 where: {
-
                     id: userId,
                 },
             });
+            console.log("user : ", user);
             if (!user) {
                 console.log('user not found');
                 throw new HttpException('User not found', 404);
@@ -33,7 +35,7 @@ export class NotificationService  {
                         id: userId,
                     },
                     data: {
-                        status: userStatus, 
+                        realStatus: userStatus,
                     },
                 });
                 return user;

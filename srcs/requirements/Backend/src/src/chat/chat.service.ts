@@ -23,10 +23,14 @@ import { createMessageDto } from './message/message.dto';
 import { PostPrivateChatRoomDto } from './dto/postPrivateChatRoom';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
+
+// 
+import { clients } from 'src/notify/notify.gateway';
+
 @Injectable()
 export class ChatService {
     constructor(private prisma: PrismaService,
-        // private MessageService: MessageService
+        // private MessageService: MessageServic
     ) { }
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
@@ -178,6 +182,11 @@ export class ChatService {
         //     content: payload.content
         // }
 
+            
+        // get number of clients of the room
+        
+        
+        
         
         // check if privatchatroom exist.
         try {
@@ -186,15 +195,32 @@ export class ChatService {
                     id: await this.getRoomId(payload.sender_id, payload.receiver_id),
                 },
             })
- 
+            // if the receiver is not in the private chat room, join the private chat room
+            
             // create a new private message, and adds it to the private chat room
     
             // if both sockets are connected, set seen to true
             // if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
-            //     payload.seen = true;
-            // }
-            // if (!privateRoom) {
-            //     // check if the usr
+                //     payload.seen = true;
+                // }
+                // if (!privateRoom) {
+                    //     // check if the usr
+                    
+                    // checking if how many clients are in the rooms
+                    // const numOfClients = server.sockets.adapter.rooms.get(privateRoom.id)?.size;
+                    // console.log("Number of clients in the room: ", numOfClients);
+                    
+            const numOfClient = server.sockets.adapter.rooms.get(privateRoom.id)?.size;
+            
+            // console.log("Number of clients in the room: ", numOfClient);
+            console.log("Number of clients in the room: ", numOfClient);
+
+            if (clients.get(payload.receiver_id)) {
+                console.log("The guy is alive");
+            }
+            else  {
+                console.log("The guy is not alive");
+            }
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,
@@ -207,7 +233,6 @@ export class ChatService {
             if (!message) {
                 throw new HttpException("Error creating private message", 500);
             }
-            console.log("Private message: ", message);
             await this.prisma.privateChatRoom.update({
                 where: {
                     id: privateRoom.id

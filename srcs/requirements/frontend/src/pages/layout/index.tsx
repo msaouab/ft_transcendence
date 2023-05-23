@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import {io} from "socket.io-client";
 import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
+import UserSettings from "../user/UserSettings";
 const index = () => {
 
 
@@ -39,31 +40,35 @@ height: 100vh;
         margin-right: 0;
         margin-top: 0;
     }
-  
 
     } */
 
   `;
 
-
   const notifySocket = useRef<any>(null);
   const [connected, setConnected] = useState(false);
   // const {setUserStatus} = useGlobalContext();
+  // const {userStatus} = useGlobalContext();
+  // defining on connect event to call it inside teh DropDownMenu component
+  // const onConnect = () => {log(
+  //   console."connected to the server notify");
 
   useEffect(() => {
+    console.log("IM HERE");
+    console.log("connected: ", notifySocket);
     if (!connected) {
-      notifySocket.current = io("http://localhost:3000");
-      setConnected(true);
-      console.log("connected to the server notify");
+      notifySocket.current = io("http://localhost:3000"); 
     }
-  
-    notifySocket.current.on("disconnect", () => {
-      notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: 'Offline'});
-      console.log("disconnected from the server notify");
+    notifySocket.current.on("connect", () => {
+      setConnected(true);
+      // call a function inside the drop down menu to change the status
     });
 
-  
-  }, []);
+    notifySocket.current.on("disconnect", () => {
+      setConnected(false);
+    });
+
+    }, []);
 
 
 
@@ -81,7 +86,7 @@ height: 100vh;
           </div>
           <Notifications />
           <div className="user flex justify-center items-center  relative">
-            <DropDownMenu notifySocket={notifySocket} connected={connected} />
+            <DropDownMenu notifySocket={notifySocket.current} connected={connected} />
           </div>
         </div>
         <div className="content  flex-1">

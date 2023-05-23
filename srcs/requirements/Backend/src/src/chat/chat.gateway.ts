@@ -36,7 +36,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const { id } = client;
         console.log(`Client with id ${id} connected to chat namespace`);
     }
-
     handleDisconnect(client: Socket) {
         const { id } = client;
         console.log(`Client with id ${id} disconnected`);
@@ -87,7 +86,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("We've got the event of sending a private message");
         // return await this.chatService.sendPrivateMessage(client, payload, this.server, this.clients);
         return await  this.chatService.sendPrivateMessage(client, payload, this.server);
-
     }
 
 

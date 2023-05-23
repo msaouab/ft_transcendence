@@ -31,15 +31,6 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 
-
-
-
-
-
-
-
-
-
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
   /* width: 100px; */
@@ -245,6 +236,7 @@ const Profile = (props: ProfileInterface) => {
     }
   `;
 
+  console.log("user status inside profile is ", userStatus);
   return (
     <div className="  w-[100%] flex flex-col gap-5  ">
       <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">

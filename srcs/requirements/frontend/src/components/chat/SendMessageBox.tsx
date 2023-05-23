@@ -47,9 +47,6 @@ const SendMessageBoxStyle = styled.div`
         cursor: pointer;
     }
 
-
-
-
     @media (max-width: 400px) {
         ${(props: { size: any }) => props.size === 'big' ? `
         padding: 5px;
@@ -103,13 +100,9 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
     // };
 
     const sendMessage = (messageProp: string) => {
-
-
         // if the user is blocked, don't send the message
         // console.log(selectedChat);
         if (selectedChat.blocked) {
-        //    console.log('blocked');
-             
 
         setConfirmData({
             ...confirmData,
@@ -121,7 +114,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
         if (messageProp === '') {
             return;
         }
-      
+        
         let message = {
             dateCreated: dateToStr(new Date()),
             content: messageProp,
@@ -133,6 +126,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
         if (connected) {
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
+           
             if (setNewLatestMessage) {
                 setNewLatestMessage(
                     {

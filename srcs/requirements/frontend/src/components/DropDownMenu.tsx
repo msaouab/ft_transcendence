@@ -7,9 +7,16 @@ import { Checkbox, Dialog, Radio } from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
 import axios from "axios";
-const DropDownMenu = (notifySocket: any, connected : boolean) => {
+
+
+type Props = {
+  notifySocket: any;
+  connected: boolean;
+};
+const DropDownMenu = ({notifySocket, connected} : Props) => {
   const { userStatus, setUserStatus } = useGlobalContext();
   const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
+
   const handelDropDown = () => {
     setIsDropDownOpen(!isDropDownOpen);
   };
@@ -22,24 +29,69 @@ const DropDownMenu = (notifySocket: any, connected : boolean) => {
   const handleStatusChange = (event: any) => {
     console.log(event.target.value);
     setUserStatus(event.target.value);
+
+    // notifySocket.emit("status", {
+    //   id: Cookies.get("id"),
+    //   userStatus: event.target.value,
+    // });
   };
   
   useEffect(() => {
-    // console.log("userStatus", userStatus);
-    // const status  = Cookies.get('status')
-    if (userStatus !== '')
-    {
-    if (connected) 
-    {
-      notifySocket.current.on("connect", () => {
-        console.log("connected to the server notify"); 
-        notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: userStatus});
+    // console.log("heeeeeeeeeeeeeee: ", userStatus);
+    if (connected) {
+    console.log("connected to the server notify");
+      console.log("current: ", notifySocket);
+      if (notifySocket) {
+        console.log("we're emmiting the event status");
+      notifySocket.emit("realStatus", {
+        id: Cookies.get("id"),
+        userStatus: true,
       });
-      console.log("im here user status", userStatus);
+      setUserStatus("Online");
+    }
+    }
+    else if (!connected) {
+      console.log("we're emmiting the event status");
+      if (notifySocket) {
+      notifySocket.emit("realStatus", {
+        id: Cookies.get("id"),
+        userStatus: false,
+      });
+      setUserStatus("Offline");
     }
   }
+  }, [connected]);
 
-  }, [userStatus] )
+
+  // useEffect(() => {
+  // console.log("hello im being called to upadate user status");
+  // console.log("userStatus: ", userStatus);
+  // setUserStatus(userStatus);
+
+  // }, [userStatus] );
+  
+  // console.log("userStatus", userStatus);
+  // const status  = Cookies.get('status')
+  // if (userStatus !== '')
+  // {
+  // console.log("userStatus", userStatus);
+  // if (connected) 
+  // {
+  //   notifySocket && notifySocket.current.on("connect", () => {
+  //     console.log("connected to the server notify"); 
+  //     // notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
+
+  //   });
+  //   // console.log("im here user status", userStatus);
+  // }
+// }  
+
+// notifySocket.current.on("connect", () => {
+//   console.log("connected to the server notify");
+//   notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
+// });
+  
+
 
   const { userImg } = useGlobalContext();
 

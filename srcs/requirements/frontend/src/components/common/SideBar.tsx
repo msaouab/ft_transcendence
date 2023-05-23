@@ -69,10 +69,7 @@ const SideBar = () => {
           if (response.statusText) {
           }
           Cookies.set("userid", response.data.id);
-          // setUserStatus(response.data.status);
           setUserId(response.data.id);
-          // console.log(response.data);
-          // setOnlineStat(user.status);
           setUserStatus(response.data.status.tolowoerCase());
         })
         .catch((error) => {

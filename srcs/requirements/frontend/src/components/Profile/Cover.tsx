@@ -161,6 +161,7 @@ function	Cover() {
     }, []);
 
     useEffect(() => {
+        console.log("id avatar: is : ", Cookies.get('userid'));
         const avatarUrl = `http://localhost:3000/api/v1/user/` + Cookies.get('userid') + '/avatar';
         async function fetchAvatar() {
             try {

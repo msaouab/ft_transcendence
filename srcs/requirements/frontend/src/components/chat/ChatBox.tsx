@@ -31,7 +31,6 @@ import SendMessageBox from './SendMessageBox';
 import axios from 'axios';
 import ChatInfiniteScroll from './ChatInfiniteScroll';
 
-
 const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connected }: {
     selectedChat: PrivateMessage,
     size: string,
@@ -55,16 +54,14 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                     if (response.status !== 200) {
                         alert("error updating the seen status of the messages");
                     }
-                }
-                ).catch((error) => {
+                }).catch((error) => {
                     console.log("error", error);
-                }
-                );
+                });
             }
         });
     }
 
-                
+    
     useEffect(() => {
         if (connected) {  
             chatSocket.current.on('newPrivateMessage', (message: any) => {
