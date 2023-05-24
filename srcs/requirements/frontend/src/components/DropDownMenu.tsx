@@ -1,7 +1,14 @@
 import { BsChevronDown } from "react-icons/bs";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {  Dialog, Radio } from "@material-tailwind/react";
+import {
+  Button,
+  Dialog,
+  Popover,
+  PopoverContent,
+  PopoverHandler,
+  Radio,
+} from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
 import instance from "../api/axios";
@@ -13,8 +20,9 @@ const DropDownMenu = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
-          
-          console.log("logout");
+          console.log("logout1111");
+          console.log( "logout");
+          window.location.reload();
           if (error.response.status == 401) {
             navigate("/login");
           }
@@ -27,10 +35,7 @@ const DropDownMenu = () => {
   };
 
   const { userStatus, setUserStatus } = useGlobalContext();
-  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-  const handelDropDown = () => {
-    setIsDropDownOpen(!isDropDownOpen);
-  };
+
 
   const [open, setOpen] = useState(false);
   const handelOpen = () => {
@@ -103,33 +108,38 @@ const DropDownMenu = () => {
             className="w-[40px] h-[40px] rounded-[50%]"
           />
         )}
-        <BsChevronDown
+        {/* <BsChevronDown
           className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2"
           onClick={handelDropDown}
-        />
-        <div
-          className={`settings bg-slate-50  bg-[#ffffff26] backdrop-blur-sm	 flex  duration-300 ease-in-out  top-12 right-0 z-10 flex-col gap-2 absolute bottom-0 w-[12]   p-4 font-bold text-white h-[8rem] rounded-md transition-all ${
-            isDropDownOpen ? "block transition-all" : "hidden transition-all"
-          } `}
-        >
-          <Link
-            to="/profile"
-            className="setting-item transition-all hover:scale-105"
-          >
-            Profile
-          </Link>
-          <div className="setting-item transition-all hover:scale-105 cursor-pointer"
-            onClick={handleLogout}
-          >
-            Logout
-          </div>
-          <div
-            className="setting-item  transition-all hover:scale-105 cursor-pointer"
-            onClick={handelOpen}
-          >
-            Status
-          </div>
-        </div>
+        /> */}
+        <Popover placement="bottom-end" offset={10}>
+          <PopoverHandler>
+            <Button
+              className="bg-none p-0 m-0 bg-transparent shadow-transparent "
+              ripple={false}
+            >
+              <BsChevronDown className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2" />
+            </Button>
+          </PopoverHandler>
+          <PopoverContent className="bg-slate-50  bg-[#9343076e] backdrop-blur-sm	px-4 shadow-xs shadow-white text-white border-0 py-1">
+            <div className="setting-item  transition-all hover:scale-105 cursor-pointer py-1">
+              <Link to="/profile">Profile</Link>
+            </div>
+            <div
+              className="setting-item  transition-all hover:scale-105 cursor-pointer py-1"
+              onClick={handelOpen}
+            >
+              Status
+            </div>
+            <div
+              className="setting-item transition-all hover:scale-105 cursor-pointer py-1"
+              onClick={handleLogout}
+            >
+              Logout
+            </div>
+          </PopoverContent>
+        </Popover>
+        
       </div>
     </div>
   );

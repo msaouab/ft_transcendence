@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import { GetAvatar, PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
-import { Dialog } from "@material-tailwind/react";
+import { Button, Dialog } from "@material-tailwind/react";
 import Cookies from "js-cookie";
+import { Alert } from "@material-tailwind/react";
+import Notification from "../../common/Notification";
+
+
 
 function Avatar() {
   const { userImg, setUserImg } = useGlobalContext();
@@ -42,8 +46,8 @@ function Avatar() {
 
     PostAvatar(selectedFile)
       .then(() => {
-        console.log("File uploaded!", );
-        GetAvatar(Cookies.get('userid') || "").then((res) => {
+        console.log("File uploaded!");
+        GetAvatar(Cookies.get("userid") || "").then((res) => {
           setUserImg(res);
         });
       })
@@ -89,6 +93,7 @@ function Avatar() {
           </div>
         </div>
       </label>
+      <Notification  message="Profile picture updated successfully" type="green" delay={1000} />
       {/* /// image preview  */}
       <Dialog
         size="sm"

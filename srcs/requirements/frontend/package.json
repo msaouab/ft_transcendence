@@ -18,6 +18,7 @@
     "env-cmd": "^10.1.0",
     "js-cookie": "^3.0.5",
     "lottie-web": "^5.11.0",
+    "matter-js": "^0.19.0",
     "react": "^18.2.0",
     "react-animated-progress-bar": "^1.1.2",
     "react-circular-progressbar": "^2.1.0",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "@ramonak/react-progress-bar": "^5.0.3",
     "@types/js-cookie": "^3.0.3",
+    "@types/matter-js": "^0.18.3",
     "@types/node": "^18.16.1",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

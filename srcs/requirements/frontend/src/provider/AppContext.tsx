@@ -1,9 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
 
 interface AppContextType {
@@ -15,7 +10,6 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
-  
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -28,11 +22,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState("");
   const [userId, setUserId] = useState<string>("");
-  // chat context 
-  const [privateChatRooms, setPrivateChatRooms] = useState([]);
+  // chat context
+  const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
 
   //  user auth context
-
 
   const value = {
     userStatus,
@@ -43,7 +36,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
-  }
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

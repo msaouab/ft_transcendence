@@ -9,7 +9,7 @@ const Notifications = () => {
   };
 
   return (
-    <div className="notification relative">
+    <div className="notification relative font-['Oxanium']">
       <div className="notif-count absolute z-10 text-white bg-red-500 rounded-[50%] w-[15px] h-[15px] text-xs p-0 m-0 flex justify-center items-center top-0 right-0">
         1
       </div>
