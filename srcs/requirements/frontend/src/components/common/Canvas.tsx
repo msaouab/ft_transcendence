@@ -28,10 +28,10 @@ const ScoreContainter = styled.div`
 `;
 
 type PlayerState = {
-	width: number;
-	height: number;
 	x: number;
 	y: number;
+	width: number;
+	height: number;
 };
 
 type BallState = {
@@ -51,16 +51,16 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	const [mousePosition, setMousePosition] = useState(0);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
-		width: 80,
-		height: 10,
 		x: width / 2 - 40,
 		y: height - 20,
-	});
-	const [player2X, setPlayer2X] = useState<PlayerState>({
 		width: 80,
 		height: 10,
+	});
+	const [player2X, setPlayer2X] = useState<PlayerState>({
 		x: width / 2 - 40,
 		y: 10,
+		width: 80,
+		height: 10,
 	});
 	const [ball, setBall] = useState({
 		x: width / 2,
@@ -122,8 +122,8 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				y: y,
 				height: height,
 				width: width,
-				player1X: player1X,
-				player2X: player2X,
+				// player1X: player1X,
+				// player2X: player2X,
 			};
 			socket.emit("requesteMouse", data);
 		};
@@ -131,6 +131,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		socket.on("responseMouse", (playerPosition) => {
 			setMousePosition(playerPosition);
 			setPlayer1X(playerPosition);
+			// console.log(playerPosition);
 			// setPlayer2X(data.player2X);
 		});
 		socket.on("responsePlayer2", (playerPosition) => {
@@ -156,24 +157,22 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	};
 
 	useEffect(() => {
-		// socket.emit("requesteBall", ball);
-		socket.on("responseBall", (ball) => {
+		socket.on("responseBall", (ball, score) => {
 			setBall(ball);
-			// console.log(ball);
-			// drawBall(ball);
+			setScore(score);
 		});
 		return () => {
 			socket.off("responseBall");
 		};
-	}, [ socket, ball ]);
+	}, [ socket, ball]);
 
 	return (
 		<PlayGround className="">
-			<ScoreContainter>
-				{/* <div className="score">{score.player1}</div>
-				<div className="score">{score.player2}</div> */}
-			</ScoreContainter>
 			<canvas ref={canvasRef} width={width} height={height} />
+			<ScoreContainter>
+				<div className="score">{score.player1}</div>
+				<div className="score">{score.player2}</div>
+			</ScoreContainter>
 		</PlayGround>
 	);
 };

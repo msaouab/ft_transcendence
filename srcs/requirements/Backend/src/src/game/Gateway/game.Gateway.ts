@@ -46,19 +46,37 @@ export class GameGateway
 		socket: Socket[];
 		player1: {
 			id: string;
-			x: number;
-			y: number;
-			width: number;
-			height: number;
+			score: number;
+			paddle1: {
+				x: number;
+				y: number;
+				width: number;
+				height: number;
+			};
+			paddle2: {
+				x: number;
+				y: number;
+				width: number;
+				height: number;
+			};
 		};
 		player2: {
 			id: string;
-			x: number;
-			y: number;
-			width: number;
-			height: number;
+			score: number;
+			paddle1: {
+				x: number;
+				y: number;
+				width: number;
+				height: number;
+			};
+			paddle2: {
+				x: number;
+				y: number;
+				width: number;
+				height: number;
+			};
 		};
-		score: { player1: number; player2: number };
+		// score: { player1: number; player2: number };
 		status: "waiting" | "OnGoing" | "Finished";
 		type: "Time" | "Round";
 		mode: "random" | "friend";
@@ -128,7 +146,7 @@ export class GameGateway
 		});
 		return roomId;
 	}
-	// key: { width: 80, height: 10, x: 310, y: 980 }
+
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
 		const userId = client.handshake.query.userId.toString();
@@ -140,52 +158,60 @@ export class GameGateway
 		)
 			return;
 		const room = this.roomMap.get(roomId);
-		
-		console.log("requestMouse: ", data);
-		room.player1.x = data.player1X.x;
-		room.player1.y = data.player1X.y;
-		room.player1.width = data.player1X.width;
-		room.player1.height = data.player1X.height;
-		room.player2.x = data.player2X.x;
-		room.player2.y = data.player2X.y;
-		room.player2.width = data.player2X.width;
-		room.player2.height = data.player2X.height;
 		if (
 			data.x >= 0 &&
 			data.x <= data.width &&
 			data.y <= data.height &&
 			data.y >= data.height / 2
 		) {
-			if (data.player1X.x >= data.x) {
-				data.player1X.x -= 12;
-				data.player2X.x = data.width - data.player1X.x - data.player1X.width;
-				this.server.to(client.id).emit("responseMouse", data.player1X);
-				const opponentSocketId =
-					client.id === room.socket[0].id
-						? room.socket[1].id
-						: room.socket[0].id;
-				this.server.to(opponentSocketId).emit("responsePlayer2", data.player2X);
-			} else if (
-				data.player1X.x <= data.x - 50 &&
-				data.player1X.x <= data.width
-			) {
-				data.player1X.x += 12;
-				data.player2X.x = data.width - data.player1X.x - data.player1X.width;
-				this.server.to(client.id).emit("responseMouse", data.player1X);
-				const opponentSocketId =
-					client.id === room.socket[0].id
-						? room.socket[1].id
-						: room.socket[0].id;
-				this.server.to(opponentSocketId).emit("responsePlayer2", data.player2X);
+			if (client.id === room.socket[0].id) {
+				if (room.player1.paddle2.x >= data.x) {
+					room.player1.paddle2.x -= 12;
+					room.player2.paddle1.x += 12;
+					this.server
+						.to(room.socket[0].id)
+						.emit("responseMouse", room.player1.paddle2);
+					const opponentSocketId = this.server
+						.to(room.socket[1].id)
+						.emit("responsePlayer2", room.player2.paddle1);
+				} else if (
+					room.player1.paddle2.x <= data.x - 50 &&
+					room.player1.paddle2.x <= data.width - room.player1.paddle2.width
+				) {
+					room.player1.paddle2.x += 12;
+					room.player2.paddle1.x -= 12;
+					this.server
+						.to(room.socket[0].id)
+						.emit("responseMouse", room.player1.paddle2);
+					this.server
+						.to(room.socket[1].id)
+						.emit("responsePlayer2", room.player2.paddle1);
+				}
 			}
-			room.player1.x = data.player1X.x;
-			room.player2.x = data.player2X.x;
-			room.player1.y = data.player1X.y;
-			room.player2.y = data.player2X.y;
-			room.player1.width = data.player1X.width;
-			room.player2.width = data.player2X.width;
-			room.player1.height = data.player1X.height;
-			room.player2.height = data.player2X.height;
+			if (client.id === room.socket[1].id) {
+				if (room.player2.paddle2.x >= data.x) {
+					room.player2.paddle2.x -= 12;
+					room.player1.paddle1.x += 12;
+					this.server
+						.to(room.socket[1].id)
+						.emit("responseMouse", room.player2.paddle2);
+					this.server
+						.to(room.socket[0].id)
+						.emit("responsePlayer2", room.player1.paddle1);
+				} else if (
+					room.player2.paddle2.x <= data.x - 50 &&
+					room.player2.paddle2.x <= data.width - room.player2.paddle2.width
+				) {
+					room.player2.paddle2.x += 12;
+					room.player1.paddle1.x -= 12;
+					this.server
+						.to(room.socket[1].id)
+						.emit("responseMouse", room.player2.paddle2);
+					this.server
+						.to(room.socket[0].id)
+						.emit("responsePlayer2", room.player1.paddle1);
+				}
+			}
 		}
 	}
 
@@ -208,57 +234,68 @@ export class GameGateway
 			c: "#fff",
 		};
 		const intervalId = setInterval(() => {
+			if (room.socket.length !== 2) {
+				clearInterval(intervalId);
+				return;
+			}
 			const newX = this.ball.x + this.ball.dx;
 			const newY = this.ball.y + this.ball.dy;
+			// wall collision
 			if (newX - this.ball.r <= 0 || newX + this.ball.r >= width)
-				// wall collision
 				this.ball.dx = -this.ball.dx;
 			if (newY - this.ball.r <= 0 || newY + this.ball.r >= height)
-				// wall collision
 				this.ball.dy = -this.ball.dy;
 
-			if (this.ball.x + this.ball.r >= room.player1.x) {}
-			// if (
-			// 	newY + this.ball.r >= room.player1.y &&
-			// 	newX >= room.player1.x &&
-			// 	newX <= room.player1.x + room.player1.width
-			// )
-			// 	// player1 collision
-			// 	this.ball.dy = -Math.abs(this.ball.dy);
-			// if (
-			// 	newY - this.ball.r <= room.player2.y + room.player2.height &&
-			// 	newX >= room.player2.x &&
-			// 	newX <= room.player2.x + room.player2.width
-			// )
-			// 	// player2 collision
-			// 	this.ball.dy = Math.abs(this.ball.dy);
-			// else if (newY + this.ball.r >= room.player1.y + room.player1.height) {
-			// 	// player1 score
-			// 	// setScore((prev) => ({ ...prev, player2: prev.player2 + 1 }));
-			// 	this.ball.dx = -3;
-			// 	this.ball.dy = -3;
-			// 	this.ball.x = width / 2;
-			// 	this.ball.y = height / 2;
-			// }
-			// if (newY - this.ball.r <= room.player2.y) {
-			// 	// player2 score
-			// 	// setScore((prev) => ({ ...prev, player1: prev.player1 + 1 }));
-			// 	this.ball.dx = 3;
-			// 	this.ball.dy = 3;
-			// 	this.ball.x = width / 2;
-			// 	this.ball.y = height / 2;
-			// }
+			// paddle collision
+			if (
+				newY + this.ball.r >= room.player1.paddle2.y &&
+				newX >= room.player1.paddle2.x &&
+				newX <= room.player1.paddle2.x + room.player1.paddle2.width
+			)
+				// player1 collision
+				this.ball.dy = -Math.abs(this.ball.dy);
+			if (
+				newY - this.ball.r <= room.player1.paddle1.y &&
+				newX >= room.player1.paddle1.x &&
+				newX <= room.player1.paddle1.x + room.player1.paddle1.width
+			)
+				// player2 collision
+				this.ball.dy = Math.abs(this.ball.dy);
+			// score
+			if (newY - this.ball.r <= 0) {
+				this.ball.x = width / 2;
+				this.ball.y = height / 2;
+				this.ball.dx = -this.ball.dx;
+				this.ball.dy = -this.ball.dy;
+				room.player1.score++;
+			}
+			if (newY + this.ball.r >= height) {
+				this.ball.x = width / 2;
+				this.ball.y = height / 2;
+				this.ball.dx = -this.ball.dx;
+				this.ball.dy = -this.ball.dy;
+				room.player2.score++;
+			}
 			this.ball.x += this.ball.dx;
 			this.ball.y += this.ball.dy;
 
 			const client1Ball = { ...this.ball }; // Create a copy of the ball object
 			const client2Ball = { ...this.ball }; // Create a copy of the ball object
 			// Send ball position to client 1
-			this.server.to(room.socket[0].id).emit("responseBall", client1Ball);
-			// Reverse ball position for client 2
+			const player1 = room.player1.score;
+			const player2 = room.player2.score;
+			const score = { player1, player2 };
+			this.server
+				.to(room.socket[0].id)
+				.emit("responseBall", client1Ball, score);
+			// // Reverse ball position for client 2
 			client2Ball.x = width - client2Ball.x;
 			client2Ball.y = height - client2Ball.y;
-			this.server.to(room.socket[1].id).emit("responseBall", client2Ball);
+			this.server
+				.to(room.socket[1].id)
+				.emit("responseBall", client2Ball, score);
+			if (room.socket[0].id === undefined || room.socket[1].id === undefined) 
+				clearInterval(intervalId);
 		}, 1000 / 60);
 	}
 
@@ -276,11 +313,25 @@ export class GameGateway
 					if (value.player1.id === "") {
 						value.player1 = { id: client.handshake.query.userId.toString() };
 					} else if (value.player2.id === "") {
-						value.player2 = { id: client.handshake.query.userId.toString() };
+						value.player2 = {
+							id: client.handshake.query.userId.toString(),
+							score: 0,
+							paddle1: {
+								x: payload.width / 2 - 40,
+								y: 10,
+								width: 80,
+								height: 10,
+							},
+							paddle2: {
+								x: payload.width / 2 - 40,
+								y: payload.height - 20,
+								width: 80,
+								height: 10,
+							},
+						};
 						value.status = "OnGoing";
 						value.members++;
 						value.socket.push(client);
-						value.score = { player1: 0, player2: 0 };
 						value.type = payload.type;
 						value.mode = payload.mode;
 					}
@@ -292,6 +343,7 @@ export class GameGateway
 						value.type,
 						value.mode
 					);
+					// startGame();
 					this.handleBall(client, key, payload.width, payload.height);
 					AvailableRoom = false;
 				}
@@ -324,13 +376,36 @@ export class GameGateway
 				socket: [client],
 				player1: {
 					id: client.handshake.query.userId.toString(),
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0,
+					score: 0,
+					paddle1: {
+						x: payload.width / 2 - 40,
+						y: 10,
+						width: 80,
+						height: 10,
+					},
+					paddle2: {
+						x: payload.width / 2 - 40,
+						y: payload.height - 20,
+						width: 80,
+						height: 10,
+					},
 				},
-				player2: { id: "", x: 0, y: 0, width: 0, height: 0 },
-				score: { player1: 0, player2: 0 },
+				player2: {
+					id: "",
+					score: 0,
+					paddle1: {
+						x: payload.width / 2 - 40,
+						y: 10,
+						width: 80,
+						height: 10,
+					},
+					paddle2: {
+						x: payload.width / 2 - 40,
+						y: payload.height - 20,
+						width: 80,
+						height: 10,
+					},
+				},
 				status: "waiting",
 				type: payload.type,
 				mode: payload.mode,
