@@ -4,6 +4,7 @@ import DeleteSvg from "../../../assets/deleteSvg.svg";
 import { GetAvatar, PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
 import { Dialog } from "@material-tailwind/react";
+import Cookies from "js-cookie";
 
 function Avatar() {
   const { userImg, setUserImg } = useGlobalContext();
@@ -41,7 +42,8 @@ function Avatar() {
 
     PostAvatar(selectedFile)
       .then(() => {
-        GetAvatar().then((res) => {
+        console.log("File uploaded!", );
+        GetAvatar(Cookies.get('userid') || "").then((res) => {
           setUserImg(res);
         });
       })

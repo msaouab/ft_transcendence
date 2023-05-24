@@ -1,27 +1,25 @@
-import PadelSvg from "../../assets/icons/PadelSvg";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import Avatar from "../../assets/avatar.png";
-import PlayWithMe from "../../assets/playWithMe.svg";
+import { Link, useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
-import AchivementImg2 from "../../assets/achivement2.png";
-import AchivementImg3 from "../../assets/achivement3.png";
-import AchivementImg4 from "../../assets/achivement4.png";
+
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import instance, {
-  FetchUsersFriends,
-  fetchRankData,
-  fetchUserData,
+  getAchivements,
+  getChannels,
+  getFriendsInfo,
+  getRankData,
+  getUserInfo,
 } from "../../api/axios";
 import Cookies from "js-cookie";
-import axios from "axios";
+import SwiperComponent from "../../components/common/Slider";
+import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -32,58 +30,15 @@ export const ReusableCardStyle = styled.div`
   border-radius: 20px 20px 0px 0px;
   padding: 1rem;
 `;
-const FreindCarde = styled.div``;
 
-const FreindCard = () => {
-  return (
-    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
-      <div className="image ">
-        <img src={Avatar} alt="" width={60} />
-      </div>
-      <div className="name text-2xl font-[800]"></div>
-      <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-        online
-        <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
-      </div>
-    </div>
-  );
-};
 
-const GameCard = () => {
-  return (
-    <div className="flex justify-center mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]	">
-      <div className="flex items-center gap-7">
-        <div className="firstAdversary text-xl">Lala dodo</div>
-        <div className="result text-xl font-bold text-red-400">1 - 0</div>
-        <div className="secondAdversary text-xl">Koko Nani</div>
-      </div>
-    </div>
-  );
-};
 
-const ChanelCard = () => {
-  return (
-    <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
-      <div className="chanelname text-xl font-bold">Mohima</div>
-      <div className="membersNumber"> Members : 210</div>
-      <div className="subject">Subject : Hadra Khauia</div>
-    </div>
-  );
-};
 
-const AchivementCard = ({ title, description, imgPath }: any) => {
-  return (
-    <div className="bg-white  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
-      <div className="image">
-        <img src={imgPath} alt="" width={150} />
-      </div>
-      <div className="title text-center font-bold text-xl  text-red-500">
-        {title}
-      </div>
-      <div className="description text-center">{description}</div>
-    </div>
-  );
-};
+
+
+
+
+
 
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
@@ -104,7 +59,7 @@ const Status = styled.div<{ userStatus: string }>`
     right: 10%;
     background-color: ${({ userStatus }) =>
       userStatus === "online"
-        ? "#00ff00"
+        ? "#01d101"
         : userStatus === "offline"
         ? "#6a6a6a"
         : userStatus === "donotdisturb"
@@ -124,7 +79,10 @@ interface friendsInterface {
   Status: string;
 }
 
-const Home = () => {
+interface ProfileInterface {
+  isAnotherUser?: boolean;
+}
+const Profile = (props: ProfileInterface) => {
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -134,7 +92,7 @@ const Home = () => {
     lastName: "",
     status: "",
   });
-  const [rankData, getRankData] = useState({
+  const [rankData, setRankData] = useState({
     wins: "",
     loses: "",
     draws: "",
@@ -143,38 +101,50 @@ const Home = () => {
   });
 
   const [friends, setFriends] = useState<friendsInterface[]>([]);
+  const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
+  const [achivements, setAchivements] = useState<friendsInterface[]>([]);
+  const [userId, setUserId] = useState(Cookies.get("userid") || "");
+
+
+  const getAllData = () => {
+    const friendsData = async () => {
+      const data = await getFriendsInfo(userId);
+      setFriends(data);
+    };
+    const joinedChannelData = async () => {
+      const data = await getChannels(userId);
+      setJoinedChannel(data);
+    };
+    const achivementsData = async () => {
+      const data = await getAchivements(userId);
+      setAchivements(data);
+    };
+
+    const rankData = async () => {
+      const data = await getRankData(userId);
+      setRankData(data);
+    };
+
+    const getUserData = async () => {
+      const data = await getUserInfo(userId);
+      setData(data);
+    };
+
+    friendsData();
+    joinedChannelData();
+    achivementsData();
+    rankData();
+    getUserData();
+  };
+  const { id } = useParams(); // Extract the user ID from the URL params
 
   useEffect(() => {
-    const FetchRank = async () => {
-      try {
-        const response = await fetchRankData();
-        getRankData(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const FetchUserData = async () => {
-      try {
-        const response = await fetchUserData();
-        setData(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    if (props.isAnotherUser) {
+      console.log("id", id);
+      setUserId(id || "");
+    }
 
-    const FetchFriends = async () => {
-      try {
-        const response = await FetchUsersFriends();
-        setFriends(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-      FetchRank();
-      FetchUserData();
-      FetchFriends();
-      console.log("friends");
+    getAllData();
   }, []);
 
   const Status = styled.div<{ userStatus: string }>`
@@ -236,7 +206,30 @@ const Home = () => {
         flex-wrap: wrap;
         & > div {
           max-width: 70%;
-          min-width: 300px;
+          min-width: 360px;
+          max-height: 500px;
+        }
+      }
+      .achievements {
+        /* height: 500px; */
+        width: 100%;
+        .achiv-container {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+    @media (max-width: 800px) {
+      flex-direction: column;
+      .stats {
+        height: unset;
+        min-height: fit-content;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        & > div {
+          max-width: 90%;
+          min-width: 360px;
           max-height: 500px;
         }
       }
@@ -245,6 +238,8 @@ const Home = () => {
         .achiv-container {
           display: flex;
           flex-direction: column;
+          width: unset;
+          max-width: 90%;
         }
       }
     }
@@ -258,57 +253,44 @@ const Home = () => {
         </Status>
         <div className="description flex flex-col  text-center justify-center ">
           <div className="name md:text-4xl text-xl  font-[800] ">
-            {user.firstName} {user.lastName}
+            {user?.firstName || ""} {user?.lastName || ""}
           </div>
-          <div className="name  font-[400] ">{user.login}</div>
+          <div className="name  font-[400] ">{user?.login}</div>
           <div className="flex gap-10 items-center "></div>
         </div>
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
-          <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-            <img src={Dice} alt="" width={50} />
-            Games : {rankData.wins + rankData.loses + rankData.draws}
+        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-6  ">
+            <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
+              <img src={Dice} alt="_" width={40} />
+              Games : {rankData?.wins + rankData?.loses + rankData?.draws || " " }
+            </div>
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={AchivementImg1} width={40} alt="_" />
+              Wins : {rankData?.wins || " "}
+            </div>
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={Draw} alt="_" width={40} />
+              Draw: {rankData?.draws || " "}
+            </div>
+            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+              <img src={Lose} alt="_" width={40} />
+              Lose: {rankData?.loses || " "}
+            </div>
           </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={AchivementImg1} width={50} alt="" />
-            Wins : {rankData.wins}
-          </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={Draw} alt="" width={50} />
-            Draw: {rankData.draws}
-          </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={Lose} alt="" width={50} />
-            Lose: {rankData.loses}
-          </div>
-        </div>
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
-          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] min-h-[25rem] ">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] h-[25rem] ">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FriendsImg} alt="" width={50} />
                 Friends
               </div>
             </div>
-            <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2 ">
-              {friends.length ? (
-                <div>
+            <div className="chanel h-full  py-2 ">
+              {friends && friends?.length > 0 ? (
+                <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {friends.map((Friend, index) => (
-                    <FreindCarde key={index}>
-                      <div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem] ">
-                        <div className="image">
-                          <img src={Avatar} alt="" width={60} />
-                        </div>
-                        <div className="name text-2xl font-[800]">
-                          {Friend.login}
-                        </div>
-                        <div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-                          {Friend.Status}
-                          <div className="dot w-3 h-3 bg-green-500 rounded-full"></div>
-                        </div>
-                      </div>
-                    </FreindCarde>
+                    <FreindCard key={index} {...Friend} />
                   ))}
                 </div>
               ) : (
@@ -318,7 +300,7 @@ const Home = () => {
               )}
             </div>
           </div>
-          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
+          <div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={ChatImg} alt="" width={50} />
@@ -326,12 +308,20 @@ const Home = () => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
-                <ChanelCard key={index} />
-              ))}
+              {joinedChannel && joinedChannel.length ? (
+                <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
+                  {joinedChannel.map((chanel, index) => (
+                    <ChanelCard key={index} {...chanel} />
+                  ))}
+                </div>
+              ) : (
+                <div className=" h-full flex justify-center items-center text-3xl">
+                  No Joined Chanels
+                </div>
+              )}
             </div>
           </div>
-          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-full min-h-[25rem]">
+          <div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
             <div className="top border-b border-white/50  h-[5rem]">
               <div className="title text-2xl font-[600] flex gap-2  items-center">
                 <img src={GameImg} alt="" width={50} />
@@ -345,31 +335,24 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="achievements    h-[40%]  ">
+        <div className="achievements border border-gray-300-100 rounded-xl p-4   h-[40%]  w-[70%] m-auto">
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
-            Achievement
+            Achievements
           </div>
-          <div className="achiv-container flex gap-10 w-[80%] m-auto">
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg2}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg3}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg4}
-            />
-            <AchivementCard
-              title="Achivement 1"
-              description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-              imgPath={AchivementImg4}
-            />
+          <div className="achiv-container flex gap-10   m-auto ">
+            {achivements && achivements.length ? (
+              <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
+                <SwiperComponent
+                  slides={achivements.map((achivement, index) => (
+                    <AchivementCard key={index} {...achivement} />
+                  ))}
+                ></SwiperComponent>
+              </div>
+            ) : (
+              <div className=" h-full flex justify-center items-center text-3xl text-center">
+                No Achivements
+              </div>
+            )}
           </div>
         </div>
       </Main>
@@ -377,4 +360,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Profile;

@@ -14,6 +14,7 @@ export interface PrivateMessage {
     lastMessageDate: string;
     seen: boolean;
     status: any;
+    blocked?: boolean;
 };
 
 

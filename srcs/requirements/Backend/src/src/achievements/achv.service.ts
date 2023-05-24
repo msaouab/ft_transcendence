@@ -55,13 +55,16 @@ export class AchvService {
             winner_pts = pts_one;
             loser_pts = pts_two;
         }
-        else if (pts_one == pts_two)
-        {    isdraw = true;
+        else
+        {    
             winner_id = two_id;
             loser_id = one_id;
             winner_pts = pts_two;
             loser_pts = pts_one;
         }
+        if (pts_one == pts_two)
+            isdraw = true;
+    
             await this.update_data(winner_id, loser_id, winner_pts, loser_pts, isdraw);
             await this.Here_We_Go(winner_id);
             await this.Here_We_Go(loser_id);
@@ -156,8 +159,10 @@ export class AchvService {
             { id: winner_id, pts: winner_pts },
             { id: loser_id, pts: loser_pts },
           ];
+          
         for (let i = 0; i < users.length; i++) {
             const user = users[i];
+            console.log(user);
             const to_update = await this.prisma.rankingData.findFirst({
                 where: {
                     user_id: user.id,
@@ -423,6 +428,21 @@ export class AchvService {
     async testAchievements(body: PostGameDto)
     {
         const {playerOne, playerTwo, playeOne_pts, playeTwo_pts} = body;
+        const checkUser = await this.prisma.user.findFirst(
+            {
+                where:
+                    {id: playerOne,}
+            }
+        )
+        const checkUsert = await this.prisma.user.findFirst(
+            {
+                where:
+                    {id: playerTwo,}
+            }
+        )
+        console.log(checkUser, checkUsert)
+            if (!checkUser || !checkUsert)
+                throw new NotFoundException("User not found");
         return await this.CheckAchv(playerOne, playerTwo, playeOne_pts, playeTwo_pts)
     }
 
@@ -435,15 +455,27 @@ export class AchvService {
         if (!user) {
             throw new NotFoundException("No user found");
         }
-        const achievements = await this.prisma.achievementsAssignement.findMany({
+        const achievementsIds = await this.prisma.achievementsAssignement.findMany({
             where: {
                 player_id: id,
             },
         });
-        if (!achievements) {
+        
+        if (!achievementsIds) {
             throw new NotFoundException("No achievements found");
         }
-        return achievements;
+        const achivementInfos =[];
+        for (let achivement of achievementsIds){
+            const achivementInfo = await this.prisma.achievements.findFirst(
+                {
+                    where: {
+                        achievement_id: achivement.achievement_id
+                    }
+                }
+            )
+            achivementInfos.push(achivementInfo);
+        }
+        return achivementInfos;
         
     }
 

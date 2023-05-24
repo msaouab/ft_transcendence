@@ -29,12 +29,12 @@ const users = [
         firstName: 'rida',
         lastName: 'ennasry',
     },
-    {
-        login: 'mbehhar',
-        email: 'mbehhar@student.1337.ma',
-        firstName: 'Mohamed',
-        lastName: 'Behhar',
-    },
+    // {
+    //     login: 'mbehhar',
+    //     email: 'mbehhar@student.1337.ma',
+    //     firstName: 'Mohamed',
+    //     lastName: 'Behhar',
+    // },
     {
         login: 'rbenjell',
         email: 'rbenjell@student.1337.ma',
@@ -85,13 +85,13 @@ const messages = [
 
 
 
-class FriendshipInvites {
-    id: string;
-    sender_id: string;
-    receiver_id: string;
-    status: string;
-    created_at: Date;
-}
+// class FriendshipInvites {
+//     id: string;
+//     sender_id: string;
+//     receiver_id: string;
+//     status: string;
+//     created_at: Date;
+// }
 
 
 const getRoomId = async (senderId: string, receiverId: string) => {
@@ -136,25 +136,26 @@ async function main() {
             data: user,
         })
 
-
-        // add id to users arr 
-        await prisma.channel.create({
-            data: {
-                name: `channel-${Math.floor(Math.random() * 100)}`,
-                chann_type: 'Public',
-                owner_id: userCreate.id,
-                limit_members: 10,
-            },
-        })
-
-        console.log(`Created user with id: ${userCreate.id}`)
     }
 
-    let user = await prisma.user.findUnique({
-        where: {
-            login: 'ren-nasr',
-        },
-    })
+    //     // add id to users arr 
+    //     await prisma.channel.create({
+    //         data: {
+    //             name: `channel-${Math.floor(Math.random() * 100)}`,
+    //             chann_type: 'Public',
+    //             owner_id: userCreate.id,
+    //             limit_members: 10,
+    //         },
+    //     })
+
+    //     console.log(`Created user with id: ${userCreate.id}`)
+    // }
+
+    // let user = await prisma.user.findUnique({
+    //     where: {
+    //         login: 'ren-nasr',
+    //     },
+    // })
 
 
 
@@ -164,7 +165,7 @@ async function main() {
     // creating 10 private chat rooms two rooms for each user, each rooms should have ren-nasr as a member
     // then at each room we create 50 messages, while selecting a random user to be the sender or the receiver from the room members
     // for (let i = 0; i < 5; i++) {
-    let newArr = users.filter((user) => user.login !== 'ren-nasr')
+    // let newArr = users.filter((user) => user.login !== 'ren-nasr')
     let user1 = await prisma.user.findUnique({
         where: {
             // login: newArr[i].login,
@@ -173,11 +174,11 @@ async function main() {
     })
 
 
-    // while (user1.login === 'ren-nasr') {
-    //     user1 = await getRandomUser(    
-    // }
+    // // while (user1.login === 'ren-nasr') {
+    // //     user1 = await getRandomUser(    
+    // // }
 
-    // user 2 should be ren-nasr
+    // // user 2 should be ren-nasr
 
     const user2 = await prisma.user.findUnique({
         where: {
@@ -185,6 +186,8 @@ async function main() {
         },
     })
 
+    console.log(user1)
+    console.log(user2)
     const privateChatRoom = await prisma.privateChatRoom.create({
         data: {
             id: await getRoomId(user1.id, user2.id),
@@ -192,7 +195,7 @@ async function main() {
 
         },
     })
-    console.log(`Created private chat room with id: ${privateChatRoom.id}`)
+    // console.log(`Created private chat room with id: ${privateChatRoom.id}`)
     for (let j = 0; j < 50; j++) {
         let sender = Math.random() >= 0.5 ? user1 : user2
         let receiver = sender.id === user1.id ? user2 : user1
@@ -215,38 +218,38 @@ async function main() {
             {
                 name: 'Here We Go',
                 description: 'Played your first game.',
-                image: "/app/public/achievements/here_we_go.png",
+                image: "/achievements/here_we_go.png",
 
             },
             {
                 name: 'Ace',
                 description: 'Win a game with a perfect score.',
-                image: "/app/public/achievements/ace.png",
+                image: "/achievements/ace.png",
             },
             {
                 name: 'Atlas Athlete',
                 description: 'Score 50 pts',
-                image: "/app/public/achievements/Atlas_athlete.jpeg",
+                image: "/achievements/Atlas_athlete.jpeg",
             },
             {
                 name: 'Kasbah King',
                 description: 'Win five 5 games in a row.',
-                image: "/app/public/achievements/Kasbah_king.jpeg",
+                image: "/achievements/Kasbah_king.jpeg",
             },
             {
                 name: 'Intouchable',
                 description: 'Win 5 games without losing or draw in any game',
-                image: "/app/public/achievements/Intouchable.png",
+                image: "/achievements/Intouchable.png",
             },
             {
                 name: 'Kang the conqueror',
                 description: 'Win 20 games without losing or draw in any game',
-                image: "/app/public/achievements/kang.jpg",
+                image: "/achievements/kang.jpg",
             },
             {
                 name: 'Are u okay ?',
                 description: 'Just checking after your mediocre performance.',
-                image: "/app/public/achievements/ok.png",
+                image: "/achievements/ok.png",
             }
         ]
         for (let index = 0; index < achievements.length; index++) {

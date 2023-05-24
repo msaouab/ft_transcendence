@@ -11,7 +11,7 @@ import {
 } from "../../assets/icons";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import instance from "../../api/axios";
+import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
@@ -46,7 +46,7 @@ const Routes = [
 
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus } = useGlobalContext();
+  const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
 
   const handleToggleSidebar = () => {
@@ -54,41 +54,50 @@ const SideBar = () => {
   };
   
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       await instance
-  //         .get("/me")
-  //         .then((response) => {
-  //           if (
-  //             response?.data?.tfa == true &&
-  //             response.data.otp_verified == false
-  //           ) {
-  //             // alert("Please enable two factor authentication");
-  //             navigate("/tfa");
-  //           }
-  //           if (response.statusText) {
-  //           }
-  //           Cookies.set("userid", response.data.id);
-  //           // setOnlineStat(user.status);
-  //           setUserStatus(response.data.status);
-  //         })
-  //         .catch((error) => {
-  //           if (error.response.status == 401 || error.response.status == 403) {
-  //             navigate("/login");
-  //           }
-  //         });
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   }
-  //   fetchData();
-  // }, []);
+
+  async function fetchData() {
+    try {
+      await instance
+        .get("/me")
+        .then((response) => {
+          if (
+            response?.data?.tfa == true &&
+            response.data.otp_verified == false
+          ) {
+            // alert("Please enable two factor authentication");
+            navigate("/login/two-factor-authentication");
+          }
+          if (response.statusText) {
+          }
+          Cookies.set("userid", response.data.id);
+          setUserId(response.data.id);
+          console.log(response.data);
+          // setOnlineStat(user.status);
+          setUserStatus(response.data.status.tolowoerCase());
+        })
+        .catch((error) => {
+          if (error.response.status == 401 || error.response.status == 403) {
+            navigate("/login");
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+    console.log("ppppppp", userId);
+    const res = await GetAvatar(userId);
+    setUserImg(res);
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [userId]);
+
   const handleLogout = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
-          if (error.response.status == 401 || error.response.status == 403) {
+
+          if (error.response.status == 401) {
             navigate("/login");
           }
         });
@@ -100,12 +109,12 @@ const SideBar = () => {
   };
 
   return (
-    <div className="  bg-red-400">
-      {/* <div
+    <div className=" ">
+      <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
-      ></div> */}
+        } transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+      ></div>
 
       <div
         className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
@@ -114,7 +123,7 @@ const SideBar = () => {
             : "md:w-20   transition-all duration-300 ease-out "
         }`}
       >
-        <div className="burger text-white text-3xl  mb-10 flex justify-center ">
+        <div className="burger cursor-pointer text-white text-3xl  mb-10 flex justify-center ">
           {isSidebarOpen ? (
             <CgClose
               onClick={handleToggleSidebar}

@@ -59,7 +59,8 @@ export class MessageService {
     }
 
 
-    async updatePrivateChatMessage(id: string, msgId: string, body: updateMessageDto): Promise<PrivateMessage> {
+    async updatePrivateChatMessage(roomId: string, msgId: string, body: updateMessageDto): Promise<PrivateMessage> {
+        
         try {
             const privateChatMessages = await this.prismaService.privateMessage.update({
                 where: {

@@ -34,6 +34,7 @@ export class MessageConroller {
     }
     @Put("/private/:id/message/:msgId")
     async updatePrivateChatMessages(@Param('id') id: string, @Param('msgId') msgId: string, @Body() body: updateMessageDto) {
+        console.log("updatePrivateChatMessages");
         return await this.MessageService.updatePrivateChatMessage(id, msgId, body);
     }
 

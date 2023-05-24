@@ -6,28 +6,43 @@ import Layout from "./pages/layout";
 import GameDashboard from "./pages/game/GameDashboard";
 import GlobalStyle from "./GlobalStyle";
 import { useState } from "react";
-import { MdDoubleArrow } from "react-icons/md";
-// import { ReactComponent as SearchIcon } from '../src/assets/icons/searchIcon.svg'
+
 import LoginPage from "./pages/loginPage/LoginPage";
+import Profile from "./pages/profile/Profile";
 import Game from "./components/common/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
-import Profile from "./pages/profile/Profile";
 import { GameProvider } from "./provider/GameProvider";
 
-function App() {
-	const [bgColor, setBgColor] = useState("#1E1E1E");
-	const [textColor, setTextColor] = useState("#ffffff");
-	const handelBgChange = (e: any) => {
-		setBgColor(e.target.value);
-	};
-	const handelTextChange = (e: any) => {
-		setTextColor(e.target.value);
-	};
+// function App() {
+// 	const [bgColor, setBgColor] = useState("#1E1E1E");
+// 	const [textColor, setTextColor] = useState("#ffffff");
+// 	const handelBgChange = (e: any) => {
+// 		setBgColor(e.target.value);
+// 	};
+// 	const handelTextChange = (e: any) => {
+// 		setTextColor(e.target.value);
+// 	};
 
-	const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+// 	const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+// import OtherUserProfile from "./pages/profile/OtherUserProfile";
+// import NotFound from "./pages/notFound/NotFound";
+
+
+
+function App() {
+  const [bgColor, setBgColor] = useState("#1e1d18");
+  const [textColor, setTextColor] = useState("#ffffff");
+  const handelBgChange = (e: any) => {
+    setBgColor(e.target.value);
+  };
+  const handelTextChange = (e: any) => {
+    setTextColor(e.target.value);
+  };
+
+  // const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
 	// const L  inkStyle: string = " hover:bg-cyan-700 hover:text-white flex-1  text-center transition-all ease-linear duration-200 py-2 px-4 text-2xl "
 
