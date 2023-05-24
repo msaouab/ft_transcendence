@@ -20,6 +20,8 @@ import {
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
 import { string } from "joi";
+import { Game } from "@prisma/client";
+import { time } from "console";
 // import io from "socket.io-client";
 
 @WebSocketGateway({
@@ -79,7 +81,8 @@ export class GameGateway
 		// score: { player1: number; player2: number };
 		status: "waiting" | "OnGoing" | "Finished";
 		type: "Time" | "Round";
-		mode: "random" | "friend";
+		mode: "random" | "friend" | "bot";
+		time: number;
 	};
 	handleConnection(client) {
 		console.log(`Client connected: ${client.id}`);
@@ -215,6 +218,18 @@ export class GameGateway
 		}
 	}
 
+	RoundScore(roomId: string) {
+		const room = this.roomMap.get(roomId);
+		if (room.type === "Round")
+		if (room.player1.score === 5 || room.player2.score === 5) return true;
+		if (room.type === "Time") {
+			let lastTime = new Date().getTime();
+			return (lastTime - room.time) / 1000 >= 60 ? true : false;
+			// if (timeStatus) return true;
+		}
+		return false;
+	}
+
 	// @SubscribeMessage("requesteBall")
 	async handleBall(
 		client: Socket,
@@ -223,6 +238,9 @@ export class GameGateway
 		height: number
 	) {
 		const room = this.roomMap.get(roomId);
+		room.time = new Date().getTime();
+		this.server.to(room.socket[0].id).emit("StartTime", room.time);
+		this.server.to(room.socket[1].id).emit("StartTime", room.time);
 		console.log("ball from room:", room);
 		this.ball = {
 			x: width / 2,
@@ -233,6 +251,7 @@ export class GameGateway
 			speed: 1,
 			c: "#fff",
 		};
+		let status = false;
 		const intervalId = setInterval(() => {
 			if (room.socket.length !== 2) {
 				clearInterval(intervalId);
@@ -265,15 +284,15 @@ export class GameGateway
 			if (newY - this.ball.r <= 0) {
 				this.ball.x = width / 2;
 				this.ball.y = height / 2;
-				this.ball.dx = -this.ball.dx;
-				this.ball.dy = -this.ball.dy;
+				this.ball.dx = this.ball.dx;
+				this.ball.dy = this.ball.dy;
 				room.player1.score++;
 			}
 			if (newY + this.ball.r >= height) {
 				this.ball.x = width / 2;
 				this.ball.y = height / 2;
-				this.ball.dx = -this.ball.dx;
-				this.ball.dy = -this.ball.dy;
+				this.ball.dx = this.ball.dx;
+				this.ball.dy = this.ball.dy;
 				room.player2.score++;
 			}
 			this.ball.x += this.ball.dx;
@@ -294,8 +313,19 @@ export class GameGateway
 			this.server
 				.to(room.socket[1].id)
 				.emit("responseBall", client2Ball, score);
-			if (room.socket[0].id === undefined || room.socket[1].id === undefined) 
+			status = this.RoundScore(roomId);
+			if (
+				room.socket[0].id === undefined ||
+				room.socket[1].id === undefined ||
+				status
+			) {
+				room.status = "Finished";
+				let winner = (room.player1.score > room.player2.score) ? "Player 1" : "Player 2";
+				this.server.to(room.socket[0].id).emit("responseWinner", winner);
+				this.server.to(room.socket[1].id).emit("responseWinner", winner);
 				clearInterval(intervalId);
+				this.handleDisconnect(client);
+			}
 		}, 1000 / 60);
 	}
 
@@ -343,7 +373,7 @@ export class GameGateway
 						value.type,
 						value.mode
 					);
-					// startGame();
+					// this.startGame(client, key, payload);
 					this.handleBall(client, key, payload.width, payload.height);
 					AvailableRoom = false;
 				}
@@ -409,6 +439,7 @@ export class GameGateway
 				status: "waiting",
 				type: payload.type,
 				mode: payload.mode,
+				time: 0
 			};
 			this.roomMap.set(key, this.roomObj);
 			client.join(key);

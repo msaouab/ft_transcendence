@@ -157,9 +157,15 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	};
 
 	useEffect(() => {
+		socket.on("StartTime", (time) => {
+			console.log(time);
+		});
 		socket.on("responseBall", (ball, score) => {
 			setBall(ball);
 			setScore(score);
+		});
+		socket.on("responseWinner", (winner) => {
+			// console.log(winner);
 		});
 		return () => {
 			socket.off("responseBall");
@@ -168,10 +174,11 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 
 	return (
 		<PlayGround className="">
+			{/* <div>{time}</div> */}
 			<canvas ref={canvasRef} width={width} height={height} />
 			<ScoreContainter>
-				<div className="score">{score.player1}</div>
-				<div className="score">{score.player2}</div>
+				<div className="score">P1: {score.player1}</div>
+				<div className="score">P2: {score.player2}</div>
 			</ScoreContainter>
 		</PlayGround>
 	);
