@@ -25,13 +25,17 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 
 // 
-import { clients } from 'src/notify/notify.gateway';
+// import { clients } from 'src/notify/notify.gateway';
 
+
+// a type 
 @Injectable()
 export class ChatService {
     constructor(private prisma: PrismaService,
         // private MessageService: MessageServic
     ) { }
+
+    // a map that contain the id of the user and it's websocket object
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
         const { senderId, receiverId } = postreatePrivateChatRoomDto;
@@ -145,7 +149,7 @@ export class ChatService {
     // }
 
 
-
+  
     async leavePrivateChatRoom(client: Socket, payload: {
         senderId: string,
         receiverId: string
@@ -169,58 +173,70 @@ export class ChatService {
     }
 
     /* sendPrivateMessage(senderId: string, receiverId: string, message: string) */
-    async sendPrivateMessage(client: Socket, payload: createMessageDto, server: Server
+    async sendPrivateMessage(
+        client: Socket, 
+        payload: createMessageDto,
+        server: Server, 
+        clients: Map<string, Socket>
         ) {
-
-        // if client 
-        // if room doesn't exist, call joinPrivateChatRoom
-        // const subPayload = {
-        //     senderId: payload.sender_id,
-        //     receiverId: payload.receiver_id,
-        //     chatRoomId: payload.chatRoom_id,
-        //     seen: payload.seen,
-        //     content: payload.content
-        // }
-
-            
-        // get number of clients of the room
-        
-        
-        
-        
         // check if privatchatroom exist.
+        const roomId = await this.getRoomId(payload.sender_id, payload.receiver_id);
         try {
             const privateRoom = await this.prisma.privateChatRoom.findUnique({
                 where: {
-                    id: await this.getRoomId(payload.sender_id, payload.receiver_id),
+                    id: roomId,
                 },
             })
-            // if the receiver is not in the private chat room, join the private chat room
             
-            // create a new private message, and adds it to the private chat room
-    
-            // if both sockets are connected, set seen to true
-            // if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
-                //     payload.seen = true;
-                // }
-                // if (!privateRoom) {
-                    //     // check if the usr
-                    
-                    // checking if how many clients are in the rooms
-                    // const numOfClients = server.sockets.adapter.rooms.get(privateRoom.id)?.size;
-                    // console.log("Number of clients in the room: ", numOfClients);
-                    
-            const numOfClient = server.sockets.adapter.rooms.get(privateRoom.id)?.size;
-            
-            // console.log("Number of clients in the room: ", numOfClient);
-            console.log("Number of clients in the room: ", numOfClient);
+            console.log("sender socket id is ", client.id);
+            // checking if other user is in thr room
+            // if (roomsClientsMap.get(privateRoom.id).length == 2) {
+            //     // join the other 
+            // } 
+            // else {
+            //     console.log("Other user is in the room");
+            // }
 
-            if (clients.get(payload.receiver_id)) {
-                console.log("The guy is alive");
+            // if this the first message and the other user is online join him to the room and send him the message
+            const messages = await this.prisma.privateMessage.findMany({
+                where: {
+                    chatRoom_id: privateRoom.id
+                },
+                take: 1
+            });
+            if (messages.length == 0) {
+                // check if the other user is online
+                console.log("zero messages")
+                if (clients.has(payload.receiver_id)) {
+                    // console.log("Other user is online: ", payload.receiver_id);
+                    const otherClientSocket = clients.get(payload.receiver_id);
+                    console.log("receiver socket id is ", otherClientSocket.id);
+                    // console.log
+                    // console.log("the key of our value is ", clients.forEach((value, key) => {
+                    //     // console.log("key: ", key, " value: ", value.id);
+                    // if (value.id == otherClientSocket.id) {
+                    //     return key;
+                    // }
+
+                    // }));
+
+                    await otherClientSocket.join(privateRoom.id);
+                    // emit the event roomJoined to the other user
+                    otherClientSocket.emit("roomJoined", { "roomId": privateRoom.id });
+
+                    // const otherUser = clients.get(payload.receiver_id);
+                    // console.log("Other user is online: ", otherUser.id);
+                    // // join the other user to the room
+                    // const otherClient = clients.get(payload.receiver_id);
+                    // await otherClient.join(privateRoom.id);
+                    // // send the event to the other user
+                    // otherClient.emit("roomJoined", { "roomId": privateRoom.id });
+                    // console.log("User with id ", payload.receiver_id, " joined the room: ", privateRoom.id);
+
+                    // await this.joinPrivateChatRoom(clients.get(payload.receiver_id), { "senderId": payload.sender_id, "receiverId": payload.receiver_id });
+                }
             }
-            else  {
-                console.log("The guy is not alive");
-            }
+            // create the message
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,

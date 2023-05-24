@@ -84,20 +84,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
     );
 
     const {setPrivateChatRooms} = useGlobalContext();
-    
-    // let initData = {
-    //     show: false,
-    //     title: 'Message not sent',
-    //     message: 'you cannot send a message to this user at the moment',
-    //     actionName: 'Ok',
-    //     confirm: () => {
-    //         setConfirmData({
-    //             ...confirmData,
-    //             show: false
-    //         });
-    
-    //     }
-    // };
+     
 
     const sendMessage = (messageProp: string) => {
         // if the user is blocked, don't send the message

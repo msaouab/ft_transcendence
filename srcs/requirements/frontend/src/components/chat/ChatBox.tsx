@@ -22,7 +22,7 @@ const ChatBoxStyle = styled.div`
     }
 `;
 
-
+import { useGlobalContext } from '../../provider/AppContext';
 import { PrivateMessage } from '../../types/message';
 import { singleMessage } from '../../types/message';
 // components
@@ -45,6 +45,8 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
+    const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
+
     const updateSeenStatus = (messages: singleMessage[]) => {
         messages.forEach((message: any) => {
             if (message.seen === false && message.sender_id !== Cookies.get('id')) {
@@ -65,6 +67,81 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     useEffect(() => {
         if (connected) {  
             chatSocket.current.on('newPrivateMessage', (message: any) => {
+                console.log("new private message", message);
+                // if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
+                /*
+                chatRoom_id
+: 
+"1af1e142520bc7d144d88df6c689e92f"
+content
+: 
+"hey there"
+dateCreated
+: 
+"2023-05-24T18:07:14.663Z"
+id
+: 
+"e7c02dd2-1ff3-465e-8dfa-afe3eed5719b"
+receiver_id
+: 
+"43dae621-259a-455a-bd69-0602d1fa9694"
+seen
+: 
+false
+sender_id
+: 
+"0dcb6826-1832-46d7-84fe-3f3491f83ced"
+*/
+                const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
+                    const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
+                    const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+
+                    return user.data;
+                }
+
+                const getPrivateRoom = async (chatRoom_id: string): Promise<any> => {
+                    const privateRoom = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${chatRoom_id}`);
+                    return privateRoom.data;
+                }
+                
+
+                // getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
+                const checkNew = async () => {
+                if (!privateChatRooms.find(  (chatRoom: any)  => chatRoom.chatRoomid === message.chatRoom_id) && message.sender_id !== Cookies.get('id')) {
+                    const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
+                    const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
+                    const newPrivatRoom : PrivateMessage = {
+                        chatRoomid: message.chatRoom_id,
+                        messageId: message.id,
+                        sender_id: message.sender_id,
+                        receiver_id: message.receiver_id,
+                        lastMessage: message.content,
+                        lastMessageDate: message.dateCreated,
+                        seen: message.seen,
+                        login: login,
+                        profileImage: profileImage,
+                        blocked: false,
+                        status: 'online'
+                    }
+                    setPrivateChatRooms((prevState: any) => ([...prevState, newPrivatRoom]));
+                }
+            }  
+            checkNew(); 
+
+                    // const privateRoom = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}`);
+
+                     
+        
+                        
+                        
+                // }
+                    // setPrivateChatRooms((prevState: any) => ([...prevState, {
+                    //     chatRoomid: message.chatRoom_id,
+                    //     user: {
+                    //         id: message.sender_id,
+                    //         username: message.sender_username,
+                    //         profilePicture: message.sender_profilePicture
+                    //     },
                 setState((prevState: any) => ({
                     ...prevState,
                     messages: [message, ...prevState.messages]

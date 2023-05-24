@@ -89,9 +89,16 @@ const Chat = () => {
     
       // chatSocket.current.emit('alive', {id: Cookies.get("id")});
       setConnected(true);
+      chatSocket.current.emit('alive', {id: Cookies.get("id")} );
       console.log("connected to the server");
     });
+    
 
+    chatSocket.current.on("roomJoined", () => {
+      console.log("room joined");
+    });
+
+  
     return () => {
       chatSocket.current.disconnect();
       setConnected(false);
