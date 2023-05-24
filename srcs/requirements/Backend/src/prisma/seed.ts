@@ -11,18 +11,18 @@ import e from 'express';
 //     password: 'ren-nasr',
 // },
 const users = [
-    // {
-    //     login: 'ichoukri',
-    //     email: 'ichoukri@student.1337.ma',
-    //     firstName: 'Ismail',
-    //     lastName: 'Choukri',
-    // },
     {
-        login: 'msaouab',
-        email: 'msaouab@student.1337.ma',
-        firstName: 'mohamed',
-        lastName: 'saouab',
+        login: 'ichoukri',
+        email: 'ichoukri@student.1337.ma',
+        firstName: 'Ismail',
+        lastName: 'Choukri',
     },
+    // {
+    //     login: 'msaouab',
+    //     email: 'msaouab@student.1337.ma',
+    //     firstName: 'mohamed',
+    //     lastName: 'saouab',
+    // },
     {
         login: 'ren-nasr',
         email: 'ren-nasr@student.1337.ma',

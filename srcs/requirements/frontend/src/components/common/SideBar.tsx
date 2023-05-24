@@ -52,6 +52,7 @@ const SideBar = () => {
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+  
   const navigate = useNavigate();
 
   async function fetchData() {
