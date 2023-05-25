@@ -194,10 +194,6 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             .catch(err => {
                 console.log("error unblocking user: ", err);
             })
-
-
-
-        // 
     };
 
     return (

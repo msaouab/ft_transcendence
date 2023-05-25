@@ -8,7 +8,7 @@ import { dateToStr } from '../common/CommonFunc';
 
 import { useGlobalContext } from '../../provider/AppContext';
 import ConfirmDelete from '../common/ConfirmDelete';
-
+import axios from 'axios';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
     /* height: 8%; */
@@ -86,7 +86,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
     const {setPrivateChatRooms} = useGlobalContext();
      
 
-    const sendMessage = (messageProp: string) => {
+    const sendMessage = async (messageProp: string) => {
         // if the user is blocked, don't send the message
         // console.log(selectedChat);
         if (selectedChat.blocked) {
@@ -98,6 +98,35 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
         setMessage('');      
        return ;
         }
+        const myId = Cookies.get('id');
+        const otherUserId = selectedChat.sender_id === myId ? selectedChat.receiver_id : selectedChat.sender_id;
+
+        const userBlocks = await axios.get(`http://localhost:3000/api/v1/user/${myId}/blockedusers/${otherUserId}`);
+        if (userBlocks.data.length > 0) {
+            console.log("these mother fuckers are blocked");
+            setConfirmData({
+                ...confirmData,
+                show: true
+            });
+            setMessage('');
+            setPrivateChatRooms(prev => {
+                const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
+                if (index === -1) {
+                    return [...prev, selectedChat];
+                }
+                else {
+                    return [...prev];
+                }
+            }
+            )
+            return;
+        }
+        
+
+        
+
+        // ge
+
         if (messageProp === '') {
             return;
         }
@@ -127,6 +156,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
                 lastMessage: message.content,
                 lastMessageDate: Date.now(),
             }
+
             setPrivateChatRooms(prev => {   
                 const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
                 if (index === -1) {

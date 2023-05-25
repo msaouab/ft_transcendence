@@ -69,42 +69,11 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
             chatSocket.current.on('newPrivateMessage', (message: any) => {
                 console.log("new private message", message);
                 // if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
-                /*
-                chatRoom_id
-: 
-"1af1e142520bc7d144d88df6c689e92f"
-content
-: 
-"hey there"
-dateCreated
-: 
-"2023-05-24T18:07:14.663Z"
-id
-: 
-"e7c02dd2-1ff3-465e-8dfa-afe3eed5719b"
-receiver_id
-: 
-"43dae621-259a-455a-bd69-0602d1fa9694"
-seen
-: 
-false
-sender_id
-: 
-"0dcb6826-1832-46d7-84fe-3f3491f83ced"
-*/
                 const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
                     const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
                     const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
-
                     return user.data;
-                }
-
-                const getPrivateRoom = async (chatRoom_id: string): Promise<any> => {
-                    const privateRoom = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${chatRoom_id}`);
-                    return privateRoom.data;
-                }
-                
-
+                }                
                 // getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
                 const checkNew = async () => {
                 if (!privateChatRooms.find(  (chatRoom: any)  => chatRoom.chatRoomid === message.chatRoom_id) && message.sender_id !== Cookies.get('id')) {
@@ -121,27 +90,13 @@ sender_id
                         login: login,
                         profileImage: profileImage,
                         blocked: false,
+                        // change later
                         status: 'online'
                     }
                     setPrivateChatRooms((prevState: any) => ([...prevState, newPrivatRoom]));
                 }
             }  
             checkNew(); 
-
-                    // const privateRoom = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}`);
-
-                     
-        
-                        
-                        
-                // }
-                    // setPrivateChatRooms((prevState: any) => ([...prevState, {
-                    //     chatRoomid: message.chatRoom_id,
-                    //     user: {
-                    //         id: message.sender_id,
-                    //         username: message.sender_username,
-                    //         profilePicture: message.sender_profilePicture
-                    //     },
                 setState((prevState: any) => ({
                     ...prevState,
                     messages: [message, ...prevState.messages]
@@ -169,7 +124,6 @@ sender_id
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         updateSeenStatus(responseMessages.data[1]);
-        
         return responseMessages.data[1];
     };
 

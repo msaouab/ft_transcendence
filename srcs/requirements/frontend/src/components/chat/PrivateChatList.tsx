@@ -45,7 +45,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         try {
             const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
-            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean, blocked: boolean }) => {
+            await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean, blocked: boolean}) => {
                 const { id } = room;
                 const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
@@ -73,8 +73,9 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     login: user.login,
                     // profileImage: await GetAvatar(chattingUserId),
                     profileImage: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
-                    blocked: room.blocked, 
-                    status: user.status
+                    blocked: room.blocked,
+                    // change this later
+                    status: 'online'
                 }
                 Tabs.push(data);
             }));

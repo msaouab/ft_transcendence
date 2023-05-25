@@ -22,15 +22,21 @@ export class BlockedUsersController {
 
     @Get(":id/blockedusers")
     async getBlockedUsers(@Param('id') id: string) {
-        console.log("getBlockedUsers");
-
         const blockedUsers = await this.BlockedUsersService.getBlockedUsers(id);
         return blockedUsers;
     }
 
+
+    @Get(":id/blockedusers/:idBlockedUser")
+    async checkIfBlocked(@Param('id') id: string, @Param('idBlockedUser') blockedUserId: string) {
+
+        const blockedUsers = await this.BlockedUsersService.checkIfBlocked(id, blockedUserId);
+        return blockedUsers;
+    }
+
+
     @Post(":id/blockedusers")
     async postBlockedUsers(@Body() BlockedUserDto: BlockedUserDto, @Param('id') id: string) {
-        console.log("postBlockedUsers");
         const blockedUsers = await this.BlockedUsersService.createBlockedUser(BlockedUserDto, id);
         return blockedUsers;
     }

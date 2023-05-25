@@ -31,7 +31,7 @@ export class ChatController {
     @Get("/private/single/:senderId/:receiverId")
     @ApiParam({ name: 'senderId', required: true, description: 'id of the sender' })
     @ApiParam({ name: 'receiverId', required: true, description: 'id of the receiver' })
-    async getPrivateChatRooms(@Param('senderId') senderId: string, @Param('receiverId') receiverId: string) {
+    async getPrivateChatRoom(@Param('senderId') senderId: string, @Param('receiverId') receiverId: string) {
         const privateChatRooms = await this.ChatService.getPrivateChatRoom(senderId, receiverId);
         return privateChatRooms;
     }

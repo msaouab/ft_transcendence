@@ -53,6 +53,16 @@ height: 100vh;
   // const onConnect = () => {log(
   //   console."connected to the server notify");
 
+  // a notification object
+  // const notification = {
+  //   "chat": [
+  //     {
+
+  //     }
+  //   ]
+  //   "profile": 0,
+  //   "game": 0,
+  // }
   useEffect(() => {
     console.log("IM HERE");
     console.log("connected: ", notifySocket);

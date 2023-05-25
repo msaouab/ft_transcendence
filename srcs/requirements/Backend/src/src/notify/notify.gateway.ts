@@ -16,8 +16,6 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
     
     constructor(private notificationService: NotificationService) { }
     // private clients  = new Map<string, Socket>();
-
-
     @SubscribeMessage('realStatus')
     async handleStatus(client: Socket, payload: {
         id: string,
@@ -27,8 +25,7 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
         console.log("We've got the event to add the client to the map");
         // console.log("We've got the event to add the client to the map"); 
         clients.set(id, client);
-        console.log("clients: ", clients.keys());
-
+        // console.log("clients: ", clients.keys());
         await this.notificationService.updateUserStatus(id, userStatus);
     }
 

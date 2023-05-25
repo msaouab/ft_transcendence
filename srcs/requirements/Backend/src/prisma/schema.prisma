@@ -129,8 +129,8 @@ model PrivateChatRoom {
   lastUpdatedTime DateTime         @default(now())
   sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
   receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
-  blocked         Boolean          @default(false)
-}
+  blocked         Boolean          @default(false) 
+  }
 
 model BlockTab {
   user_id        String
