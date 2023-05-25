@@ -23,8 +23,7 @@ import { createMessageDto } from './message/message.dto';
 import { PostPrivateChatRoomDto } from './dto/postPrivateChatRoom';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
-
-// 
+import { clients as onlineClients } from 'src/notify/notify.gateway';
 // import { clients } from 'src/notify/notify.gateway';
 
 
@@ -258,6 +257,13 @@ export class ChatService {
                 throw new HttpException("Private chat doesn't exist", 404);
             }
         }
+        // if receiver is online notify him 
+        if (onlineClients.has(payload.receiver_id)) {
+            const otherClientSocket = onlineClients.get(payload.receiver_id);
+            console.log("We're sending the chatNotif event to the other client");
+            otherClientSocket.emit("chatNotif", { "num": 1 });
+        }
+
     }
 
 

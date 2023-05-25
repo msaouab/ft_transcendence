@@ -76,7 +76,8 @@ const Chat = () => {
     chatRoomId: string;
     message: string;
   }>({} as { chatRoomId: string; message: string });
-  const { privateChatRooms } = useGlobalContext();
+  const { privateChatRooms, setChatNotif } = useGlobalContext();
+
 
   useEffect(() => {
     // socket connection
@@ -93,16 +94,23 @@ const Chat = () => {
       console.log("connected to the server");
     });
     
+       
+    
 
     chatSocket.current.on("roomJoined", () => {
       console.log("room joined");
     });
+
+    Cookies.set("chatNotif", "0");
+    setChatNotif(0);
 
   
     return () => {
       chatSocket.current.disconnect();
       setConnected(false);
     };
+
+
   }, []);
 
   useEffect(() => {

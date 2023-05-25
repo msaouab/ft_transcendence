@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import DefaultAvatar from "../assets/avatar.png";
 import {useRef} from "react";
+import Cookies from "js-cookie";
 
 interface AppContextType {
   userStatus: string;
@@ -16,6 +17,9 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  chatNotif: number;
+  setChatNotif: React.Dispatch<React.SetStateAction<number>>;
+
   
 }
 
@@ -31,7 +35,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<string>("");
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
-  
+  const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
+  console.log("chatNotif: ", chatNotif);
+
   const value = {
     userStatus,
     setUserStatus,
@@ -41,6 +47,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
+    chatNotif,
+    setChatNotif,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -48,10 +56,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
 export const useGlobalContext = (): AppContextType => {
   const context = useContext(AppContext);
-
   if (!context) {
     throw new Error("useGlobalContext must be used within an AppProvider");
   }
-
   return context;
 };

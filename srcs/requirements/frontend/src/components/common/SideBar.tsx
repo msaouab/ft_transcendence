@@ -15,6 +15,8 @@ import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
+import { parse } from "path";
+
 
 const Routes = [
   {
@@ -44,11 +46,33 @@ const Routes = [
   },
 ];
 
-const SideBar = () => {
+const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boolean}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
   // const 
+
+  const {setChatNotif, chatNotif} = useGlobalContext();
+  // const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
+  useEffect(() => {
+    if (connected) {
+      notifySocket.on("chatNotif", (data: any) => {
+  
+        if (window.location.pathname != "/chat") {
+          console.log("Im heeeeeeeer");
+          const prevNotif = chatNotif;
+          console.log("prev notif: ", prevNotif);
+
+          const num = parseInt(data.num) + prevNotif;
+          console.log(num.toString());
+          Cookies.set("chatNotif", String(num));
+          console.log("what we're setting to the state: ", num);
+          setChatNotif(num);
+          Cookies.set("chatNotif", String(num));
+          // setChatNotif(num);
+       }});
+    }
+  }, [chatNotif]);  
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -152,6 +176,13 @@ const SideBar = () => {
                 }}
               >
                 <div className="icon">{route.icon}</div>
+                {/* a notif small red cirle with num inside */}
+                {route.name == "chat" && chatNotif > 0 && (
+                  <div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+                    {chatNotif}
+                  </div>
+                )}
+
                 {isSidebarOpen && <div className="text ml-4">{route.name}</div>}
               </Link>
             );

@@ -7,9 +7,9 @@ import SearchBar from "../../components/common/Search/SearchBar";
 
 import { useEffect, useRef, useState } from "react";
 import {io} from "socket.io-client";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
-import UserSettings from "../user/UserSettings";
+// import UserSettings from "../user/UserSettings";
 const index = () => {
 
 
@@ -47,22 +47,8 @@ height: 100vh;
 
   const notifySocket = useRef<any>(null);
   const [connected, setConnected] = useState(false);
-  // const {setUserStatus} = useGlobalContext();
-  // const {userStatus} = useGlobalContext();
-  // defining on connect event to call it inside teh DropDownMenu component
-  // const onConnect = () => {log(
-  //   console."connected to the server notify");
+    
 
-  // a notification object
-  // const notification = {
-  //   "chat": [
-  //     {
-
-  //     }
-  //   ]
-  //   "profile": 0,
-  //   "game": 0,
-  // }
   useEffect(() => {
     console.log("IM HERE");
     console.log("connected: ", notifySocket);
@@ -73,6 +59,9 @@ height: 100vh;
       setConnected(true);
       // call a function inside the drop down menu to change the status
     });
+
+   
+
 
     notifySocket.current.on("disconnect", () => {
       setConnected(false);
@@ -86,7 +75,7 @@ height: 100vh;
   return (
     <LayoutStyle className=" px-1 md:px-5">
       <div className="md:w-[5rem] ">
-        <SideBar />
+        <SideBar notifySocket={notifySocket.current} connected={connected} />
       </div>
       <div className="main-content w-full ">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
