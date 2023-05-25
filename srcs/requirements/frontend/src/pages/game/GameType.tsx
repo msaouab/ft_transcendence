@@ -7,17 +7,17 @@ import { useAppContext } from "../../provider/GameProvider"
 const Games = [
   {
     id: 1,
-    name: "play vs bot",
+    name: "Bot",
     icon: "fas fa-robot",
   },
   {
     id: 2,
-    name: "play vs player",
+    name: "Friend",
     icon: "fas fa-user",
   },
   {
     id: 3,
-    name: "Random table",
+    name: "Random",
     icon: "fas fa-dice",
   },
 ];

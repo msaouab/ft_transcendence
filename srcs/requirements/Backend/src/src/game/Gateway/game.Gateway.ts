@@ -221,7 +221,7 @@ export class GameGateway
 	RoundScore(roomId: string) {
 		const room = this.roomMap.get(roomId);
 		if (room.type === "Round")
-		if (room.player1.score === 5 || room.player2.score === 5) return true;
+			if (room.player1.score === 5 || room.player2.score === 5) return true;
 		if (room.type === "Time") {
 			let lastTime = new Date().getTime();
 			return (lastTime - room.time) / 1000 >= 60 ? true : false;
@@ -320,7 +320,8 @@ export class GameGateway
 				status
 			) {
 				room.status = "Finished";
-				let winner = (room.player1.score > room.player2.score) ? "Player 1" : "Player 2";
+				let winner =
+					room.player1.score > room.player2.score ? "Player 1" : "Player 2";
 				this.server.to(room.socket[0].id).emit("responseWinner", winner);
 				this.server.to(room.socket[1].id).emit("responseWinner", winner);
 				clearInterval(intervalId);
@@ -390,14 +391,11 @@ export class GameGateway
 			payload
 		);
 		console.log("avialableRoom:", avialableRoom);
-		console.log("payload:", payload);
 		if (
 			avialableRoom &&
 			payload.type &&
-			payload.mode &&
-			payload.mode !== "play vs player"
+			payload.mode && payload.mode !== "Friend"
 		) {
-			console.log("payload:", payload);
 			const key = createHash("sha256")
 				.update(Date.now().toString())
 				.digest("hex");
@@ -439,7 +437,7 @@ export class GameGateway
 				status: "waiting",
 				type: payload.type,
 				mode: payload.mode,
-				time: 0
+				time: 0,
 			};
 			this.roomMap.set(key, this.roomObj);
 			client.join(key);
