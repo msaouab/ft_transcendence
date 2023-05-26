@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
+import { useAppContext } from "../../provider/GameProvider";
 
 interface PingPongProps {
 	width: number;
@@ -47,6 +48,7 @@ type BallState = {
 let ctx: CanvasRenderingContext2D | null;
 
 const PingPong = ({ width, height, socket }: PingPongProps) => {
+	const { modeRoom } = useAppContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
@@ -124,7 +126,9 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				// player1X: player1X,
 				// player2X: player2X,
 			};
-			socket.emit("requesteMouse", data);
+			if (modeRoom === "Bot") socket.emit("requesteBot", data);
+			else socket.emit("requesteMouse", data);
+
 		};
 		document.addEventListener("mousemove", handleMouseMove as unknown as EventListener);
 		socket.on("responseMouse", (playerPosition) => {
@@ -138,7 +142,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 			socket.off("responseMouse");
 			socket.off("responsePlayer2");
 		};
-	}, [socket, player1X, player2X, height, width]);
+	}, [socket, player1X, player2X, height, width, ball]);
 
 	//	render the ball and get the new position of the ball from the server
 
