@@ -59,17 +59,10 @@ const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boo
       notifySocket.on("chatNotif", (data: any) => {
   
         if (window.location.pathname != "/chat") {
-          console.log("Im heeeeeeeer");
           const prevNotif = chatNotif;
-          console.log("prev notif: ", prevNotif);
-
           const num = parseInt(data.num) + prevNotif;
-          console.log(num.toString());
-          Cookies.set("chatNotif", String(num));
-          console.log("what we're setting to the state: ", num);
           setChatNotif(num);
           Cookies.set("chatNotif", String(num));
-          // setChatNotif(num);
        }});
     }
   }, [chatNotif]);  

@@ -36,7 +36,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
-  console.log("chatNotif: ", chatNotif);
+  // console.log("chatNotif: ", chatNotif);
 
   const value = {
     userStatus,

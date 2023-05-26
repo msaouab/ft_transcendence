@@ -8,7 +8,9 @@ import { useRef } from 'react';
 import { io } from "socket.io-client";
 
 import styled from "styled-components";
-import { useGlobalContext } from "../../../provider/AppContext";
+import { GetAvatar } from "../../../api/axios";
+
+// import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
     position: absolute;
     bottom: 0;
@@ -74,49 +76,60 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
         }
     }, [dummySelectedChat]);
 
+
     useEffect(() => {
         const sender_id = Cookies.get('id') || '';
         const receiver_id = user.id;
-        // console.log("heeeelo");
-        // console.log("sender_id", sender_id);
-        // console.log("receiver_id", receiver_id);
+        const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, avatar: string, status : string }> => {
+            const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
+            // console.log("userId", userId);
+            const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+            // console.log("user", user.data.login);
+            const avatar = await GetAvatar(user.data.id);
+            return { login: user.data.login, avatar: avatar, status: user.data.status };
+        }
+
+    
+
         axios.get(`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
-            .then((res) => {
+            .then(async (res) => {
+                const {status, avatar} = await getUser(sender_id, receiver_id);
                 if (res.data.length !== 0) {
-                    console.log('chat room exists', res)
+        
                     setDummySelectedChat({
                         chatRoomid: res.data.id,
                         messageId: '',
                         sender_id: sender_id,
                         receiver_id: receiver_id,
-                        login: user.login,
-                        profileImage: user.profileImage,
+                        login: user.login, 
+                        profileImage: avatar,
                         lastMessage: '',
                         lastMessageDate: '',
                         seen: false,
-                        status: user.status,
+                        status: status
                     
                     });
                 }
                 else {
-                    console.log('chat room does not exist', res)
+                    // console.log('chat room does not exist', res)
                     axios.post(`http://localhost:3000/api/v1/chatrooms/private`, {
                         senderId: sender_id,
                         receiverId: receiver_id
                     })
-                        .then((res) => {
-                            console.log('chat room created', res);
+                        .then(async (res) => {
+                            // console.log('chat room created', res);
+                            const {status, avatar} = await getUser(sender_id, receiver_id);
                             setDummySelectedChat({
                                 chatRoomid: res.data.id,
                                 messageId: '',
                                 sender_id: sender_id,
                                 receiver_id: receiver_id,
                                 login: user.login,
-                                profileImage: user.profileImage,
+                                profileImage: avatar,
                                 lastMessage: '',
                                 lastMessageDate: '',
                                 seen: false,
-                                status: user.status
+                                status: status
                             });
 
                         }).catch((err) => {

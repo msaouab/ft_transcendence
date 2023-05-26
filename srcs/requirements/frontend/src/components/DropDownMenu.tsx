@@ -39,10 +39,10 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
   useEffect(() => {
     // console.log("heeeeeeeeeeeeeee: ", userStatus);
     if (connected) {
-    console.log("connected to the server notify");
-      console.log("current: ", notifySocket);
+    // console.log("connected to the server notify");
+      // console.log("current: ", notifySocket);
       if (notifySocket) {
-        console.log("we're emmiting the event status");
+        // console.log("we're emmiting the event status");
       notifySocket.emit("realStatus", {
         id: Cookies.get("id"),
         userStatus: true,
@@ -51,7 +51,7 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
     }
     }
     else if (!connected) {
-      console.log("we're emmiting the event status");
+      // console.log("we're emmiting the event status");
       if (notifySocket) {
       notifySocket.emit("realStatus", {
         id: Cookies.get("id"),

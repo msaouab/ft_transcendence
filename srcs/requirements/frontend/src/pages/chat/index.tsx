@@ -139,7 +139,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (!selectedChat.chatRoomid) {
-      console.log("no chat room selected from global context");
+      // console.log("no chat room selected from global context");
       return;
     }
     for (let i = 0; i < privateChatRooms.length; i++) {
@@ -159,7 +159,7 @@ const Chat = () => {
           closestDate = date;
         }
       }
-      console.log("selecting the closest chat room");
+      // console.log("selecting the closest chat room");
       setSelectedChat(closestChatRoom);
       return;
     } else {

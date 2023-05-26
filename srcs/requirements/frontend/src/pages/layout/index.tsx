@@ -50,8 +50,8 @@ height: 100vh;
     
 
   useEffect(() => {
-    console.log("IM HERE");
-    console.log("connected: ", notifySocket);
+    // console.log("IM HERE");
+    // console.log("connected: ", notifySocket);
     if (!connected) {
       notifySocket.current = io("http://localhost:3000"); 
     }

@@ -31,11 +31,13 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
     const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
     const [selected, setSelected] = useState<string>('');
 
-    const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
+    const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, avatar: string, status : string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
         const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
-
-        return user.data;
+        // cons
+        const avatar = await GetAvatar(userId);
+        return { login: user.data.login, avatar: avatar, status: user.data.status };
+        // return user.data
     }
 
     const getPrivateChats = async (limitRoom: string, limitMsg: string) => {
@@ -59,7 +61,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     console.error(error);
                     return;
                 }
-
+                
                 // const chattingUserId = message.data[1][0].sender_id === Cookies.get('id') ? message.data[1][0].receiver_id : message.data[1][0].sender_id; 
 
                 const data: PrivateMessage = {
@@ -72,10 +74,10 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
                     seen: message.data[1][0].seen,
                     login: user.login,
                     // profileImage: await GetAvatar(chattingUserId),
-                    profileImage: "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png",
+                    profileImage: user.avatar,
                     blocked: room.blocked,
                     // change this later
-                    status: 'online'
+                    status: user.status
                 }
                 Tabs.push(data);
             }));
