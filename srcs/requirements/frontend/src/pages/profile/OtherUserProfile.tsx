@@ -103,7 +103,8 @@ const OtherUserProfile = () => {
     };
     const isMyFriend = async () => {
       const data = await isFriend(userId || "", id || "");
-      if (data) setRelationStatus("friends");
+      console.log("shfhlsfjsjf", data)
+      if (!data) setRelationStatus(data);
     };
 
     friendsData();
@@ -122,7 +123,7 @@ const OtherUserProfile = () => {
 
   // a function that returns the type of the relation between the current user and the user whose profile is being viewed and
   const FriendRelatioType = () => {
-    if (relationStatus === "friends") {
+    if (relationStatus === "notFriend") {
       return (
         <div className="w-full p-2 ">
           <button
@@ -151,7 +152,21 @@ const OtherUserProfile = () => {
           </button>
         </div>
       );
-    } else {
+    } else if (relationStatus === "friend") {
+      return (
+        <div className="w-full p-2 ">
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3">
+            <AiOutlineUserDelete className="mr-1 text-3xl" />
+            Remove Friend
+          </button>
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3">
+            <AiOutlineUserDelete className="mr-1 text-3xl" />
+            Block User
+          </button>
+        </div>
+      );
+    }
+    else {
       return (
         <div className="w-full p-2 ">
           <button

@@ -135,7 +135,7 @@ export class FriendsService {
   }
 
   // check if user_id and friendUser_id are friends
-  async isFriend(user_id: string, friendUser_id: string): Promise<boolean> {
+  async isFriend(user_id: string, friendUser_id: string): Promise<string> {
     const friendship = await this.prisma.friendsTab.findUnique({
       where: {
         user_id_friendUser_id: {
@@ -145,30 +145,30 @@ export class FriendsService {
       },
     });
     if (friendship) {
-      return true;
+      return "freind";
     }
-    return false;
-  }
-
-  // check if user_id and other_user_id  are blocked
-  async isBlocked(user_id: string, other_user_id: string): Promise<boolean> {
+    const pending = await this.prisma.friendshipInvites.findUnique({
+      where: {
+        sender_id_receiver_id: {
+          sender_id: user_id,
+          receiver_id: friendUser_id,
+        },
+      },
+    });
+    if (pending) {
+      return "pending";
+    }
     const blocked = await this.prisma.blockTab.findMany({
       where: {
-        OR: [
-          {
-            user_id: user_id,
-            blockedUser_id: other_user_id,
-          },
-          {
-            user_id: other_user_id,
-            blockedUser_id: user_id,
-          },
-        ],
+        user_id: user_id,
+        blockedUser_id: friendUser_id,
       },
     });
     if (blocked) {
-      return true;
+      return "blocked";
     }
-    return false;
+    return "notFriend";
   }
+
+
 }
