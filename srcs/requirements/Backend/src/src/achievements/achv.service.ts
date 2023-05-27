@@ -2,6 +2,7 @@ import {  Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { PostGameDto } from './dto/post.game.dto';
 import { use } from 'passport';
+import { on } from 'events';
 
 
 export enum Rank {
@@ -47,6 +48,8 @@ export class AchvService {
     async CheckAchv(one_id: string, two_id: string, pts_one: number, pts_two : number)
     {
        var isdraw = false;
+    //    if (!one_id || !two_id || !pts_one || !pts_two)
+    //         throw new NotFoundException("Missing data");
         var winner_id, loser_id, winner_pts, loser_pts;
         if (pts_one > pts_two)
         {

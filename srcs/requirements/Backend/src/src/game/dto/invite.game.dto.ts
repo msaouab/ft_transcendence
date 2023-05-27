@@ -8,11 +8,26 @@ enum Status {
     REJECTED = 'Rejected',
 }
 
+enum Mode {
+    TIME = 'Time',
+    ROUND = 'Round',
+}
+
 export class inviteGameDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    login: string;
+    invited: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    send: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    mode: Mode
 };
 
 export class StatusInviteDto {
@@ -20,4 +35,9 @@ export class StatusInviteDto {
     @IsNotEmpty()
     @IsString()
     status: Status
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    recvId: string
 }

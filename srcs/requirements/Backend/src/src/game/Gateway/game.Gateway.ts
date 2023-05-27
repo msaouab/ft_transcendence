@@ -19,6 +19,8 @@ import {
 } from "@nestjs/common";
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
+import { AchvService } from "src/achievements/achv.service";
+import { date } from "joi";
 // import io from "socket.io-client";
 
 @WebSocketGateway({
@@ -35,7 +37,8 @@ export class GameGateway
 	constructor(
 		// private gameService: GameService,
 		private prisma: PrismaService,
-		private UserService: UserService
+		private UserService: UserService,
+		private readonly achvService: AchvService
 	) {}
 
 	// private roomArr: { [key: string]: Socket[] } = {};
@@ -107,9 +110,9 @@ export class GameGateway
 		console.log(`Client connected: ${client.id}`);
 	}
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
-		this.roomMap.forEach((value, key) => {
+		this.roomMap.forEach(async (value, key) => {
 			if (
 				value.player1.id === client.handshake.query.userId ||
 				value.player2.id === client.handshake.query.userId
@@ -122,6 +125,20 @@ export class GameGateway
 					if (value.members === 0) {
 						this.roomMap.delete(key);
 					} else if (value.members === 1) {
+						const updateGame = await this.prisma.game.update({
+							where: {
+								id: key,
+		
+							},
+							data: {
+								gameStatus: "Finished",
+								player1_pts: value.player1.score,
+								player2_pts: value.player2.score,
+							}
+		
+						})
+						console.log(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts)
+						this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
 						if (value.player1.id === client.handshake.query.userId.toString())
 							value.player1 = { id: "" };
 						else value.player2 = { id: "" };
@@ -620,13 +637,29 @@ export class GameGateway
 			} else if (payload.mode === "Friend") {
 				this.FriendRoom(client, key, payload);
 			}
+			console.log("room",key);
 		}
-		this.roomMap.forEach((value, key) => {
+		this.roomMap.forEach(async (value, key) => {
 			if (value.status === "Finished") {
+				const updateGame = await this.prisma.game.update({
+
+					where: {
+						id: key,
+
+					},
+					data: {
+						gameStatus: "Finished",
+						player1_pts: value.player1.score,
+						player2_pts: value.player2.score,
+					}
+
+				})
+				this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+
 				this.roomMap.delete(key);
 			}
 		});
-		console.log("roomMap => :", this.roomMap);
+		console.log("roomMap => :", this.roomMap);//update db
 	}
 
 	async CreateRoom(key: string, value: any) {

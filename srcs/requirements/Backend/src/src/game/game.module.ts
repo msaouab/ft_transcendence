@@ -8,6 +8,7 @@ import { GameGateway } from "./Gateway/game.Gateway";
 import { PrismaService } from "prisma/prisma.service";
 import { UserModule } from "src/user/user.module";
 import { PrismaModule } from "prisma/prisma.module";
+import { AchvService } from "src/achievements/achv.service";
 
 
 // console.log({GameGateway});
@@ -22,6 +23,7 @@ import { PrismaModule } from "prisma/prisma.module";
 		GameService,
 		// PrismaService,
 		GameGateway,
+		AchvService,
 	],
 	exports: [GameService],
 })
