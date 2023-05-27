@@ -9,7 +9,7 @@ import { useState } from "react";
 
 import LoginPage from "./pages/loginPage/LoginPage";
 import Profile from "./pages/profile/Profile";
-import Game from "./components/common/Game";
+import Game from "./components/Game/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";

@@ -9,25 +9,6 @@ interface PingPongProps {
 	socket: Socket;
 }
 
-const PlayGround = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-`;
-
-const ScoreContainter = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 50%;
-	.score {
-		font-size: 5rem;
-		font-weight: bolder;
-		color: white;
-	}
-`;
-
 type PlayerState = {
 	x: number;
 	y: number;
@@ -44,6 +25,26 @@ type BallState = {
 	speed: number;
 	c: string;
 };
+
+const PlayGround = styled.div`
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
+	align-items: center;
+`;
+
+// const ScoreContainter = styled.div`
+// 	display: flex;
+// 	flex-direction: column;
+// 	justify-content: space-between;
+// 	align-items: center;
+// 	width: 50%;
+// 	.score {
+// 		font-size: 5rem;
+// 		font-weight: bolder;
+// 		color: white;
+// 	}
+// `;
 
 let ctx: CanvasRenderingContext2D | null;
 
@@ -99,7 +100,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		return () => {
 			ctx = null;
 		};
-	}, [player1X, player2X, ball]);
+	}, [player1X, player2X, ball, score]);
 
 	const drawPlayer = (player: PlayerState) => {
 		if (ctx) {
@@ -123,14 +124,14 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				y: y,
 				height: height,
 				width: width,
-				// player1X: player1X,
-				// player2X: player2X,
 			};
 			if (modeRoom === "Bot") socket.emit("requesteBot", data);
 			else socket.emit("requesteMouse", data);
-
 		};
-		document.addEventListener("mousemove", handleMouseMove as unknown as EventListener);
+		document.addEventListener(
+			"mousemove",
+			handleMouseMove as unknown as EventListener
+		);
 		socket.on("responseMouse", (playerPosition) => {
 			setPlayer1X(playerPosition);
 		});
@@ -138,7 +139,10 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 			setPlayer2X(playerPosition);
 		});
 		return () => {
-			document.removeEventListener("mousemove", handleMouseMove as unknown as EventListener);
+			document.removeEventListener(
+				"mousemove",
+				handleMouseMove as unknown as EventListener
+			);
 			socket.off("responseMouse");
 			socket.off("responsePlayer2");
 		};
@@ -170,16 +174,11 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		return () => {
 			socket.off("responseBall");
 		};
-	}, [ socket, ball]);
+	}, [socket, ball]);
 
 	return (
 		<PlayGround className="">
-			{/* <div>{time}</div> */}
 			<canvas ref={canvasRef} width={width} height={height} />
-			<ScoreContainter>
-				<div className="score">P1: {score.player1}</div>
-				<div className="score">P2: {score.player2}</div>
-			</ScoreContainter>
 		</PlayGround>
 	);
 };
