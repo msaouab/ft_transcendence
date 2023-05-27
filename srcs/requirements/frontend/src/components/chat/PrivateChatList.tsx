@@ -8,6 +8,7 @@ import Cookies from 'js-cookie'
 import ChatTab from './ChatTab';
 import { PrivateMessage } from '../../types/message';
 import { useGlobalContext } from '../../provider/AppContext';
+import { HOSTNAME } from '../../api/axios';
 const UsersChatListStyle = styled.div`
 
     width: 100%;
@@ -32,7 +33,7 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
 
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, profileImage: string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
-        const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+        const user = await axios.get(`http://${HOSTNAME}:3000/api/v1/user/${userId}`);
         return user.data;
     }
 
@@ -41,11 +42,11 @@ const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat:
         let id = Cookies.get('id');
         if (!id) return;
         try {
-            const privateRooms = await axios.get(`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
+            const privateRooms = await axios.get(`http://${HOSTNAME}:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`);
             if (privateRooms.status !== 200) throw new Error('Error while fetching private chat rooms');
             await Promise.all(privateRooms.data.map(async (room: { id: string, content: string, dateCreated: Date, seen: boolean, blocked: boolean }) => {
                 const { id } = room;
-                const message = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
+                const message = await axios.get(`http://${HOSTNAME}:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`);
                 // console.log(
 
                 let user;

@@ -65,6 +65,7 @@ const ChatStyle = Styled.div`
 
 import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
@@ -80,7 +81,7 @@ const Chat = () => {
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io(`http://localhost:3000/chat`);
+      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
       setConnected(true);
       console.log("connected to the server");
     }

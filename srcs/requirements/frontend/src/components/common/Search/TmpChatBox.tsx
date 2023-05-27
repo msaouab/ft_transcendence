@@ -43,7 +43,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
 
     useEffect(() => {
         if (!connected) {
-            chatSocket.current = io(`http://localhost:3000/chat`);
+            chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
             setConnected(true);
             console.log('connected to the server')
         }
@@ -80,7 +80,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
         console.log("heeeelo");
         console.log("sender_id", sender_id);
         console.log("receiver_id", receiver_id);
-        axios.get(`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
+        axios.get(`http://${HOSTNAME}:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`)
             .then((res) => {
                 if (res.data.length !== 0) {
                     console.log('chat room exists', res)
@@ -100,7 +100,7 @@ const TmpChatBox = ({ showTempChat, user }: { showTempChat: boolean, user: any }
                 }
                 else {
                     console.log('chat room does not exist', res)
-                    axios.post(`http://localhost:3000/api/v1/chatrooms/private`, {
+                    axios.post(`http://${HOSTNAME}:3000/api/v1/chatrooms/private`, {
                         senderId: sender_id,
                         receiverId: receiver_id
                     })

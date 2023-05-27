@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import Cookies from 'js-cookie';
+import { HOSTNAME } from "../../api/axios";
 // import { History} from "history"
 
 const LdataContainer = styled.div`
@@ -37,7 +38,7 @@ function	Ldata() {
     
 	useEffect(() => {
 		setLoading(true);
-        const apiUrl = `http://localhost:3000/api/v1/me`
+        const apiUrl = `http://${HOSTNAME}:3000/api/v1/me`
 		async function fetchData() {
 		try {
 			await axios.get(apiUrl, {

@@ -160,7 +160,7 @@ const SearchBar = () => {
 
 
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
-            socket.current = io(`http://localhost:3000/search`);
+            socket.current = io(`http://${HOSTNAME}:3000/search`);
 
             socket.current.on('connect', () => {
                 setSearchConnected(true);

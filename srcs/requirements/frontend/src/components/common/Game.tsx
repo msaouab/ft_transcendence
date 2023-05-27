@@ -5,6 +5,7 @@ import { useAppContext } from "../../provider/GameProvider";
 import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
+import { HOSTNAME } from "../../api/axios";
 
 const CanvasContainer = styled.div`
 	display: flex;
@@ -31,7 +32,7 @@ const Game = () => {
 	};
 
 	useEffect(() => {
-		const socket = io("http://localhost:3000/game", {query: {userId: Cookies.get('id')}});
+		const socket = io("http://"+HOSTNAME+":3000/game", {query: {userId: Cookies.get('id')}});
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");

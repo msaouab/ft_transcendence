@@ -164,7 +164,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
         }
         if ((fullScreenDropdown) && !searchConnected) {
             // console.log("connecting");
-            socket.current = io(`http://localhost:3000/search`);
+            socket.current = io(`http://${HOSTNAME}:3000/search`);
             socket.current.on('connect', () => {
                 setSearchConnected(true);
                 // console.log("connected");

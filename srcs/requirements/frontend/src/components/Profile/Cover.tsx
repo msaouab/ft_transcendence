@@ -9,6 +9,7 @@ import Cookies from 'js-cookie'
 // import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import ProgressBar from "@ramonak/react-progress-bar";
+import { HOSTNAME } from "../../api/axios";
 
 const CoverContainer = styled.div`
     background-image: url(${cover});
@@ -134,7 +135,7 @@ function	Cover() {
 
 	useEffect(() => {
 		setLoading(true);
-        const apiUrl = `http://localhost:3000/api/v1/me`
+        const apiUrl = `http://${HOSTNAME}:3000/api/v1/me`
 		async function fetchData() {
             try {
                 await axios.get(apiUrl, {
@@ -161,7 +162,7 @@ function	Cover() {
     }, []);
 
     useEffect(() => {
-        const avatarUrl = `http://localhost:3000/api/v1/user/` + Cookies.get('userid') + '/avatar';
+        const avatarUrl = `http://${HOSTNAME}:3000/api/v1/user/` + Cookies.get('userid') + '/avatar';
         async function fetchAvatar() {
             try {
                 await axios.get(avatarUrl, {
@@ -187,7 +188,7 @@ function	Cover() {
 }, []);
     
     useEffect(() => {
-    const rankUrl = `http://localhost:3000/api/v1/user/` + Cookies.get('userid') + '/rankData';
+    const rankUrl = `http://${HOSTNAME}:3000/api/v1/user/` + Cookies.get('userid') + '/rankData';
     async function fetchRankData() {
         try {
             await axios.get(rankUrl, {

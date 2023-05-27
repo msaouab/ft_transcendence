@@ -23,8 +23,17 @@ credit:
 
 env:
 	@mkdir -p ./srcs/requirements/db
-	# @echo "HOSTNAME="$(hostname) >> ./srcs/requirements/Backend/src/db-env-example
-	# @echo "HOSTNAME="$(hostname) >> ./srcs/requirements/frontend/.env.example
+	@if grep -q "HOSTNAME=*.*.*.*" ./srcs/requirements/Backend/src/db-env-example; then \
+		sed -i '' "s/HOSTNAME=*.*.*.*/HOSTNAME=$$(hostname)/g" ./srcs/requirements/Backend/src/db-env-example; \
+	else \
+		echo "HOSTNAME=$$(hostname)" >> ./srcs/requirements/Backend/src/db-env-example; \
+	fi
+	@if grep -q "VITE_API_URL=*.*.*.*" ./srcs/requirements/frontend/.env.example; then \
+		sed -i '' "s/VITE_API_URL=*.*.*.*/VITE_API_URL=$$(hostname)/g" ./srcs/requirements/frontend/.env.example; \
+	else \
+		echo "VITE_API_URL=$$(hostname)" >> ./srcs/requirements/frontend/.env.example; \
+	fi
+
 	@cp ./srcs/env-example ./srcs/.env
 	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env
 	@cp ./srcs/requirements/frontend/.env.example ./srcs/requirements/frontend/.env

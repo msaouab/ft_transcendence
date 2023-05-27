@@ -3,7 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { Switch, Dialog } from "@material-tailwind/react";
 import CustomInput from "../../common/CustomInput";
-import instance from "../../../api/axios";
+import instance, { HOSTNAME } from "../../../api/axios";
 
 function CheckMark() {
   const [checked, setChecked] = useState<boolean>(false);
@@ -19,7 +19,7 @@ function CheckMark() {
     console.log(typeof sixDigit);
     const number = sixDigit.toString();
     axios.put(
-        "http://localhost:3000/api/v1/user/" +
+        "http://"+HOSTNAME+":3000/api/v1/user/" +
           Cookies.get("userid") +
           "/2fa/verify",
         {number},
