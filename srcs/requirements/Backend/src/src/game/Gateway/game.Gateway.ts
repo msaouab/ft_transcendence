@@ -19,9 +19,6 @@ import {
 } from "@nestjs/common";
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
-import { string } from "joi";
-import { Game } from "@prisma/client";
-import { time } from "console";
 // import io from "socket.io-client";
 
 @WebSocketGateway({
@@ -240,9 +237,7 @@ export class GameGateway
 		const room = this.roomMap.get(roomId);
 		room.time = new Date().getTime();
 		this.server.to(room.socket[0].id).emit("StartTime", room.time);
-		if (room.mode !== "Bot")
-			this.server.to(room.socket[1].id).emit("StartTime", room.time);
-		console.log("ball from room:", room);
+		this.server.to(room.socket[1].id).emit("StartTime", room.time);
 		this.ball = {
 			x: width / 2,
 			y: height / 2,
@@ -254,21 +249,7 @@ export class GameGateway
 		};
 		let status = false;
 		const intervalId = setInterval(() => {
-			if (room.mode === "Bot") {
-				let OldY = height / 2;
-				if (this.ball.y <= OldY) {
-					if (this.ball.x >= room.player1.paddle1.x) {
-						room.player1.paddle1.x += 12;
-					}
-					if (this.ball.x <= room.player1.paddle1.x) {
-						room.player1.paddle1.x -= 12;
-					}
-					OldY = this.ball.y;
-					// console.log("Ball:", room.player1.paddle1.x, "Bot:", this.ball.x);
-					this.server.emit("responsePlayer2", room.player1.paddle1);
-				}
-			}
-			if (room.socket.length !== 2 && room.mode !== "Bot") {
+			if (room.socket.length !== 2) {
 				clearInterval(intervalId);
 				return;
 			}
@@ -323,29 +304,23 @@ export class GameGateway
 				.to(room.socket[0].id)
 				.emit("responseBall", client1Ball, score);
 			// // Reverse ball position for client 2
-			if (room.mode !== "Bot") {
 				client2Ball.x = width - client2Ball.x;
 				client2Ball.y = height - client2Ball.y;
 				this.server
 					.to(room.socket[1].id)
 					.emit("responseBall", client2Ball, score);
-			}
 			status = this.RoundScore(roomId);
-			if (room.mode !== "Bot") {
-				if (
-					room.socket[0].id === undefined ||
+			if (room.socket[0].id === undefined ||
 					room.socket[1].id === undefined ||
 					status
-				) {
-					room.status = "Finished";
-					let winner =
-						room.player1.score > room.player2.score ? "Player 1" : "Player 2";
-					this.server.to(room.socket[0].id).emit("responseWinner", winner);
-					if (room.mode !== "Bot")
-						this.server.to(room.socket[1].id).emit("responseWinner", winner);
-					clearInterval(intervalId);
-					this.handleDisconnect(client);
-				}
+			) {
+				room.status = "Finished";
+				let winner =
+					room.player1.score > room.player2.score ? "Player 1" : "Player 2";
+				this.server.to(room.socket[0].id).emit("responseWinner", winner);
+				this.server.to(room.socket[1].id).emit("responseWinner", winner);
+				clearInterval(intervalId);
+				this.handleDisconnect(client);
 			}
 		}, 1000 / 60);
 	}
@@ -482,6 +457,100 @@ export class GameGateway
 		client.join(key);
 		this.server.emit("joinedRoom", key);
 	}
+
+	PlayvsBot(client: any, roomId: any, width: any, height: any) {
+		const room = this.roomMap.get(roomId);
+		room.time = new Date().getTime();
+		this.server.emit("StartTime", room.time);
+		console.log("ball from room:", room);
+		this.ball = {
+			x: width / 2,
+			y: height / 2,
+			r: 10,
+			dx: 4,
+			dy: 4,
+			speed: 1,
+			c: "#fff",
+		};
+		let status = false;
+		const intervalId = setInterval(() => {
+			if (room.socket.length !== 1) {
+				clearInterval(intervalId);
+				return;
+			}
+			let OldY = height / 2;
+			if (this.ball.y <= OldY) {
+				if (this.ball.x >= room.player1.paddle1.x) {
+					room.player1.paddle1.x += 12;
+				}
+				if (this.ball.x <= room.player1.paddle1.x) {
+					room.player1.paddle1.x -= 12;
+				}
+				OldY = this.ball.y;
+				// console.log("Ball:", room.player1.paddle1.x, "Bot:", this.ball.x);
+				this.server.emit("responsePlayer2", room.player1.paddle1);
+			}
+			const newX = this.ball.x + this.ball.dx;
+			const newY = this.ball.y + this.ball.dy;
+			// wall collision
+			if (newX - this.ball.r <= 0 || newX + this.ball.r >= width)
+				this.ball.dx = -this.ball.dx;
+			if (newY - this.ball.r <= 0 || newY + this.ball.r >= height)
+				this.ball.dy = -this.ball.dy;
+
+			// paddle collision
+			if (
+				newY + this.ball.r >= room.player1.paddle2.y &&
+				newX >= room.player1.paddle2.x &&
+				newX <= room.player1.paddle2.x + room.player1.paddle2.width
+			)
+				// player1 collision
+				this.ball.dy = -Math.abs(this.ball.dy);
+			if (
+				newY - this.ball.r <= room.player1.paddle1.y &&
+				newX >= room.player1.paddle1.x &&
+				newX <= room.player1.paddle1.x + room.player1.paddle1.width
+			)
+				// player2 collision
+				this.ball.dy = Math.abs(this.ball.dy);
+			// score
+			if (newY - this.ball.r <= 0) {
+				this.ball.x = width / 2;
+				this.ball.y = height / 2;
+				this.ball.dx = this.ball.dx;
+				this.ball.dy = this.ball.dy;
+				room.player1.score++;
+			}
+			if (newY + this.ball.r >= height) {
+				this.ball.x = width / 2;
+				this.ball.y = height / 2;
+				this.ball.dx = this.ball.dx;
+				this.ball.dy = this.ball.dy;
+				room.player2.score++;
+			}
+			this.ball.x += this.ball.dx;
+			this.ball.y += this.ball.dy;
+
+			const client1Ball = { ...this.ball }; // Create a copy of the ball object
+			const client2Ball = { ...this.ball }; // Create a copy of the ball object
+			// Send ball position to client 1
+			const player1 = room.player1.score;
+			const player2 = room.player2.score;
+			const score = { player1, player2 };
+			this.server.emit("responseBall", client1Ball, score);
+			status = this.RoundScore(roomId);
+			if (room.socket[0].id === undefined || status) {
+				room.status = "Finished";
+				let winner =
+					room.player1.score > room.player2.score ? "Player 1" : "Player 2";
+				this.server.emit("responseWinner", winner);
+				clearInterval(intervalId);
+				this.handleDisconnect(client);
+				return ;
+			}
+		}, 1000 / 60);
+	}
+
 	BotRoom(client: any, key: any, payload: any) {
 		this.roomObj = {
 			members: 2,
@@ -527,8 +596,7 @@ export class GameGateway
 		client.join(key);
 		this.server.emit("joinedRoom", key);
 		this.CreateRoom(key, this.roomObj);
-		// this.PlayWithAi(client, key, payload.width, payload.height);
-		this.handleBall(client, key, payload.width, payload.height);
+		this.PlayvsBot(client, key, payload.width, payload.height);
 	}
 
 	FriendRoom(client: any, key: any, payload: any) {}
