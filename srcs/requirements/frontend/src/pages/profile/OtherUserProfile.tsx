@@ -3,6 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
+import { CiCircleMore } from "react-icons/ci";
+import { AiOutlineUserAdd, AiOutlineUserDelete } from "react-icons/ai";
+import { IoPersonRemoveOutline } from "react-icons/io5";
+import { Top, Status, Main } from "./ProfileStyle";
+
 import AchivementImg1 from "../../assets/achivement1.png";
 
 import Dice from "../../assets/dice.png";
@@ -12,11 +17,13 @@ import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useId, useState } from "react";
 import instance, {
   GetAvatar,
+  addFriend,
   getAchivements,
   getChannels,
   getFriendsInfo,
   getRankData,
   getUserInfo,
+  isFriend,
 } from "../../api/axios";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
@@ -36,11 +43,8 @@ interface friendsInterface {
   Status: string;
 }
 
-interface ProfileInterface {
-  isAnotherUser?: boolean;
-}
-const OtherUserProfile = (props: ProfileInterface) => {
-  const { userStatus } = useGlobalContext();
+const OtherUserProfile = () => {
+  const { id } = useParams(); // Extract the user ID from the URL params
   const [user, setData] = useState({
     id: "",
     login: "",
@@ -59,42 +63,47 @@ const OtherUserProfile = (props: ProfileInterface) => {
   const [friends, setFriends] = useState<friendsInterface[]>([]);
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [userId, setUserId] = useState("");
   const [avatar, setAvatar] = useState("");
-  const { id } = useParams(); // Extract the user ID from the URL params
-  //   console.log("id", id);
+  const { userId } = useGlobalContext();
+  const [relationStatus, setRelationStatus] = useState("");
+
   useEffect(() => {
-    setUserId(id as string);
     getAllData();
   }, [userId]);
 
   const getAllData = () => {
+    if (id === "") return;
+
     const friendsData = async () => {
-      const data = await getFriendsInfo(userId);
+      const data = await getFriendsInfo(id || "");
       setFriends(data);
     };
     const joinedChannelData = async () => {
-      const data = await getChannels(userId);
+      const data = await getChannels(id || "");
       setJoinedChannel(data);
     };
     const achivementsData = async () => {
-      const data = await getAchivements(userId);
+      const data = await getAchivements(id || "");
       setAchivements(data);
     };
 
     const rankData = async () => {
-      const data = await getRankData(userId);
+      const data = await getRankData(id || "");
       setRankData(data);
     };
 
     const getUserData = async () => {
-      const data = await getUserInfo(userId);
+      const data = await getUserInfo(id || "");
       setData(data);
     };
 
     const getUserAvatar = async () => {
-      const data = await GetAvatar(userId);
+      const data = await GetAvatar(id || "");
       setAvatar(data);
+    };
+    const isMyFriend = async () => {
+      const data = await isFriend(userId || "", id || "");
+      if (data) setRelationStatus("friends");
     };
 
     friendsData();
@@ -103,104 +112,64 @@ const OtherUserProfile = (props: ProfileInterface) => {
     rankData();
     getUserData();
     getUserAvatar();
+    isMyFriend();
   };
 
-  const Status = styled.div<{ userStatus: string }>`
-    position: relative;
-    /* width: 100px; */
-    /* aspect-ratio: 1/1; */
-    height: 100%;
-    img {
-      position: relative;
-      border-radius: 50%;
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
-      @media (max-width: 1200px) {
-        height: 70px;
-        width: 70px;
-      }
-    }
-    &:after {
-      content: "";
-      position: absolute;
-      bottom: 5px;
-      right: 10%;
-      background-color: ${({ userStatus }) =>
-        userStatus === "online"
-          ? "#00ff00"
-          : userStatus === "offline"
-          ? "#6a6a6a"
-          : userStatus === "donotdisturb"
-          ? "#ff0000"
-          : userStatus === "ingame"
-          ? "#011c77"
-          : "#ffcc00"};
-      border: 1px solid #ececec;
-      width: 15%;
-      height: 15%;
-      border-radius: 50%;
-    }
-  `;
+  const sendFriendInvitation = async () => {
+    const data = await addFriend(userId, id || "");
+    console.log(data);
+  };
 
-  const Top = styled.div`
-    @media (max-width: 1200px) {
-      display: unset;
-      height: fit-content;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+  // a function that returns the type of the relation between the current user and the user whose profile is being viewed and
+  const FriendRelatioType = () => {
+    if (relationStatus === "friends") {
+      return (
+        <div className="w-full p-2 ">
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3"
+            onClick={sendFriendInvitation}
+          >
+            <AiOutlineUserAdd className="mr-1 text-3xl" />
+            Add Friend
+          </button>
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3">
+            <AiOutlineUserDelete className="mr-1 text-3xl" />
+            Block User
+          </button>
+        </div>
+      );
+    } else if (relationStatus === "pending") {
+      return (
+        <div className="w-full p-2 ">
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3">
+            <AiOutlineUserDelete className="mr-1 text-3xl" />
+            Remove Invitation
+          </button>
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3">
+            <AiOutlineUserDelete className="mr-1 text-3xl" />
+            Block User
+          </button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="w-full p-2 ">
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3"
+            onClick={sendFriendInvitation}
+          >
+            <AiOutlineUserAdd className="mr-1 text-3xl" />
+            Unblock
+          </button>
+        </div>
+      );
     }
-  `;
+  };
 
-  const Main = styled.div`
-    @media (max-width: 1200px) {
-      flex-direction: column;
-      .stats {
-        height: unset;
-        min-height: fit-content;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        & > div {
-          max-width: 70%;
-          min-width: 360px;
-          max-height: 500px;
-        }
-      }
-      .achievements {
-        /* height: 500px; */
-        width: 100%;
-        .achiv-container {
-          display: flex;
-          flex-direction: column;
-        }
-      }
-    }
-    @media (max-width: 800px) {
-      flex-direction: column;
-      .stats {
-        height: unset;
-        min-height: fit-content;
-        justify-content: center;
-        align-items: center;
-        flex-wrap: wrap;
-        & > div {
-          max-width: 90%;
-          min-width: 360px;
-          max-height: 500px;
-        }
-      }
-      .achievements {
-        /* height: 500px; */
-        .achiv-container {
-          display: flex;
-          flex-direction: column;
-          width: unset;
-          max-width: 90%;
-        }
-      }
-    }
+  const [showFriendRelationMenu, setShowFriendRelationMenu] = useState(false);
+  const FriendRelationMenuAnimation = styled.div``;
+  const FriendRelationMenuStyle = styled.div`
+    animation: 1s ease-in-out;
   `;
 
   return (
@@ -220,29 +189,43 @@ const OtherUserProfile = (props: ProfileInterface) => {
             <div className="flex gap-10 items-center "></div>
           </div>
         )}
-       
-          <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
-            <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-              <img src={Dice} alt="_" width={50} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws || "_"}
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={AchivementImg1} width={50} alt="_" />
-              Wins : {rankData?.wins || "_"}
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Draw} alt="_" width={50} />
-              Draw: {rankData?.draws || "_"}
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Lose} alt="_" width={50} />
-              Lose: {rankData?.loses || "_"}
-            </div>
+
+        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
+          <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
+            <img src={Dice} alt="_" width={50} />
+            Games : {rankData?.wins + rankData?.loses + rankData?.draws || "_"}
           </div>
+          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+            <img src={AchivementImg1} width={50} alt="_" />
+            Wins : {rankData?.wins || "_"}
+          </div>
+          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+            <img src={Draw} alt="_" width={50} />
+            Draw: {rankData?.draws || "_"}
+          </div>
+          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+            <img src={Lose} alt="_" width={50} />
+            Lose: {rankData?.loses || "_"}
+          </div>
+          <div className="relative text-white">
+            {showFriendRelationMenu}
+            <CiCircleMore
+              className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
+              onClick={() => {
+                setShowFriendRelationMenu(!showFriendRelationMenu);
+              }}
+            />
+            {showFriendRelationMenu && (
+              <FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[12rem]   rounded-md shadow-xl shadow-white/10 border z-50">
+                {FriendRelatioType()}
+              </FriendRelationMenuStyle>
+            )}
+          </div>
+        </div>
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
-          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[100%] h-[25rem] ">
+          <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4  h-[25rem] ">
             <div className="top border-b border-white/50  h-[5rem]  ">
               <div className="title text-2xl font-[600] flex  gap-2  items-center ">
                 <img src={FriendsImg} alt="" width={50} />

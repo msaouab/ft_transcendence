@@ -9,7 +9,7 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import instance, {
   getAchivements,
   getChannels,
@@ -30,15 +30,6 @@ export const ReusableCardStyle = styled.div`
   border-radius: 20px 20px 0px 0px;
   padding: 1rem;
 `;
-
-
-
-
-
-
-
-
-
 
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
@@ -104,7 +95,6 @@ const Profile = (props: ProfileInterface) => {
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
   const [userId, setUserId] = useState(Cookies.get("userid") || "");
-
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -212,7 +202,8 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
-        width: 100%;
+        /* width: 100%; */
+        width: unset;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -235,6 +226,9 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
+        max-width: 90%;
+        min-width: 360px;
+        max-height: 500px;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -259,23 +253,23 @@ const Profile = (props: ProfileInterface) => {
           <div className="flex gap-10 items-center "></div>
         </div>
         <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-6  ">
-            <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
-              <img src={Dice} alt="_" width={40} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws || " " }
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={AchivementImg1} width={40} alt="_" />
-              Wins : {rankData?.wins || " "}
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={Draw} alt="_" width={40} />
-              Draw: {rankData?.draws || " "}
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={Lose} alt="_" width={40} />
-              Lose: {rankData?.loses || " "}
-            </div>
+          <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
+            <img src={Dice} alt="_" width={40} />
+            Games : {rankData?.wins + rankData?.loses + rankData?.draws || " "}
           </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={AchivementImg1} width={40} alt="_" />
+            Wins : {rankData?.wins || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Draw} alt="_" width={40} />
+            Draw: {rankData?.draws || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Lose} alt="_" width={40} />
+            Lose: {rankData?.loses || " "}
+          </div>
+        </div>
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">

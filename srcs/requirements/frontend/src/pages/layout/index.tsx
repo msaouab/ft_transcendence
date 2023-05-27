@@ -26,6 +26,7 @@ height: 100vh;
       </div>
       <div className="main-content w-full ">
         <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
+          
         ">
           <div className="search">
             <SearchBar />

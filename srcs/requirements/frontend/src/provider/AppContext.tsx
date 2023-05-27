@@ -10,6 +10,8 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  isTfaEnabled: boolean;
+  setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -22,6 +24,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState("");
   const [userId, setUserId] = useState<string>("");
+  const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
   // chat context
   const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
 
@@ -36,6 +39,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
+    isTfaEnabled,
+    setIsTfaEnabled,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

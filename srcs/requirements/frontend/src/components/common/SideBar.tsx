@@ -46,13 +46,13 @@ const Routes = [
 
 const SideBar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
+  const { setUserStatus, setUserImg, setUserId, userId, setIsTfaEnabled } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
 
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-  
+
   const navigate = useNavigate();
 
   async function fetchData() {
@@ -71,8 +71,7 @@ const SideBar = () => {
           }
           Cookies.set("userid", response.data.id);
           setUserId(response.data.id);
-          console.log(response.data);
-          // setOnlineStat(user.status);
+          setIsTfaEnabled(response.data.tfa);
           setUserStatus(response.data.status.tolowoerCase());
         })
         .catch((error) => {
@@ -96,7 +95,6 @@ const SideBar = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
-
           if (error.response.status == 401) {
             navigate("/login");
           }
@@ -113,11 +111,11 @@ const SideBar = () => {
       <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+        } transition duration-500 ease-in-out shadow w-screen h-full backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
       ></div>
 
       <div
-        className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
+        className={`sideBar   z-40 pt-5 px-4  h-full  fixed top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
           isSidebarOpen
             ? "w-full bg-[#434242]  md:w-60 h-full   transition-all duration-300 ease-out "
             : "md:w-20   transition-all duration-300 ease-out "
