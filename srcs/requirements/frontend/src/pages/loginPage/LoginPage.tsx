@@ -63,7 +63,7 @@ const LoginContainer = styled.div`
       }
       .prvs {
         text-align: center;
-        color: #005066;
+        color: #005066 !important;
 
         a {
           text-decoration: none;

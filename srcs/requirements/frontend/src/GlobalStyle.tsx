@@ -1,16 +1,19 @@
 import { createGlobalStyle } from "styled-components";
 
-const GlobalStyle = createGlobalStyle`
-  *{
+interface GlobalStyleProps {
+  background: string;
+  txtColor: string;
+}
+
+const GlobalStyle = createGlobalStyle<GlobalStyleProps>`
+  * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
   body {
-    background-color: ${(props:  { background: any;  }) => props.background};
-    color: ${(props:  { txtColor: any;  }) => props.textColor};
-    color : #ffffff;
-    /* background-color: #7a7a7a; */
+    background-color: ${(props) => props.background};
+    color: ${(props) => props.txtColor};
   }
 `;
 
