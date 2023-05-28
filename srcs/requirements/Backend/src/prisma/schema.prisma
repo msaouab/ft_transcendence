@@ -87,7 +87,6 @@ model User {
   privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
   privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
 
-  realStatus Boolean @default(false)
 }
 
 model FriendshipInvites {
