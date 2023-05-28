@@ -1,10 +1,6 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+
 import {useRef} from "react";
 import Cookies from "js-cookie";
 
@@ -17,10 +13,12 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  isTfaEnabled: boolean;
+  setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  notifications: any[];
+  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
   chatNotif: number;
   setChatNotif: React.Dispatch<React.SetStateAction<number>>;
-
-  
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,10 +31,17 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState("");
   const [userId, setUserId] = useState<string>("");
-  // chat context 
-  const [privateChatRooms, setPrivateChatRooms] = useState([]);
+
+  const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
+  // chat context
+  const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
+
+  // notification context
+  const [notifications, setNotifications] = useState([] as any[]);
+
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
-  // console.log("chatNotif: ", chatNotif);
+
+  //  user auth context
 
   const value = {
     userStatus,
@@ -47,9 +52,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
+    isTfaEnabled,
+    setIsTfaEnabled,
+    notifications,
+    setNotifications,
     chatNotif,
     setChatNotif,
-  }
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

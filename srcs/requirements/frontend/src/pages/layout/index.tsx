@@ -10,45 +10,17 @@ import {io} from "socket.io-client";
 // import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
 // import UserSettings from "../user/UserSettings";
+
+
 const index = () => {
-
-
-
-const LayoutStyle = styled.div`
-display: flex;
-height: 100vh;
-    /* height: 100vh;
-    width: 100vw;
-    max-height: 100vh;
-    width: 100vw; 
-    display: grid;
-    // display: flex;
-    grid-template-columns: 1fr 11fr;
-    padding: 1rem 2rem;
-
-    @media (max-width: 500px) {
-      
-      padding: 0;
-      padding-right: 1rem;
-      padding-bottom: 1rem;
-    }
-
-    @media (max-width: 768px) {
-      
-      padding: 0; 
-      .header {
-        margin-right: 0;
-        margin-top: 0;
-    }
-
-    } */
-
+  const LayoutStyle = styled.div`
+    display: flex;
+    height: 100vh;
   `;
 
   const notifySocket = useRef<any>(null);
   const [connected, setConnected] = useState(false);
     
-
   useEffect(() => {
     // console.log("IM HERE");
     // console.log("connected: ", notifySocket);
@@ -70,22 +42,24 @@ height: 100vh;
     }, []);
 
 
-
-
   return (
     <LayoutStyle className=" px-1 md:px-5">
       <div className="md:w-[5rem] ">
         <SideBar notifySocket={notifySocket.current} connected={connected} />
       </div>
       <div className="main-content w-full ">
-        <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
-        ">
+        <div
+          className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
+          
+        "
+        >
           <div className="search">
             <SearchBar />
           </div>
-          <Notifications />
+          <Notifications notifSocket={notifySocket} conected={connected} />
           <div className="user flex justify-center items-center  relative">
             <DropDownMenu notifySocket={notifySocket.current} connected={connected} />
+
           </div>
         </div>
         <div className="content  flex-1">

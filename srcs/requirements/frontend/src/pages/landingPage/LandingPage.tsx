@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 import backGroundGif from "../../assets/arcade.svg";
 import RegisterNowBtn from "../../components/RegisterNowBtn";
 import Quotes from "../../components/Quotes";
@@ -85,15 +85,15 @@ const LandingContainer = styled.div`
         display: flex;
         justify-content: flex-end;
         z-index: -1;
-		padding: 3rem;
-		align-items: center;
+        padding: 3rem;
+        align-items: center;
         img {
           max-width: 100%;
-		  max-height: 80%;
+          max-height: 80%;
           box-sizing: border-box;
           width: 100%;
           z-index: -1;
-		  animation: ${moveUpDown} 2s ease-in-out infinite;
+          animation: ${moveUpDown} 2s ease-in-out infinite;
         }
       }
     }

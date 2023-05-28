@@ -9,7 +9,7 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import instance, {
   getAchivements,
   getChannels,
@@ -95,7 +95,6 @@ const Profile = (props: ProfileInterface) => {
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
   const [userId, setUserId] = useState(Cookies.get("userid") || "");
-
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -203,7 +202,8 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
-        width: 100%;
+        /* width: 100%; */
+        width: unset;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -226,6 +226,9 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
+        max-width: 90%;
+        min-width: 360px;
+        max-height: 500px;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -247,27 +250,27 @@ const Profile = (props: ProfileInterface) => {
           <div className="name md:text-4xl text-xl  font-[800] ">
             {user?.firstName || ""} {user?.lastName || ""}
           </div>
-          <div className="name  font-[400] ">{user.login}</div>
+          <div className="name  font-[400] ">{user?.login}</div>
           <div className="flex gap-10 items-center "></div>
         </div>
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  ">
-            <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-              <img src={Dice} alt="_" width={50} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={AchivementImg1} width={50} alt="_" />
-              Wins : {rankData?.wins }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Draw} alt="_" width={50} />
-              Draw: {rankData?.draws }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Lose} alt="_" width={50} />
-              Lose: {rankData?.loses }
-            </div>
+        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-6  ">
+          <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
+            <img src={Dice} alt="_" width={40} />
+            Games : {rankData?.wins + rankData?.loses + rankData?.draws || " "}
           </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={AchivementImg1} width={40} alt="_" />
+            Wins : {rankData?.wins || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Draw} alt="_" width={40} />
+            Draw: {rankData?.draws || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Lose} alt="_" width={40} />
+            Lose: {rankData?.loses || " "}
+          </div>
+        </div>
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
@@ -279,7 +282,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full  py-2 ">
-              {friends && friends.length > 0 ? (
+              {friends && friends?.length > 0 ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {friends.map((Friend, index) => (
                     <FreindCard key={index} {...Friend} />
@@ -300,7 +303,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {joinedChannel.length ? (
+              {joinedChannel && joinedChannel.length ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {joinedChannel.map((chanel, index) => (
                     <ChanelCard key={index} {...chanel} />
@@ -332,7 +335,7 @@ const Profile = (props: ProfileInterface) => {
             Achievements
           </div>
           <div className="achiv-container flex gap-10   m-auto ">
-            {achivements.length ? (
+            {achivements && achivements.length ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
