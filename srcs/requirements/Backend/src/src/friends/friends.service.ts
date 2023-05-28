@@ -145,7 +145,17 @@ export class FriendsService {
       },
     });
     if (friendship) {
-      return "freind";
+      return "friend";
+    }
+    const blocked = await this.prisma.blockTab.findMany({
+      where: {
+        user_id: user_id,
+        blockedUser_id: friendUser_id,
+      },
+    });
+
+    if (blocked.length > 0) {
+      return "blocked";
     }
     const pending = await this.prisma.friendshipInvites.findUnique({
       where: {
@@ -155,20 +165,10 @@ export class FriendsService {
         },
       },
     });
+
     if (pending) {
       return "pending";
     }
-    const blocked = await this.prisma.blockTab.findMany({
-      where: {
-        user_id: user_id,
-        blockedUser_id: friendUser_id,
-      },
-    });
-    if (blocked) {
-      return "blocked";
-    }
     return "notFriend";
   }
-
-
 }

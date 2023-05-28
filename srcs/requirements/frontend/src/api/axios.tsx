@@ -92,6 +92,53 @@ export const addFriend = async (id: string, receiver_id: string) => {
   }
 };
 
+export const blockThisUser = async (id: string, blockedUser_id: string) => {
+  if (id === blockedUser_id || blockedUser_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.post("/user/" + id + "/blockedusers", {
+      blockedUser_id,
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const unblockThisUser = async (id: string, blockedUser_id: string) => {
+  if (id === blockedUser_id || blockedUser_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.delete(
+      "/user/" + id + "/blockedusers/" + blockedUser_id
+    );
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const RemoveThisFriendInvite = async ( id: string, receiver_id: any) => {
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.delete("/user/" + id + "/invites", {
+      data: { receiver_id },
+    });
+    return res.data;
+  } catch (err) {
+
+    console.log(err);
+  }
+};
+
+
+
+
+
 
 export const isFriend = async (id: string, receiver_id: string) => {
   if (id === receiver_id || receiver_id === "" || id === "") {

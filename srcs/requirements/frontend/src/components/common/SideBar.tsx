@@ -15,6 +15,8 @@ import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
+import { parse } from "path";
+
 
 const Routes = [
   {
@@ -44,15 +46,29 @@ const Routes = [
   },
 ];
 
-const SideBar = () => {
+const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boolean}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus, setUserImg, setUserId, userId, setIsTfaEnabled } = useGlobalContext();
+  const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
+  // const 
 
+  const {setChatNotif, chatNotif} = useGlobalContext();
+  // const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
+  useEffect(() => {
+    if (connected) {
+      notifySocket.on("chatNotif", (data: any) => {
+  
+        if (window.location.pathname != "/chat") {
+          const prevNotif = chatNotif;
+          const num = parseInt(data.num) + prevNotif;
+          setChatNotif(num);
+          Cookies.set("chatNotif", String(num));
+       }});
+    }
+  }, [chatNotif]);  
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
-
   const navigate = useNavigate();
 
   async function fetchData() {
@@ -71,7 +87,6 @@ const SideBar = () => {
           }
           Cookies.set("userid", response.data.id);
           setUserId(response.data.id);
-          setIsTfaEnabled(response.data.tfa);
           setUserStatus(response.data.status.tolowoerCase());
         })
         .catch((error) => {
@@ -82,7 +97,7 @@ const SideBar = () => {
     } catch (error) {
       console.log(error);
     }
-    console.log("ppppppp", userId);
+    // console.log("ppppppp", userId);
     const res = await GetAvatar(userId);
     setUserImg(res);
   }
@@ -95,6 +110,7 @@ const SideBar = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
+
           if (error.response.status == 401) {
             navigate("/login");
           }
@@ -111,11 +127,11 @@ const SideBar = () => {
       <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-full backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+        } transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
       ></div>
 
       <div
-        className={`sideBar   z-40 pt-5 px-4  h-full  fixed top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
+        className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
           isSidebarOpen
             ? "w-full bg-[#434242]  md:w-60 h-full   transition-all duration-300 ease-out "
             : "md:w-20   transition-all duration-300 ease-out "
@@ -153,6 +169,13 @@ const SideBar = () => {
                 }}
               >
                 <div className="icon">{route.icon}</div>
+                {/* a notif small red cirle with num inside */}
+                {route.name == "chat" && chatNotif > 0 && (
+                  <div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+                    {chatNotif}
+                  </div>
+                )}
+
                 {isSidebarOpen && <div className="text ml-4">{route.name}</div>}
               </Link>
             );

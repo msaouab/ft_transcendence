@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+import Cookies from "js-cookie";
 
 interface AppContextType {
   userStatus: string;
@@ -12,6 +13,10 @@ interface AppContextType {
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
   isTfaEnabled: boolean;
   setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  notifications: any[];
+  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
+  chatNotif: number;
+  setChatNotif: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -28,6 +33,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // chat context
   const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
 
+  // notification context
+  const [notifications, setNotifications] = useState([] as any[]);
+
+  const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
+
   //  user auth context
 
   const value = {
@@ -41,6 +51,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setPrivateChatRooms,
     isTfaEnabled,
     setIsTfaEnabled,
+    notifications,
+    setNotifications,
+    chatNotif,
+    setChatNotif,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

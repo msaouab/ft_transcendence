@@ -1,5 +1,5 @@
 import { BsChevronDown } from "react-icons/bs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -12,16 +12,22 @@ import {
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
 import instance from "../api/axios";
+import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
-const DropDownMenu = () => {
+
+type Props = {
+  notifySocket: any;
+  connected: boolean;
+};
+const DropDownMenu = ({notifySocket, connected} : Props) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     async function logout() {
       try {
         await instance.get("/logout").catch((error) => {
           console.log("logout1111");
-          console.log( "logout");
+          console.log("logout");
           window.location.reload();
           if (error.response.status == 401) {
             navigate("/login");
@@ -36,7 +42,6 @@ const DropDownMenu = () => {
 
   const { userStatus, setUserStatus } = useGlobalContext();
 
-
   const [open, setOpen] = useState(false);
   const handelOpen = () => {
     setOpen(!open);
@@ -46,6 +51,33 @@ const DropDownMenu = () => {
     console.log(event.target.value);
     setUserStatus(event.target.value);
   };
+
+
+
+  useEffect(() => {
+    console.log("heeeeeeeeeeeeeee: ", userStatus);
+    if (connected) {
+      console.log("connected to the server notify");
+      // console.log("current: ", notifySocket);
+      if (notifySocket) {
+        console.log("we're emmiting the event status");
+        notifySocket.emit("realStatus", {
+          id: Cookies.get("id"),
+          userStatus: true,
+        });
+        setUserStatus("Online");
+      }
+    } else if (!connected) {
+      // console.log("we're emmiting the event status");
+      if (notifySocket) {
+        notifySocket.emit("realStatus", {
+          id: Cookies.get("id"),
+          userStatus: false,
+        });
+        setUserStatus("Offline");
+      }
+    }
+  }, [connected]);
 
   const { userImg } = useGlobalContext();
 
@@ -139,7 +171,6 @@ const DropDownMenu = () => {
             </div>
           </PopoverContent>
         </Popover>
-        
       </div>
     </div>
   );
