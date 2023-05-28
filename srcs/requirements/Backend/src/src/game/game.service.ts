@@ -122,7 +122,11 @@ export class GameService {
 			if (FindUser.status == "InGame") {
 				throw new BadRequestException("You are already in game");
 			}
-			if (Benome === "friend") {
+	
+			if (opponent === "friend") {
+
+// 			if (Benome === "friend") {
+// >>>>>>> Dev
 				const FindFriend = await this.prisma.user.findUnique({
 					where: {
 						login: login,

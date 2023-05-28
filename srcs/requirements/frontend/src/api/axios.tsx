@@ -145,7 +145,8 @@ export const isFriend = async (id: string, receiver_id: string) => {
     return;
   }
   try {
-    const res = await instance.get("/user/" + id + "/is-friend/" + receiver_id);
+    const res = await instance.get("/User/" + id );
+<!--     console.log("we've got the user id: ", res.data); -->
     return res.data;
   } catch (err) {
     console.log(err);

@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+
+import {useRef} from "react";
 import Cookies from "js-cookie";
 
 interface AppContextType {
@@ -29,6 +31,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userStatus, setUserStatus] = useState<string>("");
   const [userImg, setUserImg] = useState("");
   const [userId, setUserId] = useState<string>("");
+
   const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
   // chat context
   const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
@@ -62,10 +65,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
 export const useGlobalContext = (): AppContextType => {
   const context = useContext(AppContext);
-
   if (!context) {
     throw new Error("useGlobalContext must be used within an AppProvider");
   }
-
   return context;
 };

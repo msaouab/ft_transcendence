@@ -29,7 +29,7 @@ CREATE TABLE "User" (
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
     "avatar" TEXT NOT NULL DEFAULT '/app/public/default.png',
-    "status" "Status" NOT NULL DEFAULT 'Online',
+    "status" "Status" NOT NULL DEFAULT 'Offline',
     "tfa" BOOLEAN NOT NULL DEFAULT false,
     "otp_verified" BOOLEAN NOT NULL DEFAULT false,
     "otp_base32" TEXT,
@@ -70,6 +70,7 @@ CREATE TABLE "PrivateChatRoom" (
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
     "lastUpdatedTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "blocked" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "PrivateChatRoom_pkey" PRIMARY KEY ("id")
 );
@@ -77,7 +78,8 @@ CREATE TABLE "PrivateChatRoom" (
 -- CreateTable
 CREATE TABLE "BlockTab" (
     "user_id" TEXT NOT NULL,
-    "blockedUser_id" TEXT NOT NULL
+    "blockedUser_id" TEXT NOT NULL,
+    "uuid" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -227,7 +229,7 @@ CREATE UNIQUE INDEX "FriendshipInvites_sender_id_receiver_id_key" ON "Friendship
 CREATE UNIQUE INDEX "FriendsTab_user_id_friendUser_id_key" ON "FriendsTab"("user_id", "friendUser_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "BlockTab_user_id_blockedUser_id_key" ON "BlockTab"("user_id", "blockedUser_id");
+CREATE UNIQUE INDEX "BlockTab_uuid_key" ON "BlockTab"("uuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ChannelsJoinTab_user_id_channel_id_key" ON "ChannelsJoinTab"("user_id", "channel_id");

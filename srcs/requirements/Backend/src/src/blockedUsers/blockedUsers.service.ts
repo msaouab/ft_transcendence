@@ -21,16 +21,37 @@ export class BlockedUsersService {
         const blocks = await this.prisma.blockTab.findMany({
             where: {
                 user_id: id,
-
             },
         });
-        console.log('blocks :>> ', blocks);
         return blocks;
 
     }
 
+
+    async checkIfBlocked(id: string, blockedUserId: string): Promise<BlockTab> {
+        await this.UserService.getUser(id);
+        await this.UserService.getUser(blockedUserId);
+        // find any block in which the user is blocking or blocked with the blocked user
+        const block = await this.prisma.blockTab.findFirst({
+            where: {
+                OR: [
+                    {
+                        user_id: id,
+                        blockedUser_id: blockedUserId,
+                    },
+                    {
+                        user_id: blockedUserId,
+                        blockedUser_id: id,
+                    },
+                ],
+            },
+        });
+        return block;
+    }
+
+
     async getRoomId(senderId: string, receiverId: string): Promise<string> {
-        const roomName = [senderId, receiverId].sort().join('-');
+    const roomName = [senderId, receiverId].sort().join('-');
         const secretKey = process.env.SECRET_KEY;
         // hash the room name using md5
         const hash = createHash('md5');
@@ -194,6 +215,17 @@ export class BlockedUsersService {
                 id: roomName,
             },
         });
+        // check if there's no record in th blockeTab between the two users
+        const blockTab2 = await this.prisma.blockTab.findFirst({
+            where: {
+                AND: [
+                    { user_id: blockedUserId },
+                    { blockedUser_id: id },
+                ],
+
+            },
+        });
+        if (!blockTab2) {
         if (room) {
             const updateRoom = await this.prisma.privateChatRoom.update({
                 where: {
@@ -207,6 +239,7 @@ export class BlockedUsersService {
                 throw new Error("Failed to update private chatroom");
             }
         }
+    }
         return block;
     }
 
