@@ -15,6 +15,7 @@ import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
 import { GameProvider } from "./provider/GameProvider";
+import StartGame from "./pages/game/StartGame";
 
 // function App() {
 // 	const [bgColor, setBgColor] = useState("#1E1E1E");
@@ -88,7 +89,10 @@ function App() {
 					<Route path="/game" element={
 						<GameProvider><GameDashboard /></GameProvider>
 					} />
-					<Route path="/game/10" element={
+					<Route path="/game/startGame" element={
+						<GameProvider><StartGame /></GameProvider>
+					} />
+          <Route path="/game/10" element={
 						<GameProvider><Game /></GameProvider>
 					} />
 					<Route path="/game-type" element={

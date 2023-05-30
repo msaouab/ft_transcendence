@@ -64,7 +64,7 @@ const GameType = () => {
         {Games.map(item =>
           <Link
           key={item.id}
-          to={`/game/10`}
+          to={`/game/startGame`}
           className="w-[18rem]"
           onClick={() => handleModeGame(item.name)}
         >

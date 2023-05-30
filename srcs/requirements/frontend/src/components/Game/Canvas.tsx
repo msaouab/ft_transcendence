@@ -51,7 +51,6 @@ let ctx: CanvasRenderingContext2D | null;
 const PingPong = ({ width, height, socket }: PingPongProps) => {
 	const { modeRoom } = useAppContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const [score, setScore] = useState({ player1: 0, player2: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
 		x: width / 2 - 40,
 		y: height - 20,
@@ -100,7 +99,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		return () => {
 			ctx = null;
 		};
-	}, [player1X, player2X, ball, score]);
+	}, [player1X, player2X, ball]);
 
 	const drawPlayer = (player: PlayerState) => {
 		if (ctx) {
@@ -164,9 +163,8 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 		socket.on("StartTime", (time) => {
 			console.log(time);
 		});
-		socket.on("responseBall", (ball, score) => {
+		socket.on("responseBall", (ball) => {
 			setBall(ball);
-			setScore(score);
 		});
 		socket.on("responseWinner", (winner) => {
 			console.log(winner);

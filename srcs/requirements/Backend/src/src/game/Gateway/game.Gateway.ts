@@ -302,13 +302,14 @@ export class GameGateway
 			const score = { player1, player2 };
 			this.server
 				.to(room.socket[0].id)
-				.emit("responseBall", client1Ball, score);
+				.emit("responseBall", client1Ball);
 			// // Reverse ball position for client 2
 				client2Ball.x = width - client2Ball.x;
 				client2Ball.y = height - client2Ball.y;
 				this.server
 					.to(room.socket[1].id)
-					.emit("responseBall", client2Ball, score);
+					.emit("responseBall", client2Ball);
+			this.server.emit("responseScore", score);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined ||
 					room.socket[1].id === undefined ||
@@ -402,7 +403,9 @@ export class GameGateway
 						value.mode = payload.mode;
 					}
 					client.join(key);
-					this.server.emit("joinedRoom", key, this.IPlayer);
+					this.server.emit("BenomeId", key, value.player2.id);
+					this.server.to(value.socket[0].id).emit("BenomeId", value.player2.id);
+					this.server.to(value.socket[1].id).emit("BenomeId", value.player1.id);
 					this.CreateRoom(key, value);
 					this.handleBall(client, key, payload.width, payload.height);
 					AvailableRoom = false;
@@ -456,13 +459,13 @@ export class GameGateway
 		this.roomMap.set(key, this.roomObj);
 		client.join(key);
 		this.server.emit("joinedRoom", key);
+
 	}
 
 	PlayvsBot(client: any, roomId: any, width: any, height: any) {
 		const room = this.roomMap.get(roomId);
 		room.time = new Date().getTime();
 		this.server.emit("StartTime", room.time);
-		console.log("ball from room:", room);
 		this.ball = {
 			x: width / 2,
 			y: height / 2,
@@ -480,14 +483,13 @@ export class GameGateway
 			}
 			let OldY = height / 2;
 			if (this.ball.y <= OldY) {
-				if (this.ball.x >= room.player1.paddle1.x) {
+				if (this.ball.x >= room.player1.paddle1.x && room.player1.paddle1.x <= width - 80) {
 					room.player1.paddle1.x += 12;
 				}
 				if (this.ball.x <= room.player1.paddle1.x) {
 					room.player1.paddle1.x -= 12;
 				}
 				OldY = this.ball.y;
-				// console.log("Ball:", room.player1.paddle1.x, "Bot:", this.ball.x);
 				this.server.emit("responsePlayer2", room.player1.paddle1);
 			}
 			const newX = this.ball.x + this.ball.dx;
@@ -497,7 +499,6 @@ export class GameGateway
 				this.ball.dx = -this.ball.dx;
 			if (newY - this.ball.r <= 0 || newY + this.ball.r >= height)
 				this.ball.dy = -this.ball.dy;
-
 			// paddle collision
 			if (
 				newY + this.ball.r >= room.player1.paddle2.y &&
@@ -537,7 +538,8 @@ export class GameGateway
 			const player1 = room.player1.score;
 			const player2 = room.player2.score;
 			const score = { player1, player2 };
-			this.server.emit("responseBall", client1Ball, score);
+			this.server.emit("responseBall", client1Ball);
+			this.server.emit("responseScore", score);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined || status) {
 				room.status = "Finished";
@@ -595,6 +597,7 @@ export class GameGateway
 		this.roomMap.set(key, this.roomObj);
 		client.join(key);
 		this.server.emit("joinedRoom", key);
+		this.server.emit("BenomeId", this.roomObj.player2.id);
 		this.CreateRoom(key, this.roomObj);
 		this.PlayvsBot(client, key, payload.width, payload.height);
 	}

@@ -8,6 +8,7 @@ interface GameProfileProps {
 		status: string;
 	};
 	isFirst?: boolean;
+	score?: number;
 }
 
 const PlayerContainer = styled.div<{ isFirst?: boolean }>`
@@ -28,18 +29,34 @@ const PlayerContainer = styled.div<{ isFirst?: boolean }>`
 			border-radius: 50%;
 		}
 	}
+	@media (max-width: 1200px) {
+		flex-direction: row;
+		padding: 0;
+		justify-content: space-around;
+		align-items: center;
+		border: 1px solid red;
+		width: 100%;
+		flex-direction: ${({ isFirst }) => (isFirst ? "row" : "row-reverse")};
+		.score {
+			font-size: 3rem;
+			line-height: normal;
+		}
+	}
 `;
 
 const ScoreContainer = styled.div`
 	font-size: 5rem;
 	line-height: 0;
+	@media (max-width: 1200px) {
+		/* font-size: 3rem; */
+	}
 `;
 
-const GameProfile = ({ data, isFirst }: GameProfileProps) => {
+const GameProfile = ({ data, isFirst, score }: GameProfileProps) => {
 	const { userImg } = useGlobalContext();
 	return (
 		<PlayerContainer isFirst={isFirst}>
-			<ScoreContainer>0</ScoreContainer>
+			<ScoreContainer className="score">{score}</ScoreContainer>
 			<div className="useInfo">
 				<img src={userImg} alt="avatar" width={60} />
 				<p className="login">{data.login}</p>
