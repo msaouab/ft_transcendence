@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { User } from './user.decorator/user.decorator';
 import { Profile } from 'passport';
 import { ApiTags } from '@nestjs/swagger';
+import { HOSTNAME } from 'src/main';
 
 
 @ApiTags('login')
@@ -22,9 +23,9 @@ export class AuthController {
   async ftAuthCallback(@User() user: Profile, @Res() res) {
     const User = await this.authService.login(user, res);
     if (User.tfa == true && User.otp_verified == false) {
-      return res.redirect('http://localhost:5173/tfa');
+      return res.redirect('http://'+HOSTNAME+':5173/tfa');
     }
-    return res.redirect('http://localhost:5173/profile');
+    return res.redirect('http://'+HOSTNAME+':5173/profile');
   }
 
 

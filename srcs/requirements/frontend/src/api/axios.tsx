@@ -1,20 +1,21 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const instance = axios.create({
-	baseURL: "http://localhost:3000/api/v1",
-	withCredentials: true,
-});
+export const HOSTNAME = import.meta.env.VITE_API_URL || "localhost";
+console.log("HOSTNAME", import.meta.env.VITE_API_URL);
 
-export const GetAvatar = async (id: string) => {
-	try {
-		const res = await instance.get("/user/" + id + "/avatar", {
-			responseType: "blob",
-		});
-		return URL.createObjectURL(res.data);
-	} catch (err) {
-		console.log(err);
-	}
+
+const instance =  axios.create({
+  baseURL: "http://"+ HOSTNAME + ":3000/api/v1", 
+  withCredentials: true,
+}) 
+
+
+export const GetAvatar = async (id:string) => {
+  const res = await instance.get("/user/" + id + "/avatar", {
+    responseType: "blob",
+  });
+  return URL.createObjectURL(res.data);
 };
 
 export const PostAvatar = async (file: File) => {

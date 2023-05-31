@@ -8,6 +8,7 @@ import { TfaDto } from 'src/user/dto/Tfa.dto';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { Strategy } from 'passport-otp';
+import { HOSTNAME } from 'src/main';
 
 
 @Injectable()
@@ -16,6 +17,8 @@ export class AuthService {
 
     async signup(user, res) {
         try {
+            //  console.log();
+
             const find_user = await this.prisma.user.findUnique({
                 where: {
                     login: user.username,

@@ -19,8 +19,8 @@ import {
   import { StatusInviteDto, inviteGameDto } from "./dto/invite.game.dto";
   import { Request } from "express";
   
-  @ApiTags("Game")
-  @Controller("Game")
+  @ApiTags("game")
+  @Controller("game")
   export class GameController {
 	constructor(private readonly gameService: GameService) {}
   
@@ -30,25 +30,15 @@ import {
 	//         return this.userService.getUser(id);
 	//     }
   
-	@Post("start")
+	@Post("invite")
 	@UseGuards(AuthenticatedGuard)
-	StartGame(
-	  @Query("type") type: string,
-	  @Query("opponent") opponent: string,
-	  @User() user: Profile,
-	  @Body() inviteGameDto: inviteGameDto
-	) {
-	  return this.gameService.StartGame(type, opponent, user, inviteGameDto);
+	StartGame(@Body() inviteGameDto: inviteGameDto, @User() user: Profile, @Req() req: Request){
+	  return this.gameService.createInvite(user, inviteGameDto);
 	}
-	@Put("invite/:id")
+	@Put("invite/respond/:id")
 	@UseGuards(AuthenticatedGuard)
-	StatusInvite(
-	  @Param("id") id: string,
-	  @User() user: Profile,
-	  @Body() StatusInviteDto: StatusInviteDto,
-	  @Req() req: Request
-	) {
-	  return this.gameService.StatusInvite(id, user, StatusInviteDto, req);
+	updateInvite(@Body() StatusInviteDto: StatusInviteDto, @User() user: Profile, @Param("id") id: string) {
+	  return this.gameService.updateInvite(user, StatusInviteDto, id);
 	}
 	// @Get("mode/:id")
 	// @UseGuards(AuthenticatedGuard)

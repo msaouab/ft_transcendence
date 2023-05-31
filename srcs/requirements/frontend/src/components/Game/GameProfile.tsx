@@ -1,9 +1,11 @@
+import { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import styled from "styled-components";
+import { useEffect, useState } from "react";
 
 interface GameProfileProps {
-    data: {
-        id: string;
+	user: {
+		id: string;
 		login: string;
 		status: string;
 	};
@@ -16,7 +18,7 @@ const PlayerContainer = styled.div<{ isFirst?: boolean }>`
 	flex-direction: ${({ isFirst }) => (isFirst ? "column" : "column-reverse")};
 	align-items: center;
 	justify-content: space-between;
-	padding: .7rem 0;
+	padding: 0.7rem 0;
 	.useInfo {
 		display: flex;
 		flex-direction: ${({ isFirst }) => (isFirst ? "row-reverse" : "row")};
@@ -30,13 +32,12 @@ const PlayerContainer = styled.div<{ isFirst?: boolean }>`
 		}
 	}
 	@media (max-width: 1200px) {
-		flex-direction: row;
 		padding: 0;
 		justify-content: space-around;
 		align-items: center;
 		border: 1px solid red;
 		width: 100%;
-		flex-direction: ${({ isFirst }) => (isFirst ? "row" : "row-reverse")};
+		flex-direction: ${({ isFirst }) => (isFirst ? "row-reverse" : "row")};
 		.score {
 			font-size: 3rem;
 			line-height: normal;
@@ -52,14 +53,29 @@ const ScoreContainer = styled.div`
 	}
 `;
 
-const GameProfile = ({ data, isFirst, score }: GameProfileProps) => {
-	const { userImg } = useGlobalContext();
+const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
+	const [userImg, setUserImg] = useState<string>("");
+
+	useEffect(() => {
+		const getAvatarImg = async (id: string) => {
+			const userImg = await GetAvatar(id);
+			setUserImg(userImg);
+			console.log(userImg);
+		};
+		getAvatarImg(user.id);
+		console.log("user:", user)
+		return () => {
+			setUserImg("");
+		};
+	}, []);
+
+	// console.log(user.id, score);
 	return (
 		<PlayerContainer isFirst={isFirst}>
 			<ScoreContainer className="score">{score}</ScoreContainer>
 			<div className="useInfo">
 				<img src={userImg} alt="avatar" width={60} />
-				<p className="login">{data.login}</p>
+				<p className="login">{user.login}</p>
 			</div>
 		</PlayerContainer>
 	);

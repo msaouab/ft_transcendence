@@ -161,7 +161,7 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 
 	useEffect(() => {
 		socket.on("StartTime", (time) => {
-			console.log(time);
+			// console.log(time);
 		});
 		socket.on("responseBall", (ball) => {
 			setBall(ball);

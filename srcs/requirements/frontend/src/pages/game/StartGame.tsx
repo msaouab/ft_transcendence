@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
-import { getUserInfo } from "../../api/axios";
+import { HOSTNAME, getUserInfo } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useAppContext } from "../../provider/GameProvider";
 import styled, { keyframes } from "styled-components";
 import Game from "../../components/Game/Game";
+import Lottie from "react-lottie";
+import PongAnimation from "../../assets/Lottie/PongAnimation.json";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -17,7 +19,7 @@ const StartGameContainer = styled.div`
 const LoadingText = styled.p`
 	position: absolute;
 	font-weight: bold;
-	color: #3498db;
+	color: #99c4e1;
 `;
 
 const spinAnimation = keyframes`
@@ -30,15 +32,33 @@ const spinAnimation = keyframes`
 `;
 
 const SpinnerContainer = styled.div`
+	position: absolute;
 	border: 3px solid #af5151;
 	border-top: 3px solid #b9c2c9;
 	border-bottom: 3px solid #b9c2c9;
 	border-radius: 50%;
-	width: 200px;
-	height: 200px;
+	width: 250px;
+	height: 250px;
 	animation: ${spinAnimation} 0.5s linear infinite;
-	
 `;
+
+const AnimationContainer = styled.div`
+	/* border: 1px dashed #7c6d6d; */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 460px;
+	height: 550px;
+`;
+
+const defaultOptions = {
+	loop: true,
+	autoplay: true,
+	animationData: PongAnimation,
+	rendererSettings: {
+		preserveAspectRatio: "xMidYMid slice",
+	},
+};
 
 const StartGame = () => {
 	const [mysocket, setMySocket] = useState<Socket>();
@@ -52,7 +72,7 @@ const StartGame = () => {
 		lastName: "",
 		status: "",
 	});
-	const [data, setData] = useState({
+	const [user, setUser] = useState({
 		id: "",
 		login: "",
 		firstName: "",
@@ -68,7 +88,7 @@ const StartGame = () => {
 	};
 
 	useEffect(() => {
-		const socket = io("http://localhost:3000/game", {
+		const socket = io(`http://${HOSTNAME}:3000/game`, {
 			query: { userId: Cookies.get("id") },
 		});
 		setMySocket(socket);
@@ -81,27 +101,34 @@ const StartGame = () => {
 		});
 		socket.on("BenomeId", (benome) => {
 			setBenomeId(benome);
-			console.log("benomeId:", benome);
+			console.log("test benomeId:", benome);
 		});
 		getAllData();
 		return () => {
 			socket.disconnect();
 		};
-	}, [userId]);
+	}, [userId, benomeId]);
 
 	const getAllData = async () => {
-		const data = await getUserInfo(userId);
-		console.log("data:", data);
-		setData(data);
-		const BenomeData = await getUserInfo(benomeId);
-		setBenomeData(BenomeData);
+		const user = await getUserInfo(userId);
+		console.log("user:", user);
+		setUser(user);
+		const Benome = await getUserInfo(benomeId);
+		setBenomeData(Benome);
+		console.log("1 - BenomeData:", Benome);
 	};
 
 	return (
 		<StartGameContainer>
-			{benomeId && mysocket ? (<Game socket={mysocket} benome={benomeData}/>) : (
-				<><LoadingText>Loading...</LoadingText><SpinnerContainer></SpinnerContainer></>
-				)}
+			{benomeId && mysocket ? (
+				<Game socket={mysocket} user={user} benome={benomeData} />
+			) : (
+				<AnimationContainer>
+					<LoadingText>Loading...</LoadingText>
+					<SpinnerContainer></SpinnerContainer>
+					<Lottie options={defaultOptions} height={800} width={800} />
+				</AnimationContainer>
+			)}
 		</StartGameContainer>
 	);
 };

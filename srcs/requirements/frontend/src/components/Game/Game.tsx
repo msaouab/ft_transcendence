@@ -10,6 +10,13 @@ import GameProfile from "./GameProfile";
 
 interface GameProps {
 	socket: Socket;
+	user: {
+		id: string;
+		login: string;
+		firstName: string;
+		lastName: string;
+		status: string;
+	};
 	benome: {
 		id: string;
 		login: string;
@@ -19,7 +26,7 @@ interface GameProps {
 	}
 }
 
-const CanvasContainer = styled.div`
+const CanvasContainer = styled.div<{isFirst: Boolean}>`
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -28,7 +35,8 @@ const CanvasContainer = styled.div`
 	/* height: auto; */
 	@media (max-width: 1200px) {
 		gap: 0;
-		flex-direction: column;
+		flex-direction: ${({ isFirst }) => (isFirst ? "column-reverse" : "column")};;
+		/* flex-direction: column; */
 	}
 `;
 
@@ -42,7 +50,6 @@ const PlayerContainer = styled.div<{
 	height: ${({ height }) => height / 2 + 10}px;
 	@media (max-width: 1200px) {
 		/* border: 1px solid red; */
-		flex-direction: row;
 		height: auto;
 		align-self: ${({ isFirst }) => (isFirst ? "flex-end" : "flex-start")};
 		/* width: ${({ width }) => width}px; */
@@ -50,28 +57,28 @@ const PlayerContainer = styled.div<{
 	}
 `;
 
-const Game = ({socket, benome}: GameProps) => {
-	const { userId } = useGlobalContext();
+const Game = ({socket, user, benome}: GameProps) => {
+	// const { userId } = useGlobalContext();
 	const { setTypeRoom, typeRoom, setModeRoom, modeRoom } = useAppContext();
-	const [mysocket, setMySocket] = useState<Socket>();
-	const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+	// const [mysocket, setMySocket] = useState<Socket>();
+	// const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+	// const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
-	const [benomeId, setBenomeId] = useState("");
-	const [benomeData, setBenomeData] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
-	const [data, setData] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
+	// const [benomeId, setBenomeId] = useState("");
+	// const [benomeData, setBenomeData] = useState({
+	// 	id: "",
+	// 	login: "",
+	// 	firstName: "",
+	// 	lastName: "",
+	// 	status: "",
+	// });
+	// const [data, setData] = useState({
+	// 	id: "",
+	// 	login: "",
+	// 	firstName: "",
+	// 	lastName: "",
+	// 	status: "",
+	// });
 
 	
 	const payload = {
@@ -85,19 +92,11 @@ const Game = ({socket, benome}: GameProps) => {
 		socket.on("responseScore", (score: SetStateAction<{ player1: number; player2: number; }>) => {
 			setScore(score);
 		});
-		getAllData();
+		// getAllData();
 		return () => {
 			socket.off("responseScore");
 		}
 	}, [socket]);
-
-	const getAllData = async () => {
-		const data = await getUserInfo(userId);
-		console.log("data:", data);
-		setData(data);
-		const BenomeData = await getUserInfo(benomeId);
-		setBenomeData(BenomeData);
-	};
 
 	useEffect(() => {
 		const RoomType = localStorage.getItem("typeRoom");
@@ -106,11 +105,14 @@ const Game = ({socket, benome}: GameProps) => {
 		if (RoomMode) setModeRoom(RoomMode);
 	}, [typeRoom, socket]);
 
+	console.log("score.player1", score.player1)
+	console.log("score.player2", score.player2)
+
 	return (
-		<CanvasContainer>
+		<CanvasContainer isFirst>
 			<PlayerContainer isFirst height={payload.height} width={payload.width}>
-				{data ? (
-					<GameProfile data={data} isFirst={true} score={score.player1} />
+				{user ? (
+					<GameProfile user={user} isFirst={true} score={score.player1}  />
 				) : (
 					<p>Loading...</p>
 				)}
@@ -125,8 +127,8 @@ const Game = ({socket, benome}: GameProps) => {
 				<p>Loading...</p>
 			)}
 			<PlayerContainer height={payload.height} width={payload.width}>
-				{data ? (
-					<GameProfile data={data} isFirst={false} score={score.player2} />
+				{benome ? (
+					<GameProfile user={benome} isFirst={false} score={score.player2} />
 				) : (
 					<p>Loading...</p>
 				)}

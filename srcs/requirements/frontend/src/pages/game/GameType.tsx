@@ -61,9 +61,9 @@ const GameType = () => {
   return (
     <div className="h-full w-full  flex flex-col items-center ">
       <div className="game-type w-[60%] flex justify-between m-auto min-h-[25rem]">
-        {Games.map(item =>
+      {Games.map((item, index) => (
           <Link
-          key={item.id}
+          key={index}
           to={`/game/startGame`}
           className="w-[18rem]"
           onClick={() => handleModeGame(item.name)}
@@ -72,10 +72,9 @@ const GameType = () => {
             title={item.name}
             description={item.name}
             imgPath={GameImg}
-            key={item.id}
           />
         </Link>
-        )}
+        ))}
       </div>
       <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
         <div className="border rounded-2xl flex-1 p-4 h-full">
@@ -86,7 +85,7 @@ const GameType = () => {
             {Array(10)
               .fill(0)
               .map((item, index) => (
-                <FreindCard name="koko" points="1337" rank={index+1} />
+                <FreindCard name="koko" points="1337" rank={index + 1} />
               ))}
           </div>
         </div>
@@ -98,7 +97,7 @@ const GameType = () => {
             {Array(10)
               .fill(0)
               .map((item, index) => (
-                <FreindCard name="koko" points="1337" />
+                <FreindCard name="koko" points="1337" key={index} />
               ))}
           </div>
         </div>

@@ -19,6 +19,8 @@ import {
 } from "@nestjs/common";
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
+import { AchvService } from "src/achievements/achv.service";
+// import { date } from "joi";
 // import io from "socket.io-client";
 
 @WebSocketGateway({
@@ -35,7 +37,8 @@ export class GameGateway
 	constructor(
 		// private gameService: GameService,
 		private prisma: PrismaService,
-		private UserService: UserService
+		private UserService: UserService,
+		// private readonly achvService: AchvService
 	) {}
 
 	// private roomArr: { [key: string]: Socket[] } = {};
@@ -107,9 +110,9 @@ export class GameGateway
 		console.log(`Client connected: ${client.id}`);
 	}
 
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
-		this.roomMap.forEach((value, key) => {
+		this.roomMap.forEach(async (value, key) => {
 			if (
 				value.player1.id === client.handshake.query.userId ||
 				value.player2.id === client.handshake.query.userId
@@ -121,12 +124,27 @@ export class GameGateway
 					client.leave(client.id);
 					if (value.members === 0) {
 						this.roomMap.delete(key);
-					} else if (value.members === 1) {
-						if (value.player1.id === client.handshake.query.userId.toString())
-							value.player1 = { id: "" };
-						else value.player2 = { id: "" };
-						value.status = "Finished";
 					}
+					// else if (value.members === 1) {
+					// 	const updateGame = await this.prisma.game.update({
+							// where: {
+					// 			id: key,
+		
+					// 		},
+					// 		data: {
+					// 			gameStatus: "Finished",
+					// 			player1_pts: value.player1.score,
+					// 			player2_pts: value.player2.score,
+					// 		}
+		
+					// 	})
+					// 	console.log(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts)
+					// 	// this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+					// 	if (value.player1.id === client.handshake.query.userId.toString())
+					// 		value.player1 = { id: "" };
+					// 	else value.player2 = { id: "" };
+					// 	value.status = "Finished";
+					// }
 				}
 			}
 			if (value.status === "Finished") this.roomMap.delete(key);
@@ -221,7 +239,7 @@ export class GameGateway
 			if (room.player1.score === 5 || room.player2.score === 5) return true;
 		if (room.type === "Time") {
 			let lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 60 ? true : false;
+			return (lastTime - room.time) / 1000 >= 60000 ? true : false;
 			// if (timeStatus) return true;
 		}
 		return false;
@@ -309,7 +327,8 @@ export class GameGateway
 				this.server
 					.to(room.socket[1].id)
 					.emit("responseBall", client2Ball);
-			this.server.emit("responseScore", score);
+			this.server.emit("responseScorePlayer1", score.player1);
+			this.server.emit("responseScorePlayer2", score.player2);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined ||
 					room.socket[1].id === undefined ||
@@ -354,7 +373,7 @@ export class GameGateway
 						.emit("responseMouse", room.player1.paddle2);
 				}
 			}
-			// // let OldX = data[1].x;
+			// let OldX = data[1].x;
 			// if (data[1].x >= room.player1.paddle1.x) {
 			// 	room.player1.paddle1.x += 12;
 			// }
@@ -403,7 +422,7 @@ export class GameGateway
 						value.mode = payload.mode;
 					}
 					client.join(key);
-					this.server.emit("BenomeId", key, value.player2.id);
+					// this.server.emit("BenomeId", key, value.player2.id);
 					this.server.to(value.socket[0].id).emit("BenomeId", value.player2.id);
 					this.server.to(value.socket[1].id).emit("BenomeId", value.player1.id);
 					this.CreateRoom(key, value);
@@ -539,13 +558,15 @@ export class GameGateway
 			const player2 = room.player2.score;
 			const score = { player1, player2 };
 			this.server.emit("responseBall", client1Ball);
-			this.server.emit("responseScore", score);
+			// this.server.emit("responseScore", score);
+			this.server.emit("responseScorePlayer1", score.player1);
+			this.server.emit("responseScorePlayer2", score.player2);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined || status) {
 				room.status = "Finished";
 				let winner =
 					room.player1.score > room.player2.score ? "Player 1" : "Player 2";
-				this.server.emit("responseWinner", winner);
+				// this.server.emit("responseWinner", winner);
 				clearInterval(intervalId);
 				this.handleDisconnect(client);
 				return ;
@@ -623,13 +644,29 @@ export class GameGateway
 			} else if (payload.mode === "Friend") {
 				this.FriendRoom(client, key, payload);
 			}
+			console.log("room",key);
 		}
-		this.roomMap.forEach((value, key) => {
+		this.roomMap.forEach(async (value, key) => {
 			if (value.status === "Finished") {
+				const updateGame = await this.prisma.game.update({
+
+					where: {
+						id: key,
+
+					},
+					data: {
+						gameStatus: "Finished",
+						player1_pts: value.player1.score,
+						player2_pts: value.player2.score,
+					}
+
+				})
+				// this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+
 				this.roomMap.delete(key);
 			}
 		});
-		console.log("roomMap => :", this.roomMap);
+		console.log("roomMap => :", this.roomMap);//update db
 	}
 
 	async CreateRoom(key: string, value: any) {

@@ -30,6 +30,7 @@ import ChatBoxTopBar from './ChatBoxToBar';
 import SendMessageBox from './SendMessageBox';
 import axios from 'axios';
 import ChatInfiniteScroll from './ChatInfiniteScroll';
+import { HOSTNAME } from '../../api/axios';
 
 
 const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connected }: {
@@ -49,7 +50,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
     const updateSeenStatus = (messages: singleMessage[]) => {
         messages.forEach((message: any) => {
             if (message.seen === false && message.sender_id !== Cookies.get('id')) {
-                axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
+                axios.put(`http://${HOSTNAME}:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
                     seen: true
                 }).then((response) => {
 
@@ -93,7 +94,7 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
             return [];
         } 
         // making the url dynamic
-        let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
+        let responseMessages = await axios.get(`http://${HOSTNAME}:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         updateSeenStatus(responseMessages.data[1]);
         
