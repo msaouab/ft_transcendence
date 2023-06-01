@@ -2,6 +2,7 @@ import { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
+import Moulinete from "../../../public/Moulinette42.jpeg"
 
 interface GameProfileProps {
 	user: {
@@ -24,11 +25,13 @@ const PlayerContainer = styled.div<{ isFirst?: boolean }>`
 		flex-direction: ${({ isFirst }) => (isFirst ? "row-reverse" : "row")};
 		align-items: center;
 		gap: 10px;
-		img {
-			max-width: 100%;
+		.circle-image {
+			/* max-width: 100%; */
 			box-sizing: border-box;
 			width: 50px;
+			height: 50px;
 			border-radius: 50%;
+			object-fit: cover;
 		}
 	}
 	@media (max-width: 1200px) {
@@ -60,21 +63,20 @@ const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
 		const getAvatarImg = async (id: string) => {
 			const userImg = await GetAvatar(id);
 			setUserImg(userImg);
-			console.log(userImg);
 		};
+		if (user.id === "Bot")
+			setUserImg(Moulinete);
 		getAvatarImg(user.id);
-		console.log("user:", user)
 		return () => {
 			setUserImg("");
 		};
 	}, []);
 
-	// console.log(user.id, score);
 	return (
 		<PlayerContainer isFirst={isFirst}>
 			<ScoreContainer className="score">{score}</ScoreContainer>
 			<div className="useInfo">
-				<img src={userImg} alt="avatar" width={60} />
+				<img src={userImg} alt="avatar" className="circle-image"/>
 				<p className="login">{user.login}</p>
 			</div>
 		</PlayerContainer>

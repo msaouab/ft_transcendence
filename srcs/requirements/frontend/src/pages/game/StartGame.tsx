@@ -101,7 +101,6 @@ const StartGame = () => {
 		});
 		socket.on("BenomeId", (benome) => {
 			setBenomeId(benome);
-			console.log("test benomeId:", benome);
 		});
 		getAllData();
 		return () => {
@@ -111,11 +110,18 @@ const StartGame = () => {
 
 	const getAllData = async () => {
 		const user = await getUserInfo(userId);
-		console.log("user:", user);
 		setUser(user);
 		const Benome = await getUserInfo(benomeId);
 		setBenomeData(Benome);
-		console.log("1 - BenomeData:", Benome);
+		if (payload.mode === "Bot") {
+			setBenomeData({
+				id: "Bot",
+				login: "Moulinette_42",
+				firstName: "Bot",
+				lastName: "Bot",
+				status: "Bot",
+			});
+		}
 	};
 
 	return (

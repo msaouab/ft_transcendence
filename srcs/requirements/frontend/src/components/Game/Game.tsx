@@ -58,28 +58,8 @@ const PlayerContainer = styled.div<{
 `;
 
 const Game = ({socket, user, benome}: GameProps) => {
-	// const { userId } = useGlobalContext();
 	const { setTypeRoom, typeRoom, setModeRoom, modeRoom } = useAppContext();
-	// const [mysocket, setMySocket] = useState<Socket>();
-	// const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-	// const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
-	// const [benomeId, setBenomeId] = useState("");
-	// const [benomeData, setBenomeData] = useState({
-	// 	id: "",
-	// 	login: "",
-	// 	firstName: "",
-	// 	lastName: "",
-	// 	status: "",
-	// });
-	// const [data, setData] = useState({
-	// 	id: "",
-	// 	login: "",
-	// 	firstName: "",
-	// 	lastName: "",
-	// 	status: "",
-	// });
-
 	
 	const payload = {
 		type: typeRoom,
@@ -91,8 +71,8 @@ const Game = ({socket, user, benome}: GameProps) => {
 	useEffect(() => {
 		socket.on("responseScore", (score: SetStateAction<{ player1: number; player2: number; }>) => {
 			setScore(score);
+			console.log("score:", score)
 		});
-		// getAllData();
 		return () => {
 			socket.off("responseScore");
 		}
@@ -105,14 +85,11 @@ const Game = ({socket, user, benome}: GameProps) => {
 		if (RoomMode) setModeRoom(RoomMode);
 	}, [typeRoom, socket]);
 
-	console.log("score.player1", score.player1)
-	console.log("score.player2", score.player2)
-
 	return (
 		<CanvasContainer isFirst>
 			<PlayerContainer isFirst height={payload.height} width={payload.width}>
 				{user ? (
-					<GameProfile user={user} isFirst={true} score={score.player1}  />
+					<GameProfile user={user} isFirst={true} score={score.player1} />
 				) : (
 					<p>Loading...</p>
 				)}

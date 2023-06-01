@@ -318,6 +318,7 @@ export class GameGateway
 			const player1 = room.player1.score;
 			const player2 = room.player2.score;
 			const score = { player1, player2 };
+			const revScore = { player1: room.player2.score, player2: room.player1.score };
 			this.server
 				.to(room.socket[0].id)
 				.emit("responseBall", client1Ball);
@@ -327,8 +328,8 @@ export class GameGateway
 				this.server
 					.to(room.socket[1].id)
 					.emit("responseBall", client2Ball);
-			this.server.emit("responseScorePlayer1", score.player1);
-			this.server.emit("responseScorePlayer2", score.player2);
+			this.server.to(room.socket[0].id).emit("responseScore", score);
+			this.server.to(room.socket[1].id).emit("responseScore", revScore);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined ||
 					room.socket[1].id === undefined ||
@@ -559,8 +560,7 @@ export class GameGateway
 			const score = { player1, player2 };
 			this.server.emit("responseBall", client1Ball);
 			// this.server.emit("responseScore", score);
-			this.server.emit("responseScorePlayer1", score.player1);
-			this.server.emit("responseScorePlayer2", score.player2);
+			this.server.to(room.socket[1].id).emit("responseScore", score);
 			status = this.RoundScore(roomId);
 			if (room.socket[0].id === undefined || status) {
 				room.status = "Finished";
