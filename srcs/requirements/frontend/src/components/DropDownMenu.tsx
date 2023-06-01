@@ -153,7 +153,7 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
               <BsChevronDown className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2" />
             </Button>
           </PopoverHandler>
-          <PopoverContent className="bg-slate-50  bg-[#9343076e] backdrop-blur-sm	px-4 shadow-xs shadow-white text-white border-0 py-1">
+          <PopoverContent className="bg-slate-50  bg-[#434242]  shadow-xl shadow-white/10 border z-50  text-white py-1">
             <div className="setting-item  transition-all hover:scale-105 cursor-pointer py-1">
               <Link to="/profile">Profile</Link>
             </div>

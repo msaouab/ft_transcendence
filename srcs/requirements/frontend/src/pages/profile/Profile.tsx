@@ -20,6 +20,12 @@ import instance, {
 import Cookies from "js-cookie";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
+import {
+  NoAchivements,
+  NoChanel,
+  NoFriend,
+  NoGame,
+} from "../../components/common/EmptyComponents";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -288,9 +294,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No friends
-                </div>
+                <NoFriend />
               )}
             </div>
           </div>
@@ -309,9 +313,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No Joined Chanels
-                </div>
+                <NoChanel />
               )}
             </div>
           </div>
@@ -323,9 +325,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
-                <GameCard key={index} />
-              ))}
+              {false ? <GameCard /> : <NoGame />}
             </div>
           </div>
         </div>
@@ -333,8 +333,8 @@ const Profile = (props: ProfileInterface) => {
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
             Achievements
           </div>
-          <div className="achiv-container flex gap-10   m-auto ">
-            {achivements && achivements.length ? (
+          <div className="achiv-container flex gap-10   m-auto min-h-[20rem]">
+            {false ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -343,8 +343,8 @@ const Profile = (props: ProfileInterface) => {
                 ></SwiperComponent>
               </div>
             ) : (
-              <div className=" h-full flex justify-center items-center text-3xl text-center">
-                No Achivements
+              <div className="flex justify-center items-center  w-full">
+                <NoAchivements />
               </div>
             )}
           </div>

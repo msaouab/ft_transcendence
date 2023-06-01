@@ -163,7 +163,7 @@ const OtherUserProfile = () => {
         <div className="w-full px-4 py-2 m-auto">
           <button className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 " onClick={RemoveFriendInvite}>
             <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Invitation
+            Remove Invitation3
           </button>
           <hr className="opacity-50 "></hr>
 
@@ -179,9 +179,9 @@ const OtherUserProfile = () => {
     } else if (relationStatus === "friend") {
       return (
         <div className="w-full p-2 m-auto">
-          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 ">
+          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 " onClick={RemoveFriendInvite}>
             <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Friend
+            Remove Friendf
           </button>
           <hr></hr>
           <button

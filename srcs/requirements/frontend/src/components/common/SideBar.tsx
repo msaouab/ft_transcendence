@@ -131,7 +131,7 @@ const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boo
       ></div>
 
       <div
-        className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  absolute top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
+        className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  fixed top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
           isSidebarOpen
             ? "w-full bg-[#434242]  md:w-60 h-full   transition-all duration-300 ease-out "
             : "md:w-20   transition-all duration-300 ease-out "

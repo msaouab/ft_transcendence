@@ -3,6 +3,7 @@ import { MdOutlineNotifications } from "react-icons/md";
 import styled, { keyframes } from 'styled-components';
 import { useGlobalContext } from "../provider/AppContext";
 import { io } from "socket.io-client";
+import { handelFriendInvite } from "../api/axios";
 
 
 const fadeInAnimation = keyframes`
@@ -26,7 +27,7 @@ interface NotifProps {
 
 
 const Notifications = (props: NotifProps) => {
-  const { notifications, setNotifications } = useGlobalContext();;
+  const { notifications, setNotifications, userId } = useGlobalContext();;
   const [isDropDownOpen, setIsDropDownOpen] = React.useState(false);
   const handelDropDown = () => {
     console.log("clicked");
@@ -39,6 +40,11 @@ const Notifications = (props: NotifProps) => {
     if (conected) {
       notifSocket.current.on("invite", (data: any) => {
         console.log("invite received", data);
+        setNotifications((prev: any) => {
+          return [...prev, data];
+        }
+        );
+
       });
     }
   }, [conected]);
@@ -61,11 +67,19 @@ const Notifications = (props: NotifProps) => {
   }, []);
 
 
+  const acceptFriendInvite =  async (notif:any, status: string) => {
+    console.log(notif);
+    const data = await  handelFriendInvite(notif.sender_id, userId   , status);
+    console.log(data);
+  }
+
+
+
 
   return (
     <AnimatedComponent className="notification relative font-['Oxanium'] ">
       <div className="notif-count absolute z-10 text-white bg-red-500 rounded-[50%] w-[15px] h-[15px] text-xs p-0 m-0 flex justify-center items-center top-0 right-0 ">
-        1
+        {notifications.length}
       </div>
       <MdOutlineNotifications
 
@@ -77,7 +91,17 @@ const Notifications = (props: NotifProps) => {
           isDropDownOpen ? "block transition-all" : "hidden transition-all"
         } `}
       >
-        Lorem ipsum dolor,?
+        {
+          notifications.map((notif: any, index: number) => {
+            return (
+              <div key={index} className="flex justify-between items-center">
+                <div className="name"></div>
+                <button onClick={()=>acceptFriendInvite(notif , "Accepted")}>acc</button>
+                <button onClick={()=>acceptFriendInvite(notif,"")}>refuse</button>
+              </div>
+            );
+          })
+        }
       </div>
     </AnimatedComponent>
   );

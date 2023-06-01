@@ -135,12 +135,8 @@ const GameType = () => {
             onClick={() => {
               if (item.id === 2) {
                 handelOpen();
-                console.log("bbbbbbb ",userId);
                 getFriendsData();
-                
-
               }
-
               else navigate("/game/10");
             }}
           >

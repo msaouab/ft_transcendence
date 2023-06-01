@@ -136,6 +136,24 @@ export const RemoveThisFriendInvite = async ( id: string, receiver_id: any) => {
 };
 
 
+export const handelFriendInvite = async (id: string, receiver_id: string, status : string) => {
+  console.log("handelFriendInvite", id, receiver_id, status);
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.put("/user/" + id + "/invites", {
+      receiver_id,
+      status,
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
 
 
 
