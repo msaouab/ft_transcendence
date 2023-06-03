@@ -155,33 +155,14 @@ export class InvitesService {
             // create a friendship
             await this.friendService.createFriendship(sender_id, receiver_id);
         }
-        // find the invite by looking for sender_id and receiver_id
-        const invite = await this.prisma.friendshipInvites.findFirst({
-            where: {
-                sender_id,
-                receiver_id,
-            },
-        });
-
-        if (!invite) {
-            throw new NotFoundException('Invite does not exist');
-        }
-
-
-        // update the invite
-        return this.prisma.friendshipInvites.update({
-
+        return await this.prisma.friendshipInvites.delete({
             where: {
                 sender_id_receiver_id: {
                     sender_id: sender_id,
                     receiver_id: receiver_id,
                 },
             },
-            data: {
-                status: status === 'Accepted' ? 'Accepted' : 'Rejected',
-            },
         });
-
     }
 
 
