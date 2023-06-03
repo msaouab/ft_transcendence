@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 import { HOSTNAME, getUserInfo } from "../../api/axios";
@@ -60,6 +60,10 @@ const defaultOptions = {
 	},
 };
 
+const socket = io(`http://${HOSTNAME}:3000/game`, {
+	query: { userId: Cookies.get("id") },
+});
+
 const StartGame = () => {
 	const [mysocket, setMySocket] = useState<Socket>();
 	const { userId } = useGlobalContext();
@@ -88,9 +92,7 @@ const StartGame = () => {
 	};
 
 	useEffect(() => {
-		const socket = io(`http://${HOSTNAME}:3000/game`, {
-			query: { userId: Cookies.get("id") },
-		});
+		console.log(socket)
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
