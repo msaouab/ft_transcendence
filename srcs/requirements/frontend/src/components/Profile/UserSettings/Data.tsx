@@ -80,7 +80,7 @@ function Form() {
   return (
     <form onSubmit={handleSubmit} className="text-white flex flex-col items-center">
       <h1 className="text-xl font-bold text-center mb-4">User Informations</h1>
-      <div className="flex gap-10">
+      <div className="flex gap-10 flex-wrap justify-center">
         <label>
           {/* Login:
           <br /> */}
@@ -92,7 +92,6 @@ function Form() {
             onChange={handleInputChange}
           />
         </label>
-        <br />
         <label>
           {/* First name:
           <br /> */}
@@ -104,7 +103,6 @@ function Form() {
             onChange={handleInputChange}
           />
         </label>
-        <br />
         <label>
           {/* Last name:
           <br /> */}
