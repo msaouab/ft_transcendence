@@ -69,6 +69,7 @@ const Game = ({socket, user, benome}: GameProps) => {
 	};
 
 	useEffect(() => {
+		// socket.emit("startGame", payload);
 		socket.on("responseScore", (score: SetStateAction<{ player1: number; player2: number; }>) => {
 			setScore(score);
 			console.log("score:", score)

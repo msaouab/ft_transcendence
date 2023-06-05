@@ -60,10 +60,6 @@ const defaultOptions = {
 	},
 };
 
-const socket = io(`http://${HOSTNAME}:3000/game`, {
-	query: { userId: Cookies.get("id") },
-});
-
 const StartGame = () => {
 	const [mysocket, setMySocket] = useState<Socket>();
 	const { userId } = useGlobalContext();
@@ -92,7 +88,9 @@ const StartGame = () => {
 	};
 
 	useEffect(() => {
-		console.log(socket)
+		const socket = io(`http://${HOSTNAME}:3000/game`, {
+			query: { userId: Cookies.get("id") },
+		});
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
@@ -108,7 +106,7 @@ const StartGame = () => {
 		return () => {
 			socket.disconnect();
 		};
-	}, [userId, benomeId]);
+	}, [userId]);
 
 	const getAllData = async () => {
 		const user = await getUserInfo(userId);
