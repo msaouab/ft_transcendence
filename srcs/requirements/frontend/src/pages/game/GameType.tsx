@@ -6,7 +6,7 @@ import { Dialog } from "@material-tailwind/react";
 import { useState } from "react";
 import { getFriendsInfo } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
-// import NoFriendsImg from "../../assets/noFriends.png";
+import NoFriendsImg from "../../assets/noFriends.png";
 import styled from "styled-components";
 
 const Games = [
@@ -120,7 +120,7 @@ const GameType = () => {
             ))
           ) : (
             <div className="flex flex-col gap-5  justify-center items-center">
-              {/* <ImgAnimation src={NoFriendsImg} alt="" width={150} className=""/> */}
+              <ImgAnimation src={NoFriendsImg} alt="" width={150} className=""/>
               <h1 className="text-2xl font-bold ">No Friends</h1>
             </div>
           )
@@ -153,7 +153,7 @@ const GameType = () => {
           </div>
         ))}
       </div>
-      <div className="rank flex wrap justify-center h-[30rem] w-full gap-10 ">
+      {/* <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
         <div className="border rounded-2xl flex-1 p-4 h-full">
           <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
             Global Rank
@@ -178,7 +178,7 @@ const GameType = () => {
               ))}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -19,6 +19,8 @@ import {
     NotFoundException
 } from '@nestjs/common';
 
+import { clients as  onlineClientsMap } from 'src/notify/notify.gateway'
+
 @Injectable()
 export class InvitesService {
     constructor(private prisma: PrismaService,
@@ -108,13 +110,23 @@ export class InvitesService {
             throw new ConflictException('User is already a friend');
         }
 
-        // create the invite
-        return this.prisma.friendshipInvites.create({
+         // create the invite
+         const Invite = await this.prisma.friendshipInvites.create({
             data: {
                 sender_id,
                 receiver_id,
             },
         });
+        if (!Invite) {
+            throw new ConflictException('Invite could not be created');
+        }
+        console.log('onlineClientsMap', onlineClientsMap);
+        if (onlineClientsMap.has(receiver_id)) {
+            const socket = onlineClientsMap.get(receiver_id);
+            console.log('socket', socket);
+            socket.emit('invite', Invite);
+        }
+        return Invite;
     }
 
     async putInvites(putInviteDto: PutInviteDto, sender_id: string): Promise<FriendshipInvites> {
@@ -150,6 +162,10 @@ export class InvitesService {
                 receiver_id,
             },
         });
+
+        if (!invite) {
+            throw new NotFoundException('Invite does not exist');
+        }
 
 
         // update the invite

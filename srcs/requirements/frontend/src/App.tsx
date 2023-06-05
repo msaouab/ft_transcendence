@@ -16,6 +16,7 @@ import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
 import { GameProvider } from "./provider/GameProvider";
 import StartGame from "./pages/game/StartGame";
+import OtherUserProfile from "./pages/profile/OtherUserProfile";
 
 // function App() {
 // 	const [bgColor, setBgColor] = useState("#1E1E1E");
@@ -84,6 +85,7 @@ function App() {
 				<Route path="/tfa" element={<VerifyPage />} />
 				<Route path="" element={<Layout />}>
 					<Route path="/profile" element={<Profile />} />
+					<Route path="/profile/:id" element={<OtherUserProfile />} />
 					<Route path="/settings" element={<UserSettings />} />
 					<Route path="/chat" element={<Chat />} />
 					<Route path="/game" element={

@@ -9,7 +9,7 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import instance, {
   getAchivements,
   getChannels,
@@ -20,6 +20,12 @@ import instance, {
 import Cookies from "js-cookie";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
+import {
+  NoAchivements,
+  NoChanel,
+  NoFriend,
+  NoGame,
+} from "../../components/common/EmptyComponents";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -30,15 +36,6 @@ export const ReusableCardStyle = styled.div`
   border-radius: 20px 20px 0px 0px;
   padding: 1rem;
 `;
-
-
-
-
-
-
-
-
-
 
 const Status = styled.div<{ userStatus: string }>`
   position: relative;
@@ -104,7 +101,6 @@ const Profile = (props: ProfileInterface) => {
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
   const [userId, setUserId] = useState(Cookies.get("userid") || "");
-
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -212,7 +208,8 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
-        width: 100%;
+        /* width: 100%; */
+        width: unset;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -235,6 +232,9 @@ const Profile = (props: ProfileInterface) => {
       }
       .achievements {
         /* height: 500px; */
+        max-width: 90%;
+        min-width: 360px;
+        max-height: 500px;
         .achiv-container {
           display: flex;
           flex-direction: column;
@@ -259,23 +259,23 @@ const Profile = (props: ProfileInterface) => {
           <div className="flex gap-10 items-center "></div>
         </div>
         <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-6  ">
-            <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
-              <img src={Dice} alt="_" width={40} />
-              Games : {rankData?.wins + rankData?.loses + rankData?.draws || " " }
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={AchivementImg1} width={40} alt="_" />
-              Wins : {rankData?.wins || " "}
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={Draw} alt="_" width={40} />
-              Draw: {rankData?.draws || " "}
-            </div>
-            <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
-              <img src={Lose} alt="_" width={40} />
-              Lose: {rankData?.loses || " "}
-            </div>
+          <div className="gamesNumber flex   items-center gap-1 text-xl font-[600]">
+            <img src={Dice} alt="_" width={40} />
+            Games : {rankData?.wins + rankData?.loses + rankData?.draws || " "}
           </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={AchivementImg1} width={40} alt="_" />
+            Wins : {rankData?.wins || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Draw} alt="_" width={40} />
+            Draw: {rankData?.draws || " "}
+          </div>
+          <div className="gamesNumber flex items-center gap-1 text-xl font-[600]">
+            <img src={Lose} alt="_" width={40} />
+            Lose: {rankData?.loses || " "}
+          </div>
+        </div>
       </Top>
       <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
         <div className="stats  flex gap-6 h-[25rem] w-full   ">
@@ -294,9 +294,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No friends
-                </div>
+                <NoFriend />
               )}
             </div>
           </div>
@@ -315,9 +313,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No Joined Chanels
-                </div>
+                <NoChanel />
               )}
             </div>
           </div>
@@ -329,9 +325,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
-                <GameCard key={index} />
-              ))}
+              {false ? <GameCard /> : <NoGame />}
             </div>
           </div>
         </div>
@@ -339,8 +333,8 @@ const Profile = (props: ProfileInterface) => {
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
             Achievements
           </div>
-          <div className="achiv-container flex gap-10   m-auto ">
-            {achivements && achivements.length ? (
+          <div className="achiv-container flex gap-10   m-auto min-h-[20rem]">
+            {false ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -349,8 +343,8 @@ const Profile = (props: ProfileInterface) => {
                 ></SwiperComponent>
               </div>
             ) : (
-              <div className=" h-full flex justify-center items-center text-3xl text-center">
-                No Achivements
+              <div className="flex justify-center items-center  w-full">
+                <NoAchivements />
               </div>
             )}
           </div>

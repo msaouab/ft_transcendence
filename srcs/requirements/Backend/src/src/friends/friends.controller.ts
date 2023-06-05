@@ -39,6 +39,12 @@ export class FriendsController {
         return friends;
     }
 
+    @Get(":id/is-friend/:friend_id")
+    @UseGuards(AuthenticatedGuard)
+    async isFriend(@Param('id') id: string, @Param('friend_id') friend_id: string) {
+        return   await this.FriendsService.isFriend(id, friend_id);
+    }
+
     
     @Delete(":id/friends")
     @UseGuards(AuthenticatedGuard)
