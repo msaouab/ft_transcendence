@@ -275,6 +275,7 @@ model Achievements {
 }
 
 model AchievementsAssignement {
+  // assignement_id String    @id @default(uuid())
   achievement_id Int
   achievement    Achievements @relation("achievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
   player_id      String

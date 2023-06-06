@@ -1,4 +1,3 @@
-
 import { PrismaClient, User } from '@prisma/client'
 const prisma = new PrismaClient()
 import { createHash } from 'crypto';
@@ -11,36 +10,36 @@ import e from 'express';
 //     password: 'ren-nasr',
 // },
 const users = [
-    // {
-    //     login: 'ichoukri',
-    //     email: 'ichoukri@student.1337.ma',
-    //     firstName: 'Ismail',
-    //     lastName: 'Choukri',
-    // },
-    // {
-    //     login: 'msaouab',
-    //     email: 'msaouab@student.1337.ma',
-    //     firstName: 'mohamed',
-    //     lastName: 'saouab',
-    // },
-    // {
-    //     login: 'ren-nasr',
-    //     email: 'ren-nasr@student.1337.ma',
-    //     firstName: 'rida',
-    //     lastName: 'ennasry',
-    // },
-    // {
-    //     login: 'mbehhar',
-    //     email: 'mbehhar@student.1337.ma',
-    //     firstName: 'Mohamed',
-    //     lastName: 'Behhar',
-    // },
-    // {
-    //     login: 'rbenjell',
-    //     email: 'rbenjell@student.1337.ma',
-    //     firstName: 'Reda',
-    //     lastName: 'Benjelloun',
-    // },
+//     {
+//         login: 'ichoukri',
+//         email: 'ichoukri@student.1337.ma',
+//         firstName: 'Ismail',
+//         lastName: 'Choukri',
+//     },
+    {
+        login: 'iqessam',
+        email: 'iqessam@student.1337.ma',
+        firstName: 'ilyass',
+        lastName: 'qessam',
+    },
+    {
+        login: 'ren-nasr',
+        email: 'ren-nasr@student.1337.ma',
+        firstName: 'rida',
+        lastName: 'ennasry',
+    },
+//     // {
+//     //     login: 'mbehhar',
+//     //     email: 'mbehhar@student.1337.ma',
+//     //     firstName: 'Mohamed',
+//     //     lastName: 'Behhar',
+//     // },
+//     {
+//         login: 'rbenjell',
+//         email: 'rbenjell@student.1337.ma',
+//         firstName: 'Reda',
+//         lastName: 'Benjelloun',
+//     },
 ]
 
 const messages = [
@@ -169,7 +168,7 @@ async function main() {
     let user1 = await prisma.user.findUnique({
         where: {
             // login: newArr[i].login,
-            login: 'ichoukri'
+            login: 'iqessam'
         },
     })
 
@@ -290,7 +289,3 @@ main()
 
 
 // remove this whole file later
-
-
-
-

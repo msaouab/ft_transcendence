@@ -130,9 +130,9 @@ export class GameGateway
 							player2_pts: value.player2.score,
 						},
 					});
-					console.log(value.player1, value.player2);
+					console.log(updateGame);
 					console.log(updateGame.player1_id, updateGame.player2_id)
-					this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+					this.achvService.CheckAchv(value.player1.id, value.player2.id, value.player1.score, value.player2.score);
 				}
 				value.status = "Finished";
 				client.leave(key);
@@ -242,7 +242,7 @@ export class GameGateway
 				this.server.to(room.socket[0].id).emit("responseWinner", winner);
 				this.server.to(room.socket[1].id).emit("responseWinner", winner);
 				clearInterval(intervalId);
-				this.handleDisconnect(client);
+				// this.handleDisconnect(client);
 			}
 		}, 1000 / 60);
 	}
@@ -260,15 +260,6 @@ export class GameGateway
 		const room = this.roomMap.get(roomId);
 		room.time = new Date().getTime();
 		this.server.to(client.id).emit("StartTime", room.time);
-		// this.ball = {
-		// 	x: width / 2,
-		// 	y: height / 2,
-		// 	r: 10,
-		// 	dx: 4,
-		// 	dy: 4,
-		// 	speed: 1,
-		// 	c: "#fff",
-		// };
 		let status = false;
 		const intervalId = setInterval(() => {
 			if (room.socket.length !== 1) {
@@ -609,10 +600,27 @@ export class GameGateway
 				this.CreateFriendRoom(client, payload);
 			}
 		}
+		// this.roomMap.forEach(async (value, key) => {
+		// 	if (value.status === "Finished") {
+		// 		const updateGame = await this.prisma.game.update({
+		// 			where: {
+		// 				id: key,
+		// 			},
+		// 			data: {
+		// 				gameStatus: "Finished",
+		// 				player1_pts: value.player1.score,
+		// 				player2_pts: value.player2.score,
+		// 			}
+		// 		})
+		// 		this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+		// 		this.roomMap.delete(key);
+		// 	}
+		// });
 	}
 
 	async createPrismaGame(key, room) {
 		try {
+			console.log("createPrismaGame", room.player1.id, room.player2.id)
 			const benome = await this.UserService.getUser(room.player1.id);
 			if (!benome) throw new BadRequestException("User not found");
 			await this.prisma.user.update({
@@ -629,7 +637,7 @@ export class GameGateway
 				data: {
 					id: key,
 					dateCreated: new Date(),
-					player1_id: player.id,
+					player1_id: room.player1.id,
 					player2_id: room.player2.id,
 					player1_pts: 0,
 					player2_pts: 0,
