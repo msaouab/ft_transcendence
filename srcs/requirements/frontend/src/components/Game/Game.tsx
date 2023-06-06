@@ -72,7 +72,7 @@ const Game = ({socket, user, benome}: GameProps) => {
 		// socket.emit("startGame", payload);
 		socket.on("responseScore", (score: SetStateAction<{ player1: number; player2: number; }>) => {
 			setScore(score);
-			console.log("score:", score)
+			// console.log("score:", score)
 		});
 		return () => {
 			socket.off("responseScore");

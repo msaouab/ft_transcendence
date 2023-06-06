@@ -137,7 +137,8 @@ const GameType = () => {
                 handelOpen();
                 getFriendsData();
               }
-              else navigate("/game/10");
+              else navigate("/game/startGame");
+              handleModeGame(item.name)
             }}
           >
             <div

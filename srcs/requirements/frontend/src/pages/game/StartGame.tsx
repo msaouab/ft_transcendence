@@ -8,6 +8,7 @@ import styled, { keyframes } from "styled-components";
 import Game from "../../components/Game/Game";
 import Lottie from "react-lottie";
 import PongAnimation from "../../assets/Lottie/PongAnimation.json";
+import { use } from "matter-js";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -99,14 +100,18 @@ const StartGame = () => {
 		socket.on("disconnect", () => {
 			socket.emit("leaveRoom", payload);
 		});
-		socket.on("BenomeId", (benome) => {
-			setBenomeId(benome);
-		});
-		getAllData();
 		return () => {
 			socket.disconnect();
 		};
 	}, [userId]);
+
+	useEffect(() => {
+		mysocket?.on("BenomeId", (benome) => {
+			setBenomeId(benome);
+			console.log("BenomeId", benome);
+		});
+		getAllData();
+	}, [mysocket, benomeId]);
 
 	const getAllData = async () => {
 		const user = await getUserInfo(userId);

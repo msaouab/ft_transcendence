@@ -36,7 +36,8 @@ export class GameGateway
 
 	constructor(
 		private prisma: PrismaService,
-		private UserService: UserService // private readonly achvService: AchvService
+		private UserService: UserService,
+		private readonly achvService: AchvService
 	) {}
 
 	private roomMap = new Map();
@@ -89,15 +90,6 @@ export class GameGateway
 		mode: "Random" | "Friend" | "Bot";
 		time: number;
 	};
-	// private ball: {
-	// 	x: number;
-	// 	y: number;
-	// 	r: 10;
-	// 	dx: number;
-	// 	dy: number;
-	// 	speed: number;
-	// 	c: string;
-	// };
 
 	afterInit(server: any) {
 		console.log(`WebSocket server initialized ${server}`);
@@ -105,19 +97,52 @@ export class GameGateway
 	handleConnection(client: Socket) {
 		console.log(`Client connected: ${client.id}`);
 	}
-	handleDisconnect(client: Socket) {
+	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
-		this.roomMap.forEach((value, key) => {
-			if (
-				value.player1.id === client.handshake.query.userId.toString() ||
-				value.player2.id === client.handshake.query.userId.toString()
+		this.roomMap.forEach(async (value, key) => {
+			if ( value.mode !== "Bot" &&
+				(value.player1.id === client.handshake.query.userId.toString() ||
+				value.player2.id === client.handshake.query.userId.toString())
 			) {
+				const userId = client.handshake.query.userId.toString();
+				const opponentId =
+					value.player1.id === userId ? value.player2.id : value.player1.id;
+
+				const [player, opponent] = await Promise.all([
+					this.UserService.getUser(userId),
+					this.UserService.getUser(opponentId),
+				]);
+				if (player && opponent) {
+					await this.prisma.user.updateMany({
+						where: { id: { in: [player.id, opponent.id] } },
+						data: { status: "Online" },
+					});
+				}
+				const existingGame = await this.prisma.game.findUnique({
+					where: { id: key },
+				});
+				if (existingGame) {
+					const updateGame = await this.prisma.game.update({
+						where: { id: key },
+						data: {
+							gameStatus: "Finished",
+							player1_pts: value.player1.score,
+							player2_pts: value.player2.score,
+						},
+					});
+					console.log(value.player1, value.player2);
+					console.log(updateGame.player1_id, updateGame.player2_id)
+					this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
+				}
 				value.status = "Finished";
 				client.leave(key);
 				this.roomMap.delete(key);
 			}
+			if (value.status === "Finished") {
+				client.leave(key);
+				this.roomMap.delete(key);
+			}
 		});
-		console.log("roomMap Disconnect => :", this.roomMap);
 	}
 
 	RoundScore(roomId: string): boolean {
@@ -131,7 +156,7 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 60000;
+			return (lastTime - room.time) / 1000 >= 60;
 		}
 		return false;
 	}
@@ -195,20 +220,22 @@ export class GameGateway
 			const player1 = room.player1.score;
 			const player2 = room.player2.score;
 			const score = { player1, player2 };
-			const revScore = { player1: room.player2.score, player2: room.player1.score };
-			this.server
-				.to(room.socket[0].id)
-				.emit("responseBall", client1Ball);
+			const revScore = {
+				player1: room.player2.score,
+				player2: room.player1.score,
+			};
+			this.server.to(room.socket[0].id).emit("responseBall", client1Ball);
 			// Reverse ball position for client 2
-				client2Ball.x = width - client2Ball.x;
-				client2Ball.y = height - client2Ball.y;
-				this.server
-					.to(room.socket[1].id)
-					.emit("responseBall", client2Ball);
+			client2Ball.x = width - client2Ball.x;
+			client2Ball.y = height - client2Ball.y;
+			this.server.to(room.socket[1].id).emit("responseBall", client2Ball);
 			this.server.to(room.socket[0].id).emit("responseScore", score);
 			this.server.to(room.socket[1].id).emit("responseScore", revScore);
-			console.log("score => :", score, revScore);
-			if (!room.socket[0].id || !room.socket[1].id || this.RoundScore(roomId) !== false) {
+			if (
+				!room.socket[0].id ||
+				!room.socket[1].id ||
+				this.RoundScore(roomId) !== false
+			) {
 				room.status = "Finished";
 				const winner =
 					room.player1.score > room.player2.score ? "Player 1" : "Player 2";
@@ -250,14 +277,19 @@ export class GameGateway
 			}
 			let OldY = height / 2;
 			if (room.ball.y <= OldY) {
-				if (room.ball.x >= room.player1.paddle1.x && room.player1.paddle1.x <= width - 80) {
+				if (
+					room.ball.x >= room.player1.paddle1.x &&
+					room.player1.paddle1.x <= width - 80
+				) {
 					room.player1.paddle1.x += 12;
 				}
 				if (room.ball.x <= room.player1.paddle1.x) {
 					room.player1.paddle1.x -= 12;
 				}
 				OldY = room.ball.y;
-				this.server.to(room.socket[0].id).emit("responsePlayer2", room.player1.paddle1);
+				this.server
+					.to(room.socket[0].id)
+					.emit("responsePlayer2", room.player1.paddle1);
 			}
 			const newX = room.ball.x + room.ball.dx;
 			const newY = room.ball.y + room.ball.dy;
@@ -265,7 +297,7 @@ export class GameGateway
 			if (newX - room.ball.r <= 0 || newX + room.ball.r >= width)
 				room.ball.dx = -room.ball.dx;
 			// if (newY - room.ball.r <= 0 || newY + room.ball.r >= height)
-				// room.ball.dy = -room.ball.dy;
+			// room.ball.dy = -room.ball.dy;
 			// paddle collision
 			if (
 				newY + room.ball.r >= room.player1.paddle2.y &&
@@ -311,11 +343,11 @@ export class GameGateway
 			if (client.id === undefined || status !== false) {
 				room.status = "Finished";
 				let winner =
-				room.player1.score > room.player2.score ? "Player 1" : "Molinette_42";
+					room.player1.score > room.player2.score ? "Player 1" : "Molinette_42";
 				// this.server.emit("responseWinner", winner);
 				clearInterval(intervalId);
-				this.handleDisconnect(client);
-				return ;
+				// this.handleDisconnect(client);
+				return;
 			}
 		}, 1000 / 60);
 	}
@@ -348,15 +380,6 @@ export class GameGateway
 						.emit("responseMouse", room.player1.paddle2);
 				}
 			}
-			// let OldX = data[1].x;
-			// if (data[1].x >= room.player1.paddle1.x) {
-			// 	room.player1.paddle1.x += 12;
-			// }
-			// if (data[1].x <= room.player1.paddle1.x) {
-			// 	room.player1.paddle1.x -= 12;
-			// }
-			// console.log("Ball:", room.player1.paddle1.x, "Bot:", data[1].x);
-			// this.server.emit("responsePlayer2", room.player1.paddle1);
 		}
 	}
 
@@ -451,7 +474,7 @@ export class GameGateway
 					client.join(key);
 					this.server.to(value.socket[0].id).emit("BenomeId", value.player2.id);
 					this.server.to(value.socket[1].id).emit("BenomeId", value.player1.id);
-					this.createPrismaGame(value);
+					this.createPrismaGame(key, value);
 					this.handleBall(client, key, payload.width, payload.height);
 					availableRoom = true;
 				}
@@ -466,7 +489,7 @@ export class GameGateway
 			const key = createHash("sha256")
 				.update(Date.now().toString())
 				.digest("hex");
-
+			console.log(key);
 			this.roomMap.set(key, {
 				members: 1,
 				socket: [client],
@@ -550,7 +573,7 @@ export class GameGateway
 					height: 10,
 				},
 			},
-			ball : {
+			ball: {
 				x: payload.width / 2,
 				y: payload.height / 2,
 				r: 10,
@@ -568,7 +591,6 @@ export class GameGateway
 		this.server
 			.to(client.id)
 			.emit("BenomeId", this.roomMap.get(key).player2.id);
-		console.log("roomMap CreateBotRoom => :", this.roomMap);
 		if (this.roomMap.get(key).player1.id) {
 			this.PlayvsBot(client, key, payload.width, payload.height);
 		}
@@ -586,11 +608,10 @@ export class GameGateway
 			} else if (payload.mode === "Friend") {
 				this.CreateFriendRoom(client, payload);
 			}
-			// console.log("roomMap => :", this.roomMap);
 		}
 	}
 
-	async createPrismaGame(room) {
+	async createPrismaGame(key, room) {
 		try {
 			const benome = await this.UserService.getUser(room.player1.id);
 			if (!benome) throw new BadRequestException("User not found");
@@ -606,7 +627,7 @@ export class GameGateway
 			});
 			const newRoom = await this.prisma.game.create({
 				data: {
-					id: room.key,
+					id: key,
 					dateCreated: new Date(),
 					player1_id: player.id,
 					player2_id: room.player2.id,
@@ -615,6 +636,7 @@ export class GameGateway
 					gameStatus: "OnGoing",
 				},
 			});
+			console.log("Game created", newRoom);
 		} catch (e) {
 			console.log(e);
 		}
