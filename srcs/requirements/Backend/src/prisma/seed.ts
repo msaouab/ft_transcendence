@@ -10,12 +10,12 @@ import e from 'express';
 //     password: 'ren-nasr',
 // },
 const users = [
-//     {
-//         login: 'ichoukri',
-//         email: 'ichoukri@student.1337.ma',
-//         firstName: 'Ismail',
-//         lastName: 'Choukri',
-//     },
+    {
+        login: 'Moulinette_42',
+        email: 'Bot@student.1337.ma',
+        firstName: 'Bot',
+        lastName: 'Bot',
+    },
     {
         login: 'iqessam',
         email: 'iqessam@student.1337.ma',
