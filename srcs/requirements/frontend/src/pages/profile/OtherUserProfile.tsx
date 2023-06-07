@@ -20,7 +20,6 @@ import instance, {
   RemoveThisFriendInvite,
   addFriend,
   blockThisUser,
-  blockUser,
   deleteFreind,
   getAchivements,
   getChannels,
