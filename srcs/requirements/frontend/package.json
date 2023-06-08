@@ -20,6 +20,11 @@
     "react-router-dom": "^6.12.0",
     "sass": "^1.63.2",
     "socket.io-client": "^4.6.2",
+    "react-animated-progress-bar": "^1.1.2",
+    "react-circular-progressbar": "^2.1.0",
+    "react-cookie": "^4.1.1",
+    "react-dom": "^18.2.0",
+    "react-notifications": "^1.7.4",
     "styled-components": "^5.3.10",
     "react-infinite-scroll-component": "^6.1.0",
     "swiper": "^9.3.2"

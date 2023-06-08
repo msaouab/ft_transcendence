@@ -186,4 +186,19 @@ export const isBlocked = async (id: string, receiver_id: string) => {
   }
 };
 
+
+export const deleteFreind = async (id: string, receiver_id: string) => {
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.delete("/user/" + id + "/friends", {
+      data: { friendUser_id: receiver_id },
+    } );
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 export default instance;

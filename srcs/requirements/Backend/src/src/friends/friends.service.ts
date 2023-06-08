@@ -98,12 +98,18 @@ export class FriendsService {
      *   if friendship not exist
      */
     const { friendUser_id } = deleteFriendshipDto;
-    const freindship = await this.prisma.friendsTab.findUnique({
+    const freindship = await this.prisma.friendsTab.findFirst({
       where: {
-        user_id_friendUser_id: {
-          user_id: user_id,
-          friendUser_id: friendUser_id,
-        },
+        OR: [
+          {
+            user_id: user_id,
+            friendUser_id: friendUser_id,
+          },
+          {
+            user_id: friendUser_id,
+            friendUser_id: user_id,
+          },
+        ],
       },
     });
     if (!freindship) {
@@ -113,8 +119,8 @@ export class FriendsService {
     return await this.prisma.friendsTab.delete({
       where: {
         user_id_friendUser_id: {
-          user_id: user_id,
-          friendUser_id: friendUser_id,
+          user_id: freindship.user_id,
+          friendUser_id: freindship.friendUser_id,
         },
       },
     });
@@ -136,38 +142,47 @@ export class FriendsService {
 
   // check if user_id and friendUser_id are friends
   async isFriend(user_id: string, friendUser_id: string): Promise<string> {
-    const friendship = await this.prisma.friendsTab.findUnique({
+    const invite = await this.prisma.friendshipInvites.findFirst({
       where: {
-        user_id_friendUser_id: {
-          user_id: user_id,
-          friendUser_id: friendUser_id,
-        },
+        OR: [
+          {
+            sender_id: user_id,
+            receiver_id: friendUser_id,
+          },
+          {
+            sender_id: friendUser_id,
+            receiver_id: user_id,
+          },
+        ],
+      },
+    });
+    if (invite) {
+      return "pending";
+    }
+    const block = await this.prisma.blockTab.findFirst({
+      where: {        user_id: user_id,
+        blockedUser_id: friendUser_id,
+      },
+    });
+    if (block) {
+      return "blocked";
+    }
+    const friendship = await this.prisma.friendsTab.findFirst({
+      where: {
+        OR: [
+          {
+            user_id: user_id,
+            friendUser_id: friendUser_id,
+          },
+          {
+            user_id: friendUser_id,
+            friendUser_id: user_id,
+          },
+        ],
       },
     });
     if (friendship) {
       return "friend";
-    }
-    const blocked = await this.prisma.blockTab.findMany({
-      where: {
-        user_id: user_id,
-        blockedUser_id: friendUser_id,
-      },
-    });
-
-    if (blocked.length > 0) {
-      return "blocked";
-    }
-    const pending = await this.prisma.friendshipInvites.findUnique({
-      where: {
-        sender_id_receiver_id: {
-          sender_id: user_id,
-          receiver_id: friendUser_id,
-        },
-      },
-    });
-
-    if (pending) {
-      return "pending";
     }
     return "notFriend";
   }

@@ -20,6 +20,7 @@ import instance, {
   RemoveThisFriendInvite,
   addFriend,
   blockThisUser,
+  deleteFreind,
   getAchivements,
   getChannels,
   getFriendsInfo,
@@ -139,6 +140,11 @@ const OtherUserProfile = () => {
     console.log(data);
   };
 
+  const DeleteFriend = async () => {
+    const data = await deleteFreind(userId, id || "");
+    console.log(data);
+  };
+
   // a function that returns the type of the relation between the current user and the user whose profile is being viewed and
   const FriendRelatioType = () => {
     if (relationStatus === "notFriend") {
@@ -151,7 +157,10 @@ const OtherUserProfile = () => {
             <AiOutlineUserAdd className="mr-1 text-3xl" />
             Add Friend
           </button>
-          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 ">
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+            onClick={BlockUser}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
             Block User
           </button>
@@ -160,9 +169,12 @@ const OtherUserProfile = () => {
     } else if (relationStatus === "pending") {
       return (
         <div className="w-full px-4 py-2 m-auto">
-          <button className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 " onClick={RemoveFriendInvite}>
+          <button
+            className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
+            onClick={RemoveFriendInvite}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Invitation3
+            Remove Invitation
           </button>
           <hr className="opacity-50 "></hr>
 
@@ -178,9 +190,12 @@ const OtherUserProfile = () => {
     } else if (relationStatus === "friend") {
       return (
         <div className="w-full p-2 m-auto">
-          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 " onClick={RemoveFriendInvite}>
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+            onClick={DeleteFriend}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Friendf
+            Remove Friend
           </button>
           <hr></hr>
           <button
