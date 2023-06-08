@@ -3,9 +3,8 @@ import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import { GetAvatar, PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
-import { Button, Dialog } from "@material-tailwind/react";
+import {  Dialog } from "@material-tailwind/react";
 import Cookies from "js-cookie";
-import { Alert } from "@material-tailwind/react";
 import Notification from "../../common/Notification";
 
 
@@ -58,7 +57,7 @@ function Avatar() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-5 mt-10">
       <img src={userImg} alt="" width={200} />
       <label>
         <div className="border  rounded-md overflow-hidden h-[3rem] border-dashed border-gray-500 relative flex items-center bg-slate-300/10">
@@ -94,7 +93,6 @@ function Avatar() {
           </div>
         </div>
       </label>
-      <Notification  message="Profile picture updated successfully" type="green" delay={1000} />
       {/* /// image preview  */}
       <Dialog
         size="sm"
