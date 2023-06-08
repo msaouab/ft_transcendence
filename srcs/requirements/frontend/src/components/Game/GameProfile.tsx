@@ -1,8 +1,7 @@
 import { GetAvatar } from "../../api/axios";
-import { useGlobalContext } from "../../provider/AppContext";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import Moulinete from "../../../public/Moulinette42.jpeg"
+import Moulinete from "../../assets/Moulinette42.jpeg"
 
 interface GameProfileProps {
 	user: {
