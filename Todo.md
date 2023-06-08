@@ -17,25 +17,3 @@
 
 # Notes
 - webapp is crashing in logout ()
-
-
-    "@heroicons/react": "^2.0.18",
-    "@material-tailwind/react": "^2.0.0",
-    "@react-icons/all-files": "^4.1.0",
-    "@react-spring/web": "^9.7.2",
-    "axios": "^1.3.6",
-    "env-cmd": "^10.1.0",
-    "js-cookie": "^3.0.5",
-    "lottie-web": "^5.11.0",
-    "react": "^18.2.0",
-    "react-circular-progressbar": "^2.1.0",
-    "react-cookie": "^4.1.1",
-    "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0",
-    "react-infinite-scroll-component": "^6.1.0",
-    "react-router-dom": "^6.10.0",
-    "sass": "^1.62.0",
-    "socket.io-client": "^4.6.1",
-    "styled-components": "^5.3.10",
-    "swiper": "^9.3.2",
-    "webfontloader": "^1.6.28"

@@ -53,7 +53,7 @@ export class AchvService {
 			loser_id = two_id;
 			winner_pts = pts_one;
 			loser_pts = pts_two;
-		} else if (pts_one < pts_two) {
+		} else {
 			winner_id = two_id;
 			loser_id = one_id;
 			winner_pts = pts_two;
@@ -61,12 +61,9 @@ export class AchvService {
 		}
 		if (pts_one == pts_two) isdraw = true;
 
-		console.log("winner_id:", winner_id, "loser_id:", loser_id, "winner_pts:", winner_pts, "loser_pts:", loser_pts)
-
 		await this.update_data(winner_id, loser_id, winner_pts, loser_pts, isdraw);
 		await this.Here_We_Go(winner_id);
 		await this.Here_We_Go(loser_id);
-		console.log("winner_id:", winner_id, "loser_id:", loser_id, "winner_pts:", winner_pts, "loser_pts:", loser_pts)
 		if (isdraw == false) {
 			await this.Ace(winner_id, winner_pts, loser_pts);
 			await this.Kasbah_King(winner_id);
@@ -162,10 +159,8 @@ export class AchvService {
 			{ id: winner_id, pts: winner_pts },
 			{ id: loser_id, pts: loser_pts },
 		];
-
 		for (let i = 0; i < users.length; i++) {
 			const user = users[i];
-			console.log("user:", user);
 			const to_update = await this.prisma.rankingData.findFirst({
 				where: {
 					user_id: user.id,
@@ -272,7 +267,6 @@ export class AchvService {
 						achievement_id: 2,
 					},
 				});
-				console.log('arc:', arc);
 				await this.prisma.rankingData.update({
 					where: {
 						user_id: winner_id,
@@ -421,7 +415,6 @@ export class AchvService {
 		const checkUsert = await this.prisma.user.findFirst({
 			where: { id: playerTwo },
 		});
-		console.log(checkUser, checkUsert);
 		if (!checkUser || !checkUsert)
 			throw new NotFoundException("User not found");
 		return await this.CheckAchv(

@@ -37,7 +37,7 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 interface ChalengerCardProps {
   name: string;
 }
-const ChalengerCard = (props: ChalengerCardProps) => {
+export const ChalengerCard = (props: ChalengerCardProps) => {
   const { name } = props;
   return (
     <div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
