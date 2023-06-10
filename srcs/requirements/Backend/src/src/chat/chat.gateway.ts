@@ -49,7 +49,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         // senderId: string,
         receiverId: string
     }) {
-        console.log("We've got the event");
         // return await this.chatService.checkOnline(client, payload, this.server);
     }
 
@@ -59,9 +58,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //     senderId: string,
     //     receiverId: string
     // }) {
-    //     console.log("We've got the event to create a private room");
     //     return await this.chatService.CreatePrivateChatRoom(client, payload, this.server);
-    //     // console.log("privatChatRoom: ", privatChatRoom.id);
     //     // this.server.to(privatChatRoom.id).emit('privateRoomCreated', privatChatRoom);
     //     // client.emit(callback, privatChatRoom);
     // }
@@ -75,7 +72,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         senderId: string,
         receiverId: string
     }) {
-        // console.log("We've got the event");
         return await this.chatService.joinPrivateChatRoom(client, payload);
     }
 
@@ -85,13 +81,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         receiverId: string
     }) {
         // return aw
-        // console.log("We've got the event");
         return await this.chatService.leavePrivateChatRoom(client, payload);
     }
 
     @SubscribeMessage('sendPrivateMessage')
     async handleChat(client: Socket, payload: createMessageDto) {
-        console.log("We've got the event of sending a private message");
         return await this.chatService.sendPrivateMessage(client, payload, this.server);
 
     }
@@ -100,7 +94,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // @SubscribeMessage('chatPrivately')
     // async handlePrivateChat(client: Socket, payload: createMessageDto) {
-    //     console.log("We've got the event");
     //     return await this.chatService.sendPrivateMessage(client, payload);
     // }
 

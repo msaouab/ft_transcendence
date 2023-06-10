@@ -8,7 +8,7 @@ import { getFriendsInfo, GetAvatar, getRankData } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import NoFriendsImg from "../../assets/noFriends.png";
 import styled from "styled-components";
-import { use } from "matter-js";
+import PlayWithMe from "../../assets/playWithMe.png";
 
 const Games = [
 	{
@@ -43,6 +43,8 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 };
 
 const FreindCard = ({ id, img, login, fname, lname }: any) => {
+	const navigate = useNavigate();
+	const { setFriend } = useAppContext();
 	console.log("freind card:", id, img, login, fname, lname);
 	const [userImg, setUserImg] = useState<string>("");
 	const [rankData, setRankData] = useState<any>({});
@@ -64,17 +66,26 @@ const FreindCard = ({ id, img, login, fname, lname }: any) => {
 		};
 	}, [id]);
 	return (
-		<div className="flex mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
-			<div className="image flex items-center gap-1 text-xl">
-			{/* {rankData} - */}
-				<img src={userImg} alt="frindImg" className="rounded-full w-14 h-14" />
+		<div className="flex justify-evenly">
+			<div className="flex ">
+				<img
+					src={userImg}
+					alt="frindImg"
+					width={40}
+					className=""
+				/>
+				<div className="">{login}</div>
 			</div>
-			<div className="name ">
-				<div className="name text-2xl font-[800]">{fname} {lname}</div>
-				<div className="name text-base font-[100]">{login}</div>
-			</div>
-			<div className="status justify-self-end absolute right-3 flex gap-1 text-xl font-bold  items-center">
-				{/* {fname}pt */}
+			<div className=" ">
+				<button className="flex items-center border"
+					onClick={() => {
+						setFriend(id);
+						console.log("friend id:", id);
+						navigate("/game/startGame");
+					}}
+				>
+					challenge <img src={PlayWithMe} alt="challenge-btn" width={20} />
+				</button>
 			</div>
 		</div>
 	);
@@ -130,39 +141,32 @@ const GameType = () => {
 	`;
 
 	return (
-		<div className="h-full w-full  flex flex-col items-center   gap-5">
+		<div className="h-full w-full flex flex-col items-center gap-5">
 			<Dialog
-				size="sm"
+				size="xs"
 				open={open}
 				handler={handelOpen}
-				className="flex flex-col gap-4 items-center justify-center p-10"
+				className="flex-col gap-5"
 			>
-				<div>
-					{friends && friends.length ? (
-						friends.map((item: Iitem, index) => (
-							<FreindCard
-								key={index}
-								id={item.id}
-								img={item.avatar}
-								login={item.login}
-								fname={item.firstName}
-								lname={item.lastName}
-								status={item.status}
-								// points="1337"
-							/>
-						))
-					) : (
-						<div className="flex flex-col gap-5  justify-center items-center">
-							<ImgAnimation
-								src={NoFriendsImg}
-								alt=""
-								width={150}
-								className=""
-							/>
-							<h1 className="text-2xl font-bold ">No Friends</h1>
-						</div>
-					)}
-				</div>
+				{friends && friends.length ? (
+					friends.map((item: Iitem, index) => (
+						<FreindCard
+							key={index}
+							id={item.id}
+							img={item.avatar}
+							login={item.login}
+							fname={item.firstName}
+							lname={item.lastName}
+							status={item.status}
+							// points="1337"
+						/>
+					))
+				) : (
+					<div className="flex flex-col gap-5  justify-center items-center">
+						<ImgAnimation src={NoFriendsImg} alt="" width={150} className="" />
+						<h1 className="text-2xl font-bold ">No Friends</h1>
+					</div>
+				)}
 			</Dialog>
 			<div className="game-type w-full  flex justify-around flex-wrap p-2 m-auto md:min-h-[20rem] max-w-[1300px]">
 				{Games.map((item) => (

@@ -47,9 +47,7 @@ export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
         search: string,
         limit: number,
     }) {
-        console.log("We've got the event it's: ", payload.search);
         const result = await this.SearchService.searchWebSocket(payload.search, payload.limit);
-        console.log("The result is: ", result);
         client.emit('searchInfo', result);
 
 

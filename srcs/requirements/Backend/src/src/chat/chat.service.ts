@@ -138,7 +138,6 @@ export class ChatService {
         //     await this.joinPrivateChatRoom(client, { "senderId": subPayload.senderId, "receiverId": subPayload.receiverId });
         // }
 
-        // console.log("We've got the event to join a private room");
         const { senderId, receiverId } = payload;
         // try {
         const privateChatRoom = await this.prisma.privateChatRoom.findUnique({

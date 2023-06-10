@@ -40,16 +40,9 @@ import {
 	updateInvite(@Body() StatusInviteDto: StatusInviteDto, @User() user: Profile, @Param("id") id: string) {
 	  return this.gameService.updateInvite(user, StatusInviteDto, id);
 	}
-	// @Get("mode/:id")
+	// @Post("/game/:id")
 	// @UseGuards(AuthenticatedGuard)
-	// GetMode(@Param("id") id: string, @Query("mode") mode: string): Promise<string> {
-	//   return this.gameService.GetMode(id, mode);
-	// }
-	// @Get("type/:id")
-	// @UseGuards(AuthenticatedGuard)
-	// GetType(@Param("id") id: string, @Query("type") mode: string): Promise<string> {
-	//   return this.gameService.GetType(id, mode);
-	// }
+
   }
   //   @Put(':id/update')
   //   @UseGuards(AuthenticatedGuard)

@@ -8,7 +8,6 @@ import styled, { keyframes } from "styled-components";
 import Game from "../../components/Game/Game";
 import Lottie from "react-lottie";
 import PongAnimation from "../../assets/Lottie/PongAnimation.json";
-import { use } from "matter-js";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -44,7 +43,6 @@ const SpinnerContainer = styled.div`
 `;
 
 const AnimationContainer = styled.div`
-	/* border: 1px dashed #7c6d6d; */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -64,8 +62,9 @@ const defaultOptions = {
 const StartGame = () => {
 	const [mysocket, setMySocket] = useState<Socket>();
 	const { userId } = useGlobalContext();
-	const { typeRoom, modeRoom } = useAppContext();
+	const { typeRoom, modeRoom, friend } = useAppContext();
 	const [benomeId, setBenomeId] = useState("");
+	const [roomId, setRoomId] = useState("");
 	const [benomeData, setBenomeData] = useState({
 		id: "",
 		login: "",
@@ -84,6 +83,7 @@ const StartGame = () => {
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
+		friend: friend,
 		width: 700,
 		height: 1000,
 	};
@@ -95,6 +95,7 @@ const StartGame = () => {
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
+			console.log("payload", payload);
 			socket.emit("joinRoom", payload);
 		});
 		socket.on("disconnect", () => {
@@ -106,9 +107,10 @@ const StartGame = () => {
 	}, [userId]);
 
 	useEffect(() => {
-		mysocket?.on("BenomeId", (benome) => {
+		mysocket?.on("BenomeId", (benome, key) => {
 			setBenomeId(benome);
-			console.log("BenomeId", benome);
+			setRoomId(key);
+			console.log("BenomeId", benome, key);
 		});
 		getAllData();
 	}, [mysocket, benomeId]);
@@ -129,10 +131,17 @@ const StartGame = () => {
 		}
 	};
 
+	const GameProps = {
+		socket: mysocket,
+		user: user,
+		benome: benomeData,
+	};
+
 	return (
 		<StartGameContainer>
 			{benomeId && mysocket ? (
-				<Game socket={mysocket} user={user} benome={benomeData} />
+				// <Game socket={mysocket} user={user} benome={benomeData} />
+				<Game {...GameProps} />
 			) : (
 				<AnimationContainer>
 					<LoadingText>Loading...</LoadingText>

@@ -29,8 +29,6 @@ export class NotificationGateway
     }
   ) {
     const { id, userStatus } = payload;
-    console.log("We've got the event to add the client to the map");
-    // console.log("We've got the event to add the client to the map");
     clients.set(id, client);
     // console.log("clients: ", clients.keys());
     await this.notificationService.updateUserStatus(id, userStatus);

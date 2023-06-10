@@ -17,6 +17,8 @@ interface AppContextType {
   setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
   chatNotif: number;
   setChatNotif: React.Dispatch<React.SetStateAction<number>>;
+  gameNotif: number;
+  setGameNotif: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -37,6 +39,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState([] as any[]);
 
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
+  const [gameNotif, setGameNotif] = useState(Cookies.get("gameNotif") ? parseInt(Cookies.get("gameNotif")!) : 0);
 
   //  user auth context
 
@@ -55,6 +58,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setNotifications,
     chatNotif,
     setChatNotif,
+    gameNotif,
+    setGameNotif,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

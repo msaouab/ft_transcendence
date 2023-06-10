@@ -4,8 +4,9 @@ RED='\033[0;31m'
 ED='\033[0m'
 GREEN='\033[0;32m'
 BOLD='\033[1m'
+HOST=`hostname`
 
-echo -e "${RED}${BOLD}Make sure you did setup in your Intra the redirect URI to http://<YOUR HOSTNAME>:3000/api/v1/login/42/return $ED"  
+echo -e "${RED}${BOLD}Make sure you did setup in your Intra the redirect URI to http://${HOST}:3000/api/v1/login/42/return $ED"  
 sleep 2 
 if grep -q "FORTYTWO_CLIENT_ID=UID" ./srcs/requirements/Backend/src/db-env-example; then \
     read -p "From Intra enter the UID: " uid;\

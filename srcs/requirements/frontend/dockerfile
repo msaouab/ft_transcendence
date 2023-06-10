@@ -12,7 +12,7 @@ EXPOSE 5173
 # Copy the current directory contents into the container at /app
 COPY . /app/
 
-RUN npm install -g vite
+# RUN npm install -g vite
 
 COPY ./init.sh /app/init.sh
 

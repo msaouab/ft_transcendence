@@ -1,8 +1,4 @@
-Dockerfile
-node_modules
-dist
 .vscode/*
-.env
 node_modules
 db
 dist

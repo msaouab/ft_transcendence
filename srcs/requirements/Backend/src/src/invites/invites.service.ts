@@ -120,7 +120,6 @@ export class InvitesService {
         if (!Invite) {
             throw new ConflictException('Invite could not be created');
         }
-        console.log('onlineClientsMap', onlineClientsMap);
         if (onlineClientsMap.has(receiver_id)) {
             const socket = onlineClientsMap.get(receiver_id);
             console.log('socket', socket);

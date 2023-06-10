@@ -20,6 +20,7 @@ import {
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
 import { AchvService } from "src/achievements/achv.service";
+import { clients as  onlineClientsMap } from 'src/notify/notify.gateway'
 // import { date } from "joi";
 // import io from "socket.io-client";
 
@@ -533,7 +534,7 @@ export class GameGateway
 			members: 1,
 			socket: [client],
 			player1: {
-				id: client.handshake.query.userId.toString(),
+				id: client.handshake.query.userId,
 				score: 0,
 				paddle1: {
 					x: payload.width / 2 - 40,
@@ -581,13 +582,79 @@ export class GameGateway
 		client.join(key);
 		this.server
 			.to(client.id)
-			.emit("BenomeId", this.roomMap.get(key).player2.id);
+			.emit("BenomeId", this.roomMap.get(key).player2.id, key);
 		if (this.roomMap.get(key).player1.id) {
 			this.PlayvsBot(client, key, payload.width, payload.height);
 		}
 	}
 
-	CreateFriendRoom(client: Socket, payload) {}
+	async CreateFriendRoom(client: Socket, payload) {
+		console.log("CreateFriendRoom", payload);
+		const FindBenome = await this.UserService.getUser(payload.friend);
+		console.log("FindBenome", FindBenome);
+		if (!FindBenome) throw new BadRequestException("User not found");
+		if (FindBenome.status === "InGame")
+			throw new ForbiddenException("User is already in game");
+		const key = createHash("sha256")
+			.update(Date.now().toString())
+			.digest("hex");
+		if (!key) throw new BadRequestException("Please provide a valid room key");
+		const friendMap = this.roomMap.set(key, {
+			members: 1,
+			socket: [client],
+			player1: {
+				id: client.handshake.query.userId.toString(),
+				score: 0,
+				paddle1: {
+					x: payload.width / 2 - 40,
+					y: 10,
+					width: 80,
+					height: 10,
+				},
+				paddle2: {
+					x: payload.width / 2 - 40,
+					y: payload.height - 20,
+					width: 80,
+					height: 10,
+				},
+			},
+			player2: {
+				id: payload.friend,
+				score: 0,
+				paddle1: {
+					x: payload.width / 2 - 40,
+					y: 10,
+					width: 80,
+					height: 10,
+				},
+				paddle2: {
+					x: payload.width / 2 - 40,
+					y: payload.height - 20,
+					width: 80,
+					height: 10,
+				},
+			},
+			ball: {
+				x: payload.width / 2,
+				y: payload.height / 2,
+				r: 10,
+				dx: 4,
+				dy: 4,
+				speed: 1,
+				c: "#fff",
+			},
+			status: "waiting",
+			type: payload.type,
+			mode: payload.mode,
+			time: 0,
+		});
+		if (onlineClientsMap.has(payload.friend)) {
+			const friendSocket = onlineClientsMap.get(payload.friend);
+			friendSocket.emit("GameNotif", 1);
+		}
+		// console.log(onlineClientsMap);
+
+	}
 
 	@SubscribeMessage("joinRoom")
 	async handelJoinRoom(client: Socket, payload: any) {
