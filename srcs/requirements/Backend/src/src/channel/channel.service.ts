@@ -24,7 +24,9 @@ export class ChannelService {
                     chann_type: dto.status,
                     password: dto.password,
                     owner_id: userId,
-                    limit_members: -1
+                    limit_members: -1,
+                    description: dto.description,
+                    avatar: dto.avatar
                 }
             })
             this.UserService.addChannel(channel.id, channel.name, userId, "Owner");

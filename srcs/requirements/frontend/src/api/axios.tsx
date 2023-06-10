@@ -82,4 +82,18 @@ export const getUserInfo = async (id:string) => {
   }
 }
 
+export const PostChannelAvatar = async (file: File): Promise<any> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  await instance
+    .post("/Channels/uploadAvatar", formData)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
 export default instance;

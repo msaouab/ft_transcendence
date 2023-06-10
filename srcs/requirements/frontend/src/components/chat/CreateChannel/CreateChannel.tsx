@@ -1,9 +1,10 @@
 import styled from "styled-components";
-import {  useState } from "react";
+import { useState } from "react";
 import { CiImport } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import ChannelTypes from "./ChannelTypes";
 import axios from "axios";
+import { PostChannelAvatar } from "../../../api/axios";
 
 const ModelStyle = styled.div`
   width: 100%;
@@ -137,6 +138,11 @@ const ModelStyle = styled.div`
       box-shadow: 0 0 0 2px rgb(233, 217, 144);
     }
   }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 interface ModelProps {
@@ -158,6 +164,16 @@ const Model = (props: ModelProps) => {
   };
   const [exeption, setExeption] = useState(false);
 
+  const handelFile = (e: any) => {
+    PostChannelAvatar(e.target.files[0]).then(() => {
+      const url = `http://localhost:3000/${e.target.files[0].name}`
+      setChannel({ ...channel, avatar: url });
+      e.target.value = "";
+    }).catch(() => {
+      console.log("file not uploaded");
+    });
+  };
+
   const createChannel = async (e: any) => {
     e.preventDefault();
     if (channel.name === "") {
@@ -172,10 +188,11 @@ const Model = (props: ModelProps) => {
           status: type,
           password: channel.password,
           limitUsers: 0,
+          description: channel.description,
+          avatar: channel.avatar || "localhost:3000/default.png",
         },
         { withCredentials: true }
       );
-      console.log("channel created");
       setChannel({
         avatar: "",
         name: "",
@@ -184,7 +201,6 @@ const Model = (props: ModelProps) => {
       });
       setType("Public");
       setExeption(false);
-      console.log("channel created");
       props.setShow(false);
     } catch (error) {
       console.log(error);
@@ -218,11 +234,11 @@ const Model = (props: ModelProps) => {
               type="file"
               accept="image/png, image/jpeg"
               name="avatar"
-              onChange={handelChange}
+              onChange={handelFile}
             />
 
             {channel.avatar !== "" ? (
-              <img src={channel.avatar} alt="avatar" />
+              <img src={channel.avatar} alt="avatar" className="avatar-img"/>
             ) : (
               <CiImport />
             )}

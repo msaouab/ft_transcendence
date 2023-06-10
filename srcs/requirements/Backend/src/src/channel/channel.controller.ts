@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
 import { ApiTags } from "@nestjs/swagger";
 import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
@@ -7,6 +7,8 @@ import { log } from "console";
 import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
 import { ownerPermissionGuard } from "./guards/ownerPermission.guard";
 import { administratorPermissionGuard } from "./guards/administratorPermission.guard";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from 'multer';
 
 @ApiTags('Channels')
 @Controller('Channels')
@@ -109,5 +111,20 @@ export class ChannelController{
     @UseGuards(administratorPermissionGuard)
     unmuteMember(@Param('id') channelId: string, @Body() dto: MemberDto) {
         return this.ChannelService.unmuteMember(channelId, dto);
+    }
+
+    @Post('uploadAvatar')
+    @UseInterceptors(
+        FileInterceptor("file", {
+            storage: diskStorage({
+                destination: "/app/public",
+                filename: (req, file, callback) => {
+                    callback(null, file.originalname);
+                },
+            }),
+        }),
+    )
+    uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+        return file.filename;
     }
 }
