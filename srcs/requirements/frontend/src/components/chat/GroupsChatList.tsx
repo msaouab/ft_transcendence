@@ -1,8 +1,12 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import CreateChannel from './CreateChannel/CreateChannel';
 import { GroupMessage } from '../../types/message';
+import { useGlobalContext } from '../../provider/AppContext';
+import GroupTab from './GroupTab';
+import Cookies from "js-cookie";
+import { GetJoindChannels } from "../../api/axios";
 
 
 const GroupChatListStyle = styled.div`
@@ -36,27 +40,84 @@ interface GroupChatListProps {
 }
 
 const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatListProps) => {
-    const [newChat, setNewChat] = useState(false);
+  const [newChat, setNewChat] = useState(false);
+  const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
+  const [selected, setSelected] = useState("");
 
-    return (
-      <GroupChatListStyle>
-        <div className="">
-          <h1 className="font-bold sm:text-2xl text-white text-xl flex justify-between">
-            Groups
-            <Button onClick={() => setNewChat(!newChat)}>New</Button>
-          </h1>
-          <CreateChannel
-            setSelectedGroupChat={setSelectedGroupChat}
-            show={newChat}
-            setShow={setNewChat}
-            socket={socket}
-            connected={connected}
-          />
-        </div>
-        <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
-        <div className=""></div>
-      </GroupChatListStyle>
-    );
+  const getGroupChatRooms = async () => {
+    let id = Cookies.get("id");
+    if (!id) return;
+    try {
+      const channels = await GetJoindChannels(id);
+      const res = await Promise.all(
+        channels.map(async (channel: any) => {
+          return { ...channel };
+        })
+      );
+      setGroupChatRooms(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getGroupChatRooms();
+  }, []);
+
+
+  return (
+    <GroupChatListStyle>
+      <div className="">
+        <h1 className="font-bold sm:text-2xl text-white text-xl flex justify-between">
+          Groups
+          <Button onClick={() => setNewChat(!newChat)}>New</Button>
+        </h1>
+            <CreateChannel
+              setSelectedGroupChat={setSelectedGroupChat}
+              show={newChat}
+              setShow={setNewChat}
+              socket={socket}
+              connected={connected}
+            />
+      </div>
+      <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
+      <div className="">
+        {groupChatRooms.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center ">
+            <div className=" sm:text-xl text-white max-w-[200px] ">
+              Your chat history is looking a little empty
+            </div>
+            <div>
+              <div className="text-base text-[#A8A8A8] max-w-[200px]">
+                make use of the search bar{" "}
+              </div>
+            </div>
+          </div>
+        ) : (
+          groupChatRooms.map((props: GroupMessage) => {
+            return (
+              <div
+                key={props.group_id}
+                onClick={() => {
+                  setSelected(props.group_id);
+                  setSelectedGroupChat(props);
+                }}
+              >
+                <GroupTab
+                  groupMessage={props}
+                  selected={props.group_id === selected}
+                />
+                {props.group_id !==
+                  groupChatRooms[groupChatRooms.length - 1].group_id ? (
+                  <div className="h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 mb-1.5 opacity-60"></div>
+                ) : null}
+              </div>
+            );
+          })
+        )}
+      </div>
+    </GroupChatListStyle>
+  );
 }
 
 

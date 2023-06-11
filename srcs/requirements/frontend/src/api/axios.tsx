@@ -105,4 +105,13 @@ export const CreateChannel = async (channel: any) => {
   return res.data;
 }
 
+export const GetJoindChannels = async (id: string) => {
+  try {
+    const res = await instance.get("/User/" + id + "/channels");
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 export default instance;

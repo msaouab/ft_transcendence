@@ -15,7 +15,8 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
-  
+  groupChatRooms: any[];
+  setGroupChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<string>("");
   // chat context 
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
+  const [groupChatRooms, setGroupChatRooms] = useState([]);
 
 
   const value = {
@@ -41,6 +43,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
+    groupChatRooms,
+    setGroupChatRooms,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -6,6 +6,7 @@ import ChannelTypes from "./ChannelTypes";
 import axios from "axios";
 import { CreateChannel, PostChannelAvatar } from "../../../api/axios";
 import { GroupMessage } from "../../../types/message";
+import { useGlobalContext } from "../../../provider/AppContext";
 
 const ModelStyle = styled.div`
   width: 100%;
@@ -165,6 +166,7 @@ const Model = (props: ModelProps) => {
   const [type, setType] = useState("Public");
   const [exeption, setExeption] = useState(false);
   const [groupMessage, setGroupMessage] = useState<GroupMessage>({} as GroupMessage);
+  const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
 
   const handelChange = (e: any) => {
     e.preventDefault();
@@ -189,7 +191,7 @@ const Model = (props: ModelProps) => {
       password: channel.password,
       limitUsers: 0,
       description: channel.description,
-      avatar: channel.avatar || "localhost:3000/default.png",
+      avatar: channel.avatar || "http://localhost:3000/default.png",
     },
     ).then((res) => {
       console.log(res);
@@ -207,7 +209,6 @@ const Model = (props: ModelProps) => {
       setChannel(initialChannel);
       setType("Public");
       setExeption(false);
-      props.setShow(false);
     }).catch(() => {
       setExeption(true);
     }
@@ -215,10 +216,13 @@ const Model = (props: ModelProps) => {
   };
 
   useEffect(() => {
-    if (props.connected) {
+    if (props.connected && groupMessage.group_id) {
       props.socket.current.emit("sendGroupMessage", groupMessage)
+      props.setSelectedGroupChat(groupMessage);
+      setGroupChatRooms([...groupChatRooms, groupMessage]);
+      setGroupMessage({} as GroupMessage);
+      props.setShow(false);
     }
-    props.setSelectedGroupChat(groupMessage)
   }, [groupMessage]);
 
   return (
