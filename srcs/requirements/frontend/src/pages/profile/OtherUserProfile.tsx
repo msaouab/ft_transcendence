@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import { CiCircleMore } from "react-icons/ci";
 import { AiOutlineUserAdd, AiOutlineUserDelete } from "react-icons/ai";
-import { IoPersonRemoveOutline } from "react-icons/io5";
 import { Top, Status, Main } from "./ProfileStyle";
 
 import AchivementImg1 from "../../assets/achivement1.png";
@@ -14,7 +13,7 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import instance, {
   GetAvatar,
   RemoveThisFriendInvite,
@@ -31,6 +30,7 @@ import instance, {
 } from "../../api/axios";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
+import { useOutletContext } from "react-router-dom";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -49,6 +49,7 @@ interface friendsInterface {
 
 const OtherUserProfile = () => {
   const { id } = useParams(); // Extract the user ID from the URL params
+  const {notifySocket , connected} : any  = useOutletContext();
   const [user, setData] = useState({
     id: "",
     login: "",
@@ -71,9 +72,22 @@ const OtherUserProfile = () => {
   const { userId } = useGlobalContext();
   const [relationStatus, setRelationStatus] = useState("");
 
+
   useEffect(() => {
     getAllData();
-  }, [userId]);
+  }, [userId ]);
+
+  useEffect(() => {
+    if (connected) {
+      notifySocket.on("inviteAccepted", (data: any) => {
+        console.log("inviteAccepted", data);
+        if (data.user_id === userId) {
+          getAllData();
+        }
+      });
+    }
+  }
+  , [connected]);
 
   const getAllData = () => {
     if (id === "") return;
@@ -122,26 +136,31 @@ const OtherUserProfile = () => {
 
   const sendFriendInvitation = async () => {
     const data = await addFriend(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const BlockUser = async () => {
     const data = await blockThisUser(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const unblockUser = async () => {
     const data = await unblockThisUser(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const RemoveFriendInvite = async () => {
     const data = await RemoveThisFriendInvite(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const DeleteFriend = async () => {
     const data = await deleteFreind(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
@@ -280,7 +299,7 @@ const OtherUserProfile = () => {
         </div>
       </Top>
       {relationStatus === "blocked" ? (
-        <div>Unblocked this user to see his profile</div>
+        <div className="h-[60rem] w-full flex items-center justify-center text-6xl debug">Unblocked this user to see his profile</div>
       ) : (
         <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
           <div className="stats  flex gap-6 h-[25rem] w-full   ">

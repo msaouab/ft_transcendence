@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
-
+import { useOutletContext } from "react-router-dom";
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
@@ -76,10 +76,8 @@ interface friendsInterface {
   Status: string;
 }
 
-interface ProfileInterface {
-  isAnotherUser?: boolean;
-}
-const Profile = (props: ProfileInterface) => {
+const Profile = () => {
+  const { notifySocket, connected }: any = useOutletContext();
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -135,11 +133,15 @@ const Profile = (props: ProfileInterface) => {
   const { id } = useParams(); // Extract the user ID from the URL params
 
   useEffect(() => {
-    if (props.isAnotherUser) {
-      console.log("id", id);
-      setUserId(id || "");
+    if (connected) {
+      notifySocket.on("inviteAccepted", (data: any) => {
+        getAllData();
+      });
     }
+  }, [connected]);
 
+  useEffect(() => {
+    setUserId(id || "");
     getAllData();
   }, []);
 

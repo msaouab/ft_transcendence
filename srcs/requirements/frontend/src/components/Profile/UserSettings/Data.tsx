@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import CustomInput from "../../common/CustomInput";
+import toast, { Toaster } from "react-hot-toast";
+
+const notify = (status: string) => {
+  if (status === "success")
+    toast.success("Profile information updated successfully!");
+  else toast.error("Profile information update failed!");
+};
 
 interface FormData {
   login: string;
@@ -74,15 +81,29 @@ function Form() {
         defaultFormData,
         { withCredentials: true }
       )
-      .catch((error) => console.error(error));
+      .then((response) => {
+        if (response.statusText) {
+          notify("success");
+          setFormData({
+            login: "",
+            firstName: "",
+            lastName: "",
+          });
+        }
+      })
+      .catch((error) => {
+        notify(error.response.data.message);
+      });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="text-white flex flex-col items-center">
+    <form
+      onSubmit={handleSubmit}
+      className="text-white flex flex-col items-center"
+    >
       <h1 className="text-xl font-bold text-center mb-4">User Informations</h1>
       <div className="flex gap-10 flex-wrap justify-center">
         <label>
-
           <CustomInput
             type="text"
             name="login"
@@ -92,7 +113,6 @@ function Form() {
           />
         </label>
         <label>
-
           <CustomInput
             type="text"
             name="firstName"
@@ -102,7 +122,6 @@ function Form() {
           />
         </label>
         <label>
-
           <CustomInput
             placeHolder="Last Name"
             type="text"

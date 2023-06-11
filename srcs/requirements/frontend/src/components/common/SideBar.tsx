@@ -99,7 +99,8 @@ const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boo
     }
     // console.log("ppppppp", userId);
     const res = await GetAvatar(userId);
-    setUserImg(res);
+    if (res)
+      setUserImg(res);
   }
 
   useEffect(() => {

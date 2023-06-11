@@ -15,28 +15,32 @@ import instance from "../api/axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
-
 type Props = {
   notifySocket: any;
   connected: boolean;
 };
-const DropDownMenu = ({notifySocket, connected} : Props) => {
+const DropDownMenu = ({ notifySocket, connected }: Props) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     async function logout() {
       try {
-        await instance.get("/logout").catch((error) => {
-          console.log("logout1111");
-          console.log("logout");
-          window.location.reload();
-          if (error.response.status == 401) {
-            navigate("/login");
-          }
-        });
+        await instance
+          .get("/logout")
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response.status == 401) {
+              navigate("/login");
+            }
+          });
       } catch (error) {
         console.log(error);
       }
     }
+    navigate("/login");
+    window.location.reload();
     logout();
   };
 
@@ -52,15 +56,9 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
     setUserStatus(event.target.value);
   };
 
-
-
   useEffect(() => {
-    console.log("heeeeeeeeeeeeeee: ", userStatus);
     if (connected) {
-      console.log("connected to the server notify");
-      // console.log("current: ", notifySocket);
       if (notifySocket) {
-        console.log("we're emmiting the event status");
         notifySocket.emit("realStatus", {
           id: Cookies.get("id"),
           userStatus: true,
@@ -68,7 +66,6 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
         setUserStatus("Online");
       }
     } else if (!connected) {
-      // console.log("we're emmiting the event status");
       if (notifySocket) {
         notifySocket.emit("realStatus", {
           id: Cookies.get("id"),

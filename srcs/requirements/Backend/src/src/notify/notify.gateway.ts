@@ -36,6 +36,18 @@ export class NotificationGateway
     await this.notificationService.updateUserStatus(id, userStatus);
   }
 
+
+  @SubscribeMessage("inviteAccepted")
+  handleInviteAccepted(client: Socket, payload: any) {
+
+    console.log("////////////////////////////////");
+    console.log("Invite accepted:", payload);
+    console.log("////////////////////////////////");
+    // Handle the "invite accepted" event here
+    // Perform your logic for the invite accepted event
+  }
+
+
   handleConnection(client: Socket) {
     const { id } = client;
     console.log(`Client with id ${id} connected to root namespace`);
