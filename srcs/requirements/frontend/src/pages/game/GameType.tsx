@@ -1,7 +1,7 @@
 import GameImg from "../../assets/gameImg.png";
 import Avatar from "../../assets/avatar.png";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../provider/GameProvider";
+import { useGameContext } from "../../provider/GameProvider";
 import { Dialog } from "@material-tailwind/react";
 import { useState, useEffect } from "react";
 import { getFriendsInfo, GetAvatar, getRankData } from "../../api/axios";
@@ -44,7 +44,7 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 
 const FreindCard = ({ id, img, login, fname, lname }: any) => {
 	const navigate = useNavigate();
-	const { setFriend } = useAppContext();
+	const { setFriend } = useGameContext();
 	console.log("freind card:", id, img, login, fname, lname);
 	const [userImg, setUserImg] = useState<string>("");
 	const [rankData, setRankData] = useState<any>({});
@@ -92,7 +92,7 @@ const FreindCard = ({ id, img, login, fname, lname }: any) => {
 };
 
 const GameType = () => {
-	const { setModeRoom, modeRoom } = useAppContext();
+	const { setModeRoom, modeRoom } = useGameContext();
 	const { userId } = useGlobalContext();
 
 	const navigate = useNavigate();

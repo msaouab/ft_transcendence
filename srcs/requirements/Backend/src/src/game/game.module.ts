@@ -4,7 +4,7 @@ import { FtStrategy } from "../auth/strategy/ft.strategy";
 import { GameController } from "./game.controller";
 import { UserService } from "../user/user.service";
 import { GameService } from "./game.service";
-import { GameGateway } from "./Gateway/game.Gateway";
+import { GameGateway } from "./game.Gateway";
 import { PrismaService } from "prisma/prisma.service";
 import { UserModule } from "src/user/user.module";
 import { PrismaModule } from "prisma/prisma.module";

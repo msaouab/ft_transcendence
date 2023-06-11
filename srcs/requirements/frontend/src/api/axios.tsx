@@ -70,7 +70,7 @@ export const getRankData = async (id: string) => {
 };
 
 export const getUserInfo = async (id: string) => {
-	if (id === "") {
+	if (id === "" || id === undefined) {
 		return;
 	}
 	try {

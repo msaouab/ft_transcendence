@@ -1,7 +1,7 @@
 import { GetAvatar } from "../../api/axios";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import Moulinete from "../../assets/Moulinette42.jpeg"
+import Moulinete from "../../assets/Moulinette42.jpeg";
 
 interface GameProfileProps {
 	user: {
@@ -60,11 +60,12 @@ const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
 
 	useEffect(() => {
 		const getAvatarImg = async (id: string) => {
-			const userImg = await GetAvatar(id);
-			setUserImg(userImg);
+			if (user.id !== "Bot") {
+				const userImg = await GetAvatar(id);
+				setUserImg(userImg);
+			}
 		};
-		if (user.id === "Bot")
-			setUserImg(Moulinete);
+		if (user.id === "Bot") setUserImg(Moulinete);
 		getAvatarImg(user.id);
 		return () => {
 			setUserImg("");
@@ -75,7 +76,7 @@ const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
 		<PlayerContainer isFirst={isFirst}>
 			<ScoreContainer className="score">{score}</ScoreContainer>
 			<div className="useInfo">
-				<img src={userImg} alt="avatar" className="circle-image"/>
+				<img src={userImg} alt="avatar" className="circle-image" />
 				<p className="login">{user.login}</p>
 			</div>
 		</PlayerContainer>

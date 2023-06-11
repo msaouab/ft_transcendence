@@ -53,11 +53,11 @@ const SideBar = ({
 	connected: boolean;
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { setUserStatus, setUserImg, setUserId, userId, gameNotif, setGameNotif } = useGlobalContext();
+	const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
 	const [menuIndex, setMenuIndex] = useState<number>(2);
 	// const
 
-	const { setChatNotif, chatNotif } = useGlobalContext();
+	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
 	// const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
 	useEffect(() => {
 		if (connected) {
@@ -69,11 +69,11 @@ const SideBar = ({
 					Cookies.set("chatNotif", String(num));
 				}
 			});
-			notifySocket.on("GameNotif", (data: any) => {
+			notifySocket.on("gameNotif", (data: any) => {
 				console.log("GameInvite received", data);
 				if (window.location.pathname != "/game") {
 					const prevNotif = gameNotif;
-					const num = parseInt(data) + prevNotif;
+					const num = parseInt(data.num) + prevNotif;
 					setGameNotif(num);
 					Cookies.set("gameNotif", String(num));
 					console.log("game", num)

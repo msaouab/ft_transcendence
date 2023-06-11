@@ -94,7 +94,7 @@ function App() {
 					<Route path="/game/startGame" element={
 						<GameProvider><StartGame /></GameProvider>
 					} />
-          <Route path="/game/10" element={
+          <Route path="/game/:id" element={
 						<GameProvider><Game /></GameProvider>
 					} />
 					<Route path="/game-type" element={

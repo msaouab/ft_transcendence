@@ -6,7 +6,7 @@ import Avatar from "../../assets/avatar.png";
 import SwiperComponent from "../../components/common/Slider";
 import PlayWithMe from "../../assets/playWithMe.png";
 import GameImg from "../../assets/gameImg.png";
-import { useAppContext } from "../../provider/GameProvider";
+import { useGameContext } from "../../provider/GameProvider";
 import styled from "styled-components";
 
 const chalenger = [
@@ -81,7 +81,7 @@ const GameCard = (props: GameCardProps) => {
 };
 
 const GameDashboard = () => {
-	const { setTypeRoom } = useAppContext();
+	const { setTypeRoom } = useGameContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);

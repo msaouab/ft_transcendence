@@ -1,15 +1,13 @@
 import PingPong from "./Canvas";
 import styled from "styled-components";
-import { useAppContext } from "../../provider/GameProvider";
+import { useGameContext } from "../../provider/GameProvider";
 import { SetStateAction, useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-import Cookies from "js-cookie";
-import { getUserInfo } from "../../api/axios";
-import { useGlobalContext } from "../../provider/AppContext";
+import { Socket } from "socket.io-client";
 import GameProfile from "./GameProfile";
+import { useLocation } from "react-router-dom";
 
 interface GameProps {
-	socket: Socket;
+	// socket: mysocket;
 	user: {
 		id: string;
 		login: string;
@@ -23,10 +21,10 @@ interface GameProps {
 		firstName: string;
 		lastName: string;
 		status: string;
-	}
+	};
 }
 
-const CanvasContainer = styled.div<{isFirst: Boolean}>`
+const CanvasContainer = styled.div<{ isFirst: Boolean }>`
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -35,7 +33,7 @@ const CanvasContainer = styled.div<{isFirst: Boolean}>`
 	/* height: auto; */
 	@media (max-width: 1200px) {
 		gap: 0;
-		flex-direction: ${({ isFirst }) => (isFirst ? "column-reverse" : "column")};;
+		flex-direction: ${({ isFirst }) => (isFirst ? "column-reverse" : "column")};
 		/* flex-direction: column; */
 	}
 `;
@@ -57,10 +55,18 @@ const PlayerContainer = styled.div<{
 	}
 `;
 
-const Game = ({socket, user, benome}: GameProps) => {
-	const { setTypeRoom, typeRoom, setModeRoom, modeRoom } = useAppContext();
-	const [score, setScore] = useState({ player1: 0, player2: 0 });
+// const Game = ({socket, user, benome}: GameProps) => {
+const Game = () => {
+	const { setTypeRoom, typeRoom, setModeRoom, modeRoom, mysocket } = useGameContext();
+    const location = useLocation();
+	const { user, benome } = location.state;
+	console.log("location =>", location.state.user);
+	console.log("location =>", location.state.benome);
+	console.log("1 - useGameContext =>", mysocket, mysocket?.id);
 	
+	
+	const [score, setScore] = useState({ player1: 0, player2: 0 });
+
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
@@ -69,22 +75,24 @@ const Game = ({socket, user, benome}: GameProps) => {
 	};
 
 	useEffect(() => {
-		// socket.emit("startGame", payload);
-		socket.on("responseScore", (score: SetStateAction<{ player1: number; player2: number; }>) => {
-			setScore(score);
-			// console.log("score:", score)
-		});
+		mysocket?.on(
+			"responseScore",
+			(score: SetStateAction<{ player1: number; player2: number }>) => {
+				setScore(score);
+			}
+		);
 		return () => {
-			socket.off("responseScore");
-		}
-	}, [socket]);
+			mysocket?.off("responseScore");
+		};
+	}, [mysocket]);
 
 	useEffect(() => {
 		const RoomType = localStorage.getItem("typeRoom");
 		const RoomMode = localStorage.getItem("modeRoom");
 		if (RoomType) setTypeRoom(RoomType);
 		if (RoomMode) setModeRoom(RoomMode);
-	}, [typeRoom, socket]);
+		console.log("2 - mysocket", mysocket);
+	}, [typeRoom, mysocket]);
 
 	return (
 		<CanvasContainer isFirst>
@@ -95,11 +103,11 @@ const Game = ({socket, user, benome}: GameProps) => {
 					<p>Loading...</p>
 				)}
 			</PlayerContainer>
-			{socket ? (
+			{mysocket ? (
 				<PingPong
 					width={payload.width}
 					height={payload.height}
-					socket={socket}
+					// socket={mysocket}
 				/>
 			) : (
 				<p>Loading...</p>

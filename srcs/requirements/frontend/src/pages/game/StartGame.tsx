@@ -3,11 +3,12 @@ import { io, Socket } from "socket.io-client";
 import Cookies from "js-cookie";
 import { HOSTNAME, getUserInfo } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useAppContext } from "../../provider/GameProvider";
+import { useGameContext } from "../../provider/GameProvider";
 import styled, { keyframes } from "styled-components";
 import Game from "../../components/Game/Game";
 import Lottie from "react-lottie";
 import PongAnimation from "../../assets/Lottie/PongAnimation.json";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -43,6 +44,7 @@ const SpinnerContainer = styled.div`
 `;
 
 const AnimationContainer = styled.div`
+	/* border: 1px dashed #7c6d6d; */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -59,13 +61,18 @@ const defaultOptions = {
 	},
 };
 
+const socket = io(`http://${HOSTNAME}:3000/game`, {
+	query: { userId: Cookies.get("id") },
+});
+
 const StartGame = () => {
-	const [mysocket, setMySocket] = useState<Socket>();
+	const navigate = useNavigate();
+	// const [mysocket, setMySocket] = useState<Socket>();
 	const { userId } = useGlobalContext();
-	const { typeRoom, modeRoom, friend } = useAppContext();
+	const { typeRoom, modeRoom, mysocket, setMySocket } = useGameContext();
 	const [benomeId, setBenomeId] = useState("");
-	const [roomId, setRoomId] = useState("");
-	const [benomeData, setBenomeData] = useState({
+	const [roomid, setRoomid] = useState("");
+	const [benome, setBenome] = useState({
 		id: "",
 		login: "",
 		firstName: "",
@@ -83,45 +90,42 @@ const StartGame = () => {
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
-		friend: friend,
 		width: 700,
 		height: 1000,
 	};
 
 	useEffect(() => {
-		const socket = io(`http://${HOSTNAME}:3000/game`, {
-			query: { userId: Cookies.get("id") },
-		});
+		console.log("socket", socket);
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
-			console.log("payload", payload);
 			socket.emit("joinRoom", payload);
 		});
 		socket.on("disconnect", () => {
+			console.log(socket.id, "disconnected from server");
 			socket.emit("leaveRoom", payload);
 		});
-		return () => {
-			socket.disconnect();
-		};
+		// return () => {
+		// 	socket.disconnect();
+		// };
 	}, [userId]);
 
 	useEffect(() => {
+		getAllData();
 		mysocket?.on("BenomeId", (benome, key) => {
 			setBenomeId(benome);
-			setRoomId(key);
-			console.log("BenomeId", benome, key);
+			setRoomid(key);
+			console.log("BenomeId", benome, mysocket);
 		});
-		getAllData();
-	}, [mysocket, benomeId]);
+	}, [mysocket, benomeId, mysocket]);
 
 	const getAllData = async () => {
-		const user = await getUserInfo(userId);
-		setUser(user);
+		const userdata = await getUserInfo(userId);
+		setUser(userdata);
 		const Benome = await getUserInfo(benomeId);
-		setBenomeData(Benome);
+		setBenome(Benome);
 		if (payload.mode === "Bot") {
-			setBenomeData({
+			setBenome({
 				id: "Bot",
 				login: "Moulinette_42",
 				firstName: "Bot",
@@ -129,26 +133,24 @@ const StartGame = () => {
 				status: "Bot",
 			});
 		}
-	};
-
-	const GameProps = {
-		socket: mysocket,
-		user: user,
-		benome: benomeData,
+		if (benome && roomid) {
+			console.log("navigate to game", user, benome);
+			navigate(`/game/${roomid}`, {
+				state: {
+					user: user,
+					benome: benome,
+				},
+			});
+		}
 	};
 
 	return (
 		<StartGameContainer>
-			{benomeId && mysocket ? (
-				// <Game socket={mysocket} user={user} benome={benomeData} />
-				<Game {...GameProps} />
-			) : (
-				<AnimationContainer>
-					<LoadingText>Loading...</LoadingText>
-					<SpinnerContainer></SpinnerContainer>
-					<Lottie options={defaultOptions} height={800} width={800} />
-				</AnimationContainer>
-			)}
+			<AnimationContainer>
+				<LoadingText>Loading...</LoadingText>
+				<SpinnerContainer></SpinnerContainer>
+				<Lottie options={defaultOptions} height={800} width={800} />
+			</AnimationContainer>
 		</StartGameContainer>
 	);
 };

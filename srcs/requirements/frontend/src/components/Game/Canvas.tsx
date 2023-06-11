@@ -1,12 +1,12 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
-import { useAppContext } from "../../provider/GameProvider";
+// import { Socket } from "mysocket?.io-client";
+import { useGameContext } from "../../provider/GameProvider";
 
 interface PingPongProps {
 	width: number;
 	height: number;
-	socket: Socket;
+	// socket: Socket;
 }
 
 type PlayerState = {
@@ -48,8 +48,8 @@ const PlayGround = styled.div`
 
 let ctx: CanvasRenderingContext2D | null;
 
-const PingPong = ({ width, height, socket }: PingPongProps) => {
-	const { modeRoom } = useAppContext();
+const PingPong = ({ width, height }: PingPongProps) => {
+	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [player1X, setPlayer1X] = useState<PlayerState>({
 		x: width / 2 - 40,
@@ -124,17 +124,18 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				height: height,
 				width: width,
 			};
-			if (modeRoom === "Bot") socket.emit("requesteBot", data);
-			else socket.emit("requesteMouse", data);
+			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
+			else mysocket?.emit("requesteMouse", data);
 		};
+	console.log('canvas:', mysocket)
 		document.addEventListener(
 			"mousemove",
 			handleMouseMove as unknown as EventListener
 		);
-		socket.on("responseMouse", (playerPosition) => {
+		mysocket?.on("responseMouse", (playerPosition) => {
 			setPlayer1X(playerPosition);
 		});
-		socket.on("responsePlayer2", (playerPosition) => {
+		mysocket?.on("responsePlayer2", (playerPosition) => {
 			setPlayer2X(playerPosition);
 		});
 		return () => {
@@ -142,10 +143,10 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				"mousemove",
 				handleMouseMove as unknown as EventListener
 			);
-			socket.off("responseMouse");
-			socket.off("responsePlayer2");
+			mysocket?.off("responseMouse");
+			mysocket?.off("responsePlayer2");
 		};
-	}, [socket, player1X, player2X, height, width, ball]);
+	}, [mysocket, player1X, player2X, height, width, ball]);
 
 	//	render the ball and get the new position of the ball from the server
 
@@ -160,19 +161,19 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	};
 
 	useEffect(() => {
-		socket.on("StartTime", (time) => {
-			// console.log(time);
+		mysocket?.on("StartTime", (time) => {
+			console.log(time);
 		});
-		socket.on("responseBall", (ball) => {
+		mysocket?.on("responseBall", (ball) => {
 			setBall(ball);
 		});
-		socket.on("responseWinner", (winner) => {
+		mysocket?.on("responseWinner", (winner) => {
 			console.log(winner);
 		});
 		return () => {
-			socket.off("responseBall");
+			mysocket?.off("responseBall");
 		};
-	}, [socket, ball]);
+	}, [mysocket, ball]);
 
 	return (
 		<PlayGround className="">

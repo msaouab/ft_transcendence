@@ -8,7 +8,7 @@ import {
 	WebSocketServer,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { GameService } from "../game.service";
+import { GameService } from "./game.service";
 import { createHash } from "crypto";
 import { PrismaService } from "prisma/prisma.service";
 import {
@@ -20,7 +20,7 @@ import {
 import { Response, Request } from "express";
 import { UserService } from "src/user/user.service";
 import { AchvService } from "src/achievements/achv.service";
-import { clients as  onlineClientsMap } from 'src/notify/notify.gateway'
+import { clients as onlineClientsMap } from "src/notify/notify.gateway";
 // import { date } from "joi";
 // import io from "socket.io-client";
 
@@ -101,24 +101,43 @@ export class GameGateway
 	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
 		this.roomMap.forEach(async (value, key) => {
-			if ( value.mode !== "Bot" &&
+			if (
+				value.mode !== "Bot" &&
 				(value.player1.id === client.handshake.query.userId.toString() ||
-				value.player2.id === client.handshake.query.userId.toString())
+					value.player2.id === client.handshake.query.userId.toString())
 			) {
 				const userId = client.handshake.query.userId.toString();
 				const opponentId =
 					value.player1.id === userId ? value.player2.id : value.player1.id;
 
-				const [player, opponent] = await Promise.all([
-					this.UserService.getUser(userId),
-					this.UserService.getUser(opponentId),
-				]);
-				if (player && opponent) {
-					await this.prisma.user.updateMany({
-						where: { id: { in: [player.id, opponent.id] } },
-						data: { status: "Online" },
-					});
+				if (userId) {
+					const player = await this.UserService.getUser(userId);
+					if (player) {
+						await this.prisma.user.update({
+							where: { id: player.id },
+							data: { status: "Online" },
+						});
+					}
 				}
+				if (opponentId) {
+					const opponent = await this.UserService.getUser(opponentId);
+					if (opponent) {
+						await this.prisma.user.update({
+							where: { id: opponent.id },
+							data: { status: "Online" },
+						});
+					}
+				}
+				// const [player, opponent] = await Promise.all([
+				// 	this.UserService.getUser(userId),
+				// 	this.UserService.getUser(opponentId),
+				// ]);
+				// if (player && opponent) {
+				// 	await this.prisma.user.updateMany({
+				// 		where: { id: { in: [player.id, opponent.id] } },
+				// 		data: { status: "Online" },
+				// 	});
+				// }
 				const existingGame = await this.prisma.game.findUnique({
 					where: { id: key },
 				});
@@ -132,8 +151,13 @@ export class GameGateway
 						},
 					});
 					console.log(updateGame);
-					console.log(updateGame.player1_id, updateGame.player2_id)
-					this.achvService.CheckAchv(value.player1.id, value.player2.id, value.player1.score, value.player2.score);
+					console.log(updateGame.player1_id, updateGame.player2_id);
+					this.achvService.CheckAchv(
+						value.player1.id,
+						value.player2.id,
+						value.player1.score,
+						value.player2.score
+					);
 				}
 				value.status = "Finished";
 				client.leave(key);
@@ -144,6 +168,7 @@ export class GameGateway
 				this.roomMap.delete(key);
 			}
 		});
+		console.log(this.roomMap);
 	}
 
 	RoundScore(roomId: string): boolean {
@@ -464,8 +489,12 @@ export class GameGateway
 					value.socket.push(client);
 					value.time = new Date().getTime();
 					client.join(key);
-					this.server.to(value.socket[0].id).emit("BenomeId", value.player2.id);
-					this.server.to(value.socket[1].id).emit("BenomeId", value.player1.id);
+					this.server
+						.to(value.socket[0].id)
+						.emit("BenomeId", value.player2.id, key);
+					this.server
+						.to(value.socket[1].id)
+						.emit("BenomeId", value.player1.id, key);
 					this.createPrismaGame(key, value);
 					this.handleBall(client, key, payload.width, payload.height);
 					availableRoom = true;
@@ -477,6 +506,7 @@ export class GameGateway
 
 	CreateRandomRoom(client: Socket, payload) {
 		const availableRoom = this.AvailableRoom(client, payload, this.roomMap);
+		console.log("availableRoom", availableRoom);
 		if (!availableRoom) {
 			const key = createHash("sha256")
 				.update(Date.now().toString())
@@ -650,10 +680,9 @@ export class GameGateway
 		});
 		if (onlineClientsMap.has(payload.friend)) {
 			const friendSocket = onlineClientsMap.get(payload.friend);
-			friendSocket.emit("GameNotif", 1);
+			friendSocket.emit("gameNotif", { num: 1 });
 		}
 		// console.log(onlineClientsMap);
-
 	}
 
 	@SubscribeMessage("joinRoom")
@@ -687,7 +716,7 @@ export class GameGateway
 
 	async createPrismaGame(key, room) {
 		try {
-			console.log("createPrismaGame", room.player1.id, room.player2.id)
+			console.log("createPrismaGame", room.player1.id, room.player2.id);
 			const benome = await this.UserService.getUser(room.player1.id);
 			if (!benome) throw new BadRequestException("User not found");
 			await this.prisma.user.update({

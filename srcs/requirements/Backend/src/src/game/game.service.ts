@@ -15,7 +15,7 @@ import { User } from "../auth/user.decorator/user.decorator";
 import { StatusInviteDto, inviteGameDto } from "./dto/invite.game.dto";
 import { UserService } from "src/user/user.service";
 import { log } from "console";
-import { GameGateway } from './Gateway/game.Gateway';
+import { GameGateway } from './game.Gateway';
 import { Cookie } from "express-session";
 
 
