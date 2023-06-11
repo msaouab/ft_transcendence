@@ -92,19 +92,26 @@ const Notifications = (props: NotifProps) => {
           isDropDownOpen ? "block transition-all" : "hidden transition-all"
         } `}
       >
-        {notifications.map((notif: any, index: number) => {
-          return (
-            <div key={index} className="flex justify-between items-center">
-              <div className="name"></div>
-              <button onClick={() => acceptFriendInvite(notif, "Accepted")}>
-                acc
-              </button>
-              <button onClick={() => acceptFriendInvite(notif, "")}>
-                refuse
-              </button>
-            </div>
-          );
-        })}
+        {notifications.length === 0 ? (
+          <div className="flex h-full w-full  justify-center items-center">
+            <h1 className="text-white">No notifications</h1>
+            
+          </div>
+        ) : (
+          notifications.map((notif: any, index: number) => {
+            return (
+              <div key={index} className="flex justify-between items-center">
+                <div className="name"></div>
+                <button onClick={() => acceptFriendInvite(notif, "Accepted")}>
+                  acc
+                </button>
+                <button onClick={() => acceptFriendInvite(notif, "")}>
+                  refuse
+                </button>
+              </div>
+            );
+          })
+        )}
       </div>
     </AnimatedComponent>
   );

@@ -31,6 +31,7 @@ import instance, {
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 import { useOutletContext } from "react-router-dom";
+import { NoAchivements, NoChanel, NoFriend } from "../../components/common/EmptyComponents";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -318,9 +319,7 @@ const OtherUserProfile = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className=" h-full flex justify-center items-center text-3xl">
-                    No friends
-                  </div>
+                  <NoFriend />
                 )}
               </div>
             </div>
@@ -339,9 +338,7 @@ const OtherUserProfile = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className=" h-full flex justify-center items-center text-3xl">
-                    No Joined Chanels
-                  </div>
+                  <NoChanel />
                 )}
               </div>
             </div>
@@ -375,9 +372,9 @@ const OtherUserProfile = () => {
                   ></SwiperComponent>
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl text-center">
-                  No Achivements
-                </div>
+                <div className="flex justify-center items-center  w-full">
+                <NoAchivements />
+              </div>
               )}
             </div>
           </div>

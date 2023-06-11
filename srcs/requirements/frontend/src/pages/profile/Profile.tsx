@@ -153,8 +153,8 @@ const Profile = () => {
     img {
       position: relative;
       border-radius: 50%;
-      height: 100%;
-      width: 100%;
+      max-width : 80px;
+      aspect-ratio: 1/1;
       object-fit: cover;
       @media (max-width: 1200px) {
         height: 70px;

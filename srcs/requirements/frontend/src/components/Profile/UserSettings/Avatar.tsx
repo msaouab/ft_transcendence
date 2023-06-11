@@ -33,6 +33,7 @@ function Avatar() {
       if (event.target.files[0]) {
         setImgPreview(URL.createObjectURL(event.target.files[0]));
         handelOpen();
+        event.target.value = "";
       }
     }
   };
@@ -48,13 +49,12 @@ function Avatar() {
     handelOpen();
 
     PostAvatar(selectedFile)
-      .then(() => {
-        console.log("File uploaded!");
-        GetAvatar(Cookies.get("userid") || "").then((res) => {
-          setUserImg(res);
-          setFileName("");
-          notify("success");
-        });
+      .then((res: any) => {
+        console.log("File uploaded!:", res.data);
+        setUserImg(res.data.avatar);
+        notify("success");
+        setSelectedFile(null);
+        setFileName("");
       })
       .catch((error) => {
         console.log("Error uploading file:", error);

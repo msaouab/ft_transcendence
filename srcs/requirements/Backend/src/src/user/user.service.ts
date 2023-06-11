@@ -13,6 +13,7 @@ import { TfaDto } from './dto/Tfa.dto';
 
 
 import { PrivateMessage } from '@prisma/client';
+import { lstat } from 'fs';
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -123,10 +124,13 @@ export class UserService {
                 id: id,
             },
             data: {
-                avatar: file.destination + '/' + file.filename,
+                avatar: "http://localhost:3000/" + file.filename,
             },
+            select:{
+                avatar: true
+            }
         });
-
+        return updatePath;
     }
 
     async getImage(id: string) {

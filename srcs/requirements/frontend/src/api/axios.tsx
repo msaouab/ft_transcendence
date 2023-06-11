@@ -17,7 +17,7 @@ export const PostAvatar = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  await instance
+  const res = await instance
     .post("/user/" + Cookies.get("userid") + "/avatar", formData)
     .then((response) => {
       return response;
@@ -25,6 +25,7 @@ export const PostAvatar = async (file: File) => {
     .catch((error) => {
       console.log("Error uploading file:", error);
     });
+  return res;
 };
 
 export const getFriendsInfo = async (id: string) => {
