@@ -1,8 +1,5 @@
 
-import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import { BsChevronDown } from "react-icons/bs";
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -23,28 +20,28 @@ type Props = {
   notifySocket: any;
   connected: boolean;
 };
-const DropDownMenu = ({notifySocket, connected} : Props) => {
-  const { userStatus, setUserStatus } = useGlobalContext();
-  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-
-  const handelDropDown = () => {
-    setIsDropDownOpen(!isDropDownOpen);
+const DropDownMenu = ({ notifySocket, connected }: Props) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     async function logout() {
       try {
-        await instance.get("/logout").catch((error) => {
-          console.log("logout1111");
-          console.log("logout");
-          window.location.reload();
-          if (error.response.status == 401) {
-            navigate("/login");
-          }
-        });
+        await instance
+          .get("/logout")
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response.status == 401) {
+              navigate("/login");
+            }
+          });
       } catch (error) {
         console.log(error);
       }
     }
+    navigate("/login");
+    window.location.reload();
     logout();
   };
 
@@ -122,15 +119,9 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
   
 
 
-
-
   useEffect(() => {
-    console.log("heeeeeeeeeeeeeee: ", userStatus);
     if (connected) {
-      console.log("connected to the server notify");
-      // console.log("current: ", notifySocket);
       if (notifySocket) {
-        console.log("we're emmiting the event status");
         notifySocket.emit("realStatus", {
           id: Cookies.get("id"),
           userStatus: true,
@@ -138,7 +129,6 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
         setUserStatus("Online");
       }
     } else if (!connected) {
-      // console.log("we're emmiting the event status");
       if (notifySocket) {
         notifySocket.emit("realStatus", {
           id: Cookies.get("id"),
@@ -223,7 +213,7 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
               <BsChevronDown className="text-2xl text-[#ececec] font-bold cursor-pointer ml-2" />
             </Button>
           </PopoverHandler>
-          <PopoverContent className="bg-slate-50  bg-[#9343076e] backdrop-blur-sm	px-4 shadow-xs shadow-white text-white border-0 py-1">
+          <PopoverContent className="bg-slate-50  bg-[#434242]  shadow-xl shadow-white/10 border z-50  text-white py-1">
             <div className="setting-item  transition-all hover:scale-105 cursor-pointer py-1">
               <Link to="/profile">Profile</Link>
             </div>

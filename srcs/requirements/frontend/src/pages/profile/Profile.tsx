@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
-
+import { useOutletContext } from "react-router-dom";
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
@@ -20,6 +20,12 @@ import instance, {
 import Cookies from "js-cookie";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
+import {
+  NoAchivements,
+  NoChanel,
+  NoFriend,
+  NoGame,
+} from "../../components/common/EmptyComponents";
 
 export const ReusableCardStyle = styled.div`
   background: linear-gradient(
@@ -70,10 +76,8 @@ interface friendsInterface {
   Status: string;
 }
 
-interface ProfileInterface {
-  isAnotherUser?: boolean;
-}
-const Profile = (props: ProfileInterface) => {
+const Profile = () => {
+  const { notifySocket, connected }: any = useOutletContext();
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -129,11 +133,15 @@ const Profile = (props: ProfileInterface) => {
   const { id } = useParams(); // Extract the user ID from the URL params
 
   useEffect(() => {
-    if (props.isAnotherUser) {
-      console.log("id", id);
-      setUserId(id || "");
+    if (connected) {
+      notifySocket.on("inviteAccepted", (data: any) => {
+        getAllData();
+      });
     }
+  }, [connected]);
 
+  useEffect(() => {
+    setUserId(id || "");
     getAllData();
   }, []);
 
@@ -145,8 +153,8 @@ const Profile = (props: ProfileInterface) => {
     img {
       position: relative;
       border-radius: 50%;
-      height: 100%;
-      width: 100%;
+      max-width : 80px;
+      aspect-ratio: 1/1;
       object-fit: cover;
       @media (max-width: 1200px) {
         height: 70px;
@@ -289,9 +297,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No friends
-                </div>
+                <NoFriend />
               )}
             </div>
           </div>
@@ -310,9 +316,7 @@ const Profile = (props: ProfileInterface) => {
                   ))}
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl">
-                  No Joined Chanels
-                </div>
+                <NoChanel />
               )}
             </div>
           </div>
@@ -324,9 +328,7 @@ const Profile = (props: ProfileInterface) => {
               </div>
             </div>
             <div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((e: any, index: number) => (
-                <GameCard key={index} />
-              ))}
+              {false ? <GameCard /> : <NoGame />}
             </div>
           </div>
         </div>
@@ -334,8 +336,8 @@ const Profile = (props: ProfileInterface) => {
           <div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
             Achievements
           </div>
-          <div className="achiv-container flex gap-10   m-auto ">
-            {achivements && achivements.length ? (
+          <div className="achiv-container flex gap-10   m-auto min-h-[20rem]">
+            {false ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -344,8 +346,8 @@ const Profile = (props: ProfileInterface) => {
                 ></SwiperComponent>
               </div>
             ) : (
-              <div className=" h-full flex justify-center items-center text-3xl text-center">
-                No Achivements
+              <div className="flex justify-center items-center  w-full">
+                <NoAchivements />
               </div>
             )}
           </div>

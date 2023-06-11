@@ -153,35 +153,25 @@ export class InvitesService {
         // if invite is "Accpeted" let's create a friendship
         if (status === 'Accepted') {
             // create a friendship
-            await this.friendService.createFriendship(sender_id, receiver_id);
+            const acceptedInvite = await this.friendService.createFriendship(sender_id, receiver_id);
+            if (onlineClientsMap.has(sender_id)) {
+                const socket = onlineClientsMap.get(sender_id);
+                socket.emit('inviteAccepted', acceptedInvite);
+            }
+            if (onlineClientsMap.has(receiver_id)) {
+                const socket = onlineClientsMap.get(receiver_id);
+                socket.emit('inviteAccepted', acceptedInvite);
+            }
+ 
         }
-        // find the invite by looking for sender_id and receiver_id
-        const invite = await this.prisma.friendshipInvites.findFirst({
-            where: {
-                sender_id,
-                receiver_id,
-            },
-        });
-
-        if (!invite) {
-            throw new NotFoundException('Invite does not exist');
-        }
-
-
-        // update the invite
-        return this.prisma.friendshipInvites.update({
-
+        return await this.prisma.friendshipInvites.delete({
             where: {
                 sender_id_receiver_id: {
                     sender_id: sender_id,
                     receiver_id: receiver_id,
                 },
             },
-            data: {
-                status: status === 'Accepted' ? 'Accepted' : 'Rejected',
-            },
         });
-
     }
 
 

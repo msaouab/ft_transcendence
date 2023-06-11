@@ -3,12 +3,15 @@ import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import { GetAvatar, PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
-import { Button, Dialog } from "@material-tailwind/react";
+import { Dialog } from "@material-tailwind/react";
 import Cookies from "js-cookie";
-import { Alert } from "@material-tailwind/react";
-import Notification from "../../common/Notification";
+import toast, { Toaster } from "react-hot-toast";
 
-
+const notify = (status: string) => {
+  if (status === "success")
+    toast.success("Profile picture updated successfully!");
+  else toast.error("Profile picture update failed!");
+};
 
 function Avatar() {
   const { userImg, setUserImg } = useGlobalContext();
@@ -30,10 +33,10 @@ function Avatar() {
       if (event.target.files[0]) {
         setImgPreview(URL.createObjectURL(event.target.files[0]));
         handelOpen();
+        event.target.value = "";
       }
     }
   };
-
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,19 +49,21 @@ function Avatar() {
     handelOpen();
 
     PostAvatar(selectedFile)
-      .then(() => {
-        console.log("File uploaded!");
-        GetAvatar(Cookies.get("userid") || "").then((res) => {
-          setUserImg(res);
-        });
+      .then((res: any) => {
+        console.log("File uploaded!:", res.data);
+        setUserImg(res.data.avatar);
+        notify("success");
+        setSelectedFile(null);
+        setFileName("");
       })
       .catch((error) => {
         console.log("Error uploading file:", error);
+        notify("error");
       });
   };
 
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="flex flex-col items-center gap-5 mt-10">
       <img src={userImg} alt="" width={200} />
       <label>
         <div className="border  rounded-md overflow-hidden h-[3rem] border-dashed border-gray-500 relative flex items-center bg-slate-300/10">
@@ -94,7 +99,7 @@ function Avatar() {
           </div>
         </div>
       </label>
-      <Notification  message="Profile picture updated successfully" type="green" delay={1000} />
+      <Toaster position="top-center" reverseOrder={false} />
       {/* /// image preview  */}
       <Dialog
         size="sm"
@@ -102,7 +107,9 @@ function Avatar() {
         handler={handelOpen}
         className="flex flex-col gap-4 items-center justify-center p-10"
       >
-        {imgPreview && <img src={imgPreview as string} alt="" width={100}  className="p-4"/>}
+        {imgPreview && (
+          <img src={imgPreview as string} alt="" width={100} className="p-4" />
+        )}
         <button
           className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md text-blue-gray-50 text-lg"
           onClick={(e: any) => handleSubmit(e)}

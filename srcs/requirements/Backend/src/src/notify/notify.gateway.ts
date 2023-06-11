@@ -17,49 +17,54 @@ export const clients = new Map<string, Socket>();
 export class NotificationGateway
 	implements OnGatewayConnection, OnGatewayDisconnect
 {
-	@WebSocketServer()
-	server: Server;
+  @WebSocketServer()
+  server: Server;
 
-	constructor(private notificationService: NotificationService) {}
-	// private clients  = new Map<string, Socket>();
-	@SubscribeMessage("realStatus")
-	async handleStatus(
-		client: Socket,
-		payload: {
-			id: string;
-			userStatus: boolean;
-		}
-	) {
-		const { id, userStatus } = payload;
-		console.log("We've got the event to add the client to the map");
+  constructor(private notificationService: NotificationService) {}
+  // private clients  = new Map<string, Socket>();
+  @SubscribeMessage("realStatus")
+  async handleStatus(
+    client: Socket,
+    payload: {
+      id: string;
+      userStatus: boolean;
+    }
+  ) {
+    const { id, userStatus } = payload;
+    console.log("We've got the event to add the client to the map");
+    // console.log("We've got the event to add the client to the map");
+    clients.set(id, client);
+    // console.log("clients: ", clients.keys());
+    await this.notificationService.updateUserStatus(id, userStatus);
+  }
 
-		// if id is not valid
-		if (!id) {
-			throw new HttpException("Invalid id", 400);
-		}
 
-		// console.log("We've got the event to add the client to the map");
+  @SubscribeMessage("inviteAccepted")
+  handleInviteAccepted(client: Socket, payload: any) {
 
-		clients.set(id, client);
-		// console.log("clients: ", clients.keys());
-		await this.notificationService.updateUserStatus(id, userStatus);
-	}
+    console.log("////////////////////////////////");
+    console.log("Invite accepted:", payload);
+    console.log("////////////////////////////////");
+    // Handle the "invite accepted" event here
+    // Perform your logic for the invite accepted event
+  }
 
-	handleConnection(client: Socket) {
-		const { id } = client;
-		console.log(`Client with id ${id} connected to root namespace`);
-	}
 
-	async handleDisconnect(client: Socket) {
-		const { id } = client;
-		console.log(`Client with id ${id} disconnected`);
-		const user = [...clients.entries()].find(({ 1: v }) => v.id === client.id);
-		if (user) {
-			const key = user[0] === undefined ? "" : user[0];
-			clients.delete(key);
-			await this.notificationService.updateUserStatus(key, false);
-		}
-	}
+  handleConnection(client: Socket) {
+    const { id } = client;
+    console.log(`Client with id ${id} connected to root namespace`);
+  }
+
+  async handleDisconnect(client: Socket) {
+    const { id } = client;
+    console.log(`Client with id ${id} disconnected`);
+    const user = [...clients.entries()].find(({ 1: v }) => v.id === client.id);
+    if (user) {
+      const key = user[0] === undefined ? "" : user[0];
+      clients.delete(key);
+      await this.notificationService.updateUserStatus(key, false);
+    }
+  }
 }
 
 // =======

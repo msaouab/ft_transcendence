@@ -1,6 +1,6 @@
 import GameImg from "../../assets/gameImg.png";
 import Avatar from "../../assets/avatar.png";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../provider/GameProvider";
 import { Dialog } from "@material-tailwind/react";
 import { useState } from "react";
@@ -58,7 +58,7 @@ const FreindCard = ({ img, name, points, rank }: any) => {
 
 const GameType = () => {
   const { setModeRoom, modeRoom } = useAppContext();
-  const {userId} = useGlobalContext()
+  const { userId } = useGlobalContext();
 
   const navigate = useNavigate();
   const handleModeGame = (benome: string) => {
@@ -72,9 +72,10 @@ const GameType = () => {
   };
 
   const [friends, setFriends] = useState([]);
-  const getFriendsData = () => {
-    getFriendsInfo(userId || "").then((res) => {
-      setFriends(res.data);
+  const getFriendsData = async () => {
+    await getFriendsInfo(userId || "").then((res) => {
+      console.log(res);
+      setFriends(res);
     });
   };
 
@@ -82,10 +83,10 @@ const GameType = () => {
     id: number;
     name: string;
     icon: string;
-    avatar ?: string;
+    avatar?: string;
   }
 
-  const ImgAnimation = styled.img `
+  const ImgAnimation = styled.img`
     animation: bounce 2s infinite;
     @keyframes bounce {
       0% {
@@ -98,7 +99,7 @@ const GameType = () => {
         transform: translateY(0);
       }
     }
-  `
+  `;
 
   return (
     <div className="h-full w-full  flex flex-col items-center   gap-5">
@@ -109,22 +110,32 @@ const GameType = () => {
         className="flex flex-col gap-4 items-center justify-center p-10"
       >
         <div>
-         {
-          friends && friends.length ? (
-            friends.map((item: Iitem) => (
-              <FreindCard
-                key={item.id}
-                img={item.avatar}
-                name={item.name}
-              />
-            ))
+          {friends && friends.length ? (
+            friends.map(
+              (item: { firstName: string; avatar: string; id: number }) => (
+                <div className="flex" key={item.id}>
+                  <img src={item.avatar} alt="" />
+                  <h1>{item.firstName}</h1>
+
+                  {/* <FreindCard
+                    key={item.id}
+                    img={item.avatar}
+                    name={item.firstName}
+                  /> */}
+                </div>
+              )
+            )
           ) : (
             <div className="flex flex-col gap-5  justify-center items-center">
-              <ImgAnimation src={NoFriendsImg} alt="" width={150} className=""/>
+              <ImgAnimation
+                src={NoFriendsImg}
+                alt=""
+                width={150}
+                className=""
+              />
               <h1 className="text-2xl font-bold ">No Friends</h1>
             </div>
-          )
-         }
+          )}
         </div>
       </Dialog>
       <div className="game-type w-full  flex justify-around flex-wrap p-2 m-auto md:min-h-[20rem] max-w-[1300px]">
@@ -134,14 +145,10 @@ const GameType = () => {
             className="w-[18rem]"
             onClick={() => {
               if (item.id === 2) {
+                console.log("friend");
                 handelOpen();
-                console.log("bbbbbbb ",userId);
                 getFriendsData();
-                
-
-              }
-
-              else navigate("/game/10");
+              } else navigate("/game/10");
             }}
           >
             <div

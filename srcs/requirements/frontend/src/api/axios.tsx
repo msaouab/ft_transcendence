@@ -17,7 +17,7 @@ export const PostAvatar = async (file: File) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  await instance
+  const res = await instance
     .post("/user/" + Cookies.get("userid") + "/avatar", formData)
     .then((response) => {
       return response;
@@ -25,6 +25,7 @@ export const PostAvatar = async (file: File) => {
     .catch((error) => {
       console.log("Error uploading file:", error);
     });
+  return res;
 };
 
 export const getFriendsInfo = async (id: string) => {
@@ -136,6 +137,23 @@ export const RemoveThisFriendInvite = async ( id: string, receiver_id: any) => {
 };
 
 
+export const handelFriendInvite = async (id: string, receiver_id: string, status : string) => {
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.put("/user/" + id + "/invites", {
+      receiver_id,
+      status,
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+
 
 
 
@@ -164,5 +182,20 @@ export const isBlocked = async (id: string, receiver_id: string) => {
     console.log(err);
   }
 };
+
+
+export const deleteFreind = async (id: string, receiver_id: string) => {
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.delete("/user/" + id + "/friends", {
+      data: { friendUser_id: receiver_id },
+    } );
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export default instance;
