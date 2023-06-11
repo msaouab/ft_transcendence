@@ -65,8 +65,7 @@ model User {
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
   avatar         String            @default("/app/public/default.png")
-  status         Status            @default(Offline)
-  realStatus     Boolean           @default(false)
+  status         Status            @default(Online)
   tfa            Boolean           @default(false)
   otp_verified   Boolean           @default(false)
   otp_base32     String?
@@ -87,7 +86,7 @@ model User {
   privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
   privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
 
-  // realStatus Boolean @default(false)
+  realStatus Boolean @default(false)
 }
 
 model FriendshipInvites {
@@ -131,8 +130,8 @@ model PrivateChatRoom {
   lastUpdatedTime DateTime         @default(now())
   sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
   receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
-  blocked         Boolean          @default(false) 
-  }
+  blocked         Boolean          @default(false)
+}
 
 model BlockTab {
   user_id        String
