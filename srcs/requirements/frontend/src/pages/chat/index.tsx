@@ -65,6 +65,7 @@ const ChatStyle = Styled.div`
 
 import { GroupMessage, PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
+import GroupChatBox from "../../components/chat/GroupChatBox";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
@@ -168,14 +169,22 @@ const Chat = () => {
         />
       </div>
       <div className="chat-box-wrapper">
-        <ChatBox
-          selectedChat={selectedChat}
-          key={selectedChat.chatRoomid}
-          size="big"
-          setNewLatestMessage={setNewLatestMessage}
-          chatSocket={chatSocket}
-          connected={connected}
-        />
+        {selectedChat.chatRoomid ? (
+          <ChatBox
+            selectedChat={selectedChat}
+            key={selectedChat.chatRoomid}
+            size="big"
+            setNewLatestMessage={setNewLatestMessage}
+            chatSocket={chatSocket}
+            connected={connected}
+          />
+        ) : (
+            <GroupChatBox
+              selectedGroupChat={selectedGroupChat}
+              socket={chatSocket}
+              connected={connected}
+            />
+        )}
       </div>
     </ChatStyle>
   );

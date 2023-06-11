@@ -384,6 +384,7 @@ export class ChatService {
         if (!message) {
             throw new HttpException('Message not created', 400);
         }
+        server.to(group_id).emit('newGroupMessage', message);
         return message;
     }
 
