@@ -14,8 +14,7 @@ import { User } from "../auth/user.decorator/user.decorator";
 import { StatusInviteDto, inviteGameDto } from "./dto/invite.game.dto";
 import { UserService } from "src/user/user.service";
 import { log } from "console";
-import { GameGateway } from './Gateway/game.Gateway';
-
+import { GameGateway } from "./Gateway/game.Gateway";
 
 interface Player {
 	id: string;
@@ -28,7 +27,7 @@ export class GameService {
 		private prisma: PrismaService,
 		private UserService: UserService,
 		private gameGateway: GameGateway
-	) { }
+	) {}
 
 	// async GetMode(userId, mode: string) {
 	// 	try {
@@ -122,13 +121,11 @@ export class GameService {
 			if (FindUser.status == "InGame") {
 				throw new BadRequestException("You are already in game");
 			}
-	
+
 			// if (opponent === "friend") {
 
-
-			
 			if (Benome === "friend") {
-// >>>>>>> Dev
+				// >>>>>>> Dev
 				const FindFriend = await this.prisma.user.findUnique({
 					where: {
 						login: login,
