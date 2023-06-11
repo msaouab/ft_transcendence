@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import CreateChannel from './CreateChannel/CreateChannel';
+import { GroupMessage } from '../../types/message';
 
 
 const GroupChatListStyle = styled.div`
@@ -28,23 +29,29 @@ const Button = styled.button`
     font-size: 1.1rem;
 `;
 
+interface GroupChatListProps {
+  setSelectedGroupChat: (chat: GroupMessage) => void;
+  socket: any,
+  connected: boolean,
+}
 
-const GroupChatList = () => {
+const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatListProps) => {
     const [newChat, setNewChat] = useState(false);
-
-    const handleNewChat = () => {
-        console.log('new chat');
-        setNewChat(!newChat);
-    }
 
     return (
       <GroupChatListStyle>
         <div className="">
           <h1 className="font-bold sm:text-2xl text-white text-xl flex justify-between">
             Groups
-            <Button onClick={handleNewChat}>New</Button>
+            <Button onClick={() => setNewChat(!newChat)}>New</Button>
           </h1>
-          <CreateChannel show={newChat} setShow={setNewChat} />
+          <CreateChannel
+            setSelectedGroupChat={setSelectedGroupChat}
+            show={newChat}
+            setShow={setNewChat}
+            socket={socket}
+            connected={connected}
+          />
         </div>
         <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
         <div className=""></div>

@@ -33,7 +33,7 @@ export class ChannelService {
             return channel;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-                throw new ForbiddenException("There is already a channel with the name provided");
+                throw new HttpException("Channel already exists", HttpStatus.CONFLICT);
             }
             throw error;
         }

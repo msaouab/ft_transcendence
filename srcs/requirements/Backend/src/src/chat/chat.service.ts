@@ -212,9 +212,9 @@ export class ChatService {
                 },
             })
             console.log("Private chat room exist: ", privateRoom);
- 
+
             // create a new private message, and adds it to the private chat room
-    
+
             // if both sockets are connected, set seen to true
             // if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
             //     payload.seen = true;
@@ -226,7 +226,7 @@ export class ChatService {
                     seen: payload.seen,
                     sender_id: payload.sender_id,
                     receiver_id: payload.receiver_id,
-                chatRoom_id: payload.chatRoom_id,
+                    chatRoom_id: payload.chatRoom_id,
                 }
             });
             if (!message) {
@@ -360,6 +360,31 @@ export class ChatService {
             }),
         ])
 
+    }
+
+    async sendGroupMessage(client, payload: any, server: Server) {
+        const { group_id, sender_id, lastMessage } = payload;
+
+        const groupChatRoom = await this.prisma.channel.findFirst({
+            where: {
+                id: group_id
+            }
+        });
+        if (!groupChatRoom) {
+            throw new HttpException('Group chat room not found', 404);
+        }
+        const message = await this.prisma.message.create({
+            data: {
+                sender_id: sender_id,
+                receiver_id: group_id,
+                content: lastMessage,
+                seen: false,
+            }
+        });
+        if (!message) {
+            throw new HttpException('Message not created', 400);
+        }
+        return message;
     }
 }
 

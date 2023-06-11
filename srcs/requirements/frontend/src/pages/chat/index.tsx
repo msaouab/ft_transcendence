@@ -63,7 +63,7 @@ const ChatStyle = Styled.div`
 
 `;
 
-import { PrivateMessage } from "../../types/message";
+import { GroupMessage, PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
 const Chat = () => {
   let chatSocket = useRef(null);
@@ -71,6 +71,7 @@ const Chat = () => {
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
     {} as PrivateMessage
   );
+  const [selectedGroupChat, setSelectedGroupChat] = React.useState <GroupMessage>( {} as GroupMessage );
   const [newLatestMessage, setNewLatestMessage] = React.useState<{
     chatRoomId: string;
     message: string;
@@ -148,6 +149,9 @@ const Chat = () => {
         <ChatList
           setSelectedChat={setSelectedChat}
           newLatestMessage={newLatestMessage}
+          setSelectedGroupChat={setSelectedGroupChat}
+          socket={chatSocket}
+          connected={connected}
         />
       </div>
       <div className="chat-box-wrapper">

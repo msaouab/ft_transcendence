@@ -28,3 +28,12 @@ export interface singleMessage {
     sender_id: string
 }
 
+export interface GroupMessage {
+    group_id: string;
+    sender_id: string;
+    name: string;
+    profileImage: string;
+    lastMessage: string;
+    lastMessageDate: string;
+    role: string;
+};

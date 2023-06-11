@@ -1,10 +1,11 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CiImport } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import ChannelTypes from "./ChannelTypes";
 import axios from "axios";
-import { PostChannelAvatar } from "../../../api/axios";
+import { CreateChannel, PostChannelAvatar } from "../../../api/axios";
+import { GroupMessage } from "../../../types/message";
 
 const ModelStyle = styled.div`
   width: 100%;
@@ -148,21 +149,27 @@ const ModelStyle = styled.div`
 interface ModelProps {
   show: boolean;
   setShow?: any;
+  setSelectedGroupChat?: any;
+  socket?: any;
+  connected: boolean;
 }
 const Model = (props: ModelProps) => {
-  const [channel, setChannel] = useState({
+  const initialChannel = {
     avatar: "",
     name: "",
     description: "",
     password: "",
-  });
+  };
+
+  const [channel, setChannel] = useState(initialChannel);
   const [type, setType] = useState("Public");
+  const [exeption, setExeption] = useState(false);
+  const [groupMessage, setGroupMessage] = useState<GroupMessage>({} as GroupMessage);
 
   const handelChange = (e: any) => {
     e.preventDefault();
     setChannel({ ...channel, [e.target.name]: e.target.value });
   };
-  const [exeption, setExeption] = useState(false);
 
   const handelFile = (e: any) => {
     PostChannelAvatar(e.target.files[0]).then(() => {
@@ -176,36 +183,43 @@ const Model = (props: ModelProps) => {
 
   const createChannel = async (e: any) => {
     e.preventDefault();
-    if (channel.name === "") {
-      setExeption(true);
-      return;
-    }
-    try {
-      await axios.post(
-        "http://localhost:3000/api/v1/Channels/create",
-        {
-          name: channel.name,
-          status: type,
-          password: channel.password,
-          limitUsers: 0,
-          description: channel.description,
-          avatar: channel.avatar || "localhost:3000/default.png",
-        },
-        { withCredentials: true }
-      );
-      setChannel({
-        avatar: "",
-        name: "",
-        description: "",
-        password: "",
+    CreateChannel({
+      name: channel.name,
+      status: type,
+      password: channel.password,
+      limitUsers: 0,
+      description: channel.description,
+      avatar: channel.avatar || "localhost:3000/default.png",
+    },
+    ).then((res) => {
+      console.log(res);
+      const { id, name, avatar, dateCreated } = res;
+      console.log(id, name, avatar, dateCreated);
+      setGroupMessage({
+        group_id: id,
+        sender_id: id,
+        name: name,
+        profileImage: avatar,
+        lastMessage: "Channel Created",
+        lastMessageDate: dateCreated,
+        role: "Owner",
       });
+      setChannel(initialChannel);
       setType("Public");
       setExeption(false);
       props.setShow(false);
-    } catch (error) {
-      console.log(error);
+    }).catch(() => {
+      setExeption(true);
     }
+    );
   };
+
+  useEffect(() => {
+    if (props.connected) {
+      props.socket.current.emit("sendGroupMessage", groupMessage)
+    }
+    props.setSelectedGroupChat(groupMessage)
+  }, [groupMessage]);
 
   return (
     <ModelStyle show={props.show}>
@@ -213,12 +227,7 @@ const Model = (props: ModelProps) => {
         <AiOutlineCloseCircle
           className="close-btn"
           onClick={() => {
-            setChannel({
-              avatar: "",
-              name: "",
-              description: "",
-              password: "",
-            });
+            setChannel(initialChannel);
             setType("Public");
             setExeption(false);
             props.setShow(false);

@@ -96,4 +96,13 @@ export const PostChannelAvatar = async (file: File): Promise<any> => {
     });
 };
 
+export const CreateChannel = async (channel: any) => {
+  const res = await instance.post("/Channels/create", channel).then((response) => {
+    return response;
+  }).catch((error) => {
+    throw error;
+  });
+  return res.data;
+}
+
 export default instance;

@@ -104,6 +104,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //     return await this.chatService.sendPrivateMessage(client, payload);
     // }
 
+    @SubscribeMessage('sendGroupMessage')
+    async handleGroupChat(client: Socket, payload: any) {
+        return await this.chatService.sendGroupMessage(client, payload, this.server);
+    }
 }
 
 
