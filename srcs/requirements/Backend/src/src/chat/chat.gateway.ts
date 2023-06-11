@@ -104,6 +104,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //     return await this.chatService.sendPrivateMessage(client, payload);
     // }
 
+    @SubscribeMessage('joinGroupRoom')
+    async handleJoinGroupRoom(client: Socket, payload: any) {
+        console.log("We've got the event to join a group room");
+        return await this.chatService.joinGroupChatRoom(client, payload, this.server);
+    }
+
+    @SubscribeMessage('leaveGroupRoom')
+    async handleLeaveGroupRoom(client: Socket, payload: any) {
+        console.log("We've got the event to leave a group room");
+        return await this.chatService.leaveGroupChatRoom(client, payload, this.server);
+    }
+
     @SubscribeMessage('sendGroupMessage')
     async handleGroupChat(client: Socket, payload: any) {
         return await this.chatService.sendGroupMessage(client, payload, this.server);

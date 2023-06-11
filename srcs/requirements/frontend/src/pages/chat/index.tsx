@@ -115,6 +115,19 @@ const Chat = () => {
   }, [selectedChat.chatRoomid]);
 
   useEffect(() => {
+    if (selectedGroupChat.group_id) {
+      console.log("joining the room: ", selectedGroupChat.group_id);
+      chatSocket.current.emit("joinGroupRoom", { group_id: selectedGroupChat.group_id });
+    }
+    return () => {
+      if (selectedGroupChat.group_id) {
+        console.log("leaving the room: ", selectedGroupChat.group_id);
+        chatSocket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
+      }
+    };
+  }, [selectedGroupChat.group_id]);
+
+  useEffect(() => {
     if (!selectedChat.chatRoomid) {
       console.log("no chat room selected from global context");
       return;

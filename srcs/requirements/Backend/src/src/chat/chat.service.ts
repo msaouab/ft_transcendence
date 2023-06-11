@@ -386,6 +386,38 @@ export class ChatService {
         }
         return message;
     }
+
+    async joinGroupChatRoom(client, payload: any, server: Server) {
+        const { group_id } = payload;
+
+        const channel = await this.prisma.channel.findFirst({
+            where: {
+                id: group_id
+            }
+        });
+        if (!channel) {
+            throw new HttpException('Group chat room not found', 404);
+        }
+        await client.join(group_id);
+        console.log("The client has joined the room: ", group_id);
+        return channel;
+    }
+
+    async leaveGroupChatRoom(client, payload: any, server: Server) {
+        const { group_id } = payload;
+
+        const channel = await this.prisma.channel.findFirst({
+            where: {
+                id: group_id
+            }
+        });
+        if (!channel) {
+            throw new HttpException('Group chat room not found', 404);
+        }
+        await client.leave(group_id);
+        console.log("The client has left the room: ", group_id);
+        return channel;
+    }
 }
 
 
