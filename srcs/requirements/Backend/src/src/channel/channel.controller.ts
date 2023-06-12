@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
 import { ApiTags } from "@nestjs/swagger";
-import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto, MessagesDto } from "./dto";
 import { Request } from "express";
 import { log } from "console";
 import { AuthenticatedGuard } from "src/auth/guards/authenticated.guard";
@@ -126,5 +126,11 @@ export class ChannelController{
     )
     uploadAvatar(@UploadedFile() file: Express.Multer.File) {
         return file.filename;
+    }
+
+    @Get(':id/messages')
+    // @UseGuards(AuthenticatedGuard)
+    getMessages(@Param('id') channelId: string, @Query() dto: MessagesDto) {
+        return this.ChannelService.getMessages(channelId, dto);
     }
 }

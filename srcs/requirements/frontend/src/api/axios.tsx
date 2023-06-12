@@ -114,4 +114,14 @@ export const GetJoindChannels = async (id: string) => {
     console.log(err);
   }
 }
+
+export const GetChannelMessages = async (id: string, limit: number, offset: number) => {
+  try {
+    const res = await instance.get("/Channels/" + id + "/messages?limit=" + limit + "&offset=" + offset);
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
 export default instance;

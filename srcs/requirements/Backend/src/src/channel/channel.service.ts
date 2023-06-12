@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto, MessagesDto } from "./dto";
 import { Request } from "express";
 import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -418,5 +418,76 @@ export class ChannelService {
             }
         });
         return channels;
+    }
+
+    async getMessages(channelId: string, dto: MessagesDto) {
+        await this.getChannelById(channelId);
+        const {limit,  offset} = dto;
+        const take: number = limit ? Number(limit) : 10;
+        const skip: number = offset ? Number(offset) : 0;
+
+        const messages: {
+            id: string,
+            group_id: string,
+            sender_id: string,
+            sender_name: string,
+            sender_avatar: string,
+            content: string,
+            dateCreated: string,
+            role: string,
+        }[] = [];
+        try {
+            const res = await this.prisma.message.findMany({
+                where: {
+                    receiver_id: channelId
+                },
+                orderBy: {
+                    dateCreated: 'desc'
+                },
+                take: take,
+                skip: skip,
+            });
+            const allMessages = await this.prisma.message.count({
+                where: {
+                    receiver_id: channelId
+                }
+            });
+            for (const message of res) {
+                let joindChannel = null;
+                if (message.sender_id !== channelId)
+                {
+                    joindChannel = await this.prisma.channelsJoinTab.findFirst({
+                        where: {
+                            channel_id: channelId,
+                            user_id: message.sender_id
+                        },
+                        include: {
+                            user: {
+                                select: {
+                                    login: true,
+                                    avatar: true,
+                                }
+                            }
+                        }
+                    });
+                }
+                messages.push({
+                    id: message.id,
+                    group_id: message.receiver_id,
+                    sender_id: message.sender_id,
+                    sender_name: joindChannel ? joindChannel.user.login : "Server",
+                    sender_avatar: joindChannel ? joindChannel.user.avatar : "Server",
+                    content: message.content,
+                    dateCreated: message.dateCreated.toISOString(),
+                    role: joindChannel ? joindChannel.role : "Server",
+                })
+            }
+            return {
+                messages: messages,
+                count: allMessages
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
