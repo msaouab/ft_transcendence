@@ -17,6 +17,7 @@ const ModelStyle = styled.div`
   display: ${(props: { show: any }) => (props.show === true ? "flex" : "none")};
   justify-content: center;
   align-items: center;
+  z-index: 100;
   .new-chat {
     width: 500px;
     background: #6e6a6a;

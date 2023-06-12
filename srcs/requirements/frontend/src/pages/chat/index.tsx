@@ -179,11 +179,12 @@ const Chat = () => {
             connected={connected}
           />
         ) : (
-            <GroupChatBox
-              selectedGroupChat={selectedGroupChat}
-              socket={chatSocket}
-              connected={connected}
-            />
+          <GroupChatBox
+            selectedGroupChat={selectedGroupChat}
+            socket={chatSocket}
+            connected={connected}
+            key={selectedGroupChat.group_id}
+          />
         )}
       </div>
     </ChatStyle>

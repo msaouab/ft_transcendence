@@ -37,3 +37,14 @@ export interface GroupMessage {
     lastMessageDate: string;
     role: string;
 };
+
+export interface GroupSingleMessage {
+    id: string;
+    group_id: string;
+    sender_id: string;
+    sender_name: string;
+    sender_avatar: string;
+    content: string;
+    dateCreated: string;
+    role: string;
+}

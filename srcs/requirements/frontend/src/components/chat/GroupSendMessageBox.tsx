@@ -65,7 +65,6 @@ const GroupSendMessageBox = ({
   connected,
 }: GroupSendMessageBoxProps) => {
   const [message, setMessage] = useState<string>("");
-  const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
 
   const sendMessage = () => {
     if (message.trim() === "") return;
@@ -82,20 +81,6 @@ const GroupSendMessageBox = ({
     }
     setMessage("");
   };
-
-  useEffect(() => {
-    if (connected) {
-      socket.current.on("newGroupMessage", (data: any) => {
-        setGroupChatRooms(prev => {
-          const index = prev.findIndex((group: GroupMessage) => group.group_id === data.receiver_id);
-          const newGroupChatRooms = [...prev];
-          newGroupChatRooms[index].lastMessage = data.content;
-          newGroupChatRooms[index].lastMessageDate = data.dateCreated;
-          return newGroupChatRooms;
-        })
-      });
-    }
-  }, [connected]);
 
   return (
     <GroupSendMessageBoxStyle >
