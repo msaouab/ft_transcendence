@@ -94,7 +94,12 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
             </div>
           </div>
         ) : (
-          groupChatRooms.map((props: GroupMessage) => {
+            groupChatRooms.sort((a: GroupMessage, b: GroupMessage) => {
+            return (
+              new Date(b.lastMessageDate).getTime() -
+              new Date(a.lastMessageDate).getTime()
+            );
+          }).map((props: GroupMessage) => {
             return (
               <div
                 key={props.group_id}
