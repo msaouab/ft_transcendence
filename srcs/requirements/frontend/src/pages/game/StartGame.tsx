@@ -105,9 +105,9 @@ const StartGame = () => {
 			console.log(socket.id, "disconnected from server");
 			socket.emit("leaveRoom", payload);
 		});
-		// return () => {
-		// 	socket.disconnect();
-		// };
+		return () => {
+			socket.disconnect();
+		};
 	}, [userId]);
 
 	useEffect(() => {
