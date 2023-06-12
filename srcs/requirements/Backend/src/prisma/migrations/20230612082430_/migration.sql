@@ -29,10 +29,11 @@ CREATE TABLE "User" (
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
     "avatar" TEXT NOT NULL DEFAULT '/app/public/default.png',
-    "status" "Status" NOT NULL DEFAULT 'Offline',
+    "status" "Status" NOT NULL DEFAULT 'Online',
     "tfa" BOOLEAN NOT NULL DEFAULT false,
     "otp_verified" BOOLEAN NOT NULL DEFAULT false,
     "otp_base32" TEXT,
+    "realStatus" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

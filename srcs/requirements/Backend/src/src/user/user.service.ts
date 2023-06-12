@@ -342,5 +342,33 @@ export class UserService {
         });
         return users;
     }
+
+    async updateStatus(user,id ,status) {
+        const me = await this.prisma.user.findFirst({
+            
+            where: {
+                id: id,
+            },
+        });
+        if (!me) {
+            throw new NotFoundException('User not found');
+        }
+        if (user._json.email != me.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        if (status != 'Online' && status != 'Offline' && status != 'Idle' && status != 'DoNotDisturb')
+        {
+            throw new BadRequestException('Wrong status');
+        }
+        return await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                status: status,
+            },
+        });
+    }
+
 }
     
