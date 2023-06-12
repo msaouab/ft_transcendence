@@ -7,6 +7,7 @@ BOLD='\033[1m'
 HOST=`hostname`
 
 echo -e "${RED}${BOLD}Make sure you did setup in your Intra the redirect URI to http://${HOST}:3000/api/v1/login/42/return $ED"  
+echo -e "${RED}${BOLD}You can access to the website from: http://${HOST}:5173 $ED"  
 sleep 2 
 if grep -q "FORTYTWO_CLIENT_ID=UID" ./srcs/requirements/Backend/src/db-env-example; then \
     read -p "From Intra enter the UID: " uid;\

@@ -6,6 +6,7 @@ do
   sleep 2
 done
 
+echo "Database is ready to use"
 
 npm install
 npx prisma migrate dev --name dev --preview-feature

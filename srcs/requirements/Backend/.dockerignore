@@ -3,7 +3,7 @@ node_modules
 dist
 .vscode/*
 .env
-node_modules
+./src/node_modules
 db
 dist
 .DS_Store
