@@ -8,9 +8,9 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 export class NotificationService {
 	constructor(private prisma: PrismaService) {}
 	async updateUserStatus(userId: string, userStatus: boolean) {
-		// if (!userId || userId === '') {
-		//     throw new HttpException('Invalid user id', 400);
-		// }
+		if (!userId || userId === '') {
+		    throw new HttpException('Invalid user id', 400);
+		}
 		const user = await this.prisma.user.findUnique({
 			where: {
 				id: userId,
