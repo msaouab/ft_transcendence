@@ -54,12 +54,13 @@ export class NotificationGateway
 		const { id } = client;
 		console.log(`Client with id ${id} disconnected`);
 		const user = [...clients.entries()].find(({ 1: v }) => v.id === client.id);
+		// if user is not found , return
 		if (user) {
 			const key = user[0] === undefined ? "" : user[0];
-			clients.delete(key);
 			if (key === "") {
 				return;
 			}
+			clients.delete(key);
 			await this.notificationService.updateUserStatus(key, false);
 		}
 	}
