@@ -138,15 +138,12 @@ export const RemoveThisFriendInvite = async ( id: string, receiver_id: any) => {
 
 
 
-
-
 export const isFriend = async (id: string, receiver_id: string) => {
   if (id === receiver_id || receiver_id === "" || id === "") {
     return;
   }
   try {
     const res = await instance.get("/User/" + id );
-<!--     console.log("we've got the user id: ", res.data); -->
     return res.data;
   } catch (err) {
     console.log(err);
