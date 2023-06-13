@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
 import { GetAvatar, PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
-import { Dialog } from "@material-tailwind/react";
+import { Button, Dialog } from "@material-tailwind/react";
+import Cookies from "js-cookie";
+import { Alert } from "@material-tailwind/react";
+import Notification from "../../common/Notification";
+
+
 
 function Avatar() {
   const { userImg, setUserImg } = useGlobalContext();
@@ -29,6 +34,7 @@ function Avatar() {
     }
   };
 
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -41,7 +47,8 @@ function Avatar() {
 
     PostAvatar(selectedFile)
       .then(() => {
-        GetAvatar().then((res) => {
+        console.log("File uploaded!");
+        GetAvatar(Cookies.get("userid") || "").then((res) => {
           setUserImg(res);
         });
       })
@@ -87,6 +94,7 @@ function Avatar() {
           </div>
         </div>
       </label>
+      <Notification  message="Profile picture updated successfully" type="green" delay={1000} />
       {/* /// image preview  */}
       <Dialog
         size="sm"
@@ -94,7 +102,7 @@ function Avatar() {
         handler={handelOpen}
         className="flex flex-col gap-4 items-center justify-center p-10"
       >
-        {imgPreview && <img src={imgPreview as string} alt="" width={200} />}
+        {imgPreview && <img src={imgPreview as string} alt="" width={100}  className="p-4"/>}
         <button
           className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md text-blue-gray-50 text-lg"
           onClick={(e: any) => handleSubmit(e)}

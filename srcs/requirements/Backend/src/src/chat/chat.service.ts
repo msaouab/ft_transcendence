@@ -23,11 +23,18 @@ import { createMessageDto } from './message/message.dto';
 import { PostPrivateChatRoomDto } from './dto/postPrivateChatRoom';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
+import { clients as onlineClients } from 'src/notify/notify.gateway';
+// import { clients } from 'src/notify/notify.gateway';
+
+
+// a type 
 @Injectable()
 export class ChatService {
     constructor(private prisma: PrismaService,
-        // private MessageService: MessageService
+        // private MessageService: MessageServic
     ) { }
+
+    // a map that contain the id of the user and it's websocket object
 
     async createPrivateChatRoom(postreatePrivateChatRoomDto: PostPrivateChatRoomDto) {
         const { senderId, receiverId } = postreatePrivateChatRoomDto;
@@ -84,34 +91,6 @@ export class ChatService {
 
     }
 
-    // async CreatePrivateChatRoom(client: Socket, payload: {
-    //     senderId: string,
-    //     receiverId: string
-    // }, server: Server) {
-    //     const { senderId, receiverId } = payload;
-    //     console.log("senderId: ", senderId);
-    //     console.log("receiverId: ", receiverId);
-    //     const hashedRoomName = await this.getRoomId(senderId, receiverId);
-    //     console.log("hashedRoomName: ", hashedRoomName);
-    //     // try {
-    //     let privateChatRoom = await this.prisma.privateChatRoom.create({
-    //         data: {
-    //             id: hashedRoomName,
-    //             sender_id: senderId,
-    //             receiver_id: receiverId
-    //         }
-    //     });
-    //     if (!privateChatRoom) {
-    //         throw new HttpException("Private chat already exist", 409);
-    //     }
-    //     let privateRoom = await this.joinPrivateChatRoom(client, payload);
-    //     console.log("Private chat room created: ", privateRoom);
-    //     server.to(privateRoom.id).emit('privateChatRoomCreated', privateRoom);
-
-    //     // client.emit('privateChatRoomCreated', privateChatRoom);
-    //     return privateChatRoom;
-    // }
-
     /* joinPrivateChatRoom(senderId: string, receiverId: string) 
         will be called when senderId joins the private chat room
         it createa a new private chat room if it doesn't exist
@@ -161,15 +140,7 @@ export class ChatService {
     // which would reduce a whole db query, anyways...
 
 
-    // catch (error) {
-    //     if (error instanceof PrismaClientKnownRequestError) {
-    //         console.log("Error: ", error);
-    //         throw new HttpException("Private chat already exist", 409);
-    //     }
-    // }
-
-
-
+  
     async leavePrivateChatRoom(client: Socket, payload: {
         senderId: string,
         receiverId: string
@@ -193,36 +164,69 @@ export class ChatService {
     }
 
     /* sendPrivateMessage(senderId: string, receiverId: string, message: string) */
-    async sendPrivateMessage(client: Socket, payload: createMessageDto, server: Server) {
-
-        // if room doesn't exist, call joinPrivateChatRoom
-        const subPayload = {
-            senderId: payload.sender_id,
-            receiverId: payload.receiver_id,
-            chatRoomId: payload.chatRoom_id,
-            seen: payload.seen,
-            content: payload.content
-        }
-
-        // console.log("Subpayload: ", subPayload);
-        // const privateRoom = await this.CreatePrivateChatRoom(client, subPayload);
-        // return "ok";
-
+    async sendPrivateMessage(
+        client: Socket, 
+        payload: createMessageDto,
+        server: Server, 
+        clients: Map<string, Socket>
+        ) {
         // check if privatchatroom exist.
+        const roomId = await this.getRoomId(payload.sender_id, payload.receiver_id);
         try {
             const privateRoom = await this.prisma.privateChatRoom.findUnique({
                 where: {
-                    id: await this.getRoomId(payload.sender_id, payload.receiver_id),
+                    id: roomId,
                 },
-            })
- 
-            // create a new private message, and adds it to the private chat room
-    
-            // if both sockets are connected, set seen to true
-            if (server.sockets.sockets.get(payload.receiver_id) && server.sockets.sockets.get(payload.sender_id)) {
-                payload.seen = true;
-            }
+            });
             
+            const block = await this.prisma.blockTab.findFirst({
+                where: {
+                  OR : [
+                    {
+                        AND : [
+                            {
+                                user_id: payload.sender_id
+                            },
+                            {
+                                blockedUser_id: payload.receiver_id
+                            }
+                        ]
+                    },
+                    {
+                        AND : [
+                            {
+                                user_id: payload.receiver_id
+                            },
+                            {
+                                blockedUser_id: payload.sender_id
+                            }
+                        ]
+                    }
+                    ]
+                }
+            });
+            if (block) {
+                throw new HttpException("you can't send a message to this user atm", 403);
+            }
+
+
+            // if this the first message and the other user is online join him to the room and send him the message
+            const messages = await this.prisma.privateMessage.findMany({
+                where: {
+                    chatRoom_id: privateRoom.id
+                },
+                take: 1
+            });
+            if (messages.length == 0) {
+                // check if the other user is online
+                if (clients.has(payload.receiver_id)) {
+                    const otherClientSocket = clients.get(payload.receiver_id);
+                    await otherClientSocket.join(privateRoom.id);
+                    // emit the event roomJoined to the other user
+                    otherClientSocket.emit("roomJoined", { "roomId": privateRoom.id });
+                }
+            }
+            // create the message
             let message = await this.prisma.privateMessage.create({
                 data: {
                     content: payload.content,
@@ -235,7 +239,6 @@ export class ChatService {
             if (!message) {
                 throw new HttpException("Error creating private message", 500);
             }
-            console.log("Private message: ", message);
             await this.prisma.privateChatRoom.update({
                 where: {
                     id: privateRoom.id
@@ -245,6 +248,7 @@ export class ChatService {
                 }
             });
             console.log("We're sending the event to room: ", privateRoom);
+            // if not both sockets are connected , we send a private 
             server.to(privateRoom.id).emit('newPrivateMessage', message);
 
         } catch (error) {
@@ -252,18 +256,23 @@ export class ChatService {
                 console.log("Error: ", error);
                 throw new HttpException("Private chat doesn't exist", 404);
             }
-
         }
+        // if receiver is online notify him 
+        if (onlineClients.has(payload.receiver_id)) {
+            const otherClientSocket = onlineClients.get(payload.receiver_id);
+            console.log("We're sending the chatNotif event to the other client");
+            otherClientSocket.emit("chatNotif", { "num": 1 });
+        }
+
     }
 
 
     async getPrivateChatRoom(senderId: string, receiverId: string): Promise<PrivateChatRoom> {
-        // console.log("We've got a request to get private chat room with id: ", await this.getRoomId(senderId, receiverId));
         const privatChatRoom = await this.prisma.privateChatRoom.findUnique({
             where: {
                 id: await this.getRoomId(senderId, receiverId)
             }
-        });
+        }); 
         return privatChatRoom;
     }
 
@@ -311,9 +320,9 @@ export class ChatService {
         }
         // return all the private messages in the private chat room, sorted by date
         // if seen is passed, get all the messages that seen if (true) or not seen if (false)
-        if (seen == 'true' || seen == 'false') {
-            console.log("Seen: ", seen);
-        }
+        // if (seen == 'true' || seen == 'false') {
+        //     console.log("Seen: ", seen);
+        // }
 
         if (seen) {
             const transaction =  await this.prisma.$transaction([
@@ -336,7 +345,6 @@ export class ChatService {
                     }
                 })
             ]);
-            console.log("Transaction: ", transaction);
         }
 
         if (isNaN(Number(offset))) {

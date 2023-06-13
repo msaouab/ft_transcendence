@@ -1,114 +1,68 @@
 import { Outlet } from "react-router-dom";
-import CustomInput from "../../components/common/CustomInput";
-// import { ReactComponent as SearchIcon } from '../../assets/icons/searchIcon.svg'
 import styled from "styled-components";
-import { BiSearch } from "react-icons/bi";
-import { MdOutlineNotifications } from "react-icons/md";
-import { FaUserCircle } from "react-icons/fa";
-import { BsChevronDown } from "react-icons/bs";
 import SideBar from "../../components/common/SideBar";
-import { useState } from "react";
+import DropDownMenu from "../../components/DropDownMenu";
+import Notifications from "../../components/Notifications";
 import SearchBar from "../../components/common/Search/SearchBar";
 
-const DropDown = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: #fff;
-  width: 200px;
-  height: 200px;
-  border-radius: 5px;
-  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.75);
-  z-index: 10;
-`;
+import { useEffect, useRef, useState } from "react";
+import {io} from "socket.io-client";
+// import Cookies from "js-cookie";
+import { useGlobalContext } from "../../provider/AppContext";
+// import UserSettings from "../user/UserSettings";
 
 
 const index = () => {
-  // const { userImg } = useGlobalContext();
   const LayoutStyle = styled.div`
+    display: flex;
     height: 100vh;
-    width: 100vw;
-    max-height: 100vh;
-    width: 100vw; 
-    display: grid;
-    // display: flex;
-    grid-template-columns: 1fr 11fr;
-    padding: 1rem 2rem;
-
-    @media (max-width: 500px) {
-      
-      padding: 0;
-      padding-right: 1rem;
-      padding-bottom: 1rem;
-    }
-
-
-    @media (max-width: 768px) {
-      
-      padding: 0; 
-      .header {
-        margin-right: 0;
-        margin-top: 0;
-    }
-  
-
-    }
-
   `;
 
-  const [isDropDownOpen, setIsDropDownOpen] = useState<boolean>(false);
-  const handelDropDown = () => {
-    setIsDropDownOpen(!isDropDownOpen);
-  };
+  const notifySocket = useRef<any>(null);
+  const [connected, setConnected] = useState(false);
+    
+  useEffect(() => {
+    // console.log("IM HERE");
+    // console.log("connected: ", notifySocket);
+    if (!connected) {
+      notifySocket.current = io("http://localhost:3000"); 
+    }
+    notifySocket.current.on("connect", () => {
+      setConnected(true);
+      // call a function inside the drop down menu to change the status
+    });
 
-  // const handelOnchange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   console.log(e.target.value);
-  // };
+   
+
+
+    notifySocket.current.on("disconnect", () => {
+      setConnected(false);
+    });
+
+    }, []);
+
 
   return (
-    <LayoutStyle>
-      {/* {JSON.stringify(userAvatar)} */}
-      <div className="w-[5rem]">
-        <div className="side-bar absolute top-0 left-0  ">
-          <SideBar />
-        </div>
+    <LayoutStyle className=" px-1 md:px-5">
+      <div className="md:w-[5rem] ">
+        <SideBar notifySocket={notifySocket.current} connected={connected} />
       </div>
       <div className="main-content w-full ">
-        <div className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
-        ">
+        <div
+          className="header flex justify-end  gap-8 items-center  h-[10%]  max-h-[80px]
+          
+        "
+        >
           <div className="search">
             <SearchBar />
           </div>
-          <div className="notification relative">
-            <div className="notif-count absolute z-10 text-white bg-red-500 rounded-[50%] w-[15px] h-[15px] text-xs p-0 m-0 flex justify-center items-center top-0 right-0">
-              1
-            </div>
-            <MdOutlineNotifications className="text-4xl text-white font-bold" />
-          </div>
+          <Notifications notifSocket={notifySocket} conected={connected} />
           <div className="user flex justify-center items-center  relative">
-            {/* {userImg && (
-              <img
-                src={userImg}
-                alt="user"
-                className="w-[40px] h-[40px] rounded-[50%]"
-              />
-            )} */}
-            <BsChevronDown
-              className="text-xl text-[#A6A6A6] font-bold cursor-pointer"
-              onClick={handelDropDown}
-            />
-          
-            <div
-              className={`settings bg-slate-50 h-[8rem] flex flex-col gap-2 absolute bottom-0   p-4 font-bold text-gray-700 ${isDropDownOpen ? "block" : "hidden"
-                } transition-all duration-200 absolute top-12 right-0 z-10`}
-            >
-              {/* <div className="setting-item">Profile</div>
-              <div className="setting-item">Logout</div>
-              <div className="setting-item">Status</div> */}
-            </div>
+            <DropDownMenu notifySocket={notifySocket.current} connected={connected} />
+
           </div>
         </div>
-        <div className="content max-h-[90%] h-[100%]">
+        <div className="content  flex-1">
           <Outlet />
         </div>
       </div>

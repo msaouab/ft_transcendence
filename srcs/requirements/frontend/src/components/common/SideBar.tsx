@@ -11,10 +11,12 @@ import {
 } from "../../assets/icons";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import instance from "../../api/axios";
+import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
+import { parse } from "path";
+
 
 const Routes = [
   {
@@ -44,47 +46,66 @@ const Routes = [
   },
 ];
 
-const SideBar = () => {
+const SideBar = ({notifySocket , connected} : {notifySocket: any, connected: boolean}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { setUserStatus } = useGlobalContext();
+  const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
   const [menuIndex, setMenuIndex] = useState<number>(2);
+  // const 
 
+  const {setChatNotif, chatNotif} = useGlobalContext();
+  // const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
+  useEffect(() => {
+    if (connected) {
+      notifySocket.on("chatNotif", (data: any) => {
+  
+        if (window.location.pathname != "/chat") {
+          const prevNotif = chatNotif;
+          const num = parseInt(data.num) + prevNotif;
+          setChatNotif(num);
+          Cookies.set("chatNotif", String(num));
+       }});
+    }
+  }, [chatNotif]);  
   const handleToggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
   const navigate = useNavigate();
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        await instance
-          .get("/me")
-          .then((response) => {
-            if (
-              response?.data?.tfa == true &&
-              response.data.otp_verified == false
-            ) {
-              // alert("Please enable two factor authentication");
-              navigate("/login/two-factor-authentication");
-            }
-            if (response.statusText) {
-            }
-            Cookies.set("userid", response.data.id);
-            // setOnlineStat(user.status);
-            setUserStatus(response.data.status);
-          })
-          .catch((error) => {
-            if (error.response.status == 401 || error.response.status == 403) {
-              console.log("url: ", error.response.config.url);
-              navigate("/login");
-              
-            }
-          });
-      } catch (error) {
-        console.log(error);
-      }
+
+  async function fetchData() {
+    try {
+      await instance
+        .get("/me")
+        .then((response) => {
+          if (
+            response?.data?.tfa == true &&
+            response.data.otp_verified == false
+          ) {
+            // alert("Please enable two factor authentication");
+            navigate("/login/two-factor-authentication");
+          }
+          if (response.statusText) {
+          }
+          Cookies.set("userid", response.data.id);
+          setUserId(response.data.id);
+          setUserStatus(response.data.status.tolowoerCase());
+        })
+        .catch((error) => {
+          if (error.response.status == 401 || error.response.status == 403) {
+            navigate("/login");
+          }
+        });
+    } catch (error) {
+      console.log(error);
     }
+    // console.log("ppppppp", userId);
+    const res = await GetAvatar(userId);
+    setUserImg(res);
+  }
+
+  useEffect(() => {
     fetchData();
-  }, []);
+  }, [userId]);
+
   const handleLogout = () => {
     async function logout() {
       try {
@@ -102,11 +123,11 @@ const SideBar = () => {
   };
 
   return (
-    <div className="  bg-red-400">
+    <div className=" ">
       <div
         className={`${
           isSidebarOpen ? "block" : "hidden"
-        } transition duration-500 ease-in-out shadow w-screen h-screen backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+        } transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
       ></div>
 
       <div
@@ -116,7 +137,7 @@ const SideBar = () => {
             : "md:w-20   transition-all duration-300 ease-out "
         }`}
       >
-        <div className="burger text-white text-3xl  mb-10 flex justify-center py-2">
+        <div className="burger cursor-pointer text-white text-3xl  mb-10 flex justify-center ">
           {isSidebarOpen ? (
             <CgClose
               onClick={handleToggleSidebar}
@@ -127,7 +148,7 @@ const SideBar = () => {
           )}
         </div>
         <div
-          className={`routes mt- flex flex-col gap-5  h-screen relative ${
+          className={`routes mt- flex flex-col gap-5  relative ${
             isSidebarOpen ? "" : "md:flex flex-col gap-5 hidden "
           } `}
         >
@@ -137,8 +158,6 @@ const SideBar = () => {
                 to={route.link}
                 key={index}
                 className={`${
-                  route.name == "logout" ? "absolute bottom-36" : ""
-                } ${
                   isSidebarOpen
                     ? "flex justify-start items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"
                     : "flex justify-center items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"
@@ -150,6 +169,13 @@ const SideBar = () => {
                 }}
               >
                 <div className="icon">{route.icon}</div>
+                {/* a notif small red cirle with num inside */}
+                {route.name == "chat" && chatNotif > 0 && (
+                  <div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+                    {chatNotif}
+                  </div>
+                )}
+
                 {isSidebarOpen && <div className="text ml-4">{route.name}</div>}
               </Link>
             );

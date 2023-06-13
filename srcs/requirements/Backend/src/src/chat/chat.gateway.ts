@@ -9,7 +9,6 @@ import { Injectable } from '@nestjs/common';
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
-    OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
@@ -21,6 +20,10 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { createMessageDto } from './message/message.dto';
 // import { Message } from './message.interface';
+// import { clients } from 'src/notify/notify.gateway';
+// creating a type of rooms , where a room define a map of room id as key and a arr of object that contain 
+// the id of the  of the user and it's websocket object 
+// type rooms = Map<string, { id: string, client: Socket }[]>;
 
 
 @Injectable()
@@ -28,8 +31,13 @@ import { createMessageDto } from './message/message.dto';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
+    
+    // creating a map of rooms
+    // private roomsClientsMap : rooms = new Map();
 
 
+
+    private clients: Map<string, Socket> = new Map();
     // adding the chat service to the gateway
     constructor(private chatService: ChatService) { }
 
@@ -37,64 +45,71 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const { id } = client;
         console.log(`Client with id ${id} connected to chat namespace`);
     }
-
     handleDisconnect(client: Socket) {
         const { id } = client;
         console.log(`Client with id ${id} disconnected`);
-    }
-
-
-    @SubscribeMessage('checkOnline')
-    async handleCheckOnline(client: Socket, payload: {
-        // senderId: string,
-        receiverId: string
+        this.clients.forEach((value, key) => {
+            if (value.id === id) {
+                this.clients.delete(key);
+            }
+        });
+        }
+        @SubscribeMessage('alive')
+    async handleAlive(client: Socket, payload: {
+        id: string,
+        
     }) {
-        console.log("We've got the event");
-        // return await this.chatService.checkOnline(client, payload, this.server);
+        // adding the client to the map
+        this.clients.set(payload.id, client);
     }
+        // delete the client from the map
+        // const newClients = this.roomsClientsMap.get(privateRoom.id).filter(clientId => clientId !== payload.currentId);
+        // console.log("the new clients after leaving the room: ", newClients);
+        // this.roomsClientsMap.set(privateRoom.id, newClients);
+
+       
+        // console.log("the map after deleting the client: ", this.roomsClientsMap);
+
+        // this.clients.delete(id);
 
 
-    // @SubscribeMessage('createPrivateRoom')
-    // async handleCreateRoom(client: Socket, payload: {
+    // @SubscribeMessage('checkOnline')
+    // async handleCheckOnline(client: Socket, payload: {
+    //     // currentId: string,
     //     senderId: string,
-    //     receiverId: string
+    //     receiverId: string,
     // }) {
-    //     console.log("We've got the event to create a private room");
-    //     return await this.chatService.CreatePrivateChatRoom(client, payload, this.server);
-    //     // console.log("privatChatRoom: ", privatChatRoom.id);
-    //     // this.server.to(privatChatRoom.id).emit('privateRoomCreated', privatChatRoom);
-    //     // client.emit(callback, privatChatRoom);
+    //     console.log("We've got the event");
+    //     // return await this.chatService.checkOnline(client, payload, this.server);
     // }
 
-    // 
-
-
+    
 
     @SubscribeMessage('joinRoom')
     async handleJoinRoom(client: Socket, payload: {
+        currentId: string
         senderId: string,
-        receiverId: string
-    }) {
-        // console.log("We've got the event");
-        return await this.chatService.joinPrivateChatRoom(client, payload);
+        receiverId: string, 
+    }) { 
+        const privateRoom = await this.chatService.joinPrivateChatRoom(client, payload);         
+        return privateRoom;
     }
 
     @SubscribeMessage('leaveRoom')
     async handleLeaveRoom(client: Socket, payload: {
+        currentId: string
         senderId: string,
-        receiverId: string
+        receiverId: string, 
     }) {
-        // return aw
-        // console.log("We've got the event");
-        return await this.chatService.leavePrivateChatRoom(client, payload);
-    }
+        const privateRoom = await this.chatService.leavePrivateChatRoom(client, payload);
+        return privateRoom;
+    }   
 
     @SubscribeMessage('sendPrivateMessage')
     async handleChat(client: Socket, payload: createMessageDto) {
-        console.log("We've got the event");
-        return await this.chatService.sendPrivateMessage(client, payload, this.server);
-
+        return await  this.chatService.sendPrivateMessage(client, payload, this.server, this.clients);
     }
+
 
 
 

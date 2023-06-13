@@ -10,7 +10,7 @@ const ChatBoxStyle = styled.div`
     height: ${(props) => props.size === 'small' ? '100%' : '95%'};
     display: flex;
     flex-direction: column;
-    background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.3)'};
+    background: ${(props) => props.size === 'small' ? 'black' : ' rgba(217, 217, 217, 0.298)'};
     border-radius: ${(props) => props.size === 'small' ? '10px 10px 0px 0px' : '25px'};
     font-size: ${(props) => props.size === 'small' ? '0.8rem' : '1.1rem'};
     padding: 20px; 
@@ -22,7 +22,7 @@ const ChatBoxStyle = styled.div`
     }
 `;
 
-
+import { useGlobalContext } from '../../provider/AppContext';
 import { PrivateMessage } from '../../types/message';
 import { singleMessage } from '../../types/message';
 // components
@@ -30,7 +30,7 @@ import ChatBoxTopBar from './ChatBoxToBar';
 import SendMessageBox from './SendMessageBox';
 import axios from 'axios';
 import ChatInfiniteScroll from './ChatInfiniteScroll';
-
+import { GetAvatar } from '../../api/axios';
 
 const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connected }: {
     selectedChat: PrivateMessage,
@@ -46,30 +46,61 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         totalMessages: 0,
     };
 
+    const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
+
     const updateSeenStatus = (messages: singleMessage[]) => {
         messages.forEach((message: any) => {
             if (message.seen === false && message.sender_id !== Cookies.get('id')) {
                 axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
                     seen: true
                 }).then((response) => {
-
                     if (response.status !== 200) {
                         alert("error updating the seen status of the messages");
                     }
-
-                }
-                ).catch((error) => {
+                }).catch((error) => {
                     console.log("error", error);
-                }
-                );
+                });
             }
         });
     }
 
-                
+    
     useEffect(() => {
         if (connected) {  
             chatSocket.current.on('newPrivateMessage', (message: any) => {
+                console.log("new private message", message);
+                // if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
+                const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, avatar: string, status : string }> => {
+                    const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;
+                    const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+                    const avatar = await GetAvatar(user.data.login);
+                    return { login: user.data.login, avatar: avatar, status: user.data.status };
+
+                }                
+                // getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
+                const checkNew = async () => {
+                if (!privateChatRooms.find(  (chatRoom: any)  => chatRoom.chatRoomid === message.chatRoom_id) && message.sender_id !== Cookies.get('id')) {
+                    // const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
+                    // // co
+                    // const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
+                    const {login, avatar, status} = await getUser(message.sender_id, message.receiver_id);
+                    const newPrivatRoom : PrivateMessage = {
+                        chatRoomid: message.chatRoom_id,
+                        messageId: message.id,
+                        sender_id: message.sender_id,
+                        receiver_id: message.receiver_id,
+                        lastMessage: message.content,
+                        lastMessageDate: message.dateCreated,
+                        seen: message.seen,
+                        login: login,
+                        profileImage: avatar,
+                        blocked: false,
+                        status: status,
+                    }
+                    setPrivateChatRooms((prevState: any) => ([...prevState, newPrivatRoom]));
+                }
+            }  
+            checkNew(); 
                 setState((prevState: any) => ({
                     ...prevState,
                     messages: [message, ...prevState.messages]
@@ -97,23 +128,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
         let responseMessages = await axios.get(`http://localhost:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`);
         setTotalMessages(responseMessages.data[0]);
         updateSeenStatus(responseMessages.data[1]);
-        // responseMessages.data[1].forEach((message: any) => {
-        //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
-        //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
-        //             seen: true
-        //         }).then((response) => {
-        //             if (response.status !== 200) {
-        //                 alert("error updating the seen status of the messages");
-        //             }
-
-        //         }
-        //         ).catch((error) => {
-        //             console.log("error", error);
-        //         }
-        //         );
-        //     }
-        // });
-
         return responseMessages.data[1];
     };
 
@@ -128,8 +142,6 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 hasMore: totalMessages > prevState.offset + newMessages.length
             }));
         })
-
-
     };
 
     useEffect(() => {
@@ -144,38 +156,13 @@ const ChatBox = ({ selectedChat, size, setNewLatestMessage, chatSocket, connecte
                 });
             }
             else {
-                  // update the seen status of the messages  (seen = true) to the viewed messages
-                // messages are viewed when the user opens the chat box
-                // console.log("messages", messages);
-                // if (messages.length === 0) {
-                //    console.log("no messages");
-                // }
-                // messages.forEach((message: any) => {
-                //     // console.log("message", message);
-
-                //     if (message.seen === false && message.sender_id !== Cookies.get('id')) {
-                //         console.log("the message we're updating", message);
-                //         axios.put(`http://localhost:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}` , {
-                //             seen: true
-                //         }).then((response) => {
-
-                //             console.log("response", response);
-                //         }
-                //         ).catch((error) => {
-                //             console.log("error", error);
-                //         }
-                //         );
-                //     }
-                // });
                 setState((prevState) => ({
                     ...prevState,
                     messages: [...prevState.messages, ...messages],
                     offset: prevState.offset + messages.length,
                     hasMore: true,
                 }));
-
             }
-
         });
 
     }, [selectedChat.chatRoomid]);

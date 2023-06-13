@@ -38,9 +38,10 @@ enum GameStatus {
 
 enum Rank {
   Novice
-  Intermediate
-  Advanced
+  Veteran
+  Rif_Rebellion
   Master
+  Sahara_Tuareg
 }
 
 enum MemeberStatusTime {
@@ -64,7 +65,8 @@ model User {
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
   avatar         String            @default("/app/public/default.png")
-  status         Status            @default(Online)
+  status         Status            @default(Offline)
+  realStatus     Boolean           @default(false)
   tfa            Boolean           @default(false)
   otp_verified   Boolean           @default(false)
   otp_base32     String?
@@ -84,6 +86,8 @@ model User {
   // relation to privatchatroom
   privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
   privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
+
+  // realStatus Boolean @default(false)
 }
 
 model FriendshipInvites {
@@ -127,8 +131,8 @@ model PrivateChatRoom {
   lastUpdatedTime DateTime         @default(now())
   sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
   receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
-  blocked         Boolean          @default(false)
-}
+  blocked         Boolean          @default(false) 
+  }
 
 model BlockTab {
   user_id        String
@@ -251,10 +255,14 @@ model GameInvites {
 model RankingData {
   user_id                  String                    @unique
   user                     User                      @relation("rankingDataRelation", fields: [user_id], references: [id])
+  games                    Int                       @default(0)
   wins                     Int                       @default(0)
   loses                    Int                       @default(0)
   draws                    Int                       @default(0)
-  level                    Int                       @default(0)
+  xp                       Float                     @default(0)
+  winning_streak           Int                       @default(0)
+  losing_streak            Int                       @default(0)
+  points                   Int                       @default(0)
   rank                     Rank                      @default(Novice)
   achievements_assignement AchievementsAssignement[]
 }
@@ -263,6 +271,7 @@ model Achievements {
   achievement_id           Int                       @id @default(autoincrement())
   name                     String
   description              String
+  image                    String                   
   achievements_assignement AchievementsAssignement[] @relation("achievementsAssignementRelation")
 }
 
@@ -272,7 +281,7 @@ model AchievementsAssignement {
   player_id      String
   player         RankingData  @relation(fields: [player_id], references: [user_id])
 
-  @@id([achievement_id, player_id])
+  @@unique([achievement_id, player_id])
 }
 
 model GameHistoryTab {

@@ -8,11 +8,15 @@ import { dateToStr } from '../common/CommonFunc';
 
 import { useGlobalContext } from '../../provider/AppContext';
 import ConfirmDelete from '../common/ConfirmDelete';
-
+import axios from 'axios';
 const SendMessageBoxStyle = styled.div`
     width: 100%;
-    height: 8%;
-    max-height: 60px;
+    /* height: 8%; */
+    height: ${(props: { size: any }) => props.size === 'small' ? `1rem` : `2.5rem`};
+
+    min-height: ${(props: { size: any }) => props.size === 'small' ? `1rem` : `60px`};
+
+    /* max-height: 60px; */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -41,13 +45,6 @@ const SendMessageBoxStyle = styled.div`
         align-self: center;
         color: #ffff;
         cursor: pointer;
-    }
-
-
-    @media (max-width: 768px) {
-        ${(props: { size: any }) => props.size === 'big' ? `
-            padding: 10px; 
-        ` : ``}
     }
 
     @media (max-width: 400px) {
@@ -87,29 +84,12 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
     );
 
     const {setPrivateChatRooms} = useGlobalContext();
-    
-    // let initData = {
-    //     show: false,
-    //     title: 'Message not sent',
-    //     message: 'you cannot send a message to this user at the moment',
-    //     actionName: 'Ok',
-    //     confirm: () => {
-    //         setConfirmData({
-    //             ...confirmData,
-    //             show: false
-    //         });
-    
-    //     }
-    // };
+     
 
-    const sendMessage = (messageProp: string) => {
-
-
+    const sendMessage = async (messageProp: string) => {
         // if the user is blocked, don't send the message
-        console.log(selectedChat);
+        // console.log(selectedChat);
         if (selectedChat.blocked) {
-           console.log('blocked');
-             
 
         setConfirmData({
             ...confirmData,
@@ -118,10 +98,39 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
         setMessage('');      
        return ;
         }
+        const myId = Cookies.get('id');
+        const otherUserId = selectedChat.sender_id === myId ? selectedChat.receiver_id : selectedChat.sender_id;
+
+        const userBlocks = await axios.get(`http://localhost:3000/api/v1/user/${myId}/blockedusers/${otherUserId}`);
+        if (userBlocks.data.length > 0) {
+            console.log("these mother fuckers are blocked");
+            setConfirmData({
+                ...confirmData,
+                show: true
+            });
+            setMessage('');
+            setPrivateChatRooms(prev => {
+                const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
+                if (index === -1) {
+                    return [...prev, selectedChat];
+                }
+                else {
+                    return [...prev];
+                }
+            }
+            )
+            return;
+        }
+        
+
+        
+
+        // ge
+
         if (messageProp === '') {
             return;
         }
-      
+        
         let message = {
             dateCreated: dateToStr(new Date()),
             content: messageProp,
@@ -133,6 +142,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
         if (connected) {
             socket.current.emit('sendPrivateMessage', message);
             setMessage('');
+           
             if (setNewLatestMessage) {
                 setNewLatestMessage(
                     {
@@ -146,6 +156,7 @@ const SendMessageBox = ({ selectedChat, socket, connected, setNewLatestMessage, 
                 lastMessage: message.content,
                 lastMessageDate: Date.now(),
             }
+
             setPrivateChatRooms(prev => {   
                 const index = prev.findIndex((chatRoom: any) => chatRoom.chatRoomid === selectedChat.chatRoomid);
                 if (index === -1) {
