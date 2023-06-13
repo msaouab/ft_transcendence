@@ -61,24 +61,12 @@ const defaultOptions = {
 	},
 };
 
-const socket = io(`http://${HOSTNAME}:3000/game`, {
-	query: { userId: Cookies.get("id") },
-});
-
 const StartGame = () => {
 	const navigate = useNavigate();
-	// const [mysocket, setMySocket] = useState<Socket>();
 	const { userId } = useGlobalContext();
 	const { typeRoom, modeRoom, mysocket, setMySocket } = useGameContext();
 	const [benomeId, setBenomeId] = useState("");
-	const [roomid, setRoomid] = useState("");
-	const [benome, setBenome] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
+	const [roomId, setRoomId] = useState("");
 	const [user, setUser] = useState({
 		id: "",
 		login: "",
@@ -95,7 +83,9 @@ const StartGame = () => {
 	};
 
 	useEffect(() => {
-		console.log("socket", socket);
+		const socket = io(`http://${HOSTNAME}:3000/game`, {
+			query: { userId: Cookies.get("id") },
+		});
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
@@ -106,43 +96,53 @@ const StartGame = () => {
 			socket.emit("leaveRoom", payload);
 		});
 		return () => {
-			socket.disconnect();
+			// socket.disconnect();
 		};
-	}, [userId]);
+	}, []);
 
 	useEffect(() => {
-		getAllData();
+		let isReal = false;
+		const getAllData = async () => {
+			const userdata = await getUserInfo(userId);
+			setUser(userdata);
+			let Benome;
+			//  = await getUserInfo(benomeId);
+			// setBenome(Benome);
+			if (payload.mode === "Bot") {
+				Benome = {
+					id: "Bot",
+					login: "Moulinette_42",
+					firstName: "Bot",
+					lastName: "Bot",
+					status: "Bot",
+				};
+			} else {
+				Benome = await getUserInfo(benomeId);
+			}
+			if (Benome && roomId) {
+				isReal = true;
+				console.log("navigating", isReal)
+				navigate(`/game/${roomId}`, {
+					state: {
+						user: user,
+						benome: Benome,
+					},
+				});
+			}
+		};
 		mysocket?.on("BenomeId", (benome, key) => {
 			setBenomeId(benome);
-			setRoomid(key);
-			console.log("BenomeId", benome, mysocket);
+			setRoomId(key);
+			isReal = true;
 		});
-	}, [mysocket, benomeId, mysocket]);
-
-	const getAllData = async () => {
-		const userdata = await getUserInfo(userId);
-		setUser(userdata);
-		const Benome = await getUserInfo(benomeId);
-		setBenome(Benome);
-		if (payload.mode === "Bot") {
-			setBenome({
-				id: "Bot",
-				login: "Moulinette_42",
-				firstName: "Bot",
-				lastName: "Bot",
-				status: "Bot",
-			});
-		}
-		if (benome && roomid) {
-			console.log("navigate to game", user, benome);
-			navigate(`/game/${roomid}`, {
-				state: {
-					user: user,
-					benome: benome,
-				},
-			});
-		}
-	};
+		getAllData();
+		return () => {
+			if (!isReal) {
+				console.log("disconnecting", isReal)
+				mysocket?.disconnect();
+			}
+		};
+	}, [mysocket, benomeId]);
 
 	return (
 		<StartGameContainer>

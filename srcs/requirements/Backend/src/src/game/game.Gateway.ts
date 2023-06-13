@@ -128,16 +128,6 @@ export class GameGateway
 						});
 					}
 				}
-				// const [player, opponent] = await Promise.all([
-				// 	this.UserService.getUser(userId),
-				// 	this.UserService.getUser(opponentId),
-				// ]);
-				// if (player && opponent) {
-				// 	await this.prisma.user.updateMany({
-				// 		where: { id: { in: [player.id, opponent.id] } },
-				// 		data: { status: "Online" },
-				// 	});
-				// }
 				const existingGame = await this.prisma.game.findUnique({
 					where: { id: key },
 				});
@@ -150,8 +140,6 @@ export class GameGateway
 							player2_pts: value.player2.score,
 						},
 					});
-					console.log(updateGame);
-					console.log(updateGame.player1_id, updateGame.player2_id);
 					this.achvService.CheckAchv(
 						value.player1.id,
 						value.player2.id,
@@ -162,13 +150,38 @@ export class GameGateway
 				value.status = "Finished";
 				client.leave(key);
 				this.roomMap.delete(key);
+			} else if (value.mode === "Bot") {
+				value.status = "Finished";
+				client.leave(key);
+				this.roomMap.delete(key);
+				const userId = client.handshake.query.userId.toString();
+				const player = await this.UserService.getUser(userId);
+				if (player) {
+					await this.prisma.user.update({
+						where: { id: player.id },
+						data: { status: "Online" },
+					});
+				}
+				const existingGame = await this.prisma.game.findUnique({
+					where: { id: key },
+				});
+				if (existingGame) {
+					const updateGame = await this.prisma.game.update({
+						where: { id: key },
+						data: {
+							gameStatus: "Finished",
+							player1_pts: value.player1.score,
+							player2_pts: value.player2.score,
+						},
+					});
+				}
 			}
 			if (value.status === "Finished") {
 				client.leave(key);
 				this.roomMap.delete(key);
 			}
 		});
-		console.log(this.roomMap);
+		console.log("Note Disconnected Map", this.roomMap, client.id);
 	}
 
 	RoundScore(roomId: string): boolean {
@@ -457,7 +470,8 @@ export class GameGateway
 				if (
 					value.members === 1 &&
 					value.type === payload.type &&
-					value.mode === payload.mode
+					value.mode === payload.mode &&
+					value.player1.id !== client.handshake.query.userId.toString()
 				) {
 					value.members++;
 					value.player2 = {
@@ -620,6 +634,7 @@ export class GameGateway
 
 	async CreateFriendRoom(client: Socket, payload) {
 		console.log("CreateFriendRoom", payload);
+		console.log("benome is:", payload.friend)
 		const FindBenome = await this.UserService.getUser(payload.friend);
 		console.log("FindBenome", FindBenome);
 		if (!FindBenome) throw new BadRequestException("User not found");

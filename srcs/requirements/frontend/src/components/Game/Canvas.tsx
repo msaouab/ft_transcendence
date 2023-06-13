@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
 // import { Socket } from "mysocket?.io-client";
 import { useGameContext } from "../../provider/GameProvider";
+import { useNavigate } from "react-router-dom";
 
 interface PingPongProps {
 	width: number;
@@ -49,6 +50,7 @@ const PlayGround = styled.div`
 let ctx: CanvasRenderingContext2D | null;
 
 const PingPong = ({ width, height }: PingPongProps) => {
+	const navigate = useNavigate();
 	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [player1X, setPlayer1X] = useState<PlayerState>({
@@ -127,7 +129,6 @@ const PingPong = ({ width, height }: PingPongProps) => {
 			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
 			else mysocket?.emit("requesteMouse", data);
 		};
-	console.log('canvas:', mysocket)
 		document.addEventListener(
 			"mousemove",
 			handleMouseMove as unknown as EventListener
@@ -169,6 +170,7 @@ const PingPong = ({ width, height }: PingPongProps) => {
 		});
 		mysocket?.on("responseWinner", (winner) => {
 			console.log(winner);
+			navigate("/game");
 		});
 		return () => {
 			mysocket?.off("responseBall");
