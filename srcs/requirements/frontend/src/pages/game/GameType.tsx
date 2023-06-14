@@ -9,6 +9,7 @@ import { useGlobalContext } from "../../provider/AppContext";
 import NoFriendsImg from "../../assets/noFriends.png";
 import styled from "styled-components";
 import PlayWithMe from "../../assets/playWithMe.png";
+import { IoCloseCircleSharp } from "react-icons/io5";
 
 const Games = [
 	{
@@ -45,7 +46,6 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 const FreindCard = ({ id, img, login, fname, lname }: any) => {
 	const navigate = useNavigate();
 	const { setFriend } = useGameContext();
-	console.log("freind card:", id, img, login, fname, lname);
 	const [userImg, setUserImg] = useState<string>("");
 	const [rankData, setRankData] = useState<any>({});
 	useEffect(() => {
@@ -55,7 +55,6 @@ const FreindCard = ({ id, img, login, fname, lname }: any) => {
 		};
 		const getRankUser = async (id: string) => {
 			const rank = await getRankData(id);
-			console.log(id, rank);
 			setRankData(rank);
 		};
 		getAvatarImg(id);
@@ -66,21 +65,22 @@ const FreindCard = ({ id, img, login, fname, lname }: any) => {
 		};
 	}, [id]);
 	return (
-		<div className="flex justify-evenly">
-			<div className="flex ">
+		<div className="flex justify-around w-full text-black flex-wrap gap-6">
+			<div className="flex gap-2">
 				<img
 					src={userImg}
 					alt="frindImg"
 					width={40}
-					className=""
+					className=" w-9 aspect-square rounded-full "
 				/>
-				<div className="">{login}</div>
+				<div className="flex justify-center items-center">{login}</div>
 			</div>
-			<div className=" ">
-				<button className="flex items-center border"
+			<div className="flex justify-center items-center">
+				<button
+					className="flex items-center border gap-2 p-1"
 					onClick={() => {
 						setFriend(id);
-						console.log("friend id:", id);
+						console.log("friend:", id);
 						navigate("/game/startGame");
 					}}
 				>
@@ -101,7 +101,6 @@ const GameType = () => {
 		setModeRoom(benome);
 	};
 	const [open, setOpen] = useState(false);
-	const [imgPreview, setImgPreview] = useState("");
 	const handelOpen = () => {
 		setOpen(!open);
 	};
@@ -110,7 +109,7 @@ const GameType = () => {
 	const getFriendsData = () => {
 		getFriendsInfo(userId || "").then((res) => {
 			setFriends(res);
-			console.log(res[0]);
+			console.log("friends:", res);
 		});
 	};
 
@@ -142,33 +141,42 @@ const GameType = () => {
 
 	return (
 		<div className="h-full w-full flex flex-col items-center gap-5">
-			<Dialog
-				size="xs"
-				open={open}
-				handler={handelOpen}
-				className="flex-col gap-5"
+			<div
+				className={`${
+					open
+						? " absolute top-0 left-0 h-full w-full bg-white/30 to-blue-gray-300 z-40 flex justify-center items-center "
+						: "hidden"
+				}`}
+				onClick={handelOpen}
 			>
-				{friends && friends.length ? (
-					friends.map((item: Iitem, index) => (
-						<FreindCard
-							key={index}
-							id={item.id}
-							img={item.avatar}
-							login={item.login}
-							fname={item.firstName}
-							lname={item.lastName}
-							status={item.status}
-							// points="1337"
-						/>
-					))
-				) : (
-					<div className="flex flex-col gap-5  justify-center items-center">
-						<ImgAnimation src={NoFriendsImg} alt="" width={150} className="" />
-						<h1 className="text-2xl font-bold ">No Friends</h1>
-					</div>
-				)}
-			</Dialog>
-			<div className="game-type w-full  flex justify-around flex-wrap p-2 m-auto md:min-h-[20rem] max-w-[1300px]">
+				<div className="flex-col gap-5 w-[300px] bg-white flex justify-center items-center relative shadow-lg rounded-md z-50 py-5 max-h-64 overflow-y-auto">
+					{friends && friends.length ? (
+						friends.map((item: Iitem, index) => (
+							<FreindCard
+								key={index}
+								id={item.id}
+								img={item.avatar}
+								login={item.login}
+								fname={item.firstName}
+								lname={item.lastName}
+								status={item.status}
+								// points="1337"
+							/>
+						))
+					) : (
+						<div className="flex flex-col gap-5  justify-center items-center">
+							<ImgAnimation
+								src={NoFriendsImg}
+								alt=""
+								width={150}
+								className=""
+							/>
+							<h1 className="text-2xl font-bold text-gray-700 ">No Friends</h1>
+						</div>
+					)}
+				</div>
+			</div>
+			<div className="game-type w-full flex justify-around flex-wrap p-2 m-auto md:min-h-[20rem] max-w-[1300px]">
 				{Games.map((item) => (
 					<div
 						key={item.id}
@@ -182,7 +190,7 @@ const GameType = () => {
 						}}
 					>
 						<div
-							className="w-[90%] scale-75 md:scale-100 m-auto h-[90%]"
+							className="w-[90%] scale-75 md:scale-100 m-auto h-[90%] cursor-pointer"
 							key={item.id}
 						>
 							<GameTypeCard
@@ -194,32 +202,6 @@ const GameType = () => {
 					</div>
 				))}
 			</div>
-			{/* <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
-        <div className="border rounded-2xl flex-1 p-4 h-full">
-          <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
-            Global Rank
-          </h1>
-          <div className="ranks flex flex-col gap-2 overflow-y-scroll h-[90%]">
-            {Array(10)
-              .fill(0)
-              .map((item, index) => (
-                <FreindCard name="koko" points="1337" rank={index+1} />
-              ))}
-          </div>
-        </div>
-        <div className="border rounded-2xl flex-1 p-4 h-full">
-          <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
-            Friend Rank
-          </h1>
-          <div className="ranks flex flex-col gap-2 overflow-y-scroll h-[90%]">
-            {Array(10)
-              .fill(0)
-              .map((item, index) => (
-                <FreindCard name="koko" points="1337" />
-              ))}
-          </div>
-        </div>
-      </div> */}
 		</div>
 	);
 };

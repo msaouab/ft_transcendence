@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import Cookies from "js-cookie";
 import { HOSTNAME, getUserInfo } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useGameContext } from "../../provider/GameProvider";
 import styled, { keyframes } from "styled-components";
-import Game from "../../components/Game/Game";
 import Lottie from "react-lottie";
 import PongAnimation from "../../assets/Lottie/PongAnimation.json";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -64,7 +63,7 @@ const defaultOptions = {
 const StartGame = () => {
 	const navigate = useNavigate();
 	const { userId } = useGlobalContext();
-	const { typeRoom, modeRoom, mysocket, setMySocket } = useGameContext();
+	const { typeRoom, modeRoom, mysocket, setMySocket, friend } = useGameContext();
 	const [benomeId, setBenomeId] = useState("");
 	const [roomId, setRoomId] = useState("");
 	const [user, setUser] = useState({
@@ -78,6 +77,7 @@ const StartGame = () => {
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
+		friend: friend,
 		width: 700,
 		height: 1000,
 	};

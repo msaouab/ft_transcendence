@@ -8,6 +8,8 @@ import PlayWithMe from "../../assets/playWithMe.png";
 import GameImg from "../../assets/gameImg.png";
 import { useGameContext } from "../../provider/GameProvider";
 import styled from "styled-components";
+import { useGlobalContext } from "../../provider/AppContext";
+import { useEffect } from "react";
 
 const chalenger = [
 	{
@@ -81,11 +83,16 @@ const GameCard = (props: GameCardProps) => {
 };
 
 const GameDashboard = () => {
-	const { setTypeRoom } = useGameContext();
+	const { gameNotif, setGameNotif, friendChellenge  } = useGlobalContext();
+	const { setTypeRoom, mysocket } = useGameContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);
 	};
+
+	useEffect(() => {
+		console.log(friendChellenge);
+	}, []);
 
 	const Main = styled.div`
 		@media (max-width: 1200px) {

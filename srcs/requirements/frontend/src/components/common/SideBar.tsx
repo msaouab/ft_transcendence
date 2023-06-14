@@ -53,7 +53,7 @@ const SideBar = ({
 	connected: boolean;
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
+	const { setUserStatus, setUserImg, setUserId, userId, friendChellenge } = useGlobalContext();
 	const [menuIndex, setMenuIndex] = useState<number>(2);
 	// const
 
@@ -70,18 +70,20 @@ const SideBar = ({
 				}
 			});
 			notifySocket.on("gameNotif", (data: any) => {
-				console.log("GameInvite received", data);
 				if (window.location.pathname != "/game") {
 					const prevNotif = gameNotif;
 					const num = parseInt(data.num) + prevNotif;
 					setGameNotif(num);
 					Cookies.set("gameNotif", String(num));
-					console.log("game", num)
 				}
-				console.log("gameNotif", gameNotif)
+			});
+			notifySocket.on("friendInfo", (id: String, key: String) => {
+				console.log("friendInfo", id, key);
+				friendChellenge[id] = key;
+				console.log("friendChellenge", friendChellenge);
 			});
 		}
-	}, [chatNotif, gameNotif]);
+	}, [chatNotif, gameNotif, friendChellenge]);
 	const handleToggleSidebar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};
@@ -184,14 +186,13 @@ const SideBar = ({
 								}}
 							>
 								<div className="icon">{route.icon}</div>
-								{/* a notif small red cirle with num inside */}
 								{route.name == "chat" && chatNotif > 0 && (
 									<div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
 										{chatNotif}
 									</div>
 								)}
-								{route.name == "game" && gameNotif > 0 && (
-									<div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+								{route.name === "game" && gameNotif > 0 && (
+									<div className="absolute top-[70px] right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
 										{gameNotif}
 									</div>
 								)}

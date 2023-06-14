@@ -696,6 +696,7 @@ export class GameGateway
 		if (onlineClientsMap.has(payload.friend)) {
 			const friendSocket = onlineClientsMap.get(payload.friend);
 			friendSocket.emit("gameNotif", { num: 1 });
+			friendSocket.emit("friendInfo", payload.friend, key);
 		}
 		// console.log(onlineClientsMap);
 	}
