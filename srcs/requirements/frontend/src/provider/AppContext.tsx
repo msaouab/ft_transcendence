@@ -19,8 +19,8 @@ interface AppContextType {
   setChatNotif: React.Dispatch<React.SetStateAction<number>>;
   gameNotif: number;
   setGameNotif: React.Dispatch<React.SetStateAction<number>>;
-  friendChellenge?: any;
-  setFriendChellenge?: React.Dispatch<React.SetStateAction<any>>;
+  friendChellenge: any;
+  setFriendChellenge: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -43,7 +43,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
   const [gameNotif, setGameNotif] = useState(Cookies.get("gameNotif") ? parseInt(Cookies.get("gameNotif")!) : 0);
 
-  const [friendChellenge, setFriendChellenge] = useState({});
+  const [friendChellenge, setFriendChellenge] = useState([] as any[]);
 
   //  user auth context
 

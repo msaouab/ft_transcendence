@@ -9,7 +9,9 @@ import GameImg from "../../assets/gameImg.png";
 import { useGameContext } from "../../provider/GameProvider";
 import styled from "styled-components";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getFriendsInfo, getUserInfo } from "../../api/axios";
+import Cookies from "js-cookie";
 
 const chalenger = [
 	{
@@ -40,14 +42,21 @@ interface ChalengerCardProps {
 	name: string;
 }
 
-export const ChalengerCard = (props: ChalengerCardProps) => {
-	const { name } = props;
+export const ChalengerCard = ({
+	id,
+	img,
+	login,
+	fname,
+	lname,
+	status,
+}: any) => {
+	// const { login } = props;
 	return (
 		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
 			<div className="image">
 				<img src={Avatar} alt="" width={60} />
 			</div>
-			<div className="name text-2xl font-[800]">{name}</div>
+			<div className="name text-2xl font-[800]">{login}</div>
 			<div className="status justify-self-end absolute right-3 flex gap-1  items-center">
 				<button className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md">
 					challenge <img src={PlayWithMe} alt="" width={20} />
@@ -83,17 +92,47 @@ const GameCard = (props: GameCardProps) => {
 };
 
 const GameDashboard = () => {
-	const { gameNotif, setGameNotif, friendChellenge  } = useGlobalContext();
+	const { gameNotif, setGameNotif, friendChellenge } = useGlobalContext();
 	const { setTypeRoom, mysocket } = useGameContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);
 	};
+	interface Iitem {
+		id: number;
+		name: string;
+		icon: string;
+		avatar?: string;
+		login?: string;
+		firstName?: string;
+		lastName?: string;
+		status?: string;
+	}
+	const [friend, setFriend] = useState<Iitem[]>([]);
 
 	useEffect(() => {
-		console.log(friendChellenge);
+		// const chellenge = Cookies.get("friendChellenge");
+		const chellenge = JSON.parse(
+			window.localStorage.getItem("friendChellenge")!
+		);
+		console.log("chellenge:", chellenge);
+		const getChellenger = async () => {
+			try {
+				chellenge.forEach(async (elem: any) => {
+					const friends = await getUserInfo(elem.id);
+					setFriend((prev) => [...prev, friends]);
+					console.log("friends:", friend);
+				});
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		if (chellenge)
+			getChellenger();
 	}, []);
 
+	console.log("friendChellenge:", friend);
+	// console.log("friendlength:", friend.length)
 	const Main = styled.div`
 		@media (max-width: 1200px) {
 			flex-direction: column;
@@ -194,12 +233,20 @@ const GameDashboard = () => {
 							</div>
 						</div>
 						<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-							{true ? (
-								<div className="flex flex-col  gap-5 mr-1 h-full ">
-									{chalenger.map((chalenger, index) => (
-										<ChalengerCard key={index} name={chalenger.name} />
-									))}
-								</div>
+							{friend && friend.length ? (
+								// <div className="flex flex-col  gap-5 mr-1 h-full ">
+									friend.map((item: Iitem, index: any) => (
+										<ChalengerCard
+											key={index}
+											id={item.id}
+											img={item.avatar}
+											login={item.login}
+											fname={item.firstName}
+											lname={item.lastName}
+											status={item.status}
+										/>
+									))
+								// </div>
 							) : (
 								<div className=" h-full flex justify-center items-center text-3xl">
 									No Chalenger

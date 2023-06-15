@@ -43,7 +43,7 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 	);
 };
 
-const FreindCard = ({ id, img, login, fname, lname }: any) => {
+const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 	const navigate = useNavigate();
 	const { setFriend } = useGameContext();
 	const [userImg, setUserImg] = useState<string>("");
@@ -80,9 +80,9 @@ const FreindCard = ({ id, img, login, fname, lname }: any) => {
 					className="flex items-center border gap-2 p-1"
 					onClick={() => {
 						setFriend(id);
-						console.log("friend:", id);
 						navigate("/game/startGame");
 					}}
+					disabled={status !== "Online"}
 				>
 					challenge <img src={PlayWithMe} alt="challenge-btn" width={20} />
 				</button>
@@ -160,7 +160,6 @@ const GameType = () => {
 								fname={item.firstName}
 								lname={item.lastName}
 								status={item.status}
-								// points="1337"
 							/>
 						))
 					) : (

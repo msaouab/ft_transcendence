@@ -53,11 +53,13 @@ const SideBar = ({
 	connected: boolean;
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { setUserStatus, setUserImg, setUserId, userId, friendChellenge } = useGlobalContext();
+	const { setUserStatus, setUserImg, setUserId, userId, friendChellenge, setFriendChellenge } =
+		useGlobalContext();
 	const [menuIndex, setMenuIndex] = useState<number>(2);
 	// const
 
-	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
+	const { setChatNotif, chatNotif, gameNotif, setGameNotif } =
+		useGlobalContext();
 	// const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
 	useEffect(() => {
 		if (connected) {
@@ -71,19 +73,24 @@ const SideBar = ({
 			});
 			notifySocket.on("gameNotif", (data: any) => {
 				if (window.location.pathname != "/game") {
-					const prevNotif = gameNotif;
-					const num = parseInt(data.num) + prevNotif;
-					setGameNotif(num);
-					Cookies.set("gameNotif", String(num));
+					if (data.num != 0) {
+						const prevNotif = gameNotif;
+						const num = parseInt(data.num) + prevNotif;
+						setGameNotif(num);
+						Cookies.set("gameNotif", String(num));
+					}
 				}
 			});
-			notifySocket.on("friendInfo", (id: String, key: String) => {
-				console.log("friendInfo", id, key);
-				friendChellenge[id] = key;
-				console.log("friendChellenge", friendChellenge);
+			notifySocket.on("friendInfo", (id: string, key: string) => {
+				const ChellengeObg = { id, key}
+				setFriendChellenge((prev: any) => {
+					return [...prev, ChellengeObg];
+				});
+				console.log("ChellengeObg:", friendChellenge)
+				window.localStorage.setItem("friendChellenge", JSON.stringify(friendChellenge));
 			});
 		}
-	}, [chatNotif, gameNotif, friendChellenge]);
+	}, [chatNotif, gameNotif]);
 	const handleToggleSidebar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};

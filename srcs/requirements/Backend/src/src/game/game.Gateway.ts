@@ -103,8 +103,8 @@ export class GameGateway
 		this.roomMap.forEach(async (value, key) => {
 			if (
 				value.mode !== "Bot" &&
-				(value.player1.id === client.handshake.query.userId.toString() ||
-					value.player2.id === client.handshake.query.userId.toString())
+				(value.player1.id === client.handshake.query.userId ||
+					value.player2.id === client.handshake.query.userId)
 			) {
 				const userId = client.handshake.query.userId.toString();
 				const opponentId =
@@ -530,7 +530,7 @@ export class GameGateway
 				members: 1,
 				socket: [client],
 				player1: {
-					id: client.handshake.query.userId.toString(),
+					id: client.handshake.query.userId,
 					score: 0,
 					paddle1: {
 						x: payload.width / 2 - 40,
@@ -640,6 +640,8 @@ export class GameGateway
 		if (!FindBenome) throw new BadRequestException("User not found");
 		if (FindBenome.status === "InGame")
 			throw new ForbiddenException("User is already in game");
+		if (FindBenome.status === "Offline")
+			throw new ForbiddenException("User is offline");
 		const key = createHash("sha256")
 			.update(Date.now().toString())
 			.digest("hex");
@@ -648,7 +650,7 @@ export class GameGateway
 			members: 1,
 			socket: [client],
 			player1: {
-				id: client.handshake.query.userId.toString(),
+				id: client.handshake.query.userId,
 				score: 0,
 				paddle1: {
 					x: payload.width / 2 - 40,
@@ -693,11 +695,16 @@ export class GameGateway
 			mode: payload.mode,
 			time: 0,
 		});
+		console.log('onlineClientsMap:', onlineClientsMap.has(payload.friend))
 		if (onlineClientsMap.has(payload.friend)) {
 			const friendSocket = onlineClientsMap.get(payload.friend);
 			friendSocket.emit("gameNotif", { num: 1 });
-			friendSocket.emit("friendInfo", payload.friend, key);
+			friendSocket.emit("friendInfo", client.handshake.query.userId, key);
 		}
+		// else {
+			// const friendSocket = onlineClientsMap.get(payload.friend);
+			// friendSocket.emit("gameNotif", { num: 0 });
+		// }
 		// console.log(onlineClientsMap);
 	}
 
