@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RoundTable from "../../assets/roundTable.png";
 import TimingTable from "../../assets/timeTable.png";
 import GetChallenge from "../../assets/getChallenge.png";
@@ -11,7 +11,6 @@ import styled from "styled-components";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useState } from "react";
 import { getFriendsInfo, getUserInfo } from "../../api/axios";
-import Cookies from "js-cookie";
 
 const chalenger = [
 	{
@@ -49,7 +48,9 @@ export const ChalengerCard = ({
 	fname,
 	lname,
 	status,
+	roomID,
 }: any) => {
+	const navigate = useNavigate();
 	// const { login } = props;
 	return (
 		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
@@ -58,7 +59,11 @@ export const ChalengerCard = ({
 			</div>
 			<div className="name text-2xl font-[800]">{login}</div>
 			<div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-				<button className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md">
+				<button 
+				onClick={() => {
+					navigate(`/game/${roomID}`);
+				}}
+				className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md">
 					challenge <img src={PlayWithMe} alt="" width={20} />
 				</button>
 				{/* <div className="dot w-3 h-3 bg-green-500 rounded-full"></div> */}
@@ -92,8 +97,7 @@ const GameCard = (props: GameCardProps) => {
 };
 
 const GameDashboard = () => {
-	const { gameNotif, setGameNotif, friendChellenge } = useGlobalContext();
-	const { setTypeRoom, mysocket } = useGameContext();
+	const { setTypeRoom } = useGameContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);
@@ -107,6 +111,7 @@ const GameDashboard = () => {
 		firstName?: string;
 		lastName?: string;
 		status?: string;
+		key?: string;
 	}
 	const [friend, setFriend] = useState<Iitem[]>([]);
 
@@ -118,21 +123,32 @@ const GameDashboard = () => {
 		console.log("chellenge:", chellenge);
 		const getChellenger = async () => {
 			try {
-				chellenge.forEach(async (elem: any) => {
-					const friends = await getUserInfo(elem.id);
-					setFriend((prev) => [...prev, friends]);
-					console.log("friends:", friend);
-				});
+				const updatedFriends = await Promise.all(
+					chellenge.map(async (elem: any) => {
+						const friends = await getUserInfo(elem.id);
+						return { ...friends, key: elem.key }; // Include the key value from chellenge
+					})
+				);
+				setFriend((prev) => [...prev, ...updatedFriends]);
 			} catch (error) {
 				console.error(error);
 			}
 		};
-		if (chellenge)
-			getChellenger();
+		// const getChellenger = async () => {
+		// 	try {
+		// 		chellenge.forEach(async (elem: any) => {
+		// 			const friends = await getUserInfo(elem.id);
+		// 			setFriend((prev) => [...prev, friends]);
+		// 			console.log("friends:", friend);
+		// 		});
+		// 	} catch (error) {
+		// 		console.error(error);
+		// 	}
+		// };
+		if (chellenge) getChellenger();
 	}, []);
 
 	console.log("friendChellenge:", friend);
-	// console.log("friendlength:", friend.length)
 	const Main = styled.div`
 		@media (max-width: 1200px) {
 			flex-direction: column;
@@ -235,19 +251,20 @@ const GameDashboard = () => {
 						<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
 							{friend && friend.length ? (
 								// <div className="flex flex-col  gap-5 mr-1 h-full ">
-									friend.map((item: Iitem, index: any) => (
-										<ChalengerCard
-											key={index}
-											id={item.id}
-											img={item.avatar}
-											login={item.login}
-											fname={item.firstName}
-											lname={item.lastName}
-											status={item.status}
-										/>
-									))
-								// </div>
+								friend.map((item: Iitem, index: any) => (
+									<ChalengerCard
+										key={index}
+										id={item.id}
+										img={item.avatar}
+										login={item.login}
+										fname={item.firstName}
+										lname={item.lastName}
+										status={item.status}
+										roomID={item.key}
+									/>
+								))
 							) : (
+								// </div>
 								<div className=" h-full flex justify-center items-center text-3xl">
 									No Chalenger
 								</div>

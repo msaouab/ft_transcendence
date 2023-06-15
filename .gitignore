@@ -1,7 +1,8 @@
 .vscode/*
 .env
-node_modules/*
+node_modules
 db
 dist
 .DS_Store
 package-lock.json
+/prisma/migrations/*
