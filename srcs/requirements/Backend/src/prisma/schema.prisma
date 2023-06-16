@@ -55,6 +55,11 @@ enum InviteStatus {
   Rejected
 }
 
+enum InviteType {
+  Friend
+  Game
+}
+
 // type  attributes att functions
 model User {
   id             String            @id @default(uuid())
@@ -226,7 +231,16 @@ model Notification {
   notification_id String @id @default(uuid())
   user_id         String
   user            User   @relation("notificationRelation", fields: [notification_id], references: [id])
-  // invite_data InviteData[] @relation("InviteDataRelation")
+  invite_data InviteData[] @relation("InviteDataRelation")
+}
+
+model InviteData {
+  notification_id String @id @default(uuid())
+  type            InviteType
+  invite_id       String
+  invite          Notification[] @relation("InviteDataRelation")
+  seen            Boolean @default(false)
+  metadata        String?
 }
 
 model Game {
