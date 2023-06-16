@@ -118,7 +118,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('sendGroupMessage')
     async handleGroupChat(client: Socket, payload: any) {
+        console.log("We've got the event to send a group message: ", payload);
         return await this.chatService.sendGroupMessage(client, payload, this.server);
+    }
+
+    @SubscribeMessage('addChannelMember')
+    async handleAddChannelMember(client: Socket, payload: any) {
+        console.log("We've got the event to add a channel member: ", payload);
+        return await this.chatService.addChannelMember(client, payload, this.server);
     }
 }
 

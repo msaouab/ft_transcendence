@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { CiSearch, CiFaceMeh, CiLollipop, CiChat2, CiCircleRemove } from 'react-icons/ci';
+import { CiSearch, CiFaceMeh, CiLollipop, CiChat2 } from 'react-icons/ci';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import cmdKeyIcon from '../../../assets/cmdkey.png'
@@ -8,6 +8,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import SearchBarFull from './SearchBarFull';
 import TmpChatBox from './TmpChatBox';
 import Cookies from 'js-cookie';
+import { BiGroup } from 'react-icons/bi';
+import JoinChannel from './JoinChannel';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
@@ -141,6 +143,7 @@ const SearchBar = () => {
     let [searchResults, setSearchResults] = useState<any[]>([]);
     const [tmpChatData, setTmpChatData] = useState({});
     const [showTempChat, setShowTempChat] = useState<boolean>(false);
+    const [joinChannel, setJoinChannel] = useState({});
 
     const handleTempChat = (user: any) => {
         setShowTempChat(true);
@@ -234,6 +237,18 @@ const SearchBar = () => {
         setDropdown(!dropdown);
     };
 
+    const handleJoinChannel = (channel: any) => {
+        setJoinChannel({
+            channel: {
+                id: channel.id,
+                name: channel.name,
+                type: channel.chann_type,
+                password: channel.password,
+                avatar: channel.avatar,
+            },
+            userId: Cookies.get('id'),
+        });
+    }
 
     const navigate = useNavigate();
     return (
@@ -249,7 +264,7 @@ const SearchBar = () => {
                         navigate(`/search?entity=all&keyword=${search}`);
 
                     }}>
-                        <input type="text" placeholder="Search messages" onChange={(e) => handleSearch(e.target.value)} onClick={handleDropdown} />
+                        <input type="text" placeholder="Search messages" value={search} onChange={(e) => handleSearch(e.target.value)} onClick={handleDropdown} />
                     </form>
                     {
                         dropdown && (
@@ -309,15 +324,15 @@ const SearchBar = () => {
                                                             </Link>
                                                         </div>
                                                         { user.id === Cookies.get('id') ? null :
-                                                        <div className="chat-button flex justify-center items-center mr-1">
-                                                            <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
-                                                                e.preventDefault();
-                                                                handleTempChat(user);
-                                                            }}>
-                                                                <CiChat2 className="chat-icon " size={30} />
-                                                            </a>
-                                                        </div>
-                                            }
+                                                            <div className="chat-button flex justify-center items-center mr-1">
+                                                                <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    handleTempChat(user);
+                                                                }}>
+                                                                    <CiChat2 className="chat-icon " size={30} />
+                                                                </a>
+                                                            </div>
+                                                        }
 
                                                     </div>
                                                 )
@@ -336,6 +351,10 @@ const SearchBar = () => {
                                         }
                                         {
                                             searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
+                                                const isInChannel = channel.users.some((user: any) => {
+                                                    return user.user_id === Cookies.get('id');
+                                                });
+                                                console.log("channel: ", channel)
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
@@ -350,6 +369,21 @@ const SearchBar = () => {
                                                                     <p className="text-zinc-900" > {channel.chann_type}</p>
                                                                 </div>
                                                             </Link>
+                                                        </div>
+                                                        <div className="chat-button flex justify-center items-center mr-1">
+                                                            {
+                                                                isInChannel ? (null) : (
+                                                                    <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        setDropdown(false);
+                                                                        setSearch('');
+                                                                        setSearchResults([]);
+                                                                        handleJoinChannel(channel);
+                                                                    }}>
+                                                                        <BiGroup className="chat-icon " size={30} />
+                                                                    </a>
+                                                                )
+                                                            }
                                                         </div>
                                                     </div>
                                                 )
@@ -378,8 +412,9 @@ const SearchBar = () => {
 
                 <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} key={tmpChatData} />
             }
-
-
+            {
+                Object.keys(joinChannel).length !== 0 && (<JoinChannel joinChannel={joinChannel} setJoinChannel={setJoinChannel} />)
+            }
         </div >
     );
 };

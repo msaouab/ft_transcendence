@@ -8,7 +8,6 @@ import { GetChannelMessages } from "../../api/axios";
 import GroupChatInfiniteScroll from "./GroupChatInfiniteScroll";
 
 
-
 const GroupChatBoxStyle = styled.div`
   background: transparent;
   width: 100%;
@@ -30,12 +29,14 @@ interface GroupChatBoxProps {
   selectedGroupChat: GroupMessage;
   socket: any;
   connected: boolean;
+  joinedRooms: string[];
 }
 
 const GroupChatBox = ({
   selectedGroupChat,
   socket,
   connected,
+  joinedRooms,
 }: GroupChatBoxProps) => {
   let intialState = {
     messages: [] as GroupSingleMessage[],
@@ -61,6 +62,12 @@ const GroupChatBox = ({
     setTotalMessages(res.count);
     return res.messages;
   };
+
+  useEffect(() => {
+    if (connected && !joinedRooms.includes(selectedGroupChat.group_id)) {
+      socket.current.emit("joinGroupRoom", { group_id: selectedGroupChat.group_id });
+    }
+  }, [selectedGroupChat.group_id]);
 
   const next = () => {
     getMessages().then((newMessages) => {

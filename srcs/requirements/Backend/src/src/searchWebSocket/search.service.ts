@@ -65,11 +65,23 @@ export class SearchService {
             },
             take: limit,
         });
+        const updatedChannels = [];
+        for (const channel of channels) {
+            const users = await this.prisma.channelsJoinTab.findMany({
+                where: {
+                    channel_id: channel.id,
+                },
+            });
+
+            console.log("Channel Users are: ", users);
+            const updatedChannel = { ...channel, users: users };
+            updatedChannels.push(updatedChannel);
+        }
 
         console.log("Channels are: ", channels);
         const result = {
             users: users,
-            channels: channels,
+            channels: updatedChannels,
         };
 
         return result;

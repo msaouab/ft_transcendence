@@ -433,6 +433,55 @@ export class ChatService {
         console.log("The client has left the room: ", group_id);
         return channel;
     }
+
+    async addChannelMember(client, payload: any, server: Server) {
+        const { channel_id, user_id, type, password } = payload;
+        console.log(channel_id, user_id, type, password);
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: user_id
+            }
+        });
+        if (!user) {
+            throw new HttpException('User not found', 404);
+        }
+        const channel = await this.prisma.channel.findUnique({
+            where: {
+                id: channel_id
+            }
+        });
+        if (!channel) {
+            throw new HttpException('Channel not found', 404);
+        }
+        try {
+            if (type === 'Secret' && channel.password !== password) {
+                throw new HttpException('Wrong password', 400);
+            }
+            const memberTab = await this.prisma.membersTab.create({
+                data: {
+                    member_id: user_id,
+                    channel_id: channel_id,
+                }
+            })
+            if (!memberTab) {
+                throw new HttpException('Member not added', 400);
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: user_id,
+                    channel_name: channel.name,
+                    channel_id: channel.id,
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                throw new HttpException('Channel not joined', 400);
+            }
+            server.to(channel_id).emit('newChannelMember', user);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }
 
 

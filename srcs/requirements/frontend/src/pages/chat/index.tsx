@@ -72,6 +72,7 @@ const Chat = () => {
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
     {} as PrivateMessage
   );
+  const [joinedRooms, setJoinedRooms] = React.useState([] as string[]);
   const [selectedGroupChat, setSelectedGroupChat] = React.useState <GroupMessage>( {} as GroupMessage );
   const [newLatestMessage, setNewLatestMessage] = React.useState<{
     chatRoomId: string;
@@ -89,6 +90,7 @@ const Chat = () => {
       groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
         console.log("joining the room: ", groupChatRoom.group_id);
         chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
       });
     }
     // chatSocket.current.on('connect', () => {
@@ -98,6 +100,7 @@ const Chat = () => {
       groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
         console.log("leaving the room: ", groupChatRoom.group_id);
         chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
       });
       chatSocket.current.disconnect();
       setConnected(false);
@@ -181,6 +184,7 @@ const Chat = () => {
             socket={chatSocket}
             connected={connected}
             key={selectedGroupChat.group_id}
+            joinedRooms={joinedRooms}
           />
         )}
       </div>
