@@ -6,7 +6,6 @@ import GroupChatBoxTopBar from "./GroupChatBoxTopBar";
 import GroupSendMessageBox from "./GroupSendMessageBox";
 import { GetChannelMessages } from "../../api/axios";
 import GroupChatInfiniteScroll from "./GroupChatInfiniteScroll";
-import { useGlobalContext } from "../../provider/AppContext";
 
 
 
@@ -45,7 +44,6 @@ const GroupChatBox = ({
     totalMessages: 0,
   };
 
-  const { setGroupChatRooms } = useGlobalContext();
   const { group_id } = selectedGroupChat;
   const [totalMessages, setTotalMessages] = React.useState(0);
   const [state, setState] = React.useState(intialState);
@@ -53,17 +51,19 @@ const GroupChatBox = ({
   let limit = 20;
 
 
-  const getMessages = async (currentChat: any) => {
+  const getMessages = async () => {
     if (!selectedGroupChat.group_id) {
       return [];
     }
-    let res = await GetChannelMessages(currentChat.group_id, limit, offset);
+    console.log("group_id", group_id);
+    console.log("group_id", selectedGroupChat.group_id);
+    let res = await GetChannelMessages(group_id, limit, offset);
     setTotalMessages(res.count);
     return res.messages;
   };
 
   const next = () => {
-    getMessages(selectedGroupChat).then((newMessages) => {
+    getMessages().then((newMessages) => {
       setState((prevState) => ({
         ...prevState,
         messages: [...prevState.messages, ...newMessages],
@@ -74,7 +74,7 @@ const GroupChatBox = ({
   };
 
   useEffect(() => {
-    getMessages(selectedGroupChat).then((messages) => {
+    getMessages().then((messages) => {
       if (messages.length == 0
         || (messages[0] && selectedGroupChat.group_id !== messages[0].group_id)) {
         setState({
@@ -97,7 +97,9 @@ const GroupChatBox = ({
 
   useEffect(() => {
     if (connected) {
-      socket.current.on("newGroupMessage", (data: any) => {
+      socket.current.on("GroupMessage", (data: any) => {
+        console.log("new group message from GroupChatBox: ", data);
+        console.log("selectedGroupChat: ", selectedGroupChat);
         const getNewMessage = async () => {
           const newMessage = await GetChannelMessages(selectedGroupChat.group_id, 1, 0);
           return newMessage.messages[0];
@@ -108,23 +110,16 @@ const GroupChatBox = ({
             messages: [newMessage, ...prevState.messages],
           }));
         })
-        setGroupChatRooms(prev => {
-          const index = prev.findIndex((group: GroupMessage) => group.group_id === data.receiver_id);
-          const newGroupChatRooms = [...prev];
-          newGroupChatRooms[index].lastMessage = data.content;
-          newGroupChatRooms[index].lastMessageDate = data.dateCreated;
-          return newGroupChatRooms;
-        })
       });
     }
     return () => {
-      socket.current.off("newGroupMessage");
+      socket.current.off("GroupMessage");
     }
   }, [connected]);
 
   return (
     <>
-      <GroupChatBoxStyle  id="chat-box">
+      <GroupChatBoxStyle id="chat-box">
         {selectedGroupChat.group_id === undefined ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-2xl text-white">nothing to see here</div>
@@ -142,7 +137,7 @@ const GroupChatBox = ({
               next={next}
             />
             <GroupSendMessageBox
-              groupId={group_id}
+              selectedGroupChat={selectedGroupChat}
               socket={socket}
               connected={connected}
             />

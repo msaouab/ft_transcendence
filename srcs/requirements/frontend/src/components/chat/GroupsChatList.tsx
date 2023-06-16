@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import CreateChannel from './CreateChannel/CreateChannel';
-import { GroupMessage } from '../../types/message';
+import { GroupMessage, PrivateMessage } from '../../types/message';
 import { useGlobalContext } from '../../provider/AppContext';
 import GroupTab from './GroupTab';
 import Cookies from "js-cookie";
@@ -35,11 +35,12 @@ const Button = styled.button`
 
 interface GroupChatListProps {
   setSelectedGroupChat: (chat: GroupMessage) => void;
+  setSelectedChat: (chat: PrivateMessage) => void,
   socket: any,
   connected: boolean,
 }
 
-const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatListProps) => {
+const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connected }: GroupChatListProps) => {
   const [newChat, setNewChat] = useState(false);
   const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
   const [selected, setSelected] = useState("");
@@ -86,6 +87,29 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
     }
   }, [joinToGroup]);
 
+  useEffect(() => {
+    if (connected) {
+      socket.current.on("newGroupMessage", (data: any) => {
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === data.group_id);
+          if (index === -1) {
+            return [data, ...prev];
+          }
+          const newGroupChatRooms = [...prev];
+          newGroupChatRooms[index].lastMessage = data.lastMessage;
+          newGroupChatRooms[index].lastMessageDate = data.lastMessageDate;
+          return newGroupChatRooms;
+        })
+        setSelectedChat({} as PrivateMessage);
+        setSelected(data.group_id);
+        setSelectedGroupChat(data);
+      });
+    }
+    return () => {
+      socket.current.off("newGroupMessage");
+    }
+  }, [connected]);
+
   return (
     <GroupChatListStyle>
       <div className="">
@@ -93,13 +117,13 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
           Groups
           <Button onClick={() => setNewChat(!newChat)}>New</Button>
         </h1>
-            <CreateChannel
-              setSelectedGroupChat={setSelectedGroupChat}
-              show={newChat}
-              setShow={setNewChat}
-              socket={socket}
-              connected={connected}
-            />
+        <CreateChannel
+          setSelectedGroupChat={setSelectedGroupChat}
+          show={newChat}
+          setShow={setNewChat}
+          socket={socket}
+          connected={connected}
+        />
       </div>
       <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
       <div className="">
@@ -115,7 +139,7 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
             </div>
           </div>
         ) : (
-            groupChatRooms.sort((a: GroupMessage, b: GroupMessage) => {
+          groupChatRooms.sort((a: GroupMessage, b: GroupMessage) => {
             return (
               new Date(b.lastMessageDate).getTime() -
               new Date(a.lastMessageDate).getTime()
@@ -125,7 +149,9 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
               <div
                 key={props.group_id}
                 onClick={() => {
+                  console.log("selected group: ", props);
                   setSelected(props.group_id);
+                  setSelectedChat({} as PrivateMessage);
                   setSelectedGroupChat(props);
                 }}
               >

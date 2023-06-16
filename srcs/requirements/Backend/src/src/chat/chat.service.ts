@@ -313,7 +313,7 @@ export class ChatService {
         }
 
         if (seen) {
-            const transaction =  await this.prisma.$transaction([
+            const transaction = await this.prisma.$transaction([
                 // get count of all the messages in the private chat room
                 this.prisma.privateMessage.count({
                     where: {
@@ -359,12 +359,10 @@ export class ChatService {
                 take: limitNumber
             }),
         ])
-
     }
 
-    async sendGroupMessage(client, payload: any, server: Server) {
+    async createMessage(payload: any) {
         const { group_id, sender_id, lastMessage } = payload;
-
         const groupChatRoom = await this.prisma.channel.findFirst({
             where: {
                 id: group_id
@@ -384,7 +382,23 @@ export class ChatService {
         if (!message) {
             throw new HttpException('Message not created', 400);
         }
-        server.to(group_id).emit('newGroupMessage', message);
+        return message;
+    }
+
+    async sendGroupMessage(client, payload: any, server: Server) {
+        const { group_id } = payload;
+        const message = await this.createMessage(payload);
+        const newGroupMessage = {
+            group_id: payload.group_id,
+            sender_id: payload.sender_id,
+            name: payload.name,
+            profileImage: payload.profileImage,
+            lastMessage: message.content,
+            lastMessageDate: message.dateCreated,
+            role: payload.role
+        }
+        server.to(group_id).emit('newGroupMessage', newGroupMessage);
+        server.to(group_id).emit('GroupMessage', newGroupMessage);
         return message;
     }
 

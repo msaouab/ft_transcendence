@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import { CiImport } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import ChannelTypes from "./ChannelTypes";
-import axios from "axios";
 import { CreateChannel, PostChannelAvatar } from "../../../api/axios";
 import { GroupMessage } from "../../../types/message";
-import { useGlobalContext } from "../../../provider/AppContext";
 
 const ModelStyle = styled.div`
   width: 100%;
@@ -167,7 +165,6 @@ const Model = (props: ModelProps) => {
   const [type, setType] = useState("Public");
   const [exeption, setExeption] = useState(false);
   const [groupMessage, setGroupMessage] = useState<GroupMessage>({} as GroupMessage);
-  const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
 
   const handelChange = (e: any) => {
     e.preventDefault();
@@ -218,9 +215,8 @@ const Model = (props: ModelProps) => {
 
   useEffect(() => {
     if (props.connected && groupMessage.group_id) {
+      props.socket.current.emit("joinGroupRoom", { group_id: groupMessage.group_id })
       props.socket.current.emit("sendGroupMessage", groupMessage)
-      props.setSelectedGroupChat(groupMessage);
-      setGroupChatRooms([...groupChatRooms, groupMessage]);
       setGroupMessage({} as GroupMessage);
       props.setShow(false);
     }

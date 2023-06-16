@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import styled from "styled-components";
 import { CiPaperplane, CiChat1 } from "react-icons/ci";
 import Cookies from "js-cookie";
 import { GroupMessage } from '../../types/message';
-import { useGlobalContext } from '../../provider/AppContext';
 
 const GroupSendMessageBoxStyle = styled.div`
   width: 100%;
@@ -54,13 +53,13 @@ const GroupSendMessageBoxStyle = styled.div`
 `;
 
 interface GroupSendMessageBoxProps {
-  groupId: string;
+  selectedGroupChat: GroupMessage;
   socket: any;
   connected: boolean;
 }
 
 const GroupSendMessageBox = ({
-  groupId,
+  selectedGroupChat,
   socket,
   connected,
 }: GroupSendMessageBoxProps) => {
@@ -73,11 +72,12 @@ const GroupSendMessageBox = ({
     if (!userId) return;
 
     if (connected) {
-      socket.current.emit("sendGroupMessage", {
-        group_id: groupId,
+      const newMessage: GroupMessage = {
+        ...selectedGroupChat,
         sender_id: userId,
         lastMessage: message,
-      });
+      }
+      socket.current.emit("sendGroupMessage", newMessage);
     }
     setMessage("");
   };
