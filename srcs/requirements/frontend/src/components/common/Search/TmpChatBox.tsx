@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 
 import styled from "styled-components";
 import { GetAvatar } from "../../../api/axios";
+import { getAvatarUrl } from "../CommonFunc";
 
 // import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
@@ -89,7 +90,8 @@ const TmpChatBox = ({
 				`http://localhost:3000/api/v1/user/${userId}`
 			);
 			// console.log("user", user.data.login);
-			const avatar = await GetAvatar(user.data.id);
+			// const avatar = await GetAvatar(user.data.id);
+			const avatar = getAvatarUrl();
 			return {
 				login: user.data.login,
 				avatar: avatar,
