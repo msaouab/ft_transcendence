@@ -17,6 +17,7 @@ import { UserService } from "src/user/user.service";
 import { log } from "console";
 import { GameGateway } from './game.Gateway';
 import { Cookie } from "express-session";
+import { stat } from "fs";
 
 
 interface Player {
@@ -195,4 +196,60 @@ export class GameService {
 
 
 	}
+
+	async getMyInvites(user)
+	{
+		const me = await this.prisma.user.findUnique({
+			where: {
+				email: user._json.email
+			}
+		})
+		
+		const invites = await this.prisma.gameInvites.findMany({
+			where:
+			{
+				receiver_id: me.id,
+				status: "Pending"
+			}
+
+		})
+		return invites;
+	}
+	async getFriendsLiveGames(user)
+	{
+		const me = await this.prisma.user.findUnique({
+			where: {
+				email: user._json.email
+			}
+		})
+		const friends = await this.prisma.friendsTab.findMany({
+			where: {
+				user_id: me.id
+			}
+		})
+		const games = [];
+		for (let i = 0; i < friends.length; i++)
+		{
+			const livegames = await this.prisma.game.findMany({
+				where: {
+					OR: [
+						{
+							player1_id: friends[i].user_id,
+							gameStatus: "OnGoing"
+						},
+						{
+							player2_id: friends[i].user_id,
+							gameStatus: "OnGoing"
+						}
+					]
+				}
+			})
+			games.push(livegames);
+
+			
+		}
+
+		return games;
+	}
+
 }

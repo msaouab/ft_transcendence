@@ -42,11 +42,18 @@ import {
 	}
 	// @Post("/game/:id")
 	// @UseGuards(AuthenticatedGuard)
+	@Get("/myinvites")
+	@UseGuards(AuthenticatedGuard)
+	async getMyInvites(@User() user: Profile) {
+		return await this.gameService.getMyInvites(user);
 
-  }
+ 	}
+	async getFriendsLiveGames(@User() user: Profile) {
+		return await this.gameService.getFriendsLiveGames(user);
+	}
   //   @Put(':id/update')
   //   @UseGuards(AuthenticatedGuard)
   //     updateUser(@Param('id') id: string,@User() user: Profile) {
   //         return this.userService.updateUser(id, user, PutUserDto);
   //     }
-  
+}
