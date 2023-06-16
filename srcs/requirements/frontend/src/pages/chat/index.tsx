@@ -77,7 +77,7 @@ const Chat = () => {
     chatRoomId: string;
     message: string;
   }>({} as { chatRoomId: string; message: string });
-  const { privateChatRooms } = useGlobalContext();
+  const { privateChatRooms, groupChatRooms } = useGlobalContext();
 
   useEffect(() => {
     // socket connection
@@ -85,10 +85,20 @@ const Chat = () => {
       chatSocket.current = io(`http://localhost:3000/chat`);
       setConnected(true);
       console.log("connected to the server");
+      console.log("groupChatRooms: ", groupChatRooms);
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("joining the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+      });
     }
     // chatSocket.current.on('connect', () => {
     // });
     return () => {
+      console.log("disconnected from the server");
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("leaving the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+      });
       chatSocket.current.disconnect();
       setConnected(false);
     };
@@ -114,19 +124,6 @@ const Chat = () => {
       }
     };
   }, [selectedChat.chatRoomid]);
-
-  useEffect(() => {
-    if (selectedGroupChat.group_id) {
-      console.log("joining the room: ", selectedGroupChat.group_id);
-      chatSocket.current.emit("joinGroupRoom", { group_id: selectedGroupChat.group_id });
-    }
-    return () => {
-      if (selectedGroupChat.group_id) {
-        console.log("leaving the room: ", selectedGroupChat.group_id);
-        chatSocket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
-      }
-    };
-  }, [selectedGroupChat.group_id]);
 
   useEffect(() => {
     if (!selectedChat.chatRoomid) {

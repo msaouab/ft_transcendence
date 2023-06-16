@@ -43,6 +43,7 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
   const [newChat, setNewChat] = useState(false);
   const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
   const [selected, setSelected] = useState("");
+  const [joinToGroup, setJoinToGroup] = useState(false);
 
   const getGroupChatRooms = async () => {
     let id = Cookies.get("id");
@@ -54,7 +55,13 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
           return { ...channel };
         })
       );
-      setGroupChatRooms(res);
+      if (groupChatRooms.length === 0) {
+        setGroupChatRooms(res);
+        setJoinToGroup(true);
+      }
+      else {
+        setGroupChatRooms(res);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -64,6 +71,20 @@ const GroupChatList = ({ setSelectedGroupChat, socket, connected }: GroupChatLis
     getGroupChatRooms();
   }, []);
 
+  useEffect(() => {
+    if (connected) {
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("joining the room: ", groupChatRoom.group_id);
+        socket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+      });
+    }
+    return () => {
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("leaving the room: ", groupChatRoom.group_id);
+        socket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+      });
+    }
+  }, [joinToGroup]);
 
   return (
     <GroupChatListStyle>
