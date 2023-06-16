@@ -59,11 +59,12 @@ export const ChalengerCard = ({
 			</div>
 			<div className="name text-2xl font-[800]">{login}</div>
 			<div className="status justify-self-end absolute right-3 flex gap-1  items-center">
-				<button 
-				onClick={() => {
-					navigate(`/game/${roomID}`);
-				}}
-				className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md">
+				<button
+					onClick={() => {
+						navigate(`/game/${roomID}`);
+					}}
+					className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md"
+				>
 					challenge <img src={PlayWithMe} alt="" width={20} />
 				</button>
 				{/* <div className="dot w-3 h-3 bg-green-500 rounded-full"></div> */}
@@ -98,6 +99,7 @@ const GameCard = (props: GameCardProps) => {
 
 const GameDashboard = () => {
 	const { setTypeRoom } = useGameContext();
+	const { gameNotif, setGameNotif } = useGlobalContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);
@@ -120,7 +122,7 @@ const GameDashboard = () => {
 		const chellenge = JSON.parse(
 			window.localStorage.getItem("friendChellenge")!
 		);
-		console.log("chellenge:", chellenge);
+		// console.log("chellenge:", chellenge);
 		const getChellenger = async () => {
 			try {
 				const updatedFriends = await Promise.all(
@@ -130,6 +132,8 @@ const GameDashboard = () => {
 					})
 				);
 				setFriend((prev) => [...prev, ...updatedFriends]);
+				setGameNotif(0);
+				// console.log("friends:", friend)
 			} catch (error) {
 				console.error(error);
 			}
@@ -148,7 +152,7 @@ const GameDashboard = () => {
 		if (chellenge) getChellenger();
 	}, []);
 
-	console.log("friendChellenge:", friend);
+	// console.log("friendChellenge:", friend);
 	const Main = styled.div`
 		@media (max-width: 1200px) {
 			flex-direction: column;

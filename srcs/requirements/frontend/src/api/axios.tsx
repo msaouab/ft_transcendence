@@ -197,4 +197,13 @@ export const deleteFreind = async (id: string, receiver_id: string) => {
 	}
 };
 
+export const getInviteGame = async (id: string) => {
+	try {
+		const res = await instance.get("/game/" + id + "/invites");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
 export default instance;

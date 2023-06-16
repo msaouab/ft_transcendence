@@ -247,6 +247,7 @@ model GameInvites {
   sender      User         @relation("gameInvitesRelation", fields: [sender_id], references: [id])
   status      InviteStatus @default(Pending)
   validUntil  DateTime
+  roomId      String
 
   @@unique([sender_id, receiver_id])
 }

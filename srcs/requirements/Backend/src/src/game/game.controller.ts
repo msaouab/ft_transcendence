@@ -30,11 +30,11 @@ import {
 	//         return this.userService.getUser(id);
 	//     }
   
-	@Post("invite")
-	@UseGuards(AuthenticatedGuard)
-	StartGame(@Body() inviteGameDto: inviteGameDto, @User() user: Profile, @Req() req: Request){
-	  return this.gameService.createInvite(user, inviteGameDto);
-	}
+	// @Post("invite")
+	// @UseGuards(AuthenticatedGuard)
+	// StartGame(@Body() inviteGameDto: inviteGameDto, @User() user: Profile, @Req() req: Request){
+	//   return this.gameService.createInvite(user, inviteGameDto);
+	// }
 	@Put("invite/respond/:id")
 	@UseGuards(AuthenticatedGuard)
 	updateInvite(@Body() StatusInviteDto: StatusInviteDto, @User() user: Profile, @Param("id") id: string) {

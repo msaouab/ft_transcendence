@@ -38,6 +38,7 @@ export class GameGateway
 	constructor(
 		private prisma: PrismaService,
 		private UserService: UserService,
+		// private gameService: GameService,
 		private readonly achvService: AchvService
 	) {}
 
@@ -106,12 +107,12 @@ export class GameGateway
 				(value.player1.id === client.handshake.query.userId ||
 					value.player2.id === client.handshake.query.userId)
 			) {
-				const userId = client.handshake.query.userId.toString();
+				const userId = client.handshake.query.userId;
 				const opponentId =
 					value.player1.id === userId ? value.player2.id : value.player1.id;
 
 				if (userId) {
-					const player = await this.UserService.getUser(userId);
+					const player = await this.UserService.getUser(userId.toString());
 					if (player) {
 						await this.prisma.user.update({
 							where: { id: player.id },
@@ -632,11 +633,37 @@ export class GameGateway
 		}
 	}
 
+	async CreateInviteGame(userId: string, frindId: any, key) {
+		try {
+			const FindUser = await this.UserService.getUser(userId);
+			if (!FindUser)
+				throw new BadRequestException("User not found", userId);
+			if (FindUser.status !== "Online") {
+				throw new BadRequestException("User is not online");
+			}
+			const FindFriend = await this.UserService.getUser(frindId);
+			if (!FindFriend)
+				throw new BadRequestException("User not found", frindId);
+			if (FindFriend.status !== "Online" || FindUser.status !== "Online")
+				throw new BadRequestException("User is not online");
+			const createInvite = await this.prisma.gameInvites.create({
+				data: {
+					sender_id: FindUser.id,
+					receiver_id: FindFriend.id,
+					status: "Pending",
+					validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
+					roomId: key,
+				},
+			});
+			console.log("createInvite", createInvite);
+		}
+		catch (err) {
+			console.log(err);
+		}
+	}
+
 	async CreateFriendRoom(client: Socket, payload) {
-		console.log("CreateFriendRoom", payload);
-		console.log("benome is:", payload.friend)
 		const FindBenome = await this.UserService.getUser(payload.friend);
-		console.log("FindBenome", FindBenome);
 		if (!FindBenome) throw new BadRequestException("User not found");
 		if (FindBenome.status === "InGame")
 			throw new ForbiddenException("User is already in game");
@@ -695,17 +722,13 @@ export class GameGateway
 			mode: payload.mode,
 			time: 0,
 		});
-		console.log('onlineClientsMap:', onlineClientsMap.has(payload.friend))
 		if (onlineClientsMap.has(payload.friend)) {
 			const friendSocket = onlineClientsMap.get(payload.friend);
 			friendSocket.emit("gameNotif", { num: 1 });
 			friendSocket.emit("friendInfo", client.handshake.query.userId, key);
+			// this.createInviteGame(client.handshake.query.userId, payload.friend, key);
+			this.CreateInviteGame(client.handshake.query.userId.toString(), payload.friend, key);
 		}
-		// else {
-			// const friendSocket = onlineClientsMap.get(payload.friend);
-			// friendSocket.emit("gameNotif", { num: 0 });
-		// }
-		// console.log(onlineClientsMap);
 	}
 
 	@SubscribeMessage("joinRoom")

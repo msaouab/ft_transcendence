@@ -86,11 +86,10 @@ const SideBar = ({
 				setFriendChellenge((prev: any) => {
 					return [...prev, ChellengeObg];
 				});
-				console.log("ChellengeObg:", friendChellenge)
 				window.localStorage.setItem("friendChellenge", JSON.stringify(friendChellenge));
 			});
 		}
-	}, [chatNotif, gameNotif]);
+	}, [chatNotif, gameNotif, friendChellenge]);
 	const handleToggleSidebar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};

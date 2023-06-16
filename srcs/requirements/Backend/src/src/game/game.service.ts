@@ -137,15 +137,15 @@ export class GameService {
 		})
 		if (checkExist)
 			throw new BadRequestException("Invite already sent");
-		const newInvite = await this.prisma.gameInvites.create({
-			data: {
-				sender_id: sender.id,
-				receiver_id: receiver.id,
-				status: "Pending",
-				validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
-				// mode: mode
-			}
-		})
+		// const newInvite = await this.prisma.gameInvites.create({
+		// 	data: {
+		// 		sender_id: sender.id,
+		// 		receiver_id: receiver.id,
+		// 		status: "Pending",
+		// 		validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
+		// 		// mode: mode
+		// 	}
+		// })
 
 		
 	}
