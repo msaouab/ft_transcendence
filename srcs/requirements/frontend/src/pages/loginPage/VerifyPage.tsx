@@ -36,8 +36,8 @@ function VerifyPage() {
       <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center">
         <CustomInput
           type="number"
-          placeholder="Enter 6 digit code"
-          onChange={setFormData}
+          placeHolder="Enter 6 digit code"
+          onChange={(e:any)=>setFormData(e.target.value)}
         />
         <button
           className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md text-blue-gray-50 text-lg max-w-[100px]"

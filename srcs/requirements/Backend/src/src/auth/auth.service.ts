@@ -68,6 +68,7 @@ export class AuthService {
                     },
                     data: {
                         status: 'Offline',
+                        otp_verified: false
                     },
                 })
                 res.clearCookie('id');

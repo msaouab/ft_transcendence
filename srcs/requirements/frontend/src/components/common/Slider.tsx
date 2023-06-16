@@ -8,16 +8,33 @@ import styled from "styled-components";
 
 // Styled component for the swiper container
 const SwiperContainer = styled(Swiper)`
+max-width: 1200px;
+/* background-color: red; */
+
+  @media (max-width: 1400px) {
+    max-width: 1000px;
+  }
+  @media (max-width: 1200px) {
+    max-width: 800px;
+  }
+  @media (max-width: 1000px) {
+    max-width: 700px;
+  }
+  @media (max-width: 800px) {
+    max-width: 500px;
+  }
   /* width: 350px; */
-  height: 350px;
+  /* height: 350px;
   display: flex;
+  max-width: 70%;
+  background-color: red;
   justify-content: center;
   .swiper-slide{
     height: 100%;
     display: flex;
     justify-content: center;
     width: 100%;
-  }
+  } */
 
 `;
 
@@ -36,8 +53,7 @@ const SwiperComponent: React.FC<SwiperProps> = ({ slides }) => {
     navigation: true,
     pagination: true,
     scrollbar: true,
-    // onSwiper: (swiper : any) => console.log(swiper),
-    // onSlideChange: () => console.log("slide change"),
+
     module: [Navigation, Pagination, Scrollbar, A11y],
     spaceBetween: 10,
     slidesPerView: 2,
@@ -48,11 +64,9 @@ const SwiperComponent: React.FC<SwiperProps> = ({ slides }) => {
 
   return (
     <SwiperContainer {...swiperParams} className="">
-      <div className="slide">
         {slides.map((slide, index) => (
           <SwiperSlide key={index}>{slide}</SwiperSlide>
         ))}
-      </div>
     </SwiperContainer>
   );
 };

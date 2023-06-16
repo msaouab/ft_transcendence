@@ -17,7 +17,7 @@ export class SearchService {
         if (limit == 0) {
             limit = 4;
         }
-        console.log("Im in search service and the search is: ", search);
+        // console.log("Im in search service and the search is: ", search);
         if (search == '') {
             return [];
         }
@@ -49,7 +49,7 @@ export class SearchService {
 
         });
 
-        console.log("Users are: ", users);
+        // console.log("Users are: ", users);
 
 
         const channels = await this.prisma.channel.findMany({
@@ -78,7 +78,7 @@ export class SearchService {
             updatedChannels.push(updatedChannel);
         }
 
-        console.log("Channels are: ", channels);
+        // console.log("Channels are: ", channels);
         const result = {
             users: users,
             channels: updatedChannels,

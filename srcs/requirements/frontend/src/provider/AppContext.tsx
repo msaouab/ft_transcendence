@@ -1,10 +1,8 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+
+import {useRef} from "react";
+import Cookies from "js-cookie";
 
 interface AppContextType {
   userStatus: string;
@@ -17,6 +15,12 @@ interface AppContextType {
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
   groupChatRooms: any[];
   setGroupChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  isTfaEnabled: boolean;
+  setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  notifications: any[];
+  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
+  chatNotif: number;
+  setChatNotif: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,6 +37,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [privateChatRooms, setPrivateChatRooms] = useState([]);
   const [groupChatRooms, setGroupChatRooms] = useState([]);
 
+  const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
+  // chat context
+
+  // notification context
+  const [notifications, setNotifications] = useState([] as any[]);
+
+  const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
+
+  //  user auth context
 
   const value = {
     userStatus,
@@ -45,17 +58,21 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setPrivateChatRooms,
     groupChatRooms,
     setGroupChatRooms,
-  }
+    isTfaEnabled,
+    setIsTfaEnabled,
+    notifications,
+    setNotifications,
+    chatNotif,
+    setChatNotif,
+  };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useGlobalContext = (): AppContextType => {
   const context = useContext(AppContext);
-
   if (!context) {
     throw new Error("useGlobalContext must be used within an AppProvider");
   }
-
   return context;
 };

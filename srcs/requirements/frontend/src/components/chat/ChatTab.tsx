@@ -7,7 +7,6 @@ import Cookies from 'js-cookie';
 import { Link } from "react-router-dom";
 // components
 import MessageDate from './SeenDate';
-import { useEffect } from "react";
 const ChatTabStyle = styled.div`
     background: transparent; 
     width: 100%;
@@ -82,15 +81,12 @@ const ChatTab = ({ privateMessage, selected }:
         selected: boolean
     }
 ) => {
-
     
     let otherUserId = privateMessage.sender_id === Cookies.get('id') ? privateMessage.receiver_id : privateMessage.sender_id;
     return (
         <ChatTabStyle selected={selected}>
             <div className="chat-tab__image">
-                {/* uncomment later */}
-                {/* <img src={privateMessage.profileImage} alt="profile" className="rounded-full" /> */}
-                <img src="https://picsum.photos/200" alt="profile" className="rounded-full w-10 h-10" />
+                <img src={privateMessage.profileImage} alt="profile" className="rounded-full w-10 h-10" />
             </div>
             <div className="chat-tab__info">
                 {/* <div className="chat-tab__info__name font-black "> */}

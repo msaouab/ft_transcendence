@@ -85,6 +85,7 @@ export class UserService {
             if (!user) {
                 throw new NotFoundException('User not found');
             }
+            console.log("user : ", id);
             const rankData = await this.prisma.rankingData.findUnique({
                 where: {
                     user_id: id,
