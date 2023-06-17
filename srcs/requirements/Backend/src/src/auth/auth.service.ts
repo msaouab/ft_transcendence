@@ -151,9 +151,6 @@ export class AuthService {
             throw new ForbiddenException('Not allowed');
         }
         if (find_user) {
-            
-              
-            
             const updateUser = await this.prisma.user.update({
                 where: {
                     id: find_user.id,

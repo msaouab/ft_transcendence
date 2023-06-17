@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {  useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
@@ -122,7 +122,6 @@ const OtherUserProfile = () => {
     };
     const isMyFriend = async () => {
       const data = await isFriend(userId || "", id || "");
-      console.log("shfhlsfjsjf", data);
       if (data) setRelationStatus(data);
     };
 
@@ -241,14 +240,25 @@ const OtherUserProfile = () => {
       );
     }
   };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (relationStatus == "blockedBy")
+    navigate("*");
+  }
+  , []);
 
   const [showFriendRelationMenu, setShowFriendRelationMenu] = useState(false);
-  const FriendRelationMenuAnimation = styled.div``;
   const FriendRelationMenuStyle = styled.div`
     animation: 1s ease-in-out;
   `;
 
+  if (relationStatus === "blockedBy") {
+    navigate("/*");
+  }
+
   return (
+    
     <div className="  w-[100%] flex flex-col gap-5  ">
       <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
         {user && (
@@ -299,7 +309,7 @@ const OtherUserProfile = () => {
           </div>
         </div>
       </Top>
-      {relationStatus === "blocked" ? (
+      {relationStatus === "blocking" ? (
         <div className="h-[60rem] w-full flex items-center justify-center text-6xl debug">Unblocked this user to see his profile</div>
       ) : (
         <Main className="midel flex-1  flex flex-col gap-4 items-center  ">

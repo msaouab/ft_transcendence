@@ -1,10 +1,9 @@
-import React, { Fragment, useState } from "react";
+import React, {  useState } from "react";
 import JoinFileSvg from "../../../assets/joinFile.svg";
 import DeleteSvg from "../../../assets/deleteSvg.svg";
-import { GetAvatar, PostAvatar } from "../../../api/axios";
+import { PostAvatar } from "../../../api/axios";
 import { useGlobalContext } from "../../../provider/AppContext";
 import { Dialog } from "@material-tailwind/react";
-import Cookies from "js-cookie";
 import toast, { Toaster } from "react-hot-toast";
 
 const notify = (status: string) => {
@@ -100,7 +99,6 @@ function Avatar() {
         </div>
       </label>
       <Toaster position="top-center" reverseOrder={false} />
-      {/* /// image preview  */}
       <Dialog
         size="sm"
         open={open}

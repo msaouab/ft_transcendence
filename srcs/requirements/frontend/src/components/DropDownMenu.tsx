@@ -12,7 +12,7 @@ import {
 } from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
-import instance from "../api/axios";
+import instance, { updateUserStatus } from "../api/axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
@@ -52,9 +52,20 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
     setOpen(!open);
   };
 
+  const {userId} = useGlobalContext();
+
+  const updateStatus = async (status: string) => {
+    const res = await updateUserStatus( userId,status);
+    if (res) {
+      setUserStatus(status);
+    }
+  };
+
   const handleStatusChange = (event: any) => {
-    console.log(event.target.value);
     setUserStatus(event.target.value);
+
+    updateStatus(event.target.value);
+
 
     // notifySocket.emit("status", {
     //   id: Cookies.get("id"),
@@ -155,21 +166,12 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
         </div>
         <div className="gap-4">
           <Radio
-            id="blue"
-            name="color"
-            color="blue"
-            label="In Game"
-            value="ingame"
-            checked={userStatus === "ingame"}
-            onChange={handleStatusChange}
-          />
-          <Radio
             id="red"
             name="color"
             color="red"
             label="Do Not Disturb"
-            value="donotdisturb"
-            checked={userStatus === "donotdisturb"}
+            value="DoNotDisturb"
+            checked={userStatus === "DoNotDisturb"}
             onChange={handleStatusChange}
           />
           <Radio
@@ -177,17 +179,17 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
             name="color"
             color="green"
             label="On Line"
-            value="online"
-            checked={userStatus === "online"}
+            value="Online"
+            checked={userStatus === "Online"}
             onChange={handleStatusChange}
           />
           <Radio
             id="amber"
             name="color"
             color="amber"
-            label="Busy"
-            value="busy"
-            checked={userStatus === "busy"}
+            label="Idle"
+            value="Idle"
+            checked={userStatus === "Idle"}
             onChange={handleStatusChange}
           />
         </div>
