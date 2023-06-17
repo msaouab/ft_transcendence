@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineNotifications } from "react-icons/md";
 import styled, { keyframes } from "styled-components";
 import { useGlobalContext } from "../provider/AppContext";
-import { handelFriendInvite } from "../api/axios";
+import { getNotifications, handelFriendInvite } from "../api/axios";
+import { use } from "matter-js";
 
 const fadeInAnimation = keyframes`
   from {
@@ -33,17 +34,19 @@ const Notifications = (props: NotifProps) => {
   const prevSenderIds = [] as any[];
 
   useEffect(() => {
+    getNotif();
+  }, []);
+
+  const getNotif = async () => {
+    const notifArr = await getNotifications();
+    console.log("---------------> ", notifArr);
+    setNotifications([...notifArr]);
+  };
+
+  useEffect(() => {
     if (conected) {
       notifSocket.current.on("invite", (data: any) => {
-        console.log("11111111111111111 => ", data.sender_id);
-        prevSenderIds.push(data.sender_id);
-        if (prevSenderIds.filter((id) => id === data.sender_id).length > 1) {
-          console.log("already exists");
-          return;
-        }
-        setNotifications((prev: any) => {
-          return [...prev, data];
-        });
+        getNotif();
       });
     }
   }, [conected]);
@@ -66,14 +69,9 @@ const Notifications = (props: NotifProps) => {
   }, []);
 
   const acceptFriendInvite = async (notif: any, status: string) => {
-    console.log(notif);
-    const data = await handelFriendInvite(notif.sender_id, userId, status);
-    console.log("notif => ", notif.sender_id, "userId => ", data.sender_id);
-    if (data.status === 200) {
-      setNotifications(
-        notifications.filter((notif: any) => notif.sender_id !== data.sender_id)
-      );
-    }
+    console.log("notif55555555: ", notif.notification_id);
+    const data = await handelFriendInvite(notif.sender_id, userId, status, notif.notification_id);
+    console.log("data11111111111: ", data);
 
     console.log(data);
   };
@@ -95,17 +93,20 @@ const Notifications = (props: NotifProps) => {
         {notifications.length === 0 ? (
           <div className="flex h-full w-full  justify-center items-center">
             <h1 className="text-white">No notifications</h1>
-            
           </div>
         ) : (
           notifications.map((notif: any, index: number) => {
             return (
               <div key={index} className="flex justify-between items-center">
-                <div className="name"></div>
+                <div className="name">
+                  {
+                    notif[index]
+                  }
+                </div>
                 <button onClick={() => acceptFriendInvite(notif, "Accepted")}>
                   acc
                 </button>
-                <button onClick={() => acceptFriendInvite(notif, "")}>
+                <button onClick={() => acceptFriendInvite(notif, "Rejected")}>
                   refuse
                 </button>
               </div>

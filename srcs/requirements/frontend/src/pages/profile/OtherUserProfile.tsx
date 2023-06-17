@@ -32,20 +32,21 @@ import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 import { useOutletContext } from "react-router-dom";
 import { NoAchivements, NoChanel, NoFriend } from "../../components/common/EmptyComponents";
+import { getAvatarUrl } from "../../components/common/CommonFunc";
 
 export const ReusableCardStyle = styled.div`
-  background: linear-gradient(
-    180deg,
-    rgba(233, 217, 144, 0.2379) 0%,
-    rgba(233, 217, 144, 0) 100%
-  );
-  border-radius: 20px 20px 0px 0px;
-  padding: 1rem;
+	background: linear-gradient(
+		180deg,
+		rgba(233, 217, 144, 0.2379) 0%,
+		rgba(233, 217, 144, 0) 100%
+	);
+	border-radius: 20px 20px 0px 0px;
+	padding: 1rem;
 `;
 
 interface friendsInterface {
-  login: string;
-  Status: string;
+	login: string;
+	Status: string;
 }
 
 const OtherUserProfile = () => {
@@ -66,12 +67,12 @@ const OtherUserProfile = () => {
     rank: "",
   });
 
-  const [friends, setFriends] = useState<friendsInterface[]>([]);
-  const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
-  const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [avatar, setAvatar] = useState("");
-  const { userId } = useGlobalContext();
-  const [relationStatus, setRelationStatus] = useState("");
+	const [friends, setFriends] = useState<friendsInterface[]>([]);
+	const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
+	const [achivements, setAchivements] = useState<friendsInterface[]>([]);
+	const [avatar, setAvatar] = useState("");
+	const { userId } = useGlobalContext();
+	const [relationStatus, setRelationStatus] = useState("");
 
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const OtherUserProfile = () => {
   useEffect(() => {
     if (connected) {
       notifySocket.on("inviteAccepted", (data: any) => {
-        console.log("inviteAccepted", data);
+        console.log("inviteAccepted ------", data);
         if (data.user_id === userId) {
           getAllData();
         }
@@ -90,34 +91,35 @@ const OtherUserProfile = () => {
   }
   , [connected]);
 
-  const getAllData = () => {
-    if (id === "") return;
+	const getAllData = () => {
+		if (id === "") return;
 
-    const friendsData = async () => {
-      const data = await getFriendsInfo(id || "");
-      setFriends(data);
-    };
-    const joinedChannelData = async () => {
-      const data = await getChannels(id || "");
-      setJoinedChannel(data);
-    };
-    const achivementsData = async () => {
-      const data = await getAchivements(id || "");
-      setAchivements(data);
-    };
+		const friendsData = async () => {
+			const data = await getFriendsInfo(id || "");
+			setFriends(data);
+		};
+		const joinedChannelData = async () => {
+			const data = await getChannels(id || "");
+			setJoinedChannel(data);
+		};
+		const achivementsData = async () => {
+			const data = await getAchivements(id || "");
+			setAchivements(data);
+		};
 
-    const rankData = async () => {
-      const data = await getRankData(id || "");
-      setRankData(data);
-    };
+		const rankData = async () => {
+			const data = await getRankData(id || "");
+			setRankData(data);
+		};
 
-    const getUserData = async () => {
-      const data = await getUserInfo(id || "");
-      setData(data);
-    };
+		const getUserData = async () => {
+			const data = await getUserInfo(id || "");
+			setData(data);
+		};
 
     const getUserAvatar = async () => {
-      const data = await GetAvatar(id || "");
+      const data =  getAvatarUrl();
+      console.log("uuuuuuuuuu ",data);
       setAvatar(data);
     };
     const isMyFriend = async () => {
@@ -125,14 +127,14 @@ const OtherUserProfile = () => {
       if (data) setRelationStatus(data);
     };
 
-    friendsData();
-    joinedChannelData();
-    achivementsData();
-    rankData();
-    getUserData();
-    getUserAvatar();
-    isMyFriend();
-  };
+		friendsData();
+		joinedChannelData();
+		achivementsData();
+		rankData();
+		getUserData();
+		getUserAvatar();
+		isMyFriend();
+	};
 
   const sendFriendInvitation = async () => {
     const data = await addFriend(userId, id || "");

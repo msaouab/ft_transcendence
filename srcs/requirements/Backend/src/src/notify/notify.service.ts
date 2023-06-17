@@ -18,6 +18,7 @@ export class NotificationService {
 			where: {
 				id: userId,
 			},
+			
 		});
 		
 		if (!user) {

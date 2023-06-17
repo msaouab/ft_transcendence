@@ -116,24 +116,34 @@ export class InvitesService {
     if (!Invite) {
       throw new ConflictException("Invite could not be created");
     }
-    console.log(
-      "socket---------------------------",
-      onlineClientsMap.has(receiver_id)
-    );
-    console.log("onlineClientsMap", onlineClientsMap);
+
+    // console.log("onlineClientsMap", onlineClientsMap);
     if (onlineClientsMap.has(receiver_id)) {
       const socket = onlineClientsMap.get(receiver_id);
       socket.emit("invite", Invite);
+      const storeNotification = await this.prisma.notification.create({
+        data: {
+          user_id: receiver_id,
+                type: "Friend",
+                sender_id: sender_id,
+                receiver_id: receiver_id,
+              },
+            });
+
+      if (!storeNotification) {
+        throw new ConflictException("Notification could not be created");
+      }
+
     }
     return Invite;
   }
 
   async putInvites(
     putInviteDto: PutInviteDto,
-    sender_id: string
+    sender_id: string,
   ): Promise<FriendshipInvites> {
     // putInvites updates an existing invite
-    const { receiver_id, status } = putInviteDto;
+    const { receiver_id, status,notification_id } = putInviteDto;
 
     // if status is not Accepted or Rejected, throw a 400 exception
     if (status !== "Accepted" && status !== "Rejected") {
@@ -167,7 +177,36 @@ export class InvitesService {
         const socket = onlineClientsMap.get(receiver_id);
         socket.emit("inviteAccepted", acceptedInvite);
       }
+    }   
+
+    console.log("h11111111111111111----------------------------", notification_id);
+    //  const notificationsToDelete = await this.prisma.notification.delete({
+    //     where: {
+    //         user_id: sender_id,
+    //         type: "Friend",
+    //         sender_id: sender_id,
+    //         receiver_id: receiver_id,
+    //     },
+    //  })
+    const findnotification = await this.prisma.notification.findFirst({
+        where: {
+            notification_id: notification_id,
+        },
+    })
+    console.log("findnotification", findnotification.notification_id)
+    if (!findnotification) {
+        throw new ConflictException("Notification does not exist");
     }
+    const deleteNotification = await this.prisma.notification.deleteMany({
+        where: {
+           notification_id: notification_id,
+        },
+    })
+    if (!deleteNotification) {
+        throw new ConflictException("Notification could not be deleted");
+    }
+
+
     return await this.prisma.friendshipInvites.delete({
       where: {
         sender_id_receiver_id: {
@@ -178,34 +217,31 @@ export class InvitesService {
     });
   }
 
-  async deleteInvites(
-    deleteInviteDto: DeleteInviteDto,
-    sender_id: string
-  ): Promise<FriendshipInvites> {
+  async deleteInvites(deleteInviteDto, sender_id) {
     const { receiver_id } = deleteInviteDto;
-    // deleting an invite
-    /* err cases:
-     * if invite doesn't exist, throw a 404 exception
-     */
+  
     const inviteExists = await this.prisma.friendshipInvites.findFirst({
       where: {
         sender_id,
         receiver_id,
       },
     });
-
     if (!inviteExists) {
       throw new NotFoundException("Invite does not exist");
     }
 
-    // delete the invite
-    return this.prisma.friendshipInvites.delete({
+  
+  
+    await this.prisma.friendshipInvites.delete({
       where: {
         sender_id_receiver_id: {
-          sender_id: sender_id,
-          receiver_id: receiver_id,
+          sender_id,
+          receiver_id,
         },
       },
     });
+  
+    return inviteExists; // Return the deleted invite or any desired response
   }
-}
+  
+}  

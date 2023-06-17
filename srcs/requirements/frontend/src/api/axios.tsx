@@ -6,12 +6,12 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-export const GetAvatar = async (id: string) => {
-  const res = await instance.get("/user/" + id + "/avatar", {
-    responseType: "blob",
-  });
-  return URL.createObjectURL(res.data);
-};
+// export const GetAvatar = async (id: string) => {
+//   const res = await instance.get("/user/" + id + "/avatar", {
+//     responseType: "blob",
+//   });
+//   return URL.createObjectURL(res.data);
+// };
 
 export const PostAvatar = async (file: File) => {
   const formData = new FormData();
@@ -134,13 +134,15 @@ export const RemoveThisFriendInvite = async (id: string, receiver_id: any) => {
 export const handelFriendInvite = async (
   id: string,
   receiver_id: string,
-  status: string
+  status: string,
+  notification_id: string
 ) => {
   if (id !== receiver_id && receiver_id && id) {
     try {
       const res = await instance.put("/user/" + id + "/invites", {
         receiver_id,
         status,
+        notification_id,
       });
       return res.data;
     } catch (err) {
@@ -202,5 +204,14 @@ export const updateUserStatus = async (id: string, status: string) => {
     }
   }
 };
+
+export const getNotifications = async () => {
+  try {
+    const res = await instance.get("/user/" + Cookies.get("userid") + "/notifications");
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export default instance;

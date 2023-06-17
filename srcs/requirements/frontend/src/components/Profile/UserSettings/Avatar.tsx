@@ -13,39 +13,38 @@ const notify = (status: string) => {
 };
 
 function Avatar() {
-  const { userImg, setUserImg } = useGlobalContext();
+	const { userImg, setUserImg } = useGlobalContext();
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState("");
-  const [imgPreview, setImgPreview] = useState<string | ArrayBuffer | null>(""); // [1
-  const [open, setOpen] = useState(false);
-  const handelOpen = () => {
-    setOpen(!open);
-    console.log(open);
-  };
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+	const [fileName, setFileName] = useState("");
+	const [imgPreview, setImgPreview] = useState<string | ArrayBuffer | null>(""); // [1
+	const [open, setOpen] = useState(false);
+	const handelOpen = () => {
+		setOpen(!open);
+		console.log(open);
+	};
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target && event.target.files) {
-      const fileName = event.target.value.split("\\").pop();
-      if (fileName) setFileName(fileName);
-      setSelectedFile(event.target.files[0]);
-      if (event.target.files[0]) {
-        setImgPreview(URL.createObjectURL(event.target.files[0]));
-        handelOpen();
-        event.target.value = "";
-      }
-    }
-  };
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (event.target && event.target.files) {
+			const fileName = event.target.value.split("\\").pop();
+			if (fileName) setFileName(fileName);
+			setSelectedFile(event.target.files[0]);
+			if (event.target.files[0]) {
+				setImgPreview(URL.createObjectURL(event.target.files[0]));
+				handelOpen();
+			}
+		}
+	};
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
 
-    console.log("File selected:");
-    if (!selectedFile) {
-      console.log("No file selected");
-      return;
-    }
-    handelOpen();
+		console.log("File selected:");
+		if (!selectedFile) {
+			console.log("No file selected");
+			return;
+		}
+		handelOpen();
 
     PostAvatar(selectedFile)
       .then((res: any) => {

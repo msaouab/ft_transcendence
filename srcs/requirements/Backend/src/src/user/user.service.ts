@@ -370,5 +370,30 @@ export class UserService {
         });
     }
 
+
+
+    /// getUnsenNotifications
+    async getUnseenNotifications(ft_user) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: ft_user._json.email,
+            }
+        });
+        if (!user) {
+            throw new NotFoundException('User nwwwot found');
+        }
+        const notifications = await this.prisma.notification.findMany({
+            where: {
+                user_id: user.id,
+                
+            }
+        });
+
+        if (!notifications) {
+            throw new NotFoundException('Notifications not found');
+        }
+        return notifications;
+    }
+
 }
     

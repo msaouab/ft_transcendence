@@ -98,8 +98,8 @@ export class AuthService {
                     },
                 })
                 res.cookie('id', find_user.id, {
-                    httpOnly: true,
-                    secure: false,
+                    // httpOnly: true,
+                    // secure: false,
                 })
             
                 return updateUser;

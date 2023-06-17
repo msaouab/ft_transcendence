@@ -3,12 +3,12 @@ import { BsChevronDown } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Button,
-  Dialog,
-  Popover,
-  PopoverContent,
-  PopoverHandler,
-  Radio,
+	Button,
+	Dialog,
+	Popover,
+	PopoverContent,
+	PopoverHandler,
+	Radio,
 } from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
@@ -17,8 +17,8 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
 type Props = {
-  notifySocket: any;
-  connected: boolean;
+	notifySocket: any;
+	connected: boolean;
 };
 const DropDownMenu = ({ notifySocket, connected }: Props) => {
   const navigate = useNavigate();
@@ -41,7 +41,6 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
       }
     }
     navigate("/login");
-    window.location.reload();
     logout();
   };
 
@@ -66,11 +65,6 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
 
     updateStatus(event.target.value);
 
-
-    // notifySocket.emit("status", {
-    //   id: Cookies.get("id"),
-    //   userStatus: event.target.value,
-    // });
   };
   
   useEffect(() => {
@@ -237,5 +231,4 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
     </div>
   );
 };
-
 export default DropDownMenu;

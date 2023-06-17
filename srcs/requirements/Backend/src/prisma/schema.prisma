@@ -230,18 +230,13 @@ model Message {
 model Notification {
   notification_id String @id @default(uuid())
   user_id         String
-  user            User   @relation("notificationRelation", fields: [notification_id], references: [id])
-  invite_data InviteData[] @relation("InviteDataRelation")
+  user            User   @relation("notificationRelation", fields: [user_id], references: [id])
+  // invite_data InviteData[] @relation("InviteDataRelation")
+  type            InviteType 
+  sender_id       String?
+  receiver_id     String?
 }
 
-model InviteData {
-  notification_id String @id @default(uuid())
-  type            InviteType
-  invite_id       String
-  invite          Notification[] @relation("InviteDataRelation")
-  seen            Boolean @default(false)
-  metadata        String?
-}
 
 model Game {
   id          String           @id @default(uuid())
