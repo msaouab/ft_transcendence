@@ -10,7 +10,13 @@ import { useGameContext } from "../../provider/GameProvider";
 import styled from "styled-components";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useState } from "react";
-import { getFriendsInfo, getUserInfo } from "../../api/axios";
+import {
+	GetAvatar,
+	getGameHistory,
+	getInviteGame,
+	getLiveGame,
+	getUserInfo,
+} from "../../api/axios";
 
 const chalenger = [
 	{
@@ -41,27 +47,53 @@ interface ChalengerCardProps {
 	name: string;
 }
 
-export const ChalengerCard = ({
-	id,
-	img,
-	login,
-	fname,
-	lname,
-	status,
-	roomID,
-}: any) => {
+export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 	const navigate = useNavigate();
-	// const { login } = props;
+	const [userImg, setUserImg] = useState<string>("");
+	const [user, setUser] = useState<any>({});
+	const [Benome, setBenome] = useState<any>({});
+	const { typeRoom, modeRoom, friend, setFriend, setTypeRoom, setModeRoom } =
+		useGameContext();
+
+	useEffect(() => {
+		// setFriend(id);
+		if (type && mode && id) {
+			setTypeRoom(type);
+			localStorage.setItem("typeRoom", type);
+			setModeRoom(mode);
+			localStorage.setItem("modeRoom", mode);
+			setFriend(id);
+		}
+		const getAvatarImg = async (id: string) => {
+			const userImg = await GetAvatar(id);
+			setUserImg(userImg || "");
+		};
+		const getUser = async (id: string) => {
+			const userInfo = await getUserInfo(id);
+			setUser(userInfo);
+		};
+		getAvatarImg(id);
+		getUser(id);
+		return () => {
+			setUserImg("");
+		};
+	}, []);
+
 	return (
-		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[5rem]">
+		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
 			<div className="image">
-				<img src={Avatar} alt="" width={60} />
+				<img
+					src={userImg}
+					alt=""
+					width={45}
+					className="box-border rounded-full aspect-square"
+				/>
 			</div>
 			<div className="name text-2xl font-[800]">{login}</div>
 			<div className="status justify-self-end absolute right-3 flex gap-1  items-center">
 				<button
 					onClick={() => {
-						navigate(`/game/${roomID}`);
+						navigate(`/game/startGame`, {});
 					}}
 					className="flex gap-2 items-center m-1 border border-gray-500 rounded-md p-2 hover:scale-105 transition-all shadow-md"
 				>
@@ -73,29 +105,118 @@ export const ChalengerCard = ({
 	);
 };
 
-interface GameCardProps {
-	title: string;
-	description: string;
-	imgPath: string;
-}
+const HistoryCard = ({ history }: any) => {
+	const { player1_id, player2_id, player1_pts, player2_pts } = history;
+	const [userImg, setUserImg] = useState<string>("");
+	const [user, setUser] = useState<any>({});
+	const [Benome, setBenome] = useState<any>({});
 
-const GameCard = (props: GameCardProps) => {
-	const { title, description, imgPath } = props;
+	useEffect(() => {
+		const getAvatarImg = async (id: string) => {
+			const userImg = await GetAvatar(id);
+			setUserImg(userImg || "");
+		};
+		const getUser = async (id1: string, id2: string) => {
+			const userInfo = await getUserInfo(id1);
+			if (userInfo) setUser(userInfo);
+			const benomeInfo = await getUserInfo(id2);
+			if (benomeInfo) setBenome(benomeInfo);
+		};
+		getAvatarImg(player1_id);
+		getUser(player1_id, player2_id);
+		return () => {
+			setUserImg("");
+		};
+	}, []);
+
 	return (
-		<div className="h-full p-5 flex justify-center w-full  ">
-			<div className=" debug w-full md:max-w-[350px] cursor-pointer bg-white shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
-				<div className="image border-deep-purple-400 border-4 rounded-[50%] p-8">
-					<img src={imgPath} alt="" width={100} className="max-w-[100%]" />
+		<div className="flex justify-between p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
+			<div className="user flex justify-center items-center gap-2">
+				<div className="image">
+					<img
+						src={userImg}
+						alt=""
+						width={45}
+						className="box-border rounded-full aspect-square"
+					/>
 				</div>
-				<div className="flex flex-col justify-center items-center md:flex md:flex-row  md:justify-between  w-[80%] text-xl font-bold border border-black/40 shadow-sm p-2 rounded-md ">
-					Moha
-					<span>1 - 2</span>
-					Ilyass
+				<div className="name text-2xl font-[800]">{user.login}</div>
+			</div>
+			<div className="score flex gap-5">
+				<div className="text-2xl font-[800]">{player1_pts}</div>
+				<p className="border-t-[3px]"> - </p>
+				<div className="text-2xl font-[800]">{player2_pts}</div>
+			</div>
+			<div className="benome flex justify-center items-center gap-2">
+				<div className="name text-2xl font-[800]">{Benome.login}</div>
+				<div className="image">
+					<img
+						src={userImg}
+						alt=""
+						width={45}
+						className="box-border rounded-full aspect-square"
+					/>
 				</div>
 			</div>
 		</div>
 	);
 };
+
+interface GameCardProps {
+	title: string;
+	description: string;
+	imgPath: string;
+	game: any;
+}
+
+const GameCard = (props: GameCardProps) => {
+	const navigate = useNavigate();
+	const { title, description, imgPath, game } = props;
+	const [userImg, setUserImg] = useState<string>("");
+	const [user, setUser] = useState<any>({});
+	const [Benome, setBenome] = useState<any>({});
+	const { player1_id, player2_id, player1_pts, player2_pts } = game;
+	useEffect(() => {
+		const getAvatarImg = async (id: string) => {
+			const userImg = await GetAvatar(id);
+			setUserImg(userImg || "");
+		};
+		const getUser = async (id1: string, id2: string) => {
+			const userInfo = await getUserInfo(id1);
+			if (userInfo) setUser(userInfo);
+			const benomeInfo = await getUserInfo(id2);
+			if (benomeInfo) setBenome(benomeInfo);
+		};
+		getAvatarImg(player1_id);
+		getUser(player1_id, player2_id);
+		return () => {
+			setUserImg("");
+		};
+	}, []);
+	return (
+		<div className="h-full p-5 flex justify-center w-full ">
+			<div
+				className=" w-full md:max-w-[300px] cursor-pointer bg-white shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full"
+				// onClick={() => {
+				// 	navigate(`/game/startGame`, {});
+				// }}
+			>
+				<div className="image border-deep-purple-400 border-4 rounded-[50%] p-8">
+					<img src={imgPath} alt="" width={100} className="max-w-[100%]" />
+				</div>
+				<div className="flex justify-between gap-3 items-center w-[95%] md:flex-wrap">
+					<div className="player1">{user.login}</div>
+					<div className="score flex gap-1 md:flex-wrap">
+						<span className="">{player2_pts}</span>-
+						<span className="">{player2_pts}</span>
+					</div>
+					<div className="player2">{Benome.login}</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+// flex flex-col justify-center items-center md:flex md:flex-row  md:justify-between w-[95%] text-xl font-bold border border-black/40 shadow-sm p-2 rounded-md
 
 const GameDashboard = () => {
 	const { setTypeRoom } = useGameContext();
@@ -106,53 +227,84 @@ const GameDashboard = () => {
 	};
 	interface Iitem {
 		id: number;
-		name: string;
-		icon: string;
-		avatar?: string;
 		login?: string;
-		firstName?: string;
-		lastName?: string;
-		status?: string;
-		key?: string;
+		roomId?: string;
+		type?: string;
+		mode?: string;
 	}
-	const [friend, setFriend] = useState<Iitem[]>([]);
+	interface history {
+		player1: string;
+		player2: string;
+		player1_score: number;
+		player2_score: number;
+	}
+	const [info, setInfo] = useState<Iitem[]>([]);
+	const [history, setHistory] = useState<history[]>([]);
+	const [liveGames, setLiveGames] = useState<history[]>([]);
 
 	useEffect(() => {
-		// const chellenge = Cookies.get("friendChellenge");
-		const chellenge = JSON.parse(
-			window.localStorage.getItem("friendChellenge")!
-		);
-		// console.log("chellenge:", chellenge);
-		const getChellenger = async () => {
+		const fetchUserInfo = async (
+			senderId: string,
+			roomId: string,
+			mode: string,
+			type: string
+		): Promise<Iitem> => {
+			const userInfo = await getUserInfo(senderId);
+			const transformedInfo: Iitem = {
+				id: userInfo.id,
+				login: userInfo.login,
+				roomId: roomId,
+				type: type,
+				mode: mode,
+			};
+			return transformedInfo;
+		};
+
+		const fetchAllUserInfo = async (): Promise<void> => {
+			const invites = await getInviteGame();
+
+			const userPromises = invites.map(
+				(invite: {
+					sender_id: string;
+					roomId: string;
+					mode: string;
+					type: string;
+				}) =>
+					fetchUserInfo(
+						invite.sender_id,
+						invite.roomId,
+						invite.mode,
+						invite.type
+					)
+			);
+
 			try {
-				const updatedFriends = await Promise.all(
-					chellenge.map(async (elem: any) => {
-						const friends = await getUserInfo(elem.id);
-						return { ...friends, key: elem.key }; // Include the key value from chellenge
-					})
-				);
-				setFriend((prev) => [...prev, ...updatedFriends]);
-				setGameNotif(0);
-				// console.log("friends:", friend)
+				const userData = await Promise.all(userPromises);
+				setInfo(userData);
 			} catch (error) {
-				console.error(error);
+				console.error("Error fetching user info:", error);
 			}
 		};
-		// const getChellenger = async () => {
-		// 	try {
-		// 		chellenge.forEach(async (elem: any) => {
-		// 			const friends = await getUserInfo(elem.id);
-		// 			setFriend((prev) => [...prev, friends]);
-		// 			console.log("friends:", friend);
-		// 		});
-		// 	} catch (error) {
-		// 		console.error(error);
-		// 	}
-		// };
-		if (chellenge) getChellenger();
+		fetchAllUserInfo();
+		setGameNotif(0);
 	}, []);
 
-	// console.log("friendChellenge:", friend);
+	useEffect(() => {
+		const fetchAllHistoryGames = async (): Promise<void> => {
+			const games = await getGameHistory();
+			setHistory(games.reverse());
+		};
+		const fetchAllLiveGames = async (): Promise<void> => {
+			const games = await getLiveGame();
+			setLiveGames(games);
+			console.log("games", games);
+		};
+
+		fetchAllHistoryGames();
+		fetchAllLiveGames();
+	}, []);
+	console.log("liveGames", liveGames);
+
 	const Main = styled.div`
 		@media (max-width: 1200px) {
 			flex-direction: column;
@@ -169,8 +321,6 @@ const GameDashboard = () => {
 				}
 			}
 			.achievements {
-				/* height: 500px; */
-				/* width: 100%; */
 				width: 70%;
 				.achiv-container {
 					display: flex;
@@ -193,16 +343,8 @@ const GameDashboard = () => {
 				}
 			}
 			.achievements {
-				/* height: 500px; */
-				/* max-width: 90%;
-        min-width: 360px;
-        max-height: 500px; */
 				width: 90%;
 				.achiv-container {
-					/* display: flex;
-          flex-direction: column;
-          width: unset;
-          max-width: 90%; */
 				}
 			}
 		}
@@ -253,18 +395,16 @@ const GameDashboard = () => {
 							</div>
 						</div>
 						<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-							{friend && friend.length ? (
+							{info && info.length ? (
 								// <div className="flex flex-col  gap-5 mr-1 h-full ">
-								friend.map((item: Iitem, index: any) => (
+								info.map((item: Iitem, index: any) => (
 									<ChalengerCard
 										key={index}
 										id={item.id}
-										img={item.avatar}
 										login={item.login}
-										fname={item.firstName}
-										lname={item.lastName}
-										status={item.status}
-										roomID={item.key}
+										roomID={item.roomId}
+										type={item.type}
+										mode={item.mode}
 									/>
 								))
 							) : (
@@ -283,10 +423,10 @@ const GameDashboard = () => {
 							</div>
 						</div>
 						<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-							{true ? (
+							{history && history.length > 0 ? (
 								<div className="flex flex-col  gap-5 mr-1 h-full ">
-									{chalenger.map((chalenger, index) => (
-										<ChalengerCard key={index} name={chalenger.name} />
+									{history.map((history, index) => (
+										<HistoryCard key={index} history={history} />
 									))}
 								</div>
 							) : (
@@ -302,16 +442,27 @@ const GameDashboard = () => {
 						Live Games
 					</div>
 					<div className="achiv-container flex justify-center items-center gap-10   m-auto min-h-[15rem]">
-						{false ? (
+						{liveGames ? (
 							<div className="h-[90%] w-full ">
 								<SwiperComponent
-									slides={Array(10).fill(
-										<GameCard
-											title="Achivement 1"
-											description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
-											imgPath={GameImg}
-										/>
-									)}
+									slides={
+										liveGames.map((game, index) => (
+											<GameCard
+												key={index}
+												game={game}
+												title="Achivement 1"
+												description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
+												imgPath={GameImg}
+											/>
+										)) as any
+									}
+									// slides={Array(10).fill(
+									// 	<GameCard
+									// 		title="Achivement 1"
+									// 		description="Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum."
+									// 		imgPath={GameImg}
+									// 	/>
+									// )}
 								></SwiperComponent>
 							</div>
 						) : (

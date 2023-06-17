@@ -148,6 +148,24 @@ export class GameGateway
 						value.player2.score
 					);
 				}
+				const inviteGame = await this.prisma.gameInvites.findUnique({
+					where: {
+						sender_id_receiver_id: {
+							sender_id: value.player1.id || value.player2.id,
+							receiver_id: value.player2.id || value.player1.id,
+						}
+					}
+				});
+				if (inviteGame) {
+					await this.prisma.gameInvites.delete({
+						where: {
+							sender_id_receiver_id: {
+								sender_id: value.player1.id || value.player2.id,
+								receiver_id: value.player2.id || value.player1.id,
+							}
+						}
+					});
+				}
 				value.status = "Finished";
 				client.leave(key);
 				this.roomMap.delete(key);
@@ -196,7 +214,7 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 60;
+			return (lastTime - room.time) / 1000 >= 600;
 		}
 		return false;
 	}
@@ -633,17 +651,15 @@ export class GameGateway
 		}
 	}
 
-	async CreateInviteGame(userId: string, frindId: any, key) {
+	async CreateInviteGame(userId: string, payload, key: string) {
 		try {
 			const FindUser = await this.UserService.getUser(userId);
-			if (!FindUser)
-				throw new BadRequestException("User not found", userId);
+			if (!FindUser) throw new BadRequestException("User not found", userId);
 			if (FindUser.status !== "Online") {
 				throw new BadRequestException("User is not online");
 			}
-			const FindFriend = await this.UserService.getUser(frindId);
-			if (!FindFriend)
-				throw new BadRequestException("User not found", frindId);
+			const FindFriend = await this.UserService.getUser(payload.friend);
+			if (!FindFriend) throw new BadRequestException("User not found", payload);
 			if (FindFriend.status !== "Online" || FindUser.status !== "Online")
 				throw new BadRequestException("User is not online");
 			const createInvite = await this.prisma.gameInvites.create({
@@ -653,81 +669,163 @@ export class GameGateway
 					status: "Pending",
 					validUntil: new Date(Date.now() + 1000 * 60 * 60 * 24),
 					roomId: key,
+					type: payload.type,
+					mode: payload.mode,
 				},
 			});
 			console.log("createInvite", createInvite);
-		}
-		catch (err) {
+		} catch (err) {
 			console.log(err);
 		}
 	}
 
+	async updateInviteGame(key: string) {
+		try {
+			const updateInvite = await this.prisma.gameInvites.update({
+				where: {
+					sender_id_receiver_id: {
+						sender_id: this.roomMap.get(key).player1.id,
+						receiver_id: this.roomMap.get(key).player2.id,
+					},
+				},
+				// where: { roomId: key},
+				data: { status: "Accepted" },
+			});
+			console.log("updateInvite", updateInvite);
+		} catch (err) {
+			console.log(err);
+		}
+	}
+
+	async AcceptInviteGame(client, userId: string, payload) {
+		let availableRoom = false;
+		if (this.roomMap.size > 0) {
+			this.roomMap.forEach((value, key) => {
+				console.log(value.player2.id, "===", userId)
+				if (
+					value.type === payload.type &&
+					value.mode === payload.mode &&
+					value.player2.id === userId
+				) {
+					value.members++;
+					value.player2 = {
+						id: userId,
+						score: 0,
+						paddle1: {
+							x: payload.width / 2 - 40,
+							y: 10,
+							width: 80,
+							height: 10,
+						},
+						paddle2: {
+							x: payload.width / 2 - 40,
+							y: payload.height - 20,
+							width: 80,
+							height: 10,
+						},
+					};
+					value.ball = {
+						x: payload.width / 2,
+						y: payload.height / 2,
+						r: 10,
+						dx: 4,
+						dy: 4,
+						speed: 1,
+						c: "#fff",
+					};
+					value.status = "OnGoing";
+					value.socket.push(client);
+					value.time = new Date().getTime();
+					client.join(key);
+					this.server
+						.to(value.socket[0].id)
+						.emit("BenomeId", value.player2.id, key);
+					this.server
+						.to(value.socket[1].id)
+						.emit("BenomeId", value.player1.id, key);
+					this.updateInviteGame(key);
+					this.createPrismaGame(key, value);
+					this.handleBall(client, key, payload.width, payload.height);
+					availableRoom = true;
+				}
+			});
+		}
+		return availableRoom;
+	}
+
 	async CreateFriendRoom(client: Socket, payload) {
+		const userId = client.handshake.query.userId.toString();
+		console.log("userId", userId)
+		// if (!userId) return ;
 		const FindBenome = await this.UserService.getUser(payload.friend);
 		if (!FindBenome) throw new BadRequestException("User not found");
 		if (FindBenome.status === "InGame")
 			throw new ForbiddenException("User is already in game");
 		if (FindBenome.status === "Offline")
 			throw new ForbiddenException("User is offline");
-		const key = createHash("sha256")
-			.update(Date.now().toString())
-			.digest("hex");
-		if (!key) throw new BadRequestException("Please provide a valid room key");
-		const friendMap = this.roomMap.set(key, {
-			members: 1,
-			socket: [client],
-			player1: {
-				id: client.handshake.query.userId,
-				score: 0,
-				paddle1: {
-					x: payload.width / 2 - 40,
-					y: 10,
-					width: 80,
-					height: 10,
+		const AvailableRoom = this.AcceptInviteGame(client, userId, payload);
+		if (await AvailableRoom === false) {
+			const key = createHash("sha256")
+				.update(Date.now().toString())
+				.digest("hex");
+			if (!key)
+				throw new BadRequestException("Please provide a valid room key");
+			const friendMap = this.roomMap.set(key, {
+				members: 1,
+				socket: [client],
+				player1: {
+					id: client.handshake.query.userId,
+					score: 0,
+					paddle1: {
+						x: payload.width / 2 - 40,
+						y: 10,
+						width: 80,
+						height: 10,
+					},
+					paddle2: {
+						x: payload.width / 2 - 40,
+						y: payload.height - 20,
+						width: 80,
+						height: 10,
+					},
 				},
-				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
-					width: 80,
-					height: 10,
+				player2: {
+					id: payload.friend,
+					score: 0,
+					paddle1: {
+						x: payload.width / 2 - 40,
+						y: 10,
+						width: 80,
+						height: 10,
+					},
+					paddle2: {
+						x: payload.width / 2 - 40,
+						y: payload.height - 20,
+						width: 80,
+						height: 10,
+					},
 				},
-			},
-			player2: {
-				id: payload.friend,
-				score: 0,
-				paddle1: {
-					x: payload.width / 2 - 40,
-					y: 10,
-					width: 80,
-					height: 10,
+				ball: {
+					x: payload.width / 2,
+					y: payload.height / 2,
+					r: 10,
+					dx: 4,
+					dy: 4,
+					speed: 1,
+					c: "#fff",
 				},
-				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
-					width: 80,
-					height: 10,
-				},
-			},
-			ball: {
-				x: payload.width / 2,
-				y: payload.height / 2,
-				r: 10,
-				dx: 4,
-				dy: 4,
-				speed: 1,
-				c: "#fff",
-			},
-			status: "waiting",
-			type: payload.type,
-			mode: payload.mode,
-			time: 0,
-		});
-		if (onlineClientsMap.has(payload.friend)) {
-			const friendSocket = onlineClientsMap.get(payload.friend);
-			friendSocket.emit("gameNotif", { num: 1 });
-			friendSocket.emit("friendInfo", client.handshake.query.userId, key);
-			// this.createInviteGame(client.handshake.query.userId, payload.friend, key);
-			this.CreateInviteGame(client.handshake.query.userId.toString(), payload.friend, key);
+				status: "waiting",
+				type: payload.type,
+				mode: payload.mode,
+				time: 0,
+			});
+			if (onlineClientsMap.has(payload.friend)) {
+				const friendSocket = onlineClientsMap.get(payload.friend);
+				friendSocket.emit("gameNotif", { num: 1 });
+				// friendSocket.emit("friendInfo", client.handshake.query.userId, key);
+				// this.createInviteGame(client.handshake.query.userId, friendId, key);
+				this.CreateInviteGame(userId, payload, key);
+			}
 		}
 	}
 
@@ -762,7 +860,6 @@ export class GameGateway
 
 	async createPrismaGame(key, room) {
 		try {
-			console.log("createPrismaGame", room.player1.id, room.player2.id);
 			const benome = await this.UserService.getUser(room.player1.id);
 			if (!benome) throw new BadRequestException("User not found");
 			await this.prisma.user.update({

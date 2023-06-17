@@ -15,10 +15,9 @@ import { User } from "../auth/user.decorator/user.decorator";
 import { StatusInviteDto, inviteGameDto } from "./dto/invite.game.dto";
 import { UserService } from "src/user/user.service";
 import { log } from "console";
-import { GameGateway } from './game.Gateway';
+import { GameGateway } from "./game.Gateway";
 import { Cookie } from "express-session";
 import { stat } from "fs";
-
 
 interface Player {
 	id: string;
@@ -31,7 +30,7 @@ export class GameService {
 		private prisma: PrismaService,
 		private UserService: UserService,
 		private gameGateway: GameGateway
-	) { }
+	) {}
 
 	async CreateGamingRoom(id: string, userId: string) {
 		try {
@@ -85,59 +84,57 @@ export class GameService {
 			throw new BadRequestException(err.message);
 		}
 	}
-	
-	async createInvite(user, inviteGameDto : inviteGameDto)
-	{
-		const {invited, mode, send} = inviteGameDto;
+
+	async createInvite(user, inviteGameDto: inviteGameDto) {
+		const { invited, mode, send } = inviteGameDto;
 		const sender = await this.prisma.user.findUnique({
 			where: {
-				id: send
-			}
-		})
-		if (!sender)
-			throw new BadRequestException("User not found", send);
+				id: send,
+			},
+		});
+		if (!sender) throw new BadRequestException("User not found", send);
 		if (sender.email != user._json.email)
-			throw new UnauthorizedException("You are not authorized to do this action");
+			throw new UnauthorizedException(
+				"You are not authorized to do this action"
+			);
 		if (send == invited)
 			throw new ConflictException("You cant invite yourself");
 		const receiver = await this.prisma.user.findUnique({
 			where: {
-				id: invited
-			}
-		})
-		if (!receiver)
-			throw new BadRequestException("User not found", invited);
-			const checkban = await this.prisma.blockTab.findFirst({
-				where: {
-					AND: [
-						{
-							user_id: sender.id
-						},
-						{
-							blockedUser_id: receiver.id
-						}
-					]
-				}
-			})
+				id: invited,
+			},
+		});
+		if (!receiver) throw new BadRequestException("User not found", invited);
+		const checkban = await this.prisma.blockTab.findFirst({
+			where: {
+				AND: [
+					{
+						user_id: sender.id,
+					},
+					{
+						blockedUser_id: receiver.id,
+					},
+				],
+			},
+		});
 		if (receiver.status !== "Online" || sender.status !== "Online" || checkban)
 			throw new BadRequestException("User cant be invited");
 		const checkExist = await this.prisma.gameInvites.findFirst({
 			where: {
 				AND: [
 					{
-						sender_id: sender.id
+						sender_id: sender.id,
 					},
 					{
-						receiver_id: receiver.id
+						receiver_id: receiver.id,
 					},
 					{
-						status: "Pending"
-					}
-				]
-			}
-		})
-		if (checkExist)
-			throw new BadRequestException("Invite already sent");
+						status: "Pending",
+					},
+				],
+			},
+		});
+		if (checkExist) throw new BadRequestException("Invite already sent");
 		// const newInvite = await this.prisma.gameInvites.create({
 		// 	data: {
 		// 		sender_id: sender.id,
@@ -147,109 +144,92 @@ export class GameService {
 		// 		// mode: mode
 		// 	}
 		// })
-
-		
 	}
 
-	async updateInvite(user, statusInviteDto:StatusInviteDto, id: string) 
-	{
-		const {status, recvId} = statusInviteDto;
+	async updateInvite(user, statusInviteDto: StatusInviteDto, id: string) {
+		const { status, recvId } = statusInviteDto;
 		const sender = await this.prisma.user.findUnique({
 			where: {
-				id: user.id
-			}
-		})
-		if (!sender)
-			throw new BadRequestException("User not found", user.id);
+				id: user.id,
+			},
+		});
+		if (!sender) throw new BadRequestException("User not found", user.id);
 		const receiver = await this.prisma.user.findUnique({
 			where: {
-				id: recvId
-			}
-		})
-		if (!receiver)
-			throw new BadRequestException("User not found", recvId);
+				id: recvId,
+			},
+		});
+		if (!receiver) throw new BadRequestException("User not found", recvId);
 		const checkExist = await this.prisma.gameInvites.findUnique({
 			where: {
 				sender_id_receiver_id: {
 					sender_id: sender.id,
-					receiver_id: receiver.id
-				}
-			}
-		})
+					receiver_id: receiver.id,
+				},
+			},
+		});
 		if (receiver.email != user._json.email)
-			throw new UnauthorizedException("You are not authorized to do this action");
-		if (!checkExist)
-			throw new BadRequestException("Invite not found");
+			throw new UnauthorizedException(
+				"You are not authorized to do this action"
+			);
+		if (!checkExist) throw new BadRequestException("Invite not found");
 		await this.prisma.gameInvites.update({
 			where: {
 				sender_id_receiver_id: {
 					sender_id: sender.id,
-					receiver_id: receiver.id
-				}
+					receiver_id: receiver.id,
+				},
 			},
 			data: {
-				status: status
-			}
-		})
-			
-
-
-
+				status: status,
+			},
+		});
 	}
 
-	async getMyInvites(user)
-	{
+	async getMyInvites(user) {
 		const me = await this.prisma.user.findUnique({
 			where: {
-				email: user._json.email
-			}
-		})
-		
-		const invites = await this.prisma.gameInvites.findMany({
-			where:
-			{
-				receiver_id: me.id,
-				status: "Pending"
-			}
+				email: user._json.email,
+			},
+		});
 
-		})
+		const invites = await this.prisma.gameInvites.findMany({
+			where: {
+				receiver_id: me.id,
+				status: "Pending",
+			},
+		});
+		console.log("invites:", invites);
 		return invites;
 	}
-	async getFriendsLiveGames(user)
-	{
-		const me = await this.prisma.user.findUnique({
+	async getFriendsLiveGames(user) {
+		const games = await this.prisma.game.findMany({
 			where: {
-				email: user._json.email
-			}
-		})
-		const friends = await this.prisma.friendsTab.findMany({
-			where: {
-				user_id: me.id
-			}
-		})
-		const games = [];
-		for (let i = 0; i < friends.length; i++)
-		{
-			const livegames = await this.prisma.game.findMany({
-				where: {
-					OR: [
-						{
-							player1_id: friends[i].user_id,
-							gameStatus: "OnGoing"
-						},
-						{
-							player2_id: friends[i].user_id,
-							gameStatus: "OnGoing"
-						}
-					]
-				}
-			})
-			games.push(livegames);
-
-			
-		}
-
+				gameStatus: "OnGoing",
+			},
+		});
 		return games;
 	}
-
+	async getMyHistory(user) {
+		const me = await this.prisma.user.findUnique({
+			where: {
+				email: user._json.email,
+			},
+		});
+		const games = await this.prisma.game.findMany({
+			where: {
+				OR: [
+					{
+						player1_id: me.id,
+						gameStatus: "Finished",
+					},
+					{
+						player2_id: me.id,
+						gameStatus: "Finished",
+					},
+				],
+			},
+		});
+		return games;
+	}
 }

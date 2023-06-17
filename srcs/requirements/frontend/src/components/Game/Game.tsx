@@ -37,6 +37,7 @@ const Game = () => {
 		useGameContext();
 	const location = useLocation();
 	const { user, benome } = location.state;
+	// console.log("user:", user, "benome:", benome);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 
 	const payload = {
@@ -63,7 +64,7 @@ const Game = () => {
 		const RoomMode = localStorage.getItem("modeRoom");
 		if (RoomType) setTypeRoom(RoomType);
 		if (RoomMode) setModeRoom(RoomMode);
-		console.log("2 - mysocket", mysocket);
+		// console.log("2 - mysocket", mysocket);
 	}, [typeRoom, mysocket]);
 
 	return (

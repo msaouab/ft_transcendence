@@ -45,13 +45,20 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 
 const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 	const navigate = useNavigate();
-	const { setFriend } = useGameContext();
+	const { setFriend, typeRoom, modeRoom, friend } = useGameContext();
 	const [userImg, setUserImg] = useState<string>("");
 	const [rankData, setRankData] = useState<any>({});
+	const payload = {
+		type: typeRoom,
+		mode: modeRoom,
+		friend: friend,
+		width: 700,
+		height: 1000,
+	};
 	useEffect(() => {
 		const getAvatarImg = async (id: string) => {
 			const userImg = await GetAvatar(id);
-			setUserImg(userImg);
+			setUserImg(userImg || "");
 		};
 		const getRankUser = async (id: string) => {
 			const rank = await getRankData(id);
@@ -80,7 +87,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 					className="flex items-center border gap-2 p-1"
 					onClick={() => {
 						setFriend(id);
-						navigate("/game/startGame");
+						navigate("/game/startGame", payload);
 					}}
 					disabled={status !== "Online"}
 				>

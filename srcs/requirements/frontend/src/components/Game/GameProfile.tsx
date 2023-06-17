@@ -62,7 +62,7 @@ const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
 		const getAvatarImg = async (id: string) => {
 			if (user.id !== "Bot") {
 				const userImg = await GetAvatar(id);
-				setUserImg(userImg);
+				setUserImg(userImg || "");
 			}
 		};
 		if (user.id === "Bot") setUserImg(Moulinete);

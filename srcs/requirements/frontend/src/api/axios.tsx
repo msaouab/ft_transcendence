@@ -10,10 +10,12 @@ const instance = axios.create({
 });
 
 export const GetAvatar = async (id: string) => {
-	const res = await instance.get("/user/" + id + "/avatar", {
-		responseType: "blob",
-	});
-	return URL.createObjectURL(res.data);
+	if (id) {
+		const res = await instance.get("/user/" + id + "/avatar", {
+			responseType: "blob",
+		});
+		return URL.createObjectURL(res.data);
+	}
 };
 
 export const PostAvatar = async (file: File) => {
@@ -197,9 +199,27 @@ export const deleteFreind = async (id: string, receiver_id: string) => {
 	}
 };
 
-export const getInviteGame = async (id: string) => {
+export const getInviteGame = async () => {
 	try {
-		const res = await instance.get("/game/" + id + "/invites");
+		const res = await instance.get("/game/myinvites");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+export const getLiveGame = async () => {
+	try {
+		const res = await instance.get("/game/streaming");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+export const getGameHistory = async () => {
+	try {
+		const res = await instance.get("/game/history");
 		return res.data;
 	} catch (err) {
 		console.log(err);

@@ -176,7 +176,10 @@ CREATE TABLE "GameInvites" (
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
     "status" "InviteStatus" NOT NULL DEFAULT 'Pending',
-    "validUntil" TIMESTAMP(3) NOT NULL
+    "validUntil" TIMESTAMP(3) NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "mode" TEXT NOT NULL
 );
 
 -- CreateTable

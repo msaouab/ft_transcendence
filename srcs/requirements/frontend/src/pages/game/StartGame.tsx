@@ -81,6 +81,7 @@ const StartGame = () => {
 		width: 700,
 		height: 1000,
 	};
+	console.log("payload", payload);
 
 	useEffect(() => {
 		const socket = io(`http://${HOSTNAME}:3000/game`, {

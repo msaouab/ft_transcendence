@@ -53,7 +53,7 @@ const SideBar = ({
 	connected: boolean;
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { setUserStatus, setUserImg, setUserId, userId, friendChellenge, setFriendChellenge } =
+	const { setUserStatus, setUserImg, setUserId, userId } =
 		useGlobalContext();
 	const [menuIndex, setMenuIndex] = useState<number>(2);
 	// const
@@ -81,15 +81,17 @@ const SideBar = ({
 					}
 				}
 			});
-			notifySocket.on("friendInfo", (id: string, key: string) => {
-				const ChellengeObg = { id, key}
-				setFriendChellenge((prev: any) => {
-					return [...prev, ChellengeObg];
-				});
-				window.localStorage.setItem("friendChellenge", JSON.stringify(friendChellenge));
-			});
+			// notifySocket.on("friendInfo", (id: string, key: string) => {
+			// 	const ChellengeObg = { id, key}
+			// 	// setFriendChellenge((prev: any) => {
+			// 	// 	return [...prev, ChellengeObg];
+			// 	// });
+			// 	setFriendChellenge((prev) => [...prev, ChellengeObg]);
+			// 	localStorage.setItem("friendChellenge", JSON.stringify(friendChellenge));
+			// 	console.log("ChellengeObg:", ChellengeObg)
+			// });
 		}
-	}, [chatNotif, gameNotif, friendChellenge]);
+	}, [chatNotif, gameNotif]);
 	const handleToggleSidebar = () => {
 		setIsSidebarOpen(!isSidebarOpen);
 	};

@@ -248,6 +248,8 @@ model GameInvites {
   status      InviteStatus @default(Pending)
   validUntil  DateTime
   roomId      String
+  type        String
+  mode        String
 
   @@unique([sender_id, receiver_id])
 }
