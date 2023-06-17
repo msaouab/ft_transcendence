@@ -31,3 +31,8 @@ export const getAvatarUrl = () => {
 	const id = Cookies.get("id");
 	return `http://localhost:3000/api/v1/user/${id}/avatar`;
 };
+
+export const getAvatarUrlById = (id: string) => {
+	// get avatar url from id
+	return `http://localhost:3000/user/`;
+}

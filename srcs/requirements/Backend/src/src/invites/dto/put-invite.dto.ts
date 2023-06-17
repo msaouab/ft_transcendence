@@ -22,6 +22,11 @@ export class PutInviteDto {
     @IsNotEmpty()
     @IsString()
     status: InviteStatus;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    notification_id: string;
 }
 
 

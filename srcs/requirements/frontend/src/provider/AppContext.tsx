@@ -43,7 +43,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 		Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0
 	);
 
-	//  user auth context
+
 
 	const value = {
 		userStatus,

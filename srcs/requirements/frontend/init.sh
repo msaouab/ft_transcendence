@@ -1,5 +1,5 @@
 #!bin/bash
 
-npm install
+npm install --legacy-peer-deps
 
 exec "$@"

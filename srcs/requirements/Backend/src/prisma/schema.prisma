@@ -55,6 +55,11 @@ enum InviteStatus {
   Rejected
 }
 
+enum InviteType {
+  Friend
+  Game
+}
+
 // type  attributes att functions
 model User {
   id             String            @id @default(uuid())
@@ -64,9 +69,8 @@ model User {
   lastName       String
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
-  avatar         String            @default("/app/public/default.png")
-  status         Status            @default(Offline)
-  realStatus     Boolean           @default(false)
+  avatar         String            @default("http://localhost:3000/default.png")
+  status         Status            @default(Online)
   tfa            Boolean           @default(false)
   otp_verified   Boolean           @default(false)
   otp_base32     String?
@@ -87,7 +91,7 @@ model User {
   privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
   privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
 
-  // realStatus Boolean @default(false)
+  realStatus Boolean @default(false)
 }
 
 model FriendshipInvites {
@@ -131,8 +135,8 @@ model PrivateChatRoom {
   lastUpdatedTime DateTime         @default(now())
   sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
   receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
-  blocked         Boolean          @default(false) 
-  }
+  blocked         Boolean          @default(false)
+}
 
 model BlockTab {
   user_id        String
@@ -226,9 +230,13 @@ model Message {
 model Notification {
   notification_id String @id @default(uuid())
   user_id         String
-  user            User   @relation("notificationRelation", fields: [notification_id], references: [id])
-  // invite_data InviteData[] @relation("InviteDataRelation")
+  user            User   @relation("notificationRelation", fields: [user_id], references: [id])
+  type            InviteType 
+  sender_id       String?
+  sender_name     String?
+  receiver_id     String?
 }
+
 
 model Game {
   id          String           @id @default(uuid())

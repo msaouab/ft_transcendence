@@ -22,8 +22,6 @@ const index = () => {
   const [connected, setConnected] = useState(false);
     
   useEffect(() => {
-    // console.log("IM HERE");
-    // console.log("connected: ", notifySocket);
     if (!connected) {
       notifySocket.current = io("http://localhost:3000"); 
     }
@@ -63,7 +61,12 @@ const index = () => {
           </div>
         </div>
         <div className="content  flex-1">
-          <Outlet />
+          <Outlet
+            context={{
+              notifySocket: notifySocket.current,
+              connected: connected,
+            }}
+          />
         </div>
       </div>
     </LayoutStyle>

@@ -6,8 +6,7 @@ YELLOW = \033[1;33m
 BLUE = \033[1;34m
 ED = \033[0m
 
-# all: credit env up
-all: up
+all: credit env up
 
 credit:
 	@echo "${GREEN}"

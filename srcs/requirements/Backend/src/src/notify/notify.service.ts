@@ -1,3 +1,6 @@
+
+
+
 import { PrismaService } from "prisma/prisma.service";
 import { HttpException, Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
@@ -15,7 +18,9 @@ export class NotificationService {
 			where: {
 				id: userId,
 			},
+			
 		});
+		
 		if (!user) {
 			console.log("user not found");
 			throw new HttpException("User not found", 404);

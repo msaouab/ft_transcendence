@@ -8,7 +8,6 @@ import ChatTab from "./ChatTab";
 import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
 import { getAvatarUrl } from "../common/CommonFunc";
-// import { GetAvatar } from '../../api/axios';
 const UsersChatListStyle = styled.div`
 	width: 100%;
 	height: 100%;
