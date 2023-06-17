@@ -1,42 +1,46 @@
+
 import { BsChevronDown } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Button,
-  Dialog,
-  Popover,
-  PopoverContent,
-  PopoverHandler,
-  Radio,
+	Button,
+	Dialog,
+	Popover,
+	PopoverContent,
+	PopoverHandler,
+	Radio,
 } from "@material-tailwind/react";
 import { useGlobalContext } from "../provider/AppContext";
 import Padel from "../assets/padel.png";
-import instance from "../api/axios";
+import instance, { updateUserStatus } from "../api/axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 
-
 type Props = {
-  notifySocket: any;
-  connected: boolean;
+	notifySocket: any;
+	connected: boolean;
 };
-const DropDownMenu = ({notifySocket, connected} : Props) => {
+const DropDownMenu = ({ notifySocket, connected }: Props) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     async function logout() {
       try {
-        await instance.get("/logout").catch((error) => {
-          console.log("logout1111");
-          console.log("logout");
-          window.location.reload();
-          if (error.response.status == 401) {
-            navigate("/login");
-          }
-        });
+        await instance
+          .get("/logout")
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response.status == 401) {
+              navigate("/login");
+            }
+          });
       } catch (error) {
         console.log(error);
       }
     }
+    navigate("/login");
     logout();
   };
 
@@ -47,17 +51,82 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
     setOpen(!open);
   };
 
-  const handleStatusChange = (event: any) => {
-    console.log(event.target.value);
-    setUserStatus(event.target.value);
+  const {userId} = useGlobalContext();
+
+  const updateStatus = async (status: string) => {
+    const res = await updateUserStatus( userId,status);
+    if (res) {
+      setUserStatus(status);
+    }
   };
 
+  const handleStatusChange = (event: any) => {
+    setUserStatus(event.target.value);
+
+    updateStatus(event.target.value);
+
+  };
+  
+  useEffect(() => {
+    // console.log("heeeeeeeeeeeeeee: ", userStatus);
+    if (connected) {
+    // console.log("connected to the server notify");
+      // console.log("current: ", notifySocket);
+      if (notifySocket) {
+        // console.log("we're emmiting the event status");
+      notifySocket.emit("realStatus", {
+        id: Cookies.get("id"),
+        userStatus: true,
+      });
+      setUserStatus("Online");
+    }
+    }
+    else if (!connected) {
+      // console.log("we're emmiting the event status");
+      if (notifySocket) {
+      notifySocket.emit("realStatus", {
+        id: Cookies.get("id"),
+        userStatus: false,
+      });
+      setUserStatus("Offline");
+    }
+  }
+  }, [connected]);
+
+
+  // useEffect(() => {
+  // console.log("hello im being called to upadate user status");
+  // console.log("userStatus: ", userStatus);
+  // setUserStatus(userStatus);
+
+  // }, [userStatus] );
+  
+  // console.log("userStatus", userStatus);
+  // const status  = Cookies.get('status')
+  // if (userStatus !== '')
+  // {
+  // console.log("userStatus", userStatus);
+  // if (connected) 
+  // {
+  //   notifySocket && notifySocket.current.on("connect", () => {
+  //     console.log("connected to the server notify"); 
+  //     // notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
+
+  //   });
+  //   // console.log("im here user status", userStatus);
+  // }
+// }  
+
+// notifySocket.current.on("connect", () => {
+//   console.log("connected to the server notify");
+//   notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
+// });
+  
 
 
   useEffect(() => {
     if (connected) {
       if (notifySocket) {
-        console.log("we're emmiting the event status");
         notifySocket.emit("realStatus", {
           id: Cookies.get("id"),
           userStatus: true,
@@ -91,21 +160,12 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
         </div>
         <div className="gap-4">
           <Radio
-            id="blue"
-            name="color"
-            color="blue"
-            label="In Game"
-            value="ingame"
-            checked={userStatus === "ingame"}
-            onChange={handleStatusChange}
-          />
-          <Radio
             id="red"
             name="color"
             color="red"
             label="Do Not Disturb"
-            value="donotdisturb"
-            checked={userStatus === "donotdisturb"}
+            value="DoNotDisturb"
+            checked={userStatus === "DoNotDisturb"}
             onChange={handleStatusChange}
           />
           <Radio
@@ -113,17 +173,17 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
             name="color"
             color="green"
             label="On Line"
-            value="online"
-            checked={userStatus === "online"}
+            value="Online"
+            checked={userStatus === "Online"}
             onChange={handleStatusChange}
           />
           <Radio
             id="amber"
             name="color"
             color="amber"
-            label="Busy"
-            value="busy"
-            checked={userStatus === "busy"}
+            label="Idle"
+            value="Idle"
+            checked={userStatus === "Idle"}
             onChange={handleStatusChange}
           />
         </div>
@@ -171,5 +231,4 @@ const DropDownMenu = ({notifySocket, connected} : Props) => {
     </div>
   );
 };
-
 export default DropDownMenu;

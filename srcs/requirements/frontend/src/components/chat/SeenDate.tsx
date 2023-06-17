@@ -10,6 +10,7 @@ import notSeenIcon from '../../assets/notSeen.svg';
 import { useEffect, useState } from "react";
 import { getDateChat } from "../common/CommonFunc"
 import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
 
 const SeenNotSeenIconStyle = styled.img`
     width: 17px;
@@ -17,15 +18,6 @@ const SeenNotSeenIconStyle = styled.img`
     margin-left: 10px;
     margin-top: 5px; 
 `;
-const SenderComponent = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-`;
-
-
 
 const MessageDateStyle = styled.div`
     background: transparent;
@@ -56,7 +48,7 @@ const MessageDate = (props: PrivateMessage) => {
     // move getNumberOfNotSeeMessages inside the component and use props parameter
     const getNumberOfNotSeeMessages = async () => {
         const url = `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`;
-        console.log("url: ", url);
+        // console.log("url: ", url);
         let count = await axios.get(
             `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
         );  
@@ -65,7 +57,7 @@ const MessageDate = (props: PrivateMessage) => {
 
     useEffect(() => {
         // get the last message \in the chat room
-        console.log("privateChatRooms: ", privateChatRooms);
+        // console.log("privateChatRooms: ", privateChatRooms);
         const  privateChatRoom = privateChatRooms.find((chatRoom) => chatRoom.id === props.chatRoomid);
         if (privateChatRoom) {
 
@@ -78,7 +70,7 @@ const MessageDate = (props: PrivateMessage) => {
     useEffect(() => {
         
         getNumberOfNotSeeMessages().then((count) => {
-            console.log("number of not seen messages: ", count.length);
+            // console.log("number of not seen messages: ", count.length);
             count = count.length;
             setCount(count);
         });

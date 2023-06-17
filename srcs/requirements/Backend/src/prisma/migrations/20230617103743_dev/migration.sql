@@ -19,6 +19,9 @@ CREATE TYPE "MemeberStatusTime" AS ENUM ('Permanent', 'Temporary');
 -- CreateEnum
 CREATE TYPE "InviteStatus" AS ENUM ('Pending', 'Accepted', 'Rejected');
 
+-- CreateEnum
+CREATE TYPE "InviteType" AS ENUM ('Friend', 'Game');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -159,6 +162,17 @@ CREATE TABLE "Notification" (
 );
 
 -- CreateTable
+CREATE TABLE "InviteData" (
+    "notification_id" TEXT NOT NULL,
+    "type" "InviteType" NOT NULL,
+    "invite_id" TEXT NOT NULL,
+    "seen" BOOLEAN NOT NULL DEFAULT false,
+    "metadata" TEXT,
+
+    CONSTRAINT "InviteData_pkey" PRIMARY KEY ("notification_id")
+);
+
+-- CreateTable
 CREATE TABLE "Game" (
     "id" TEXT NOT NULL,
     "dateCreated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -220,6 +234,12 @@ CREATE TABLE "GameHistoryTab" (
     CONSTRAINT "GameHistoryTab_pkey" PRIMARY KEY ("user_id")
 );
 
+-- CreateTable
+CREATE TABLE "_InviteDataRelation" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
 
@@ -264,6 +284,12 @@ CREATE UNIQUE INDEX "RankingData_user_id_key" ON "RankingData"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AchievementsAssignement_achievement_id_player_id_key" ON "AchievementsAssignement"("achievement_id", "player_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_InviteDataRelation_AB_unique" ON "_InviteDataRelation"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_InviteDataRelation_B_index" ON "_InviteDataRelation"("B");
 
 -- AddForeignKey
 ALTER TABLE "FriendshipInvites" ADD CONSTRAINT "FriendshipInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -330,3 +356,9 @@ ALTER TABLE "GameHistoryTab" ADD CONSTRAINT "GameHistoryTab_game_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "GameHistoryTab" ADD CONSTRAINT "GameHistoryTab_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_InviteDataRelation" ADD CONSTRAINT "_InviteDataRelation_A_fkey" FOREIGN KEY ("A") REFERENCES "InviteData"("notification_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_InviteDataRelation" ADD CONSTRAINT "_InviteDataRelation_B_fkey" FOREIGN KEY ("B") REFERENCES "Notification"("notification_id") ON DELETE CASCADE ON UPDATE CASCADE;

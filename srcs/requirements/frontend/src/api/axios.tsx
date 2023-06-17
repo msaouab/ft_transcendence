@@ -19,17 +19,18 @@ export const GetAvatar = async (id: string) => {
 };
 
 export const PostAvatar = async (file: File) => {
-	const formData = new FormData();
-	formData.append("file", file);
+  const formData = new FormData();
+  formData.append("file", file);
 
-	await instance
-		.post("/user/" + Cookies.get("userid") + "/avatar", formData)
-		.then((response) => {
-			return response;
-		})
-		.catch((error) => {
-			console.log("Error uploading file:", error);
-		});
+  const res = await instance
+    .post("/user/" + Cookies.get("userid") + "/avatar", formData)
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.log("Error uploading file:", error);
+    });
+  return res;
 };
 
 export const getFriendsInfo = async (id: string) => {
@@ -97,107 +98,7 @@ export const addFriend = async (id: string, receiver_id: string) => {
 	}
 };
 
-export const blockThisUser = async (id: string, blockedUser_id: string) => {
-	if (id === blockedUser_id || blockedUser_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.post("/user/" + id + "/blockedusers", {
-			blockedUser_id,
-		});
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
 
-export const unblockThisUser = async (id: string, blockedUser_id: string) => {
-	if (id === blockedUser_id || blockedUser_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.delete(
-			"/user/" + id + "/blockedusers/" + blockedUser_id
-		);
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
-
-export const RemoveThisFriendInvite = async (id: string, receiver_id: any) => {
-	if (id === receiver_id || receiver_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.delete("/user/" + id + "/invites", {
-			data: { receiver_id },
-		});
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
-
-export const handelFriendInvite = async (
-	id: string,
-	receiver_id: string,
-	status: string
-) => {
-	console.log("handelFriendInvite", id, receiver_id, status);
-	if (id === receiver_id || receiver_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.put("/user/" + id + "/invites", {
-			receiver_id,
-			status,
-		});
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
-
-export const isFriend = async (id: string, receiver_id: string) => {
-	if (id === receiver_id || receiver_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.get("/user/" + id + "/is-friend/" + receiver_id);
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
-
-export const isBlocked = async (id: string, receiver_id: string) => {
-	if (id === receiver_id || receiver_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.get(
-			"/user/" + id + "/is-blocked/" + receiver_id
-		);
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
-
-export const deleteFreind = async (id: string, receiver_id: string) => {
-	if (id === receiver_id || receiver_id === "" || id === "") {
-		return;
-	}
-	try {
-		const res = await instance.delete("/user/" + id + "/friends", {
-			data: { friendUser_id: receiver_id },
-		});
-		return res.data;
-	} catch (err) {
-		console.log(err);
-	}
-};
 
 export const getInviteGame = async () => {
 	try {
@@ -225,5 +126,127 @@ export const getGameHistory = async () => {
 		console.log(err);
 	}
 };
+
+export const blockThisUser = async (id: string, blockedUser_id: string) => {
+  if (id !== blockedUser_id && blockedUser_id && id) {
+    try {
+      const res = await instance.post("/user/" + id + "/blockedusers", {
+        blockedUser_id,
+      });
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const unblockThisUser = async (id: string, blockedUser_id: string) => {
+  if (id !== blockedUser_id && blockedUser_id && id) {
+    try {
+      const res = await instance.delete(
+        "/user/" + id + "/blockedusers/" + blockedUser_id
+      );
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const RemoveThisFriendInvite = async (id: string, receiver_id: any) => {
+  if (receiver_id && id && id !== receiver_id) {
+    try {
+      const res = await instance.delete("/user/" + id + "/invites", {
+        data: { receiver_id },
+      });
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const handelFriendInvite = async (
+  id: string,
+  receiver_id: string,
+  status: string,
+  notification_id: string
+) => {
+  if (id !== receiver_id && receiver_id && id) {
+    try {
+      const res = await instance.put("/user/" + id + "/invites", {
+        receiver_id,
+        status,
+        notification_id,
+      });
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const isFriend = async (id: string, receiver_id: string) => {
+  if (receiver_id && id && id !== receiver_id) {
+    try {
+      const res = await instance.get(
+        "/user/" + id + "/is-friend/" + receiver_id
+      );
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const isBlocked = async (id: string, receiver_id: string) => {
+  if (receiver_id && id && id !== receiver_id) {
+    try {
+      const res = await instance.get(
+        "/user/" + id + "/is-blocked/" + receiver_id
+      );
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const deleteFreind = async (id: string, receiver_id: string) => {
+  if (id === receiver_id || receiver_id === "" || id === "") {
+    return;
+  }
+  try {
+    const res = await instance.delete("/user/" + id + "/friends", {
+      data: { friendUser_id: receiver_id },
+    });
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const updateUserStatus = async (id: string, status: string) => {
+  if (id ){
+    try {
+      const res = await instance.put("/User/" + id + "/updatestatus", {
+        status,
+      });
+      console.log("r000000 ",res.data);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+};
+
+export const getNotifications = async () => {
+  try {
+    const res = await instance.get("/user/" + Cookies.get("userid") + "/notifications");
+    return res.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 export default instance;

@@ -160,12 +160,22 @@ export class FriendsService {
       return "pending";
     }
     const block = await this.prisma.blockTab.findFirst({
-      where: {        user_id: user_id,
+      where: {
+        user_id: user_id,
         blockedUser_id: friendUser_id,
       },
     });
     if (block) {
-      return "blocked";
+      return "blocking";
+    }
+    const blockedBy = await this.prisma.blockTab.findFirst({
+      where: {
+        user_id:  friendUser_id,
+        blockedUser_id: user_id,
+      },
+    });
+    if (blockedBy) {
+      return "blockedBy";
     }
     const friendship = await this.prisma.friendsTab.findFirst({
       where: {

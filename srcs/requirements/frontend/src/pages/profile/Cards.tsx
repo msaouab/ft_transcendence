@@ -2,15 +2,15 @@ import { Link } from "react-router-dom";
 import { useGlobalContext } from "../../provider/AppContext";
 
 const CheckStatus = (stats: string) => {
-  const status = stats?.toLowerCase();
-  if (status == "online") {
+  const status = stats
+  if (status == "Online") {
     return "bg-green-500";
-  } else if (status == "offline") {
+  } else if (status == "DoNotDisturb") {
     return "bg-red-500";
-  } else if (status == "busy") {
-    return "bg-yellow-500";
-  } else if (status == "ingame") {
-    return "bg-blue-500";
+  } else if (status == "Idle") {
+    return "bg-yellow-700";
+  } else if (status == "Offline") {
+    return "bg-gray-500";
   }
 };
 
@@ -28,7 +28,7 @@ export const FreindCard = ({
       className="flex flex-wrap mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]"
     >
       <div className="image ">
-        <img src={avatar} alt="" width={50} />
+        <img src={avatar} alt=""  className="rounded-[50%] w-14 h-14" />
       </div>
       <div className="name text-md xl:text-xl font-[500] capitalize">
         {firstName.slice(0, 1) + "."}{lastName}
@@ -37,7 +37,8 @@ export const FreindCard = ({
         {status}
         <div
           className={`dot w-3 h-3 ${CheckStatus(status)} rounded-full`}
-        ></div>
+        >
+        </div>
       </div>
     </Link>
   );

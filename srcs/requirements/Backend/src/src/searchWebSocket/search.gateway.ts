@@ -6,7 +6,6 @@ import { Injectable } from "@nestjs/common";
 import {
     OnGatewayConnection,
     OnGatewayDisconnect,
-    OnGatewayInit,
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
@@ -18,12 +17,10 @@ import { Server, Socket } from "socket.io";
 import { SearchService } from "./search.service";
 
 
-// import { ChatService } from "./
 
 @Injectable()
 @WebSocketGateway({
     namespace: 'search',
-    // cors: true,
 })
 export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -47,7 +44,9 @@ export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
         search: string,
         limit: number,
     }) {
+        // console.log("We've got the event it's: ", payload.search);
         const result = await this.SearchService.searchWebSocket(payload.search, payload.limit);
+        // console.log("The result is: ", result);
         client.emit('searchInfo', result);
 
 

@@ -10,6 +10,7 @@ import ConfirmDelete from '../common/ConfirmDelete';
 import axios from 'axios';
 import { useGlobalContext } from '../../provider/AppContext';
 import Cookies from 'js-cookie';
+import { HOSTNAME } from '../../api/axios';
 
 const ChatBoxTopBarStyle = styled.div`
     background: transparent;
@@ -70,9 +71,6 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
     // console.log("props: ", props.blocked);
     const [UserIsBlocker, setUserIsBlocker] = useState(false);
-
-``
-    
     const {setPrivateChatRooms} = useGlobalContext();
     const [showConfirm, setshowConfirm] = useState(confirmData);
     const [showMore, setShowMore] = useState(false);
@@ -90,15 +88,15 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             { withCredentials: true }
         )
             .then(res => {
-                console.log("blocked users: ", res.data);
+                // console.log("blocked users: ", res.data);
                 for (let i = 0; i < res.data.length; i++) {
                     if (res.data[i].blockedUser_id === props.id) {
                         setUserIsBlocker(true);
-                        console.log("user is a blocker");
+                        // console.log("user is a blocker");
                         return;
                     }
                 }
-                console.log("user is not a blocker");
+                // console.log("user is not a blocker");
                 setUserIsBlocker(false);
             })
             .catch(err => {
@@ -134,6 +132,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
                 setPrivateChatRooms((prev: any) => {
                     return prev.filter((chatRoom: any) => {
                         return chatRoom.chatRoomid !== res.data.id;
+                        
                     })
                 })
             })
@@ -145,15 +144,15 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
     const handleBlockUser = () => {
         const meId = Cookies.get("id");
         const blockedUserId = props.id;
-        console.log("meId: ", meId);
-        console.log("blockedUserId: ", blockedUserId);
+        // console.log("meId: ", meId);
+        // console.log("blockedUserId: ", blockedUserId);
         axios.post(`http://${HOSTNAME}:3000/api/v1/user/${meId}/blockedusers/`,     
         {
             blockedUser_id: blockedUserId,
             withCredentials: true
         })
             .then(res => {
-                console.log("blocked user: ", res);
+                // console.log("blocked user: ", res);
                 setshowConfirm({ ...showConfirm, show: false });
                 setPrivateChatRooms((prev: any) => {
                    // set blocked to true
@@ -179,7 +178,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             })
 
             .then(res => {
-                console.log("unblocked user: ", res);
+                // console.log("unblocked user: ", res);
                 setshowConfirm({ ...showConfirm, show: false });
                 setPrivateChatRooms((prev: any) => {
                     // set blocked to false
@@ -196,19 +195,13 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             .catch(err => {
                 console.log("error unblocking user: ", err);
             })
-
-
-
-        // 
     };
 
     return (
         <ChatBoxTopBarStyle>
             <div className="flex flex-row ">
                 <div className="">
-                    {/* uncomment later */}
-                    {/* <img src={props.profileImage} alt="profile" className="rounded-full" /> */}
-                    <img src="https://picsum.photos/200" alt="profile" className="rounded-full w-10 h-10" />
+                    <img src={props.profileImage} alt="profile" className="rounded-full w-10 h-10" />
                 </div>
                 <div className="flex flex-col  ml-2 font-black ">
                     <div className="chat-box-top-bar__info__name font-black 

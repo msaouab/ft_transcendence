@@ -5,6 +5,10 @@ import ChatBox from "../../components/chat/ChatBox";
 
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+import { PrivateMessage } from "../../types/message";
+import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
+import Cookies from "js-cookie";
 const ChatStyle = Styled.div`
   display: flex;
   flex-direction: row;
@@ -63,9 +67,6 @@ const ChatStyle = Styled.div`
 
 `;
 
-import { PrivateMessage } from "../../types/message";
-import { useGlobalContext } from "../../provider/AppContext";
-import { HOSTNAME } from "../../api/axios";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
@@ -76,27 +77,48 @@ const Chat = () => {
     chatRoomId: string;
     message: string;
   }>({} as { chatRoomId: string; message: string });
-  const { privateChatRooms } = useGlobalContext();
+  const { privateChatRooms, setChatNotif } = useGlobalContext();
+
 
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
-      setConnected(true);
-      console.log("connected to the server");
+      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`); 
+   
     }
-    // chatSocket.current.on('connect', () => {
-    // });
+
+    chatSocket.current.on('connect', () => {
+    
+      // chatSocket.current.emit('alive', {id: Cookies.get("id")});
+      setConnected(true);
+      chatSocket.current.emit('alive', {id: Cookies.get("id")} );
+      console.log("connected to the server");
+    });
+    
+       
+    
+
+    chatSocket.current.on("roomJoined", () => {
+      console.log("room joined");
+    });
+
+    Cookies.set("chatNotif", "0");
+    setChatNotif(0);
+
+  
     return () => {
       chatSocket.current.disconnect();
       setConnected(false);
     };
+
+
   }, []);
 
   useEffect(() => {
     if (selectedChat.chatRoomid) {
       console.log("joining the room");
       const payload = {
+        currentId: Cookies.get("id"),
         senderId: selectedChat.sender_id,
         receiverId: selectedChat.receiver_id,
       };
@@ -106,17 +128,19 @@ const Chat = () => {
       if (selectedChat.chatRoomid) {
         console.log("leaving the room");
         const payload = {
+          currentId: Cookies.get("id"),
           senderId: selectedChat.sender_id,
           receiverId: selectedChat.receiver_id,
         };
         chatSocket.current.emit("leaveRoom", payload);
+
       }
     };
   }, [selectedChat.chatRoomid]);
 
   useEffect(() => {
     if (!selectedChat.chatRoomid) {
-      console.log("no chat room selected from global context");
+      // console.log("no chat room selected from global context");
       return;
     }
     for (let i = 0; i < privateChatRooms.length; i++) {
@@ -136,7 +160,7 @@ const Chat = () => {
           closestDate = date;
         }
       }
-      console.log("selecting the closest chat room");
+      // console.log("selecting the closest chat room");
       setSelectedChat(closestChatRoom);
       return;
     } else {

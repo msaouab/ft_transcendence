@@ -15,7 +15,6 @@ import instance, { GetAvatar } from "../../api/axios";
 import { useGlobalContext } from "../../provider/AppContext";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { CgClose } from "react-icons/cg";
-import { parse } from "path";
 
 const Routes = [
 	{
@@ -53,13 +52,11 @@ const SideBar = ({
 	connected: boolean;
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const { setUserStatus, setUserImg, setUserId, userId } =
-		useGlobalContext();
+	const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
 	const [menuIndex, setMenuIndex] = useState<number>(2);
 	// const
 
-	const { setChatNotif, chatNotif, gameNotif, setGameNotif } =
-		useGlobalContext();
+	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
 	// const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
 	useEffect(() => {
 		if (connected) {
@@ -72,24 +69,16 @@ const SideBar = ({
 				}
 			});
 			notifySocket.on("gameNotif", (data: any) => {
+				console.log("GameInvite received", data);
 				if (window.location.pathname != "/game") {
-					if (data.num != 0) {
-						const prevNotif = gameNotif;
-						const num = parseInt(data.num) + prevNotif;
-						setGameNotif(num);
-						Cookies.set("gameNotif", String(num));
-					}
+					const prevNotif = gameNotif;
+					const num = parseInt(data.num) + prevNotif;
+					setGameNotif(num);
+					Cookies.set("gameNotif", String(num));
+					console.log("game", num)
 				}
+				console.log("gameNotif", gameNotif)
 			});
-			// notifySocket.on("friendInfo", (id: string, key: string) => {
-			// 	const ChellengeObg = { id, key}
-			// 	// setFriendChellenge((prev: any) => {
-			// 	// 	return [...prev, ChellengeObg];
-			// 	// });
-			// 	setFriendChellenge((prev) => [...prev, ChellengeObg]);
-			// 	localStorage.setItem("friendChellenge", JSON.stringify(friendChellenge));
-			// 	console.log("ChellengeObg:", ChellengeObg)
-			// });
 		}
 	}, [chatNotif, gameNotif]);
 	const handleToggleSidebar = () => {
@@ -194,13 +183,14 @@ const SideBar = ({
 								}}
 							>
 								<div className="icon">{route.icon}</div>
+								{/* a notif small red cirle with num inside */}
 								{route.name == "chat" && chatNotif > 0 && (
 									<div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
 										{chatNotif}
 									</div>
 								)}
-								{route.name === "game" && gameNotif > 0 && (
-									<div className="absolute top-[70px] right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+								{route.name == "game" && gameNotif > 0 && (
+									<div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
 										{gameNotif}
 									</div>
 								)}

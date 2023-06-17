@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import AchivementImg1 from "../../assets/achivement1.png";
-
+import { useOutletContext } from "react-router-dom";
 import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
@@ -37,49 +37,14 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 
-const Status = styled.div<{ userStatus: string }>`
-  position: relative;
-  /* width: 100px; */
-  /* aspect-ratio: 1/1; */
-  height: 100%;
-  img {
-    position: relative;
-    border-radius: 50%;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    bottom: 5px;
-    right: 10%;
-    background-color: ${({ userStatus }) =>
-      userStatus === "online"
-        ? "#01d101"
-        : userStatus === "offline"
-        ? "#6a6a6a"
-        : userStatus === "donotdisturb"
-        ? "#ff0000"
-        : userStatus === "ingame"
-        ? "#011c77"
-        : "#ffcc00"};
-    border: 1px solid #ececec;
-    width: 15%;
-    height: 15%;
-    border-radius: 50%;
-  }
-`;
-
 interface friendsInterface {
   login: string;
   Status: string;
 }
 
-interface ProfileInterface {
-  isAnotherUser?: boolean;
-}
-const Profile = (props: ProfileInterface) => {
+const Profile = () => {
+  const { notifySocket, connected }: any = useOutletContext();
+  const { id } = useParams(); // Extract the user ID from the URL params
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -100,7 +65,12 @@ const Profile = (props: ProfileInterface) => {
   const [friends, setFriends] = useState<friendsInterface[]>([]);
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [userId, setUserId] = useState(Cookies.get("userid") || "");
+	const { userId } = useGlobalContext();
+
+
+  useEffect(() => {
+    getAllData();
+  }, [userId ]);
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -132,16 +102,17 @@ const Profile = (props: ProfileInterface) => {
     rankData();
     getUserData();
   };
-  const { id } = useParams(); // Extract the user ID from the URL params
+
 
   useEffect(() => {
-    if (props.isAnotherUser) {
-      console.log("id", id);
-      setUserId(id || "");
+    if (connected) {
+      notifySocket.on("inviteAccepted", (data: any) => {
+        if (data.user_id === userId) {
+          getAllData();
+        }
+      });
     }
-
-    getAllData();
-  }, []);
+  }, [connected]);
 
   const Status = styled.div<{ userStatus: string }>`
     position: relative;
@@ -151,8 +122,8 @@ const Profile = (props: ProfileInterface) => {
     img {
       position: relative;
       border-radius: 50%;
-      height: 100%;
-      width: 100%;
+      max-width: 80px;
+      aspect-ratio: 1/1;
       object-fit: cover;
       @media (max-width: 1200px) {
         height: 70px;
@@ -245,6 +216,7 @@ const Profile = (props: ProfileInterface) => {
     }
   `;
 
+  console.log("user status inside profile is ", userStatus);
   return (
     <div className="  w-[100%] flex flex-col gap-5  ">
       <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">

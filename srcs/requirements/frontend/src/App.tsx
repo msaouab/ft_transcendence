@@ -17,6 +17,7 @@ import GameType from "./pages/game/GameType";
 import { GameProvider } from "./provider/GameProvider";
 import StartGame from "./pages/game/StartGame";
 import OtherUserProfile from "./pages/profile/OtherUserProfile";
+import NotFound from "./pages/notFound/NotFound";
 
 // function App() {
 // 	const [bgColor, setBgColor] = useState("#1E1E1E");
@@ -101,6 +102,7 @@ function App() {
 						<GameProvider><GameType /></GameProvider>
 					} />
 				</Route>
+        <Route path="*" element={<NotFound />} />
 			</Routes>
 		</>
 	);

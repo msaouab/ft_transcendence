@@ -31,8 +31,7 @@ export class ChatController {
     @Get("/private/single/:senderId/:receiverId")
     @ApiParam({ name: 'senderId', required: true, description: 'id of the sender' })
     @ApiParam({ name: 'receiverId', required: true, description: 'id of the receiver' })
-    async getPrivateChatRooms(@Param('senderId') senderId: string, @Param('receiverId') receiverId: string) {
-        console.log("getPrivateChatRooms");
+    async getPrivateChatRoom(@Param('senderId') senderId: string, @Param('receiverId') receiverId: string) {
         const privateChatRooms = await this.ChatService.getPrivateChatRoom(senderId, receiverId);
         return privateChatRooms;
     }
@@ -53,7 +52,6 @@ export class ChatController {
     @ApiParam({ name: 'id', required: true, description: 'id of the private chat room' })
     async getPrivateChatMessages(@Param('id') id: string, @Query('limit') limit: string, @Query('offset') offset: string, @Query('seen') seen: string, @Query('userId') userId: string) {
         // console.log("limit: ", limit, "offset: ", offset);
-        console.log("seen: ", seen);
         const privateChatMessages = await this.ChatService.getPrivateChatMessages(id, { limit, offset, seen, userId });
         return privateChatMessages;
     }

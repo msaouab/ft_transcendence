@@ -10,10 +10,16 @@
  - [x] show date at last message only + show only first message as rounded with dot
  - [ ] add searches endpoint it should takes query params and return
 
- - [ ] the dot , date thing doesn't work!!! do you understand that my friend!!!!
+ - [x] the dot , date thing doesn't work!!! do you understand that my friend!!!!
  - [x] when a surfing to another page and then back to chat a problem, messages disaparead
- - [ ] font doesn't seem to work
-
+ - [x] font doesn't seem to work
+ - [ ] the path should redirect to profile and then to login , that causes problems
+ - [ ] even when logged and clicking playNow it always redirct to login
+ - [ ] a lot of errors in the console
+ - [ ] sidebar is still showing the wrong visited page
+ - [ ] games "section" have a none value
 
 # Notes
 - webapp is crashing in logout ()
+
+

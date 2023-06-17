@@ -13,6 +13,7 @@ import { TfaDto } from './dto/Tfa.dto';
 
 
 import { PrivateMessage } from '@prisma/client';
+import { lstat } from 'fs';
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -85,6 +86,7 @@ export class UserService {
             if (!user) {
                 throw new NotFoundException('User not found');
             }
+            console.log("user : ", id);
             const rankData = await this.prisma.rankingData.findUnique({
                 where: {
                     user_id: id,
@@ -123,10 +125,13 @@ export class UserService {
                 id: id,
             },
             data: {
-                avatar: file.destination + '/' + file.filename,
+                avatar: "http://localhost:3000/" + file.filename,
             },
+            select:{
+                avatar: true
+            }
         });
-
+        return updatePath;
     }
 
     async getImage(id: string) {
@@ -337,5 +342,58 @@ export class UserService {
         });
         return users;
     }
+
+    async updateStatus(user,id ,status) {
+        const me = await this.prisma.user.findFirst({
+            
+            where: {
+                id: id,
+            },
+        });
+        if (!me) {
+            throw new NotFoundException('User not found');
+        }
+        if (user._json.email != me.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        if (status != 'Online' && status != 'Offline' && status != 'Idle' && status != 'DoNotDisturb')
+        {
+            throw new BadRequestException('Wrong status');
+        }
+        return await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                status: status,
+            },
+        });
+    }
+
+
+
+    /// getUnsenNotifications
+    async getUnseenNotifications(ft_user) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: ft_user._json.email,
+            }
+        });
+        if (!user) {
+            throw new NotFoundException('User nwwwot found');
+        }
+        const notifications = await this.prisma.notification.findMany({
+            where: {
+                user_id: user.id,
+                
+            }
+        });
+
+        if (!notifications) {
+            throw new NotFoundException('Notifications not found');
+        }
+        return notifications;
+    }
+
 }
     

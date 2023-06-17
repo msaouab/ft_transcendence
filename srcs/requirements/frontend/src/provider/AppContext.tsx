@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import DefaultAvatar from "../assets/avatar.png";
+
+import { useRef } from "react";
 import Cookies from "js-cookie";
 
 interface AppContextType {
@@ -26,26 +28,24 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 interface AppProviderProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const [userStatus, setUserStatus] = useState<string>("");
-  const [userImg, setUserImg] = useState("");
-  const [userId, setUserId] = useState<string>("");
-  const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
-  // chat context
-  const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
+	const [userStatus, setUserStatus] = useState<string>("");
+	const [userImg, setUserImg] = useState("");
+	const [userId, setUserId] = useState<string>("");
 
-  // notification context
-  const [notifications, setNotifications] = useState([] as any[]);
+	const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
+	// chat context
+	const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
 
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
   const [gameNotif, setGameNotif] = useState(Cookies.get("gameNotif") ? parseInt(Cookies.get("gameNotif")!) : 0);
 
   const [friendChellenge, setFriendChellenge] = useState([] as any[]);
-
-  //  user auth context
+	// notification context
+	const [notifications, setNotifications] = useState([] as any[]);
 
   const value = {
     userStatus,
@@ -68,15 +68,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setFriendChellenge,
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+
+	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useGlobalContext = (): AppContextType => {
-  const context = useContext(AppContext);
-
-  if (!context) {
-    throw new Error("useGlobalContext must be used within an AppProvider");
-  }
-
-  return context;
+	const context = useContext(AppContext);
+	if (!context) {
+		throw new Error("useGlobalContext must be used within an AppProvider");
+	}
+	return context;
 };

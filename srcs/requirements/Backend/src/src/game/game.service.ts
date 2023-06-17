@@ -31,7 +31,6 @@ export class GameService {
 		private UserService: UserService,
 		private gameGateway: GameGateway
 	) {}
-
 	async CreateGamingRoom(id: string, userId: string) {
 		try {
 			const FindUser = await this.UserService.getUser(id);
