@@ -122,8 +122,7 @@ export const RemoveThisFriendInvite = async (id: string, receiver_id: any) => {
   if (receiver_id && id && id !== receiver_id) {
     try {
       const res = await instance.delete("/user/" + id + "/invites", {
-        data: { receiver_id,
-        },
+        data: { receiver_id },
       });
       return res.data;
     } catch (err) {
@@ -193,12 +192,12 @@ export const deleteFreind = async (id: string, receiver_id: string) => {
 };
 
 export const updateUserStatus = async (id: string, status: string) => {
-  if (id ){
+  if (id) {
     try {
       const res = await instance.put("/User/" + id + "/updatestatus", {
         status,
       });
-      console.log("r000000 ",res.data);
+      console.log("r000000 ", res.data);
       return res.data;
     } catch (err) {
       console.log(err);
@@ -208,11 +207,13 @@ export const updateUserStatus = async (id: string, status: string) => {
 
 export const getNotifications = async () => {
   try {
-    const res = await instance.get("/user/" + Cookies.get("userid") + "/notifications");
+    const res = await instance.get(
+      "/user/" + Cookies.get("userid") + "/notifications"
+    );
     return res.data;
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 export default instance;
