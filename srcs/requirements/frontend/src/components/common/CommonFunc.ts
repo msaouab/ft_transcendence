@@ -29,6 +29,10 @@ export const dateToStr = (date: Date): string => {
 export const getAvatarUrl = () => {
 	// get avatar url from id
 	const id = Cookies.get("id");
-	console.log("--------------------------------------:",id);
 	return `http://localhost:3000/api/v1/user/${id}/avatar`;
 };
+
+export const getAvatarUrlById = (id: string) => {
+	// get avatar url from id
+	return `http://localhost:3000/user/`;
+}

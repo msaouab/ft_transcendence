@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { MdOutlineNotifications } from "react-icons/md";
 import styled, { keyframes } from "styled-components";
 import { useGlobalContext } from "../provider/AppContext";
 import { getNotifications, handelFriendInvite } from "../api/axios";
-import { use } from "matter-js";
+
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { TiUserDeleteOutline } from "react-icons/ti";
 
 const fadeInAnimation = keyframes`
   from {
@@ -31,7 +33,6 @@ const Notifications = (props: NotifProps) => {
   };
 
   const { notifSocket, conected } = props;
-  const prevSenderIds = [] as any[];
 
   useEffect(() => {
     getNotif();
@@ -39,7 +40,6 @@ const Notifications = (props: NotifProps) => {
 
   const getNotif = async () => {
     const notifArr = await getNotifications();
-    console.log("---------------> ", notifArr);
     setNotifications([...notifArr]);
   };
 
@@ -69,11 +69,13 @@ const Notifications = (props: NotifProps) => {
   }, []);
 
   const acceptFriendInvite = async (notif: any, status: string) => {
-    console.log("notif55555555: ", notif.notification_id);
-    const data = await handelFriendInvite(notif.sender_id, userId, status, notif.notification_id);
-    console.log("data11111111111: ", data);
-
-    console.log(data);
+    await handelFriendInvite(
+      notif.sender_id,
+      userId,
+      status,
+      notif.notification_id
+    );
+    getNotif();
   };
 
   return (
@@ -97,18 +99,33 @@ const Notifications = (props: NotifProps) => {
         ) : (
           notifications.map((notif: any, index: number) => {
             return (
-              <div key={index} className="flex justify-between items-center">
-                <div className="name">
-                  {
-                    notif[index]
-                  }
+              <div
+                key={index}
+                className="flex flex-col gap-1 items-center  text-center text-sm   pb-2"
+                style={{
+                  borderBottom: "1px solid #ffffff85",
+                }}
+              >
+                <span className="text-[12px] font-[400] flex gap-1">
+                  Friend request from 
+                  <span className="text-blue-600 text-md font-semibold">   {notif.sender_name}</span>
+                </span>
+                <div className=" flex justify-between items-center   w-full">
+                  <button
+                    className="flex items-center gap-1 hover:scale-105 transition-all"
+                    onClick={() => acceptFriendInvite(notif, "Accepted")}
+                  >
+                    <IoCheckmarkDoneSharp className="text-green-500 text-xl" />{" "}
+                    Accept
+                  </button>
+                  <button
+                    className="flex items-center gap-1 hover:scale-105 transition-all"
+                    onClick={() => acceptFriendInvite(notif, "Rejected")}
+                  >
+                    <TiUserDeleteOutline className="text-red-400 text-xl" />{" "}
+                    Reject
+                  </button>
                 </div>
-                <button onClick={() => acceptFriendInvite(notif, "Accepted")}>
-                  acc
-                </button>
-                <button onClick={() => acceptFriendInvite(notif, "Rejected")}>
-                  refuse
-                </button>
               </div>
             );
           })

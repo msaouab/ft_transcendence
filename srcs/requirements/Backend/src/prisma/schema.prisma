@@ -231,9 +231,9 @@ model Notification {
   notification_id String @id @default(uuid())
   user_id         String
   user            User   @relation("notificationRelation", fields: [user_id], references: [id])
-  // invite_data InviteData[] @relation("InviteDataRelation")
   type            InviteType 
   sender_id       String?
+  sender_name     String?
   receiver_id     String?
 }
 

@@ -107,7 +107,8 @@ const SideBar = ({
 					}
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
-					setUserStatus(response.data.status.tolowoerCase());
+					setUserStatus(response.data.status);
+					setUserImg(response.data.avatar);
 				})
 				.catch((error) => {
 					if (error?.response?.status == 401 || error?.response?.status == 403) {
@@ -117,8 +118,8 @@ const SideBar = ({
 		} catch (error) {
 			console.log(error);
 		}
-		const res = getAvatarUrl();
-		setUserImg(res);
+		// const res = getAvatarUrl();
+		// setUserImg(res);
 	}
 
 	useEffect(() => {

@@ -37,40 +37,6 @@ export const ReusableCardStyle = styled.div`
   padding: 1rem;
 `;
 
-const Status = styled.div<{ userStatus: string }>`
-  position: relative;
-  /* width: 100px; */
-  /* aspect-ratio: 1/1; */
-  height: 100%;
-  img {
-    position: relative;
-    border-radius: 50%;
-    height: 100%;
-    width: 100%;
-    object-fit: cover;
-  }
-  &:after {
-    content: "";
-    position: absolute;
-    bottom: 5px;
-    right: 10%;
-    background-color: ${({ userStatus }) =>
-      userStatus === "online"
-        ? "#01d101"
-        : userStatus === "offline"
-        ? "#6a6a6a"
-        : userStatus === "donotdisturb"
-        ? "#ff0000"
-        : userStatus === "ingame"
-        ? "#011c77"
-        : "#ffcc00"};
-    border: 1px solid #ececec;
-    width: 15%;
-    height: 15%;
-    border-radius: 50%;
-  }
-`;
-
 interface friendsInterface {
   login: string;
   Status: string;
@@ -78,6 +44,7 @@ interface friendsInterface {
 
 const Profile = () => {
   const { notifySocket, connected }: any = useOutletContext();
+  const { id } = useParams(); // Extract the user ID from the URL params
   const { userImg } = useGlobalContext();
   const { userStatus } = useGlobalContext();
   const [user, setData] = useState({
@@ -98,7 +65,12 @@ const Profile = () => {
   const [friends, setFriends] = useState<friendsInterface[]>([]);
   const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
   const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [userId, setUserId] = useState(Cookies.get("userid") || "");
+	const { userId } = useGlobalContext();
+
+
+  useEffect(() => {
+    getAllData();
+  }, [userId ]);
 
   const getAllData = () => {
     const friendsData = async () => {
@@ -130,20 +102,17 @@ const Profile = () => {
     rankData();
     getUserData();
   };
-  const { id } = useParams(); // Extract the user ID from the URL params
+
 
   useEffect(() => {
     if (connected) {
       notifySocket.on("inviteAccepted", (data: any) => {
-        getAllData();
+        if (data.user_id === userId) {
+          getAllData();
+        }
       });
     }
   }, [connected]);
-
-  useEffect(() => {
-    setUserId(id || "");
-    getAllData();
-  }, []);
 
   const Status = styled.div<{ userStatus: string }>`
     position: relative;
@@ -153,7 +122,7 @@ const Profile = () => {
     img {
       position: relative;
       border-radius: 50%;
-      max-width : 80px;
+      max-width: 80px;
       aspect-ratio: 1/1;
       object-fit: cover;
       @media (max-width: 1200px) {

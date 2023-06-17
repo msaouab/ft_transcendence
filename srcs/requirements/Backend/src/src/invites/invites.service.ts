@@ -121,12 +121,23 @@ export class InvitesService {
     if (onlineClientsMap.has(receiver_id)) {
       const socket = onlineClientsMap.get(receiver_id);
       socket.emit("invite", Invite);
+      const senderName = await this.prisma.user.findFirst({
+        where: {
+          id: sender_id,
+        }
+      })
+
+      if (!senderName) {
+        throw new NotFoundException("User does not exist");
+      }
+
       const storeNotification = await this.prisma.notification.create({
         data: {
           user_id: receiver_id,
                 type: "Friend",
                 sender_id: sender_id,
                 receiver_id: receiver_id,
+                sender_name: senderName.login
               },
             });
 
@@ -163,7 +174,7 @@ export class InvitesService {
     }
 
     // if invite is "Accpeted" let's create a friendship
-    if (status === "Accepted") {
+    if (status === "Accepted" || status === "Rejected") {
       // create a friendship
       const acceptedInvite = await this.friendService.createFriendship(
         sender_id,
@@ -179,7 +190,6 @@ export class InvitesService {
       }
     }   
 
-    console.log("h11111111111111111----------------------------", notification_id);
     //  const notificationsToDelete = await this.prisma.notification.delete({
     //     where: {
     //         user_id: sender_id,
