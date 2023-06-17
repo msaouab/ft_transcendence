@@ -204,4 +204,15 @@ export const GetChannelMessages = async (id: string, limit: number, offset: numb
     console.log(err);
   }
 }
+
+export const GetChannelInfo = async (id: string) => {
+  try {
+    const res = await instance.get("/Channels/" + id + "/info");
+    return res.data;
+  }
+  catch (err) {
+    console.log(err);
+  }
+}
+
 export default instance;

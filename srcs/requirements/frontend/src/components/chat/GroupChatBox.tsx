@@ -6,6 +6,7 @@ import GroupChatBoxTopBar from "./GroupChatBoxTopBar";
 import GroupSendMessageBox from "./GroupSendMessageBox";
 import { GetChannelMessages } from "../../api/axios";
 import GroupChatInfiniteScroll from "./GroupChatInfiniteScroll";
+import { useGlobalContext } from "../../provider/AppContext";
 
 
 const GroupChatBoxStyle = styled.div`
@@ -49,6 +50,7 @@ const GroupChatBox = ({
   const [totalMessages, setTotalMessages] = React.useState(0);
   const [state, setState] = React.useState(intialState);
   const { messages, hasMore, offset } = state;
+  const {  setGroupChatRooms } = useGlobalContext();
   let limit = 20;
 
 
@@ -104,23 +106,34 @@ const GroupChatBox = ({
 
   useEffect(() => {
     if (connected) {
-      socket.current.on("GroupMessage", (data: any) => {
+      socket.current.on("newGroupMessage", (data: any) => {
         console.log("new group message from GroupChatBox: ", data);
-        console.log("selectedGroupChat: ", selectedGroupChat);
-        const getNewMessage = async () => {
-          const newMessage = await GetChannelMessages(selectedGroupChat.group_id, 1, 0);
-          return newMessage.messages[0];
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === data.group_id);
+          if (index === -1) {
+            return [data, ...prev];
+          }
+          const newGroupChatRooms = [...prev];
+          newGroupChatRooms[index].lastMessage = data.lastMessage;
+          newGroupChatRooms[index].lastMessageDate = data.lastMessageDate;
+          return newGroupChatRooms;
+        });
+        if (selectedGroupChat.group_id === data.group_id) {
+          const getNewMessage = async () => {
+            const newMessage = await GetChannelMessages(selectedGroupChat.group_id, 1, 0);
+            return newMessage.messages[0];
+          }
+          getNewMessage().then((newMessage) => {
+            setState((prevState) => ({
+              ...prevState,
+              messages: [newMessage, ...prevState.messages],
+            }));
+          })
         }
-        getNewMessage().then((newMessage) => {
-          setState((prevState) => ({
-            ...prevState,
-            messages: [newMessage, ...prevState.messages],
-          }));
-        })
       });
     }
     return () => {
-      socket.current.off("GroupMessage");
+      socket.current.off("newGroupMessage");
     }
   }, [connected]);
 

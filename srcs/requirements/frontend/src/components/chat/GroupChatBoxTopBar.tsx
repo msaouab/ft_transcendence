@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import { GroupMessage } from "../../types/message";
 import { CiCircleMore } from "react-icons/ci";
+import { useState } from "react";
+import ChannelInfo from "./ChannelInfo";
 
 const GroupChatBoxTopBarStyle = styled.div`
   background: transparent;
@@ -18,6 +20,12 @@ const GroupChatBoxTopBarStyle = styled.div`
     cursor: pointer;
     margin-right: 0;
   }
+  .info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
 `;
 
 const GroupChatBoxTopBar = ({
@@ -25,10 +33,11 @@ const GroupChatBoxTopBar = ({
 }: {
   selectedGroupChat: GroupMessage;
 }) => {
+  const [open, setOpen] = useState(false);
 
   return (
     <GroupChatBoxTopBarStyle>
-      <div className="flex flex-row">
+      <div className="info" onClick={() => setOpen(true)}>
         <div className="">
           <img
             src={selectedGroupChat.profileImage}
@@ -48,6 +57,9 @@ const GroupChatBoxTopBar = ({
       <div className="relative">
         <CiCircleMore size={30} />
       </div>
+      {
+        open && (<ChannelInfo open={open} setOpen={setOpen} selectedGroupChat={selectedGroupChat} />)
+      }
     </GroupChatBoxTopBarStyle>
   );
 };

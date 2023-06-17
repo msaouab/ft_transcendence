@@ -490,4 +490,60 @@ export class ChannelService {
             console.log(error);
         }
     }
+
+    async getAllSubscribers(channelId: string) {
+        try {
+            const subscribersRes = await this.prisma.channelsJoinTab.findMany({
+                where: {
+                    channel_id: channelId,
+                    OR: [
+                        { role: "Member" },
+                        { role: "Admin" },
+                        { role: "Owner" },
+                    ]
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true,
+                            login: true,
+                            avatar: true,
+                            status: true,
+                        }
+                    },
+                    role: true,
+                }
+            });
+            const subscribers = [];
+            for (const el of subscribersRes) {
+                subscribers.push({
+                    id: el.user.id,
+                    login: el.user.login,
+                    avatar: el.user.avatar,
+                    status: el.user.status,
+                    role: el.role,
+                });
+            }
+            return subscribers;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async channelInfo(channelId: string) {
+        try {
+            const channel = await this.prisma.channel.findFirst({
+                where: {
+                    id: channelId
+                },
+            });
+            const subscribers = await this.getAllSubscribers(channelId);
+            return {
+                channel: channel,
+                subscribers: subscribers,
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }

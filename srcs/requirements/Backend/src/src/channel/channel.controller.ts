@@ -133,4 +133,10 @@ export class ChannelController{
     getMessages(@Param('id') channelId: string, @Query() dto: MessagesDto) {
         return this.ChannelService.getMessages(channelId, dto);
     }
+
+    @Get(':id/info')
+    // @UseGuards(AuthenticatedGuard)
+    channelInfo(@Param('id') channelId: string) {
+        return this.ChannelService.channelInfo(channelId);
+    }
 }

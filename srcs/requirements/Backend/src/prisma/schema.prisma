@@ -23,6 +23,7 @@ enum ChanRoles {
   Admin
   Owner
   Member
+  Muted
 }
 
 enum ChanType {
