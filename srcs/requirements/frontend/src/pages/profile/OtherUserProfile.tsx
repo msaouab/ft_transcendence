@@ -79,6 +79,8 @@ const OtherUserProfile = () => {
 
   useEffect(() => {
     getAllData();
+    if (id === userId)
+      navigate("/profile"); // If the user is trying to access his own profile, redirect him to the profile page
   }, [userId]);
 
   useEffect(() => {
@@ -257,63 +259,70 @@ const OtherUserProfile = () => {
   }
 
   return (
-    <div className="  w-[100%] flex flex-col gap-5  ">
-      <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
-        {user && (
-          <Status className="" userStatus={user.status.toLowerCase()}>
-            {avatar && <img src={avatar} alt="" className="" />}
-          </Status>
-        )}
-        {user && (
-          <div className="description flex flex-col  text-center justify-center ">
-            <div className="name md:text-4xl text-xl  font-[800] capitalize ">
-              {user.firstName} {user.lastName}
-            </div>
-            <div className="name  font-[400] ">{user.login}</div>
-            <div className="flex gap-10 items-center "></div>
-          </div>
-        )}
-        {rankData && (
-          <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
-            <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-              <img src={Dice} alt="_" width={50} />
-              Games :{" "}
-              {rankData?.wins + rankData?.loses + rankData?.draws }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={AchivementImg1} width={50} alt="_" />
-              Wins : {rankData?.wins }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Draw} alt="_" width={50} />
-              Draw: {rankData?.draws }
-            </div>
-            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-              <img src={Lose} alt="_" width={50} />
-              Lose: {rankData?.loses }
-            </div>
-            <div className="relative text-white ">
-              {showFriendRelationMenu}
-              <CiCircleMore
-                className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
-                onClick={() => {
-                  setShowFriendRelationMenu(!showFriendRelationMenu);
-                }}
-              />
-              {showFriendRelationMenu && (
-                <FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[15rem]   rounded-md shadow-xl shadow-white/10 border z-50">
-                  {FriendRelatioType()}
-                </FriendRelationMenuStyle>
-              )}
-            </div>
-          </div>
-        )}
-      </Top>
+<>
       {relationStatus === "blocking" ? (
-        <div className="h-[60rem] w-full flex items-center justify-center text-6xl debug">
+        <div className="h-[60rem] w-full flex flex-col gap-2 items-center justify-center text-6xl ">
           Unblocked this user to see his profile
+          <button 
+          className="text-4xl mt-10 border-2 border-white/50 px-10 py-2 rounded-md hover:bg-white/50 hover:text-black/50"
+          onClick={unblockUser}
+          >
+            Unblock
+          </button>
         </div>
       ) : (
+        <div className="  w-[100%] flex flex-col gap-5  ">
+        <Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
+          {user && (
+            <Status className="" userStatus={user.status.toLowerCase()}>
+              {avatar && <img src={avatar} alt="" className="" />}
+            </Status>
+          )}
+          {user && (
+            <div className="description flex flex-col  text-center justify-center ">
+              <div className="name md:text-4xl text-xl  font-[800] capitalize ">
+                {user.firstName} {user.lastName}
+              </div>
+              <div className="name  font-[400] ">{user.login}</div>
+              <div className="flex gap-10 items-center "></div>
+            </div>
+          )}
+          {rankData && (
+            <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
+              <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
+                <img src={Dice} alt="_" width={50} />
+                Games :{" "}
+                {rankData?.wins + rankData?.loses + rankData?.draws }
+              </div>
+              <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+                <img src={AchivementImg1} width={50} alt="_" />
+                Wins : {rankData?.wins }
+              </div>
+              <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+                <img src={Draw} alt="_" width={50} />
+                Draw: {rankData?.draws }
+              </div>
+              <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+                <img src={Lose} alt="_" width={50} />
+                Lose: {rankData?.loses }
+              </div>
+              <div className="relative text-white ">
+                {showFriendRelationMenu}
+                <CiCircleMore
+                  className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
+                  onClick={() => {
+                    setShowFriendRelationMenu(!showFriendRelationMenu);
+                  }}
+                />
+                {showFriendRelationMenu && (
+                  <FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[15rem]   rounded-md shadow-xl shadow-white/10 border z-50">
+                    {FriendRelatioType()}
+                  </FriendRelationMenuStyle>
+                )}
+              </div>
+            </div>
+          )}
+        </Top>
         <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
           <div className="stats  flex gap-6 h-[25rem] w-full   ">
             <div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4  h-[25rem] ">
@@ -391,8 +400,9 @@ const OtherUserProfile = () => {
             </div>
           </div>
         </Main>
+        </div>
       )}
-    </div>
+      </>
   );
 };
 

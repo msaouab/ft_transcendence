@@ -124,8 +124,8 @@ export class InvitesService {
       const senderName = await this.prisma.user.findFirst({
         where: {
           id: sender_id,
-        }
-      })
+        },
+      });
 
       if (!senderName) {
         throw new NotFoundException("User does not exist");
@@ -134,27 +134,26 @@ export class InvitesService {
       const storeNotification = await this.prisma.notification.create({
         data: {
           user_id: receiver_id,
-                type: "Friend",
-                sender_id: sender_id,
-                receiver_id: receiver_id,
-                sender_name: senderName.login
-              },
-            });
+          type: "Friend",
+          sender_id: sender_id,
+          receiver_id: receiver_id,
+          sender_name: senderName.login,
+        },
+      });
 
       if (!storeNotification) {
         throw new ConflictException("Notification could not be created");
       }
-
     }
     return Invite;
   }
 
   async putInvites(
     putInviteDto: PutInviteDto,
-    sender_id: string,
+    sender_id: string
   ): Promise<FriendshipInvites> {
     // putInvites updates an existing invite
-    const { receiver_id, status,notification_id } = putInviteDto;
+    const { receiver_id, status, notification_id } = putInviteDto;
 
     // if status is not Accepted or Rejected, throw a 400 exception
     if (status !== "Accepted" && status !== "Rejected") {
@@ -188,34 +187,25 @@ export class InvitesService {
         const socket = onlineClientsMap.get(receiver_id);
         socket.emit("inviteAccepted", acceptedInvite);
       }
-    }   
+    }
 
-    //  const notificationsToDelete = await this.prisma.notification.delete({
-    //     where: {
-    //         user_id: sender_id,
-    //         type: "Friend",
-    //         sender_id: sender_id,
-    //         receiver_id: receiver_id,
-    //     },
-    //  })
     const findnotification = await this.prisma.notification.findFirst({
-        where: {
-            notification_id: notification_id,
-        },
-    })
-    console.log("findnotification", findnotification.notification_id)
+      where: {
+        notification_id: notification_id,
+      },
+    });
+    console.log("findnotification", findnotification.notification_id);
     if (!findnotification) {
-        throw new ConflictException("Notification does not exist");
+      throw new ConflictException("Notification does not exist");
     }
     const deleteNotification = await this.prisma.notification.deleteMany({
-        where: {
-           notification_id: notification_id,
-        },
-    })
+      where: {
+        notification_id: notification_id,
+      },
+    });
     if (!deleteNotification) {
-        throw new ConflictException("Notification could not be deleted");
+      throw new ConflictException("Notification could not be deleted");
     }
-
 
     return await this.prisma.friendshipInvites.delete({
       where: {
@@ -229,7 +219,7 @@ export class InvitesService {
 
   async deleteInvites(deleteInviteDto, sender_id) {
     const { receiver_id } = deleteInviteDto;
-  
+
     const inviteExists = await this.prisma.friendshipInvites.findFirst({
       where: {
         sender_id,
@@ -240,8 +230,25 @@ export class InvitesService {
       throw new NotFoundException("Invite does not exist");
     }
 
-  
-  
+    const findnotification = await this.prisma.notification.findFirst({
+      where: {
+        sender_id: sender_id,
+        receiver_id: receiver_id,
+      },
+    });
+    if (!findnotification) {
+      throw new ConflictException("Notification does not exist");
+    }
+    const deleteNotification = await this.prisma.notification.deleteMany({
+      where: {
+        sender_id: sender_id,
+        receiver_id: receiver_id,
+      },
+    });
+    if (!deleteNotification) {
+      throw new ConflictException("Notification could not be deleted");
+    }
+
     await this.prisma.friendshipInvites.delete({
       where: {
         sender_id_receiver_id: {
@@ -250,8 +257,7 @@ export class InvitesService {
         },
       },
     });
-  
+
     return inviteExists; // Return the deleted invite or any desired response
   }
-  
-}  
+}

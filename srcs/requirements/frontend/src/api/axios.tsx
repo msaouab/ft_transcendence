@@ -122,7 +122,8 @@ export const RemoveThisFriendInvite = async (id: string, receiver_id: any) => {
   if (receiver_id && id && id !== receiver_id) {
     try {
       const res = await instance.delete("/user/" + id + "/invites", {
-        data: { receiver_id },
+        data: { receiver_id,
+        },
       });
       return res.data;
     } catch (err) {
