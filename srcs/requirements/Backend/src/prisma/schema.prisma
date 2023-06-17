@@ -69,7 +69,7 @@ model User {
   lastName       String
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
-  avatar         String            @default("/app/public/default.png")
+  avatar         String            @default("http://localhost:3000/default.png")
   status         Status            @default(Online)
   tfa            Boolean           @default(false)
   otp_verified   Boolean           @default(false)
