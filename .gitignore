@@ -5,3 +5,4 @@ db
 dist
 .DS_Store
 /prisma/migrations/*
+srcs/requirements/Backend/src/public/*
