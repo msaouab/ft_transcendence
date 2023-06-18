@@ -148,7 +148,8 @@ const GroupChatBox = ({
         ) : (
           <>
             <div>
-              <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} />
+                <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} socket={socket}
+                  connected={connected} />
               <div className="h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60"></div>
             </div>
             <GroupChatInfiniteScroll

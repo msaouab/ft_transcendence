@@ -142,6 +142,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("We've got the event to add a channel member: ", payload);
         return await this.chatService.addChannelMember(client, payload, this.server);
     }
+
+    @SubscribeMessage('addAdmin')
+    async handleAddChannelAdmin(client: Socket, payload: any) {
+        console.log("We've got the event to add a channel admin: ", payload);
+        return await this.chatService.addChannelAdmin(client, payload, this.server);
+    }
+    @SubscribeMessage('removeAdmin')
+    async handleRemoveChannelAdmin(client: Socket, payload: any) {
+        console.log("We've got the event to remove a channel admin: ", payload);
+        return await this.chatService.removeChannelAdmin(client, payload, this.server);
+    }
 }
 
 

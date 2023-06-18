@@ -493,6 +493,145 @@ export class ChatService {
             client.emit('error', error);
         }
     }
+
+    async getChannel(client, channel_id: string) {
+        try {
+            const channel = await this.prisma.channel.findUnique({
+                where: {
+                    id: channel_id
+                }
+            });
+            if (!channel) {
+                client.emit('error', 'Channel not found');
+            }
+            return channel;
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
+    async getUser(user_id: string, client) {
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: user_id
+                }
+            });
+            if (!user) {
+                client.emit('error', 'User not found');
+            }
+            return user;
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async removeMember(client, group_id: string, user_id: string) {
+        try {
+            const memberTab = await this.prisma.membersTab.delete({
+                where: {
+                    channel_id_member_id: {
+                        member_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!memberTab) {
+                client.emit('error', 'Member not removed');
+            }
+            return memberTab;
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async removeAdmin(client, group_id: string, user_id: string) {
+        try {
+            const adminTab = await this.prisma.adminMembers.delete({
+                where: {
+                    channel_id_admin_id: {
+                        admin_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!adminTab) {
+                client.emit('error', 'Admin not removed');
+            }
+            return adminTab;
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
+    async addChannelAdmin(client, payload: any, server: Server) {
+        const { group_id, user } = payload;
+        const {id, name, avatar, status, role} = user;
+        try {
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(id, client);
+            const memberTab = await this.removeMember(client, group_id, id);
+            const adminTab = await this.prisma.adminMembers.create({
+                data: {
+                    admin_id: id,
+                    channel_id: group_id,
+                }
+            })
+            if (!adminTab) {
+                client.emit('error', 'Admin not added');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.update({
+                where: {
+                    user_id_channel_id: {
+                        user_id: id,
+                        channel_id: group_id
+                    }
+                },
+                data: {
+                    role: 'Admin'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            server.to(group_id).emit('newChannelAdmin', admin);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async removeChannelAdmin(client, payload: any, server: Server) {
+        const { group_id, user } = payload;
+        const {id, name, avatar, status, role} = user;
+        try {
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(id, client);
+            const adminTab = await this.removeAdmin(client, group_id, id);
+            const memberTab = await this.prisma.membersTab.create({
+                data: {
+                    member_id: id,
+                    channel_id: group_id,
+                }
+            })
+            if (!memberTab) {
+                client.emit('error', 'Member not added');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.update({
+                where: {
+                    user_id_channel_id: {
+                        user_id: id,
+                        channel_id: group_id
+                    }
+                },
+                data: {
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            server.to(group_id).emit('removeChannelAdmin', admin);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }
 
 
