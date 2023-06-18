@@ -1,32 +1,14 @@
 import styled from "styled-components";
 import { useEffect, useRef, useState } from "react";
-import { Socket } from "socket.io-client";
-import { useAppContext } from "../../provider/GameProvider";
+// import { Socket } from "mysocket?.io-client";
+import { useGameContext } from "../../provider/GameProvider";
+import { useNavigate } from "react-router-dom";
 
 interface PingPongProps {
 	width: number;
 	height: number;
-	socket: Socket;
+	// socket: Socket;
 }
-
-const PlayGround = styled.div`
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-`;
-
-const ScoreContainter = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 50%;
-	.score {
-		font-size: 5rem;
-		font-weight: bolder;
-		color: white;
-	}
-`;
 
 type PlayerState = {
 	x: number;
@@ -45,12 +27,32 @@ type BallState = {
 	c: string;
 };
 
+const PlayGround = styled.div`
+	display: flex;
+	justify-content: center;
+	gap: 2rem;
+	align-items: center;
+`;
+
+// const ScoreContainter = styled.div`
+// 	display: flex;
+// 	flex-direction: column;
+// 	justify-content: space-between;
+// 	align-items: center;
+// 	width: 50%;
+// 	.score {
+// 		font-size: 5rem;
+// 		font-weight: bolder;
+// 		color: white;
+// 	}
+// `;
+
 let ctx: CanvasRenderingContext2D | null;
 
-const PingPong = ({ width, height, socket }: PingPongProps) => {
-	const { modeRoom } = useAppContext();
+const PingPong = ({ width, height }: PingPongProps) => {
+	const navigate = useNavigate();
+	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const [score, setScore] = useState({ player1: 0, player2: 0 });
 	const [player1X, setPlayer1X] = useState<PlayerState>({
 		x: width / 2 - 40,
 		y: height - 20,
@@ -123,26 +125,30 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 				y: y,
 				height: height,
 				width: width,
-				// player1X: player1X,
-				// player2X: player2X,
 			};
-			if (modeRoom === "Bot") socket.emit("requesteBot", data);
-			else socket.emit("requesteMouse", data);
-
+			console.log("modeRoom: ", modeRoom);
+			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
+			else mysocket?.emit("requesteMouse", data);
 		};
-		document.addEventListener("mousemove", handleMouseMove as unknown as EventListener);
-		socket.on("responseMouse", (playerPosition) => {
+		document.addEventListener(
+			"mousemove",
+			handleMouseMove as unknown as EventListener
+		);
+		mysocket?.on("responseMouse", (playerPosition) => {
 			setPlayer1X(playerPosition);
 		});
-		socket.on("responsePlayer2", (playerPosition) => {
+		mysocket?.on("responsePlayer2", (playerPosition) => {
 			setPlayer2X(playerPosition);
 		});
 		return () => {
-			document.removeEventListener("mousemove", handleMouseMove as unknown as EventListener);
-			socket.off("responseMouse");
-			socket.off("responsePlayer2");
+			document.removeEventListener(
+				"mousemove",
+				handleMouseMove as unknown as EventListener
+			);
+			mysocket?.off("responseMouse");
+			mysocket?.off("responsePlayer2");
 		};
-	}, [socket, player1X, player2X, height, width, ball]);
+	}, [mysocket, player1X, player2X, height, width, ball]);
 
 	//	render the ball and get the new position of the ball from the server
 
@@ -157,29 +163,24 @@ const PingPong = ({ width, height, socket }: PingPongProps) => {
 	};
 
 	useEffect(() => {
-		socket.on("StartTime", (time) => {
+		mysocket?.on("StartTime", (time) => {
 			console.log(time);
 		});
-		socket.on("responseBall", (ball, score) => {
+		mysocket?.on("responseBall", (ball) => {
 			setBall(ball);
-			setScore(score);
 		});
-		socket.on("responseWinner", (winner) => {
+		mysocket?.on("responseWinner", (winner) => {
 			console.log(winner);
+			navigate("/game");
 		});
 		return () => {
-			socket.off("responseBall");
+			mysocket?.off("responseBall");
 		};
-	}, [ socket, ball]);
+	}, [mysocket, ball]);
 
 	return (
 		<PlayGround className="">
-			{/* <div>{time}</div> */}
 			<canvas ref={canvasRef} width={width} height={height} />
-			<ScoreContainter>
-				<div className="score">P1: {score.player1}</div>
-				<div className="score">P2: {score.player2}</div>
-			</ScoreContainter>
 		</PlayGround>
 	);
 };

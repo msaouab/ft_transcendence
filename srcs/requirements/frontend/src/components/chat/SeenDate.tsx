@@ -10,6 +10,7 @@ import notSeenIcon from '../../assets/notSeen.svg';
 import { useEffect, useState } from "react";
 import { getDateChat } from "../common/CommonFunc"
 import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
 
 const SeenNotSeenIconStyle = styled.img`
     width: 17px;
@@ -46,10 +47,10 @@ const MessageDate = (props: PrivateMessage) => {
     const [seen, setSeen] = useState(props.seen);
     // move getNumberOfNotSeeMessages inside the component and use props parameter
     const getNumberOfNotSeeMessages = async () => {
-        const url = `http://localhost:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`;
+        const url = `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`;
         // console.log("url: ", url);
         let count = await axios.get(
-            `http://localhost:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
+            `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${props.chatRoomid}/messages?seen=false&userId=${Cookies.get('id')}`,
         );  
         return count.data[0];
     };

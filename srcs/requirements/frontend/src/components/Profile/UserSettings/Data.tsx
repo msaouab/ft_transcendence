@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import CustomInput from "../../common/CustomInput";
+import { HOSTNAME } from "../../../api/axios";
 import toast, { Toaster } from "react-hot-toast";
 
 const notify = (status: string) => {
@@ -35,7 +36,7 @@ function Form() {
     lastName: "",
   });
   useEffect(() => {
-    const apiUrl = `http://localhost:3000/api/v1/me`;
+    const apiUrl = `http://${HOSTNAME}:3000/api/v1/me`;
     async function fetchData() {
       try {
         await axios
@@ -75,7 +76,7 @@ function Form() {
 
     axios
       .put(
-        `http://localhost:3000/api/v1/user/` +
+        `http://${HOSTNAME}:3000/api/v1/user/` +
           Cookies.get("userid") +
           "/update",
         defaultFormData,

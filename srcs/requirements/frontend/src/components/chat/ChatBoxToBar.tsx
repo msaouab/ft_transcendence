@@ -10,6 +10,7 @@ import ConfirmDelete from '../common/ConfirmDelete';
 import axios from 'axios';
 import { useGlobalContext } from '../../provider/AppContext';
 import Cookies from 'js-cookie';
+import { HOSTNAME } from '../../api/axios';
 
 const ChatBoxTopBarStyle = styled.div`
     background: transparent;
@@ -83,7 +84,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
             return;
         }
 
-        axios.get(`http://localhost:3000/api/v1/user/${Cookies.get('id')}/blockedusers`,
+        axios.get(`http://${HOSTNAME}:3000/api/v1/user/${Cookies.get('id')}/blockedusers`,
             { withCredentials: true }
         )
             .then(res => {
@@ -123,7 +124,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
 
 
     const handleDeleteChat = (chatRoomId: string) => {
-        axios.delete(`http://localhost:3000/api/v1/chatrooms/private/${chatRoomId}`,
+        axios.delete(`http://${HOSTNAME}:3000/api/v1/chatrooms/private/${chatRoomId}`,
             { withCredentials: true }
         )
             .then(res => {
@@ -145,7 +146,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
         const blockedUserId = props.id;
         // console.log("meId: ", meId);
         // console.log("blockedUserId: ", blockedUserId);
-        axios.post(`http://localhost:3000/api/v1/user/${meId}/blockedusers/`,     
+        axios.post(`http://${HOSTNAME}:3000/api/v1/user/${meId}/blockedusers/`,     
         {
             blockedUser_id: blockedUserId,
             withCredentials: true
@@ -171,7 +172,7 @@ const ChatBoxTopBar = (props: { login: string, profileImage: string, status: str
     const handleUnblockUser = () => {
         const meId = Cookies.get("id");
         const blockedUserId = props.id;
-        axios.delete(`http://localhost:3000/api/v1/user/${meId}/blockedusers/${blockedUserId}`,
+        axios.delete(`http://${HOSTNAME}:3000/api/v1/user/${meId}/blockedusers/${blockedUserId}`,
             {
                     withCredentials: true
             })

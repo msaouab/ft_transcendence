@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 
 import styled from "styled-components";
 import { getAvatarUrl } from "../CommonFunc";
+import { HOSTNAME } from "../../../api/axios";
 
 // import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
@@ -48,7 +49,7 @@ const TmpChatBox = ({
 
 	useEffect(() => {
 		if (!connected) {
-			chatSocket.current = io(`http://localhost:3000/chat`);
+			chatSocket.current = io(`http://{HOSTN}:3000/chat`);
 			setConnected(true);
 			console.log("connected to the server");
 		}
@@ -85,7 +86,7 @@ const TmpChatBox = ({
 		): Promise<{ login: string; avatar: string; status: string }> => {
 			const userId = sender_id === Cookies.get("id") ? receiver_id : sender_id;
 			const user = await axios.get(
-				`http://localhost:3000/api/v1/user/${userId}`
+				`http://${HOSTNAME}:3000/api/v1/user/${userId}`
 			);
 
 			const avatar = getAvatarUrl();
@@ -98,7 +99,7 @@ const TmpChatBox = ({
 
 		axios
 			.get(
-				`http://localhost:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`
+				`http://${HOSTNAME}:3000/api/v1/chatrooms/private/single/${sender_id}/${receiver_id}`
 			)
 			.then(async (res) => {
 				const { status, avatar } = await getUser(sender_id, receiver_id);
@@ -118,7 +119,7 @@ const TmpChatBox = ({
 				} else {
 					// console.log('chat room does not exist', res)
 					axios
-						.post(`http://localhost:3000/api/v1/chatrooms/private`, {
+						.post(`http://${HOSTNAME}:3000/api/v1/chatrooms/private`, {
 							senderId: sender_id,
 							receiverId: receiver_id,
 						})

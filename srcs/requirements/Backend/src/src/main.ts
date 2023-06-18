@@ -12,14 +12,14 @@ import * as session from 'express-session';
 import * as cors from 'cors';
 import * as cookieParser from 'cookie-parser';
 import { SocketAdapter } from './socket.adapter';
-
+export const HOSTNAME= process.env.HOSTNAME || 'localhost';
 
 // const APP_ROUTE_PREFIX = 'api';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
-      origin: 'http://localhost:5173',
+      origin: 'http://' + HOSTNAME +':5173',
       credentials: true,
     }
   });

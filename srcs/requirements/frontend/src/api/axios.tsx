@@ -1,17 +1,22 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
+export const HOSTNAME = import.meta.env.VITE_API_URL || "localhost";
+console.log("HOSTNAME", import.meta.env.VITE_API_URL);
+
 const instance = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
-  withCredentials: true,
+	baseURL: "http://" + HOSTNAME + ":3000/api/v1",
+	withCredentials: true,
 });
 
-// export const GetAvatar = async (id: string) => {
-//   const res = await instance.get("/user/" + id + "/avatar", {
-//     responseType: "blob",
-//   });
-//   return URL.createObjectURL(res.data);
-// };
+export const GetAvatar = async (id: string) => {
+	if (id) {
+		const res = await instance.get("/user/" + id + "/avatar", {
+			responseType: "blob",
+		});
+		return URL.createObjectURL(res.data);
+	}
+};
 
 export const PostAvatar = async (file: File) => {
   const formData = new FormData();
@@ -29,67 +34,98 @@ export const PostAvatar = async (file: File) => {
 };
 
 export const getFriendsInfo = async (id: string) => {
-  try {
-    const res = await instance.get("/user/" + id + "/friends/info");
-    return res.data;
-  } catch (err) {
-    console.log(err);
-  }
+	try {
+		const res = await instance.get("/user/" + id + "/friends/info");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const getChannels = async (id: string) => {
-  try {
-    const res = await instance.get("/User/" + id + "/channels");
-    return res.data;
-  } catch (err) {
-    console.log(err);
-  }
+	try {
+		const res = await instance.get("/User/" + id + "/channels");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const getAchivements = async (id: string) => {
-  try {
-    const res = await instance.get("/achivements/" + id);
-    return res.data;
-  } catch (err) {
-    console.log(err);
-  }
+	if (!id) return;
+	try {
+		const res = await instance.get("/achivements/" + id);
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const getRankData = async (id: string) => {
-  if (id === "") {
-    return;
-  }
-  try {
-    const res = await instance.get("/user/" + id + "/rankData");
-    return res.data;
-  } catch (err) {
-    console.log(err);
-  }
+	if (id === "") {
+		return;
+	}
+	try {
+		const res = await instance.get("/user/" + id + "/rankData");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const getUserInfo = async (id: string) => {
-  if (id === "") {
-    return;
-  }
-  try {
-    const res = await instance.get("/User/" + id);
-    return res.data;
-  } catch (err) {
-    console.log(err);
-  }
+	if (id === "" || id === undefined) {
+		return;
+	}
+	try {
+		const res = await instance.get("/User/" + id);
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const addFriend = async (id: string, receiver_id: string) => {
-  if (id !== receiver_id && receiver_id && id) {
-    try {
-      const res = await instance.post("/user/" + id + "/invites", {
-        receiver_id,
-      });
-      return res.data;
-    } catch (err) {
-      console.log(err);
-    }
-  }
+	if (id === receiver_id || receiver_id === "" || id === "") {
+		return;
+	}
+	try {
+		const res = await instance.post("/user/" + id + "/invites", {
+			receiver_id,
+		});
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+
+
+export const getInviteGame = async () => {
+	try {
+		const res = await instance.get("/game/myinvites");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+export const getLiveGame = async () => {
+	try {
+		const res = await instance.get("/game/streaming");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
+};
+
+export const getGameHistory = async () => {
+	try {
+		const res = await instance.get("/game/history");
+		return res.data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
 export const blockThisUser = async (id: string, blockedUser_id: string) => {

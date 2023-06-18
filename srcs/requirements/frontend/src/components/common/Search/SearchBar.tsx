@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SearchBarFull from './SearchBarFull';
 import TmpChatBox from './TmpChatBox';
 import Cookies from 'js-cookie';
+import { HOSTNAME } from '../../../api/axios';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
@@ -158,7 +159,7 @@ const SearchBar = () => {
             );
         }
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
-            socket.current = io(`http://localhost:3000/search`);
+            socket.current = io(`http://${HOSTNAME}:3000/search`);
 
             socket.current.on('connect', () => {
                 setSearchConnected(true);

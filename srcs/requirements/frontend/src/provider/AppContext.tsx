@@ -5,20 +5,24 @@ import { useRef } from "react";
 import Cookies from "js-cookie";
 
 interface AppContextType {
-	userStatus: string;
-	setUserStatus: React.Dispatch<React.SetStateAction<string>>;
-	userImg: string;
-	setUserImg: React.Dispatch<React.SetStateAction<string>>;
-	userId: string;
-	setUserId: React.Dispatch<React.SetStateAction<string>>;
-	privateChatRooms: any[];
-	setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
-	isTfaEnabled: boolean;
-	setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
-	notifications: any[];
-	setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
-	chatNotif: number;
-	setChatNotif: React.Dispatch<React.SetStateAction<number>>;
+  userStatus: string;
+  setUserStatus: React.Dispatch<React.SetStateAction<string>>;
+  userImg: string;
+  setUserImg: React.Dispatch<React.SetStateAction<string>>;
+  userId: string;
+  setUserId: React.Dispatch<React.SetStateAction<string>>;
+  privateChatRooms: any[];
+  setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  isTfaEnabled: boolean;
+  setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+  notifications: any[];
+  setNotifications: React.Dispatch<React.SetStateAction<any[]>>;
+  chatNotif: number;
+  setChatNotif: React.Dispatch<React.SetStateAction<number>>;
+  gameNotif: number;
+  setGameNotif: React.Dispatch<React.SetStateAction<number>>;
+  friendChellenge: any;
+  setFriendChellenge: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -36,31 +40,34 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 	// chat context
 	const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
 
+  const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
+  const [gameNotif, setGameNotif] = useState(Cookies.get("gameNotif") ? parseInt(Cookies.get("gameNotif")!) : 0);
+
+  const [friendChellenge, setFriendChellenge] = useState([] as any[]);
 	// notification context
 	const [notifications, setNotifications] = useState([] as any[]);
 
-	const [chatNotif, setChatNotif] = useState(
-		Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0
-	);
+  const value = {
+    userStatus,
+    setUserStatus,
+    userImg,
+    setUserImg,
+    userId,
+    setUserId,
+    privateChatRooms,
+    setPrivateChatRooms,
+    isTfaEnabled,
+    setIsTfaEnabled,
+    notifications,
+    setNotifications,
+    chatNotif,
+    setChatNotif,
+    gameNotif,
+    setGameNotif,
+    friendChellenge,
+    setFriendChellenge,
+  };
 
-
-
-	const value = {
-		userStatus,
-		setUserStatus,
-		userImg,
-		setUserImg,
-		userId,
-		setUserId,
-		privateChatRooms,
-		setPrivateChatRooms,
-		isTfaEnabled,
-		setIsTfaEnabled,
-		notifications,
-		setNotifications,
-		chatNotif,
-		setChatNotif,
-	};
 
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

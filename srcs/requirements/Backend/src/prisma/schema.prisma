@@ -256,6 +256,9 @@ model GameInvites {
   sender      User         @relation("gameInvitesRelation", fields: [sender_id], references: [id])
   status      InviteStatus @default(Pending)
   validUntil  DateTime
+  roomId      String
+  type        String
+  mode        String
 
   @@unique([sender_id, receiver_id])
 }
@@ -284,6 +287,7 @@ model Achievements {
 }
 
 model AchievementsAssignement {
+  // assignement_id String    @id @default(uuid())
   achievement_id Int
   achievement    Achievements @relation("achievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
   player_id      String

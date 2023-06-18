@@ -1,7 +1,5 @@
 
 
-
-
  - [x] filter messages by date( add param queiries)
 
  - [x] add queiries to get unseen messages

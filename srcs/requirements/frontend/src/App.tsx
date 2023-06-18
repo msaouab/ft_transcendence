@@ -9,12 +9,13 @@ import { useState } from "react";
 
 import LoginPage from "./pages/loginPage/LoginPage";
 import Profile from "./pages/profile/Profile";
-import Game from "./components/common/Game";
+import Game from "./components/Game/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
 import { GameProvider } from "./provider/GameProvider";
+import StartGame from "./pages/game/StartGame";
 import OtherUserProfile from "./pages/profile/OtherUserProfile";
 import NotFound from "./pages/notFound/NotFound";
 
@@ -91,7 +92,10 @@ function App() {
 					<Route path="/game" element={
 						<GameProvider><GameDashboard /></GameProvider>
 					} />
-					<Route path="/game/10" element={
+					<Route path="/game/startGame" element={
+						<GameProvider><StartGame /></GameProvider>
+					} />
+          <Route path="/game/:id" element={
 						<GameProvider><Game /></GameProvider>
 					} />
 					<Route path="/game-type" element={

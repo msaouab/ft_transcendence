@@ -5,6 +5,8 @@ import lpPicture from "/login.jpg";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { TiArrowBack } from "react-icons/ti";
+import { HOSTNAME } from "../../api/axios";
+const redirect = "http://" + HOSTNAME + ":3000/api/v1/login/42";
 // import { Link } from 'react-router-dom';
 const LoginContainer = styled.div`
   width: 100%;
@@ -146,7 +148,7 @@ const LoginContainer = styled.div`
 
 function LoginPage() {
   const [activeLink, setActiveLink] = useState<string>(
-    "http://localhost:3000/api/v1/login/42"
+    "http://"+HOSTNAME+":3000/api/v1/login/42"
   );
   useEffect(() => {
     const storedLink = localStorage.getItem("activeLink");
@@ -170,15 +172,15 @@ function LoginPage() {
         </div>
         <div className="whiteBoard">
           <img src={logoBlack} alt="Logo" className="logo" />
-          {/* <Link to="localhost:3000/api/v1/login/42" className={`ftauth`}> */}
-          <a href="http://localhost:3000/api/v1/login/42" rel="noreferrer">
+          {/* <Link to=""+HOSTNAME+":3000/api/v1/login/42" className={`ftauth`}> */}
+          <Link to={redirect} rel="noreferrer">
             <div className="ftbutton">
               <img src={ftlogo} alt="42logo" className="ftlogo" />
               <div>
                 <button className="play-now">Continue With 42</button>
               </div>
             </div>
-          </a>
+          </Link>
           {/* </Link> */}
           <div className="prvs">
             <Link to="/" className="previous flex justify-center items-center">
@@ -204,10 +206,10 @@ function LoginPage() {
             <div className="rectangle"></div>
             <p className="">NOT ON PONG YET?</p>
             <Link
-              to="http://localhost:3000/api/v1/login/42"
+              to={redirect}
               className={`ftauth`}
               onClick={() =>
-                handleLinkClick("http://localhost:3000/api/v1/login/42")
+                handleLinkClick("http://"+HOSTNAME+":3000/api/v1/login/42")
               }
             >
               SIGN UP NOW!

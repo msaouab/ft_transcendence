@@ -4,5 +4,6 @@ node_modules
 db
 dist
 .DS_Store
+package-lock.json
 /prisma/migrations/*
 srcs/requirements/Backend/src/public/*

@@ -3,11 +3,11 @@ import styled from "styled-components";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+import ChatTab from './ChatTab';
+import { PrivateMessage } from '../../types/message';
+import { HOSTNAME } from '../../api/axios';
 import Cookies from "js-cookie";
-import ChatTab from "./ChatTab";
-import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
-import { getAvatarUrl } from "../common/CommonFunc";
 const UsersChatListStyle = styled.div`
 	width: 100%;
 	height: 100%;
@@ -36,7 +36,7 @@ const UsersChatList = ({
 		receiver_id: string
 	): Promise<{ login: string; avatar: string; status: string }> => {
 		const userId = sender_id === Cookies.get("id") ? receiver_id : sender_id;
-		const user = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
+		const user = await axios.get(`http://${HOSTNAME}:3000/api/v1/user/${userId}`);
 		// cons
 		const avatar = getAvatarUrl();
 		return { login: user.data.login, avatar: avatar, status: user.data.status };
@@ -49,7 +49,7 @@ const UsersChatList = ({
 		if (!id) return;
 		try {
 			const privateRooms = await axios.get(
-				`http://localhost:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`
+				`http://${HOSTNAME}:3000/api/v1/user/${id}/chatrooms/private?limit=${limitRoom}`
 			);
 			if (privateRooms.status !== 200)
 				throw new Error("Error while fetching private chat rooms");
@@ -64,7 +64,7 @@ const UsersChatList = ({
 					}) => {
 						const { id } = room;
 						const message = await axios.get(
-							`http://localhost:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`
+							`http://${HOSTNAME}:3000/api/v1/chatrooms/private/${id}/messages?limit=${limitMsg}`
 						);
 						// console.log(
 

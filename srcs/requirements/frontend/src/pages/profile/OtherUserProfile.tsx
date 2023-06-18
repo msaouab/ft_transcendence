@@ -38,18 +38,18 @@ import {
 import { getAvatarUrl } from "../../components/common/CommonFunc";
 
 export const ReusableCardStyle = styled.div`
-  background: linear-gradient(
-    180deg,
-    rgba(233, 217, 144, 0.2379) 0%,
-    rgba(233, 217, 144, 0) 100%
-  );
-  border-radius: 20px 20px 0px 0px;
-  padding: 1rem;
+	background: linear-gradient(
+		180deg,
+		rgba(233, 217, 144, 0.2379) 0%,
+		rgba(233, 217, 144, 0) 100%
+	);
+	border-radius: 20px 20px 0px 0px;
+	padding: 1rem;
 `;
 
 interface friendsInterface {
-  login: string;
-  Status: string;
+	login: string;
+	Status: string;
 }
 
 const OtherUserProfile = () => {
