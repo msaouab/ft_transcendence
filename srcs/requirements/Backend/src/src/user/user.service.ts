@@ -374,25 +374,24 @@ export class UserService {
 
 
     /// getUnsenNotifications
-    async getUnseenNotifications(ft_user) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: ft_user._json.email,
-            }
-        });
-        if (!user) {
-            throw new NotFoundException('User nwwwot found');
-        }
+    async getUnseenNotifications(id: string) {
+        // const user = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: id,
+        //     }
+        // });
+        // if (!user) {
+        //     throw new NotFoundException('User not found');
+        // }
         const notifications = await this.prisma.notification.findMany({
             where: {
-                user_id: user.id,
-                
+                user_id: id,      
             }
         });
-
-        if (!notifications) {
-            throw new NotFoundException('Notifications not found');
-        }
+        // don't change later, this should not be an error
+        // if (!notifications) {
+        //     throw new NotFoundException('Notifications not found');
+        // }
         return notifications;
     }
 

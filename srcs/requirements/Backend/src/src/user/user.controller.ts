@@ -168,9 +168,9 @@ import { PutStatusDto } from "./dto/put.status.dto";
 
     @Get(":id/notifications")
     @UseGuards(AuthenticatedGuard)
-    async getUnseenNotifications(@User() user: Profile) {
+    async getUnseenNotifications(@Param("id") id: string) {
       console.log("getUnseenNotifications")
-      return await this.userService.getUnseenNotifications(user);
+      return await this.userService.getUnseenNotifications(id);
     }
 
 

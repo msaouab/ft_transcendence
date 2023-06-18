@@ -48,7 +48,7 @@ export class NotificationGateway
 		// console.log("We've got the event to add the client to the map");
 
 		clients.set(id, client);
-		console.log("clients: ", clients.keys());
+		console.log("clients: ---------------", clients.keys());
 		await this.notificationService.updateUserStatus(id, userStatus);
 	}
 
@@ -64,10 +64,10 @@ export class NotificationGateway
 		// if user is not found , return
 		if (user) {
 			const key = user[0] === undefined ? "" : user[0];
+			clients.delete(key);
 			if (key === "") {
 				return;
 			}
-			clients.delete(key);
 			await this.notificationService.updateUserStatus(key, false);
 		}
 	}
