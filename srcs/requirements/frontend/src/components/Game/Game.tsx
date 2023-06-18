@@ -78,8 +78,8 @@ const Game = () => {
 			</PlayerContainer>
 			{mysocket ? (
 				<PingPong
-					width={payload.width}
-					height={payload.height}
+					// width={payload.width}
+					// height={payload.height}
 				/>
 			) : (
 				<p>Loading...</p>

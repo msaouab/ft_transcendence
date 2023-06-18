@@ -91,6 +91,8 @@ export class GameGateway
 		type: "Time" | "Round";
 		mode: "Random" | "Friend" | "Bot";
 		time: number;
+		height: number;
+		width: number;
 	};
 
 	afterInit(server: any) {
@@ -218,7 +220,7 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 60;
+			return (lastTime - room.time) / 1000 >= 600;
 		}
 		return false;
 	}
@@ -318,8 +320,10 @@ export class GameGateway
 		return roomId;
 	}
 
-	PlayvsBot(client: any, roomId: any, width: any, height: any) {
+	PlayvsBot(client: any, roomId: any) {
 		const room = this.roomMap.get(roomId);
+		console.log("PlayvsBot", room.width, room.height)
+		console.log("client1Ball", room.ball);
 		room.time = new Date().getTime();
 		this.server.to(client.id).emit("StartTime", room.time);
 		let status = false;
@@ -328,11 +332,11 @@ export class GameGateway
 				clearInterval(intervalId);
 				return;
 			}
-			let OldY = height / 2;
+			let OldY = room.height / 2;
 			if (room.ball.y <= OldY) {
 				if (
 					room.ball.x >= room.player1.paddle1.x &&
-					room.player1.paddle1.x <= width - 80
+					room.player1.paddle1.x <= room.width - 80
 				) {
 					room.player1.paddle1.x += 12;
 				}
@@ -347,9 +351,9 @@ export class GameGateway
 			const newX = room.ball.x + room.ball.dx;
 			const newY = room.ball.y + room.ball.dy;
 			// wall collision
-			if (newX - room.ball.r <= 0 || newX + room.ball.r >= width)
+			if (newX - room.ball.r <= 0 || newX + room.ball.r >= room.width)
 				room.ball.dx = -room.ball.dx;
-			// if (newY - room.ball.r <= 0 || newY + room.ball.r >= height)
+			// if (newY - room.ball.r <= 0 || newY + room.ball.r >= room.height)
 			// room.ball.dy = -room.ball.dy;
 			// paddle collision
 			if (
@@ -368,15 +372,15 @@ export class GameGateway
 				room.ball.dy = Math.abs(room.ball.dy);
 			// score
 			if (newY - room.ball.r <= 0) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.ball.dx = room.ball.dx;
 				room.ball.dy = room.ball.dy;
 				room.player1.score++;
 			}
-			if (newY + room.ball.r >= height) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+			if (newY + room.ball.r >= room.height) {
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.ball.dx = -room.ball.dx;
 				room.ball.dy = -room.ball.dy;
 				room.player2.score++;
@@ -414,10 +418,11 @@ export class GameGateway
 		const room = this.roomMap.get(roomId);
 		if (
 			data.x >= 0 &&
-			data.x <= data.width &&
-			data.y <= data.height &&
-			data.y >= data.height / 2
+			data.x <= room.width &&
+			data.y <= room.height &&
+			data.y >= room.height / 2
 		) {
+			console.log("data.x", data.x, "room.width", room.width)
 			if (client.id === room.socket[0].id) {
 				if (room.player1.paddle2.x >= data.x) {
 					room.player1.paddle2.x -= 12;
@@ -426,7 +431,7 @@ export class GameGateway
 						.emit("responseMouse", room.player1.paddle2);
 				} else if (
 					room.player1.paddle2.x <= data.x - 50 &&
-					room.player1.paddle2.x <= data.width - room.player1.paddle2.width
+					room.player1.paddle2.x <= room.width - room.player1.paddle2.width
 				) {
 					room.player1.paddle2.x += 12;
 					this.server
@@ -600,8 +605,11 @@ export class GameGateway
 	}
 
 	CreateBotRoom(client: Socket, payload) {
+		console.log("CreateBotRoom", payload)
 		if (client.handshake.query.userId === undefined) return;
 		const userId = client.handshake.query.userId.toString();
+		const width = 700;
+		const height = width * 16/9 - 40;
 		const key = createHash("sha256")
 			.update(Date.now().toString())
 			.digest("hex");
@@ -613,14 +621,14 @@ export class GameGateway
 				id: userId,
 				score: 0,
 				paddle1: {
-					x: payload.width / 2 - 40,
+					x: width / 2 - 40,
 					y: 10,
 					width: 80,
 					height: 10,
 				},
 				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
+					x: width / 2 - 40,
+					y: height - 20,
 					width: 80,
 					height: 10,
 				},
@@ -629,21 +637,21 @@ export class GameGateway
 				id: "Bot",
 				score: 0,
 				paddle1: {
-					x: payload.width / 2 - 40,
+					x: width / 2 - 40,
 					y: 10,
 					width: 80,
 					height: 10,
 				},
 				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
+					x: width / 2 - 40,
+					y: height - 20,
 					width: 80,
 					height: 10,
 				},
 			},
 			ball: {
-				x: payload.width / 2,
-				y: payload.height / 2,
+				x: width / 2,
+				y: height / 2,
 				r: 10,
 				dx: 4,
 				dy: 4,
@@ -654,13 +662,15 @@ export class GameGateway
 			type: payload.type,
 			mode: payload.mode,
 			time: new Date().getTime(),
+			height: height,
+			width: width,
 		});
 		client.join(key);
 		this.server
 			.to(client.id)
 			.emit("BenomeId", this.roomMap.get(key).player2.id, key);
 		if (this.roomMap.get(key).player1.id) {
-			this.PlayvsBot(client, key, payload.width, payload.height);
+			this.PlayvsBot(client, key);
 		}
 	}
 

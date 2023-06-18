@@ -78,8 +78,8 @@ const StartGame = () => {
 		type: typeRoom,
 		mode: modeRoom,
 		friend: friend,
-		width: 700,
-		height: 1000,
+		// width: 700,
+		// height: 1000,
 	};
 
 	useEffect(() => {

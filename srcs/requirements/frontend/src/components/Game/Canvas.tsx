@@ -49,39 +49,47 @@ const PlayGround = styled.div`
 
 let ctx: CanvasRenderingContext2D | null;
 
-const PingPong = ({ width, height }: PingPongProps) => {
+// const PingPong = ({ width, height }: PingPongProps) => {
+const PingPong = () => {
 	const navigate = useNavigate();
 	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const [player1X, setPlayer1X] = useState<PlayerState>({
-		x: width / 2 - 40,
-		y: height - 20,
-		width: 80,
-		height: 10,
-	});
-	const [player2X, setPlayer2X] = useState<PlayerState>({
-		x: width / 2 - 40,
-		y: 10,
-		width: 80,
-		height: 10,
-	});
-	const [ball, setBall] = useState({
-		x: width / 2,
-		y: height / 2,
-		r: 10,
-		dx: 1,
-		dy: 1,
-		speed: 4,
-		c: "#fff",
-	});
+	const [size, setSize] = useState<number | undefined>(0);
+	const [player1X, setPlayer1X] = useState<PlayerState>({} as PlayerState);
+	const [player2X, setPlayer2X] = useState<PlayerState>({} as PlayerState);
+	const [ball, setBall] = useState<BallState>({} as BallState);
+	// const [player1X, setPlayer1X] = useState<PlayerState>({
+	// 	x: width / 2 - 40,
+	// 	y: height - 20,
+	// 	width: 80,
+	// 	height: 10,
+	// });
+	// const [player2X, setPlayer2X] = useState<PlayerState>({
+	// 	x: width / 2 - 40,
+	// 	y: 10,
+	// 	width: 80,
+	// 	height: 10,
+	// });
+	// const [ball, setBall] = useState({
+	// 	x: width / 2,
+	// 	y: height / 2,
+	// 	r: 10,
+	// 	dx: 1,
+	// 	dy: 1,
+	// 	speed: 4,
+	// 	c: "#fff",
+	// });
 
 	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
+			const width = canvas.clientWidth;
+			const height = canvas.clientHeight;
+			// console.log("width:", width, "height:", height)
 			ctx = canvas.getContext("2d");
 			if (ctx) {
 				ctx.beginPath();
-				ctx.fillStyle = "#000";
+				ctx.fillStyle = "#000000";
 				ctx.fillRect(0, 0, width, height);
 				ctx.fill();
 				// midline
@@ -96,12 +104,38 @@ const PingPong = ({ width, height }: PingPongProps) => {
 				drawPlayer(player2X);
 				// ball
 				drawBall(ball);
+				// console.log("ball:", ball);
 			}
 		}
 		return () => {
 			ctx = null;
 		};
 	}, [player1X, player2X, ball]);
+
+	useEffect(() => {
+		const resize = () => {
+			const canvas = canvasRef.current;
+			if (!canvas) return;
+			const { clientWidth } = canvas;
+			const calculatedHeight = (clientWidth * 16) / 9;
+			canvas.width = clientWidth;
+			canvas.height = calculatedHeight;
+		};
+
+		window.addEventListener("resize", resize);
+		return () => {
+			window.removeEventListener("resize", resize);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (canvasRef.current) {
+			const canvas = canvasRef.current;
+			const { clientWidth } = canvas;
+			const calculatedHeight = (clientWidth * 16) / 9;
+			canvas.height = calculatedHeight;
+		}
+	}, []);
 
 	const drawPlayer = (player: PlayerState) => {
 		if (ctx) {
@@ -123,10 +157,10 @@ const PingPong = ({ width, height }: PingPongProps) => {
 			const data = {
 				x: x,
 				y: y,
-				height: height,
-				width: width,
+				// height: height,
+				// width: width,
 			};
-			console.log("modeRoom: ", modeRoom);
+			// console.log("data:", data)
 			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
 			else mysocket?.emit("requesteMouse", data);
 		};
@@ -148,7 +182,7 @@ const PingPong = ({ width, height }: PingPongProps) => {
 			mysocket?.off("responseMouse");
 			mysocket?.off("responsePlayer2");
 		};
-	}, [mysocket, player1X, player2X, height, width, ball]);
+	}, [mysocket, player1X, player2X, ball]);
 
 	//	render the ball and get the new position of the ball from the server
 
@@ -168,6 +202,7 @@ const PingPong = ({ width, height }: PingPongProps) => {
 		});
 		mysocket?.on("responseBall", (ball) => {
 			setBall(ball);
+			// console.log("setball:", ball)
 		});
 		mysocket?.on("responseWinner", (winner) => {
 			console.log(winner);
@@ -179,8 +214,9 @@ const PingPong = ({ width, height }: PingPongProps) => {
 	}, [mysocket, ball]);
 
 	return (
-		<PlayGround className="">
-			<canvas ref={canvasRef} width={width} height={height} />
+		<PlayGround className="debug w-full max-w-[683px]">
+
+			<canvas id="myCanvas" ref={canvasRef} className="w-full" />
 		</PlayGround>
 	);
 };
