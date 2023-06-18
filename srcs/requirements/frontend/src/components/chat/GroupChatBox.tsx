@@ -73,13 +73,24 @@ const GroupChatBox = ({
 
   const next = () => {
     getMessages().then((newMessages) => {
-      setState((prevState) => ({
-        ...prevState,
-        messages: [...prevState.messages, ...newMessages],
-        offset: prevState.offset + newMessages.length,
-        hasMore: totalMessages > prevState.offset + newMessages.length
-      }));
-    })
+      setState((prevState) => {
+        const allMessages = [...prevState.messages, ...newMessages];
+        const uniqueMessages = allMessages.filter(
+          (message, index, self) =>
+            index ===
+            self.findIndex(
+              (m) => m.id === message.id && m.group_id === message.group_id
+            )
+        );
+
+        return {
+          ...prevState,
+          messages: uniqueMessages,
+          offset: prevState.offset + newMessages.length,
+          hasMore: totalMessages > prevState.offset + newMessages.length,
+        };
+      });
+    });
   };
 
   useEffect(() => {
