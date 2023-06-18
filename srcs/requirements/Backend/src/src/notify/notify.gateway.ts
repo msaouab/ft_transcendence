@@ -13,7 +13,14 @@ import { OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 
 export const clients = new Map<string, Socket>();
 @Injectable()
-@WebSocketGateway({ namespace: "/" })
+@WebSocketGateway(
+	{ 
+	// 	cors: {
+	// origin: 'http://' + process.env.HOSTNAME +':5173',
+	
+// },  
+
+namespace: "/" })
 export class NotificationGateway
 	implements OnGatewayConnection, OnGatewayDisconnect
 {

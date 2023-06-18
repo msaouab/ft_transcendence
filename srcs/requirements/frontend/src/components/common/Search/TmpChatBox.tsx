@@ -49,7 +49,7 @@ const TmpChatBox = ({
 
 	useEffect(() => {
 		if (!connected) {
-			chatSocket.current = io(`http://{HOSTN}:3000/chat`);
+			chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
 			setConnected(true);
 			console.log("connected to the server");
 		}

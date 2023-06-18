@@ -8,6 +8,7 @@ import { PrivateMessage } from '../../types/message';
 import { HOSTNAME } from '../../api/axios';
 import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
+import { getAvatarUrl } from "../common/CommonFunc";
 const UsersChatListStyle = styled.div`
 	width: 100%;
 	height: 100%;
