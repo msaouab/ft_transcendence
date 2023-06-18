@@ -14,6 +14,7 @@ import { TfaDto } from './dto/Tfa.dto';
 
 import { PrivateMessage } from '@prisma/client';
 import { lstat } from 'fs';
+import { HOSTNAME } from 'src/main';
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -125,7 +126,7 @@ export class UserService {
                 id: id,
             },
             data: {
-                avatar: "http://localhost:3000/" + file.filename,
+                avatar: `http://${HOSTNAME}:3000/` + file.filename,
             },
             select:{
                 avatar: true

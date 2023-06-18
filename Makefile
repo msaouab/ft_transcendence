@@ -61,7 +61,7 @@ clean: stop
 	@docker rm backend postgres frontend adminer || true
 	@rm -rf ./srcs/requirements/frontend/node_modules || true
 	@rm -rf ./srcs/requirements/Backend/src/node_modules || true
-	# @docker rmi backend frontend adminer || true
+	@docker rmi backend frontend adminer || true
 
 fclean: clean
 	@echo "$(GREEN)████████████████████ Remove Containers/Volumes/Networks ████████████████████$(ED)"

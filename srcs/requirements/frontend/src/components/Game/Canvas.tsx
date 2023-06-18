@@ -126,6 +126,7 @@ const PingPong = ({ width, height }: PingPongProps) => {
 				height: height,
 				width: width,
 			};
+			console.log("modeRoom: ", modeRoom);
 			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
 			else mysocket?.emit("requesteMouse", data);
 		};

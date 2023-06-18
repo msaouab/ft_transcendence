@@ -59,13 +59,13 @@ const Game = () => {
 		};
 	}, [mysocket]);
 
-	useEffect(() => {
-		const RoomType = localStorage.getItem("typeRoom");
-		const RoomMode = localStorage.getItem("modeRoom");
-		if (RoomType) setTypeRoom(RoomType);
-		if (RoomMode) setModeRoom(RoomMode);
+	// useEffect(() => {
+		// const RoomType = localStorage.getItem("typeRoom");
+		// const RoomMode = localStorage.getItem("modeRoom");
+		// if (RoomType) setTypeRoom(RoomType);
+		// if (RoomMode) setModeRoom(RoomMode);
 		// console.log("2 - mysocket", mysocket);
-	}, [typeRoom, mysocket]);
+	// }, [typeRoom, mysocket]);
 
 	return (
 		<CanvasContainer isFirst>

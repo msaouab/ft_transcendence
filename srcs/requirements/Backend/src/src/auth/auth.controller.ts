@@ -19,7 +19,6 @@ export class AuthController {
 
   @Get('42/return')
   @UseGuards(FtOauthGuard)
-  // @Redirect('http://localhost:5173/home')
   async ftAuthCallback(@User() user: Profile, @Res() res) {
     const User = await this.authService.login(user, res);
     if (User.tfa == true && User.otp_verified == false) {

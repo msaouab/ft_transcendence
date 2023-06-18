@@ -220,7 +220,7 @@ const GameCard = (props: GameCardProps) => {
 
 const GameDashboard = () => {
 	const { setTypeRoom } = useGameContext();
-	const { gameNotif, setGameNotif } = useGlobalContext();
+	const { setGameNotif } = useGlobalContext();
 	const handleLinkClick = (table: string) => {
 		localStorage.setItem("typeRoom", table);
 		setTypeRoom(table);

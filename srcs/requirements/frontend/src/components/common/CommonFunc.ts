@@ -3,6 +3,7 @@ Common functions for chat components
 */
 
 import Cookies from "js-cookie";
+import { HOSTNAME } from "../../api/axios";
 // get date fromatted as Tue, 12:00
 export const getDateChat = (date: string) => {
 	const d = new Date(date);
@@ -29,10 +30,10 @@ export const dateToStr = (date: Date): string => {
 export const getAvatarUrl = () => {
 	// get avatar url from id
 	const id = Cookies.get("id");
-	return `http://localhost:3000/api/v1/user/${id}/avatar`;
+	return `http://${HOSTNAME}:3000/api/v1/user/${id}/avatar`;
 };
 
 export const getAvatarUrlById = (id: string) => {
 	// get avatar url from id
-	return `http://localhost:3000/user/`;
+	return `http://${HOSTNAME}:3000/user/`;
 }

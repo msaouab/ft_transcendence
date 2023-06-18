@@ -17,10 +17,10 @@ const users = [
         lastName: 'Bot',
     },
     {
-        login: 'iqessam',
-        email: 'iqessam@student.1337.ma',
-        firstName: 'ilyass',
-        lastName: 'qessam',
+        login: 'test',
+        email: 'test@student.1337.ma',
+        firstName: 'fname',
+        lastName: 'lname',
     },
     {
         login: 'ren-nasr',
@@ -40,7 +40,6 @@ const users = [
 //         firstName: 'Reda',
 //         lastName: 'Benjelloun',
 //     },
-
 ]
 
 const messages = [
@@ -85,13 +84,13 @@ const messages = [
 
 
 
-// // class FriendshipInvites {
-// //     id: string;
-// //     sender_id: string;
-// //     receiver_id: string;
-// //     status: string;
-// //     created_at: Date;
-// // }
+// class FriendshipInvites {
+//     id: string;
+//     sender_id: string;
+//     receiver_id: string;
+//     status: string;
+//     created_at: Date;
+// }
 
 
 const getRoomId = async (senderId: string, receiverId: string) => {
@@ -106,85 +105,18 @@ const getRoomId = async (senderId: string, receiverId: string) => {
 
 
 
-// // async function getRandomUser(usersArr: any): Promise<User> {
+// async function getRandomUser(usersArr: any): Promise<User> {
 
-// //     const randomUser = usersArr[Math.floor(Math.random() * usersArr.length)]
-// //     // get user by login
-// //     const user = await prisma.user.findUnique({
-// //         where: {
-// //             login: randomUser.login,
-
-// //         },
-// //     })
-// //     return user
-// // }
-
-// async function main() {
-//     console.log(`Start seeding ...`)
-//     for (const user of users) {
-//         // let newArr = users.filter((user) => user.login !== 'ren-nasr')
-//         const checkUser = await prisma.user.findUnique({
-//             where: {
-//                 login: user.login,
-//             },
-//         })
-//         if (checkUser) {
-//             console.log(`User with login ${user.login} already exists`)
-//             continue
-//         }
-//         const userCreate = await prisma.user.create({
-//             data: user,
-//         })
-
-//     }
-
-//     //     // add id to users arr 
-//     //     await prisma.channel.create({
-//     //         data: {
-//     //             name: `channel-${Math.floor(Math.random() * 100)}`,
-//     //             chann_type: 'Public',
-//     //             owner_id: userCreate.id,
-//     //             limit_members: 10,
-//     //         },
-//     //     })
-
-//     //     console.log(`Created user with id: ${userCreate.id}`)
-//     // }
-
-//     // let user = await prisma.user.findUnique({
-//     //     where: {
-//     //         login: 'ren-nasr',
-//     //     },
-//     // })
-
-
-
-
-
-//     // adding a seed for private chat room and messages 
-//     // creating 10 private chat rooms two rooms for each user, each rooms should have ren-nasr as a member
-//     // then at each room we create 50 messages, while selecting a random user to be the sender or the receiver from the room members
-//     // for (let i = 0; i < 5; i++) {
-//     // let newArr = users.filter((user) => user.login !== 'ren-nasr')
-//     let user1 = await prisma.user.findUnique({
+//     const randomUser = usersArr[Math.floor(Math.random() * usersArr.length)]
+//     // get user by login
+//     const user = await prisma.user.findUnique({
 //         where: {
-//             // login: newArr[i].login,
-//             login: 'ichoukri'
+//             login: randomUser.login,
+
 //         },
 //     })
-
-
-//     // // while (user1.login === 'ren-nasr') {
-//     // //     user1 = await getRandomUser(    
-//     // // }
-
-//     // // user 2 should be ren-nasr
-
-//     const user2 = await prisma.user.findUnique({
-//         where: {
-//             login: 'ren-nasr',
-//         },
-//     })
+//     return user
+// }
 
 async function main() {
     console.log(`Start seeding ...`)
@@ -204,7 +136,6 @@ async function main() {
         })
 
     }
-
 
     //     // add id to users arr 
     //     await prisma.channel.create({
@@ -237,7 +168,7 @@ async function main() {
     let user1 = await prisma.user.findUnique({
         where: {
             // login: newArr[i].login,
-            login: 'iqessam'
+            login: 'test'
         },
     })
 
@@ -330,36 +261,31 @@ async function main() {
                 }
             })
             
-//         }
+        }
 
-//     // creatigng channels
-
-
-//     // const rennasr = await prisma.user.findUnique({
-//     //     where: {
-//     //         login: 'ren-nasr',
-//     //     },
-//     // })
-
-// }
+    // creatigng channels
 
 
+    // const rennasr = await prisma.user.findUnique({
+    //     where: {
+    //         login: 'ren-nasr',
+    //     },
+    // })
 
-
-
-// main()
-//     .catch((e) => {
-//         console.error(e)
-//         process.exit(1)
-//     })
-//     .finally(async () => {
-//         await prisma.$disconnect()
-//     })
-
-
-// // remove this whole file later
+}
 
 
 
 
-        }}
+
+main()
+    .catch((e) => {
+        console.error(e)
+        process.exit(1)
+    })
+    .finally(async () => {
+        await prisma.$disconnect()
+    })
+
+
+// remove this whole file later

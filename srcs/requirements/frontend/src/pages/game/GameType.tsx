@@ -104,6 +104,7 @@ const GameType = () => {
 
 	const navigate = useNavigate();
 	const handleModeGame = (benome: string) => {
+		console.log("benome: ", benome)
 		localStorage.setItem("typeRoom", benome);
 		setModeRoom(benome);
 	};
@@ -116,7 +117,6 @@ const GameType = () => {
 	const getFriendsData = () => {
 		getFriendsInfo(userId || "").then((res) => {
 			setFriends(res);
-			console.log("friends:", res);
 		});
 	};
 

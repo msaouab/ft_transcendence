@@ -52,6 +52,7 @@ export const getChannels = async (id: string) => {
 };
 
 export const getAchivements = async (id: string) => {
+	if (!id) return;
 	try {
 		const res = await instance.get("/achivements/" + id);
 		return res.data;

@@ -31,7 +31,7 @@ CREATE TABLE "User" (
     "lastName" TEXT NOT NULL,
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
-    "avatar" TEXT NOT NULL DEFAULT '/app/public/default.png',
+    "avatar" TEXT NOT NULL DEFAULT 'http://localhost:3000/default.png',
     "status" "Status" NOT NULL DEFAULT 'Online',
     "tfa" BOOLEAN NOT NULL DEFAULT false,
     "otp_verified" BOOLEAN NOT NULL DEFAULT false,
@@ -157,19 +157,12 @@ CREATE TABLE "Message" (
 CREATE TABLE "Notification" (
     "notification_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
+    "type" "InviteType" NOT NULL,
+    "sender_id" TEXT,
+    "sender_name" TEXT,
+    "receiver_id" TEXT,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("notification_id")
-);
-
--- CreateTable
-CREATE TABLE "InviteData" (
-    "notification_id" TEXT NOT NULL,
-    "type" "InviteType" NOT NULL,
-    "invite_id" TEXT NOT NULL,
-    "seen" BOOLEAN NOT NULL DEFAULT false,
-    "metadata" TEXT,
-
-    CONSTRAINT "InviteData_pkey" PRIMARY KEY ("notification_id")
 );
 
 -- CreateTable
@@ -234,12 +227,6 @@ CREATE TABLE "GameHistoryTab" (
     CONSTRAINT "GameHistoryTab_pkey" PRIMARY KEY ("user_id")
 );
 
--- CreateTable
-CREATE TABLE "_InviteDataRelation" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "User_login_key" ON "User"("login");
 
@@ -284,12 +271,6 @@ CREATE UNIQUE INDEX "RankingData_user_id_key" ON "RankingData"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AchievementsAssignement_achievement_id_player_id_key" ON "AchievementsAssignement"("achievement_id", "player_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_InviteDataRelation_AB_unique" ON "_InviteDataRelation"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_InviteDataRelation_B_index" ON "_InviteDataRelation"("B");
 
 -- AddForeignKey
 ALTER TABLE "FriendshipInvites" ADD CONSTRAINT "FriendshipInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -337,7 +318,7 @@ ALTER TABLE "MutedMembers" ADD CONSTRAINT "MutedMembers_channel_id_fkey" FOREIGN
 ALTER TABLE "Message" ADD CONSTRAINT "Message_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "Channel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Notification" ADD CONSTRAINT "Notification_notification_id_fkey" FOREIGN KEY ("notification_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GameInvites" ADD CONSTRAINT "GameInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -356,9 +337,3 @@ ALTER TABLE "GameHistoryTab" ADD CONSTRAINT "GameHistoryTab_game_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "GameHistoryTab" ADD CONSTRAINT "GameHistoryTab_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_InviteDataRelation" ADD CONSTRAINT "_InviteDataRelation_A_fkey" FOREIGN KEY ("A") REFERENCES "InviteData"("notification_id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "_InviteDataRelation" ADD CONSTRAINT "_InviteDataRelation_B_fkey" FOREIGN KEY ("B") REFERENCES "Notification"("notification_id") ON DELETE CASCADE ON UPDATE CASCADE;

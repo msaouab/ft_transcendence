@@ -8,6 +8,7 @@ import { dateToStr } from "../common/CommonFunc";
 import { useGlobalContext } from "../../provider/AppContext";
 import ConfirmDelete from "../common/ConfirmDelete";
 import axios from "axios";
+import { HOSTNAME } from "../../api/axios";
 const SendMessageBoxStyle = styled.div`
 	width: 100%;
 	/* height: 8%; */
@@ -116,7 +117,7 @@ const SendMessageBox = ({
 				: selectedChat.sender_id;
 
 		const userBlocks = await axios.get(
-			`http://localhost:3000/api/v1/user/${myId}/blockedusers/${otherUserId}`
+			`http://${HOSTNAME}:3000/api/v1/user/${myId}/blockedusers/${otherUserId}`
 		);
 		if (userBlocks.data.length > 0) {
 			setConfirmData({

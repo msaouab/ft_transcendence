@@ -103,6 +103,7 @@ const Profile = () => {
     getUserData();
   };
 
+  console.log("user status inside profile is ", achivements);
 
   useEffect(() => {
     if (connected) {
@@ -306,7 +307,7 @@ const Profile = () => {
             Achievements
           </div>
           <div className="achiv-container flex gap-10   m-auto min-h-[20rem]">
-            {false ? (
+            {achivements ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -315,7 +316,7 @@ const Profile = () => {
                 ></SwiperComponent>
               </div>
             ) : (
-              <div className="flex justify-center items-center  w-full">
+              <div className="flex justify-center items-center w-full">
                 <NoAchivements />
               </div>
             )}

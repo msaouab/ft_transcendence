@@ -190,7 +190,7 @@ const SideBar = ({
 									</div>
 								)}
 								{route.name == "game" && gameNotif > 0 && (
-									<div className="absolute top-0 right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
+									<div className="absolute top-[70px] right-0 w-4 h-4 rounded-full bg-red-500 text-white text-xs flex justify-center items-center">
 										{gameNotif}
 									</div>
 								)}

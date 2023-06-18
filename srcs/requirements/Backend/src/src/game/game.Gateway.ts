@@ -101,13 +101,15 @@ export class GameGateway
 	}
 	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
+		if (client.handshake.query.userId === undefined) return;
+		const userId = client.handshake.query.userId.toString();
 		this.roomMap.forEach(async (value, key) => {
 			if (
 				value.mode !== "Bot" &&
-				(value.player1.id === client.handshake.query.userId ||
-					value.player2.id === client.handshake.query.userId)
+				(value.player1.id === userId ||
+					value.player2.id === userId)
 			) {
-				const userId = client.handshake.query.userId;
+				// const userId = userId;
 				const opponentId =
 					value.player1.id === userId ? value.player2.id : value.player1.id;
 
@@ -148,23 +150,25 @@ export class GameGateway
 						value.player2.score
 					);
 				}
-				const inviteGame = await this.prisma.gameInvites.findUnique({
-					where: {
-						sender_id_receiver_id: {
-							sender_id: value.player1.id || value.player2.id,
-							receiver_id: value.player2.id || value.player1.id,
-						}
-					}
-				});
-				if (inviteGame) {
-					await this.prisma.gameInvites.delete({
+				if (value.mode === "Friend") {
+					const inviteGame = await this.prisma.gameInvites.findUnique({
 						where: {
 							sender_id_receiver_id: {
 								sender_id: value.player1.id || value.player2.id,
 								receiver_id: value.player2.id || value.player1.id,
-							}
-						}
+							},
+						},
 					});
+					if (inviteGame) {
+						await this.prisma.gameInvites.delete({
+							where: {
+								sender_id_receiver_id: {
+									sender_id: value.player1.id || value.player2.id,
+									receiver_id: value.player2.id || value.player1.id,
+								},
+							},
+						});
+					}
 				}
 				value.status = "Finished";
 				client.leave(key);
@@ -173,7 +177,7 @@ export class GameGateway
 				value.status = "Finished";
 				client.leave(key);
 				this.roomMap.delete(key);
-				const userId = client.handshake.query.userId.toString();
+				// const userId = userId;
 				const player = await this.UserService.getUser(userId);
 				if (player) {
 					await this.prisma.user.update({
@@ -214,7 +218,7 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 600;
+			return (lastTime - room.time) / 1000 >= 60;
 		}
 		return false;
 	}
@@ -403,6 +407,7 @@ export class GameGateway
 
 	@SubscribeMessage("requesteBot")
 	async handlePlayer(client: Socket, data: any) {
+		if (client.handshake.query.userId === undefined) return;
 		const userId = client.handshake.query.userId.toString();
 		const roomId = await this.getRoom(userId);
 		if (!roomId || this.roomMap.get(roomId).player1.id === "") return;
@@ -434,12 +439,14 @@ export class GameGateway
 
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
+		if (client.handshake.query.userId === undefined) return;
 		const userId = client.handshake.query.userId.toString();
 		const roomId = await this.getRoom(userId);
 		if (
 			!roomId ||
 			this.roomMap.get(roomId).player1.id === "" ||
-			this.roomMap.get(roomId).player2.id === ""
+			this.roomMap.get(roomId).player2.id === "" ||
+			this.roomMap.get(roomId).player2.id === "Bot"
 		) {
 			return;
 		}
@@ -483,6 +490,8 @@ export class GameGateway
 	}
 
 	AvailableRoom(client: Socket, payload, roomMap: any): boolean {
+		if (client.handshake.query.userId === undefined) return;
+		const userId = client.handshake.query.userId.toString();
 		let availableRoom = false;
 		if (roomMap.size > 0) {
 			roomMap.forEach((value, key) => {
@@ -490,11 +499,11 @@ export class GameGateway
 					value.members === 1 &&
 					value.type === payload.type &&
 					value.mode === payload.mode &&
-					value.player1.id !== client.handshake.query.userId.toString()
+					value.player1.id !== userId
 				) {
 					value.members++;
 					value.player2 = {
-						id: client.handshake.query.userId.toString(),
+						id: userId,
 						score: 0,
 						paddle1: {
 							x: payload.width / 2 - 40,
@@ -538,6 +547,8 @@ export class GameGateway
 	}
 
 	CreateRandomRoom(client: Socket, payload) {
+		if (client.handshake.query.userId === undefined) return;
+		const userId = client.handshake.query.userId.toString();
 		const availableRoom = this.AvailableRoom(client, payload, this.roomMap);
 		console.log("availableRoom", availableRoom);
 		if (!availableRoom) {
@@ -549,7 +560,7 @@ export class GameGateway
 				members: 1,
 				socket: [client],
 				player1: {
-					id: client.handshake.query.userId,
+					id: userId,
 					score: 0,
 					paddle1: {
 						x: payload.width / 2 - 40,
@@ -589,6 +600,8 @@ export class GameGateway
 	}
 
 	CreateBotRoom(client: Socket, payload) {
+		if (client.handshake.query.userId === undefined) return;
+		const userId = client.handshake.query.userId.toString();
 		const key = createHash("sha256")
 			.update(Date.now().toString())
 			.digest("hex");
@@ -597,7 +610,7 @@ export class GameGateway
 			members: 1,
 			socket: [client],
 			player1: {
-				id: client.handshake.query.userId,
+				id: userId,
 				score: 0,
 				paddle1: {
 					x: payload.width / 2 - 40,
@@ -701,7 +714,7 @@ export class GameGateway
 		let availableRoom = false;
 		if (this.roomMap.size > 0) {
 			this.roomMap.forEach((value, key) => {
-				console.log(value.player2.id, "===", userId)
+				console.log(value.player2.id, "===", userId);
 				if (
 					value.type === payload.type &&
 					value.mode === payload.mode &&
@@ -754,9 +767,9 @@ export class GameGateway
 	}
 
 	async CreateFriendRoom(client: Socket, payload) {
+		if (client.handshake.query.userId === undefined) return;
 		const userId = client.handshake.query.userId.toString();
-		console.log("userId", userId)
-		// if (!userId) return ;
+		console.log("userId", userId);
 		const FindBenome = await this.UserService.getUser(payload.friend);
 		if (!FindBenome) throw new BadRequestException("User not found");
 		if (FindBenome.status === "InGame")
@@ -764,7 +777,7 @@ export class GameGateway
 		if (FindBenome.status === "Offline")
 			throw new ForbiddenException("User is offline");
 		const AvailableRoom = this.AcceptInviteGame(client, userId, payload);
-		if (await AvailableRoom === false) {
+		if ((await AvailableRoom) === false) {
 			const key = createHash("sha256")
 				.update(Date.now().toString())
 				.digest("hex");
@@ -774,7 +787,7 @@ export class GameGateway
 				members: 1,
 				socket: [client],
 				player1: {
-					id: client.handshake.query.userId,
+					id: userId,
 					score: 0,
 					paddle1: {
 						x: payload.width / 2 - 40,
@@ -822,8 +835,6 @@ export class GameGateway
 			if (onlineClientsMap.has(payload.friend)) {
 				const friendSocket = onlineClientsMap.get(payload.friend);
 				friendSocket.emit("gameNotif", { num: 1 });
-				// friendSocket.emit("friendInfo", client.handshake.query.userId, key);
-				// this.createInviteGame(client.handshake.query.userId, friendId, key);
 				this.CreateInviteGame(userId, payload, key);
 			}
 		}
@@ -831,6 +842,10 @@ export class GameGateway
 
 	@SubscribeMessage("joinRoom")
 	async handelJoinRoom(client: Socket, payload: any) {
+		if (!payload.mode)
+			payload.mode = "Random";
+		if (!payload.type)
+			payload.type = "Time";
 		if (payload.type && payload.mode) {
 			if (payload.mode === "Random") {
 				this.CreateRandomRoom(client, payload);
@@ -844,7 +859,7 @@ export class GameGateway
 		// 	if (value.status === "Finished") {
 		// 		const updateGame = await this.prisma.game.update({
 		// 			where: {
-		// 				id: key,
+						// id: key,
 		// 			},
 		// 			data: {
 		// 				gameStatus: "Finished",
