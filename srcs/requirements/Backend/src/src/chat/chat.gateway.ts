@@ -153,6 +153,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("We've got the event to remove a channel admin: ", payload);
         return await this.chatService.removeChannelAdmin(client, payload, this.server);
     }
+    @SubscribeMessage('muteUser')
+    async handleMuteUser(client: Socket, payload: any) {
+        console.log("We've got the event to mute a user: ", payload);
+        return await this.chatService.muteUser(client, payload, this.server);
+    }
+    @SubscribeMessage('unmuteUser')
+    async handleUnmuteUser(client: Socket, payload: any) {
+        console.log("We've got the event to unmute a user: ", payload);
+        return await this.chatService.unmuteUser(client, payload, this.server);
+    }
 }
 
 

@@ -371,8 +371,9 @@ export class ChannelService {
                     }
                 })
                 return {
-                    user: user,
-                    status: el.status,
+                    ...user,
+                    role: "Muted",
+                    muteStatus: el.status,
                     status_end_time: el.status_end_time
                 }
             }))

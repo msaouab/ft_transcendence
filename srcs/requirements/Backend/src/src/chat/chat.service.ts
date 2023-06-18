@@ -140,7 +140,7 @@ export class ChatService {
     // which would reduce a whole db query, anyways...
 
 
-  
+
     async leavePrivateChatRoom(client: Socket, payload: {
         senderId: string,
         receiverId: string
@@ -165,11 +165,11 @@ export class ChatService {
 
     /* sendPrivateMessage(senderId: string, receiverId: string, message: string) */
     async sendPrivateMessage(
-        client: Socket, 
+        client: Socket,
         payload: createMessageDto,
-        server: Server, 
+        server: Server,
         clients: Map<string, Socket>
-        ) {
+    ) {
         // check if privatchatroom exist.
         const roomId = await this.getRoomId(payload.sender_id, payload.receiver_id);
         try {
@@ -178,30 +178,30 @@ export class ChatService {
                     id: roomId,
                 },
             });
-            
+
             const block = await this.prisma.blockTab.findFirst({
                 where: {
                   OR : [
-                    {
+                        {
                         AND : [
-                            {
-                                user_id: payload.sender_id
-                            },
-                            {
-                                blockedUser_id: payload.receiver_id
-                            }
-                        ]
-                    },
-                    {
+                                {
+                                    user_id: payload.sender_id
+                                },
+                                {
+                                    blockedUser_id: payload.receiver_id
+                                }
+                            ]
+                        },
+                        {
                         AND : [
-                            {
-                                user_id: payload.receiver_id
-                            },
-                            {
-                                blockedUser_id: payload.sender_id
-                            }
-                        ]
-                    }
+                                {
+                                    user_id: payload.receiver_id
+                                },
+                                {
+                                    blockedUser_id: payload.sender_id
+                                }
+                            ]
+                        }
                     ]
                 }
             });
@@ -272,7 +272,7 @@ export class ChatService {
             where: {
                 id: await this.getRoomId(senderId, receiverId)
             }
-        }); 
+        });
         return privatChatRoom;
     }
 
@@ -563,15 +563,14 @@ export class ChatService {
     }
 
     async addChannelAdmin(client, payload: any, server: Server) {
-        const { group_id, user } = payload;
-        const {id, name, avatar, status, role} = user;
+        const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
-            const admin = await this.getUser(id, client);
-            const memberTab = await this.removeMember(client, group_id, id);
+            const admin = await this.getUser(userId, client);
+            const memberTab = await this.removeMember(client, group_id, userId);
             const adminTab = await this.prisma.adminMembers.create({
                 data: {
-                    admin_id: id,
+                    admin_id: userId,
                     channel_id: group_id,
                 }
             })
@@ -581,7 +580,7 @@ export class ChatService {
             const joindChannel = await this.prisma.channelsJoinTab.update({
                 where: {
                     user_id_channel_id: {
-                        user_id: id,
+                        user_id: userId,
                         channel_id: group_id
                     }
                 },
@@ -598,15 +597,14 @@ export class ChatService {
         }
     }
     async removeChannelAdmin(client, payload: any, server: Server) {
-        const { group_id, user } = payload;
-        const {id, name, avatar, status, role} = user;
+        const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
-            const admin = await this.getUser(id, client);
-            const adminTab = await this.removeAdmin(client, group_id, id);
+            const admin = await this.getUser(userId, client);
+            const adminTab = await this.removeAdmin(client, group_id, userId);
             const memberTab = await this.prisma.membersTab.create({
                 data: {
-                    member_id: id,
+                    member_id: userId,
                     channel_id: group_id,
                 }
             })
@@ -616,7 +614,7 @@ export class ChatService {
             const joindChannel = await this.prisma.channelsJoinTab.update({
                 where: {
                     user_id_channel_id: {
-                        user_id: id,
+                        user_id: userId,
                         channel_id: group_id
                     }
                 },
@@ -628,6 +626,87 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             server.to(group_id).emit('removeChannelAdmin', admin);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async muteUser(client, payload: any, server: Server) {
+        const { group_id, userId } = payload;
+        try {
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(userId, client);
+            const memberTab = await this.removeMember(client, group_id, userId);
+            if (!memberTab) {
+                const adminTab = await this.removeAdmin(client, group_id, userId);
+                if (!adminTab) {
+                    client.emit('error', 'Admin not removed');
+                }
+            }
+            const mutedUser = await this.prisma.mutedMembers.create({
+                data: {
+                    muted_id: userId,
+                    channel_id: group_id,
+                }
+            })
+            if (!mutedUser) {
+                client.emit('error', 'User not muted');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.update({
+                where: {
+                    user_id_channel_id: {
+                        user_id: userId,
+                        channel_id: group_id
+                    }
+                },
+                data: {
+                    role: 'Muted'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            const res = {
+                ...admin,
+                role: 'Muted',
+                muteStatus: mutedUser.status,
+                status_end_time: mutedUser.status_end_time
+            }
+            server.to(group_id).emit('muteChannelUser', res);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async unmuteUser(client, payload: any, server: Server) {
+        const { group_id, userId } = payload;
+        try {
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(userId, client);
+            const mutedUser = await this.prisma.mutedMembers.delete({
+                where: {
+                    channel_id_muted_id: {
+                        muted_id: userId,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!mutedUser) {
+                client.emit('error', 'User not unmuted');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.update({
+                where: {
+                    user_id_channel_id: {
+                        user_id: userId,
+                        channel_id: group_id
+                    }
+                },
+                data: {
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            server.to(group_id).emit('unmuteChannelUser', admin);
         } catch (error) {
             client.emit('error', error);
         }

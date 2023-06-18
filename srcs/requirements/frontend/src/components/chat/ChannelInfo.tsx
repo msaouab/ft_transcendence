@@ -44,7 +44,13 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     const getChannelInfo = async () => {
         await GetChannelInfo(selectedGroupChat.group_id).then(res => {
             const currentUserId = Cookies.get('id') as string;
-            const currentUser = res.subscribers.find((user: any) => user.id === currentUserId);
+            let currentUser;
+            currentUser = res.subscribers.find((user: any) => user.id === currentUserId);
+            if (currentUser === undefined) {
+                currentUser = res.mutedMembers.find((data: any) => {
+                    return data.id === currentUserId
+                });
+            }
             setCurrentUser(currentUser);
             setChannel(res.channel);
             setChannelUsers(res.subscribers);
@@ -63,10 +69,20 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
 
     const handleAdminRole = (user: any) => {
         if (user.role === "Member") {
-            socket.current.emit("addAdmin", { group_id: selectedGroupChat.group_id, user: user });
+            socket.current.emit("addAdmin", { group_id: selectedGroupChat.group_id, userId: user.id });
         }
         else {
-            socket.current.emit("removeAdmin", { group_id: selectedGroupChat.group_id, user: user });
+            socket.current.emit("removeAdmin", { group_id: selectedGroupChat.group_id, userId: user.id });
+        }
+        handleOpen();
+    }
+
+    const handleMuteUser = (user: any) => {
+        if (user.role !== "Muted") {
+            socket.current.emit("muteUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+        }
+        else {
+            socket.current.emit("unmuteUser", { group_id: selectedGroupChat.group_id, userId: user.id });
         }
         handleOpen();
     }
@@ -97,11 +113,29 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                     })
                 })
             });
+            socket.current.on("muteChannelUser", (data: any) => {
+                setChannelUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                setMutedUsers((prev: any) => {
+                    return [...prev, data]
+                })
+            });
+            socket.current.on("unmuteChannelUser", (data: any) => {
+                setMutedUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                setChannelUsers((prev: any) => {
+                    return [...prev, data]
+                })
+            });
         }
         return () => {
             if (connected) {
                 socket.current.off("newChannelAdmin");
                 socket.current.off("removeChannelAdmin");
+                socket.current.off("muteChannelUser");
+                socket.current.off("unmuteChannelUser");
             }
         }
     }, [connected])
@@ -204,10 +238,19 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                             {
                                                 currentUser.role === "Owner" && (
                                                     <button className={`${buttonStyle}  bg-cyan-800`} onClick={() => handleAdminRole(selectedUser)}>
-                                                        {(selectedUser && selectedUser.role === "Admin") ? "Remove Admin" : "Make Admin" }
+                                                        {(selectedUser && selectedUser.role === "Admin") ? "Remove Admin" : "Make Admin"}
                                                     </button>
                                                 )
                                             }
+                                            <button className={`${buttonStyle}  bg-red-800`} >
+                                                Kick
+                                            </button>
+                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleMuteUser(selectedUser)}>
+                                                {selectedUser && selectedUser.role === "Muted" ? "Unmute" : "Mute"}
+                                            </button>
+                                            <button className={`${buttonStyle}  bg-red-800`} >
+                                                Ban
+                                            </button>
                                         </div>
                                     </Dialog>
                                 )
@@ -216,23 +259,23 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                 <div className='text-white/70 flex gap-2 flex-col [&>*]:flex [&>*]:items-center [&>*]:gap-2 overflow-y-scroll h-[45rem]'>
                                     {
                                         mutedUsers && mutedUsers.map((el: any) => (
-                                            <button key={el.user.id} className='hover:bg-white/10 active:bg-white/20 text-left flex  items-center gap-2 px-2 rounded'>
-                                                <Avatar user={el.user} className='w-8 h-8 !bg-blue-500' />
+                                            <button key={el.id} className='hover:bg-white/10 active:bg-white/20 text-left flex  items-center gap-2 px-2 rounded'>
+                                                <Avatar user={el} className='w-8 h-8 !bg-blue-500' />
                                                 <div className='flex-1 flex flex-col p-1'>
                                                     <span className='font-bold '>
-                                                        {el.user.login}
+                                                        {el.login}
                                                     </span>
                                                     <span className='text-xs text-gray-400'>
-                                                        {el.user.status}
+                                                        {el.status}
                                                     </span>
                                                 </div>
                                                 <span className=''>
-                                                    {el.user.role}
+                                                    {el.role}
                                                 </span>
                                                 {
-                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && el.user.id !== currentUser.id &&
+                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && el.id !== currentUser.id &&
                                                     <span className='tools'>
-                                                        <RxDotsVertical className='text-lg' onClick={() => console.log("hello world")} />
+                                                        <RxDotsVertical className='text-lg' onClick={handleChanelUser(el)} />
                                                     </span>
                                                 }
                                             </button>
