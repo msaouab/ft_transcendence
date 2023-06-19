@@ -5,6 +5,10 @@ import ChatBox from "../../components/chat/ChatBox";
 
 import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+import { PrivateMessage } from "../../types/message";
+import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
+import Cookies from "js-cookie";
 const ChatStyle = Styled.div`
   display: flex;
   flex-direction: row;
@@ -63,10 +67,8 @@ const ChatStyle = Styled.div`
 
 `;
 
-import { GroupMessage, PrivateMessage } from "../../types/message";
-import { useGlobalContext } from "../../provider/AppContext";
+import { GroupMessage } from "../../types/message";
 import GroupChatBox from "../../components/chat/GroupChatBox";
-import Cookies from "js-cookie";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
@@ -86,7 +88,7 @@ const Chat = () => {
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io(`http://localhost:3000/chat`); 
+      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`); 
    
     }
 

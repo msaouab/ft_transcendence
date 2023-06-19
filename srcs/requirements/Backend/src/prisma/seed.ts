@@ -1,4 +1,3 @@
-
 // import { PrismaClient, User } from '@prisma/client'
 // const prisma = new PrismaClient()
 // import { createHash } from 'crypto';
@@ -12,49 +11,35 @@
 // // },
 // const users = [
 //     {
-//         login: 'ichoukri',
-//         email: 'ichoukri@student.1337.ma',
-//         firstName: 'Ismail',
-//         lastName: 'Choukri',
+//         login: 'Moulinette_42',
+//         email: 'Bot@student.1337.ma',
+//         firstName: 'Bot',
+//         lastName: 'Bot',
 //     },
 //     {
-//         login: 'msaouab',
-//         email: 'msaouab@student.1337.ma',
-//         firstName: 'mohamed',
-//         lastName: 'saouab',
-//     },
-//     // {
-//     //     login: 'ichoukri',
-//     //     email: 'ichoukri@student.1337.ma',
-//     //     firstName: 'Ismail',
-//     //     lastName: 'Choukri',
-//     // },
-//     // {
-//     //     login: 'msaouab',
-//     //     email: 'msaouab@student.1337.ma',
-//     //     firstName: 'mohamed',
-//     //     lastName: 'saouab',
-//     // },
-//     // {
-//     //     login: 'ren-nasr',
-//     //     email: 'ren-nasr@student.1337.ma',
-//     //     firstName: 'rida',
-//     //     lastName: 'ennasry',
-//     // },
-
-//     {
-//         login: 'mbehhar',
-//         email: 'mbehhar@student.1337.ma',
-//         firstName: 'Mohamed',
-//         lastName: 'Behhar',
+//         login: 'test',
+//         email: 'test@student.1337.ma',
+//         firstName: 'fname',
+//         lastName: 'lname',
 //     },
 //     {
-//         login: 'rbenjell',
-//         email: 'rbenjell@student.1337.ma',
-//         firstName: 'Reda',
-//         lastName: 'Benjelloun',
+//         login: 'ren-nasr',
+//         email: 'ren-nasr@student.1337.ma',
+//         firstName: 'rida',
+//         lastName: 'ennasry',
 //     },
-
+// //     // {
+// //     //     login: 'mbehhar',
+// //     //     email: 'mbehhar@student.1337.ma',
+// //     //     firstName: 'Mohamed',
+// //     //     lastName: 'Behhar',
+// //     // },
+// //     {
+// //         login: 'rbenjell',
+// //         email: 'rbenjell@student.1337.ma',
+// //         firstName: 'Reda',
+// //         lastName: 'Benjelloun',
+// //     },
 // ]
 
 // const messages = [
@@ -183,7 +168,7 @@
 //     let user1 = await prisma.user.findUnique({
 //         where: {
 //             // login: newArr[i].login,
-//             login: 'ichoukri'
+//             login: 'test'
 //         },
 //     })
 
@@ -304,7 +289,3 @@
 
 
 // // remove this whole file later
-
-
-
-

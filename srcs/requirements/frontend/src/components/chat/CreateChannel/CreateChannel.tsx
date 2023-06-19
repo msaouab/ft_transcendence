@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { CiImport } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import ChannelTypes from "./ChannelTypes";
-import { CreateChannel, PostChannelAvatar } from "../../../api/axios";
+import { CreateChannel, HOSTNAME, PostChannelAvatar } from "../../../api/axios";
 import { GroupMessage } from "../../../types/message";
 
 const ModelStyle = styled.div`
@@ -173,7 +173,7 @@ const Model = (props: ModelProps) => {
 
   const handelFile = (e: any) => {
     PostChannelAvatar(e.target.files[0]).then(() => {
-      const url = `http://localhost:3000/${e.target.files[0].name}`
+      const url = `http://${HOSTNAME}:3000/${e.target.files[0].name}`
       setChannel({ ...channel, avatar: url });
       e.target.value = "";
     }).catch(() => {
@@ -189,7 +189,7 @@ const Model = (props: ModelProps) => {
       password: channel.password,
       limitUsers: 0,
       description: channel.description,
-      avatar: channel.avatar || "http://localhost:3000/default.png",
+      avatar: channel.avatar || `http://${HOSTNAME}:3000/default.png`,
     },
     ).then((res) => {
       console.log(res);

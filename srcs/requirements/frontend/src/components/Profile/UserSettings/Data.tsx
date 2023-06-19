@@ -2,6 +2,14 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import CustomInput from "../../common/CustomInput";
+import { HOSTNAME } from "../../../api/axios";
+import toast, { Toaster } from "react-hot-toast";
+
+const notify = (status: string) => {
+  if (status === "success")
+    toast.success("Profile information updated successfully!");
+  else toast.error("Profile information update failed!");
+};
 
 interface FormData {
   login: string;
@@ -28,7 +36,7 @@ function Form() {
     lastName: "",
   });
   useEffect(() => {
-    const apiUrl = `http://localhost:3000/api/v1/me`;
+    const apiUrl = `http://${HOSTNAME}:3000/api/v1/me`;
     async function fetchData() {
       try {
         await axios
@@ -68,22 +76,35 @@ function Form() {
 
     axios
       .put(
-        `http://localhost:3000/api/v1/user/` +
+        `http://${HOSTNAME}:3000/api/v1/user/` +
           Cookies.get("userid") +
           "/update",
         defaultFormData,
         { withCredentials: true }
       )
-      .catch((error) => console.error(error));
+      .then((response) => {
+        if (response.statusText) {
+          notify("success");
+          setFormData({
+            login: "",
+            firstName: "",
+            lastName: "",
+          });
+        }
+      })
+      .catch((error) => {
+        notify(error.response.data.message);
+      });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="text-white flex flex-col items-center">
+    <form
+      onSubmit={handleSubmit}
+      className="text-white flex flex-col items-center"
+    >
       <h1 className="text-xl font-bold text-center mb-4">User Informations</h1>
-      <div className="flex gap-10">
+      <div className="flex gap-10 flex-wrap justify-center">
         <label>
-          {/* Login:
-          <br /> */}
           <CustomInput
             type="text"
             name="login"
@@ -92,10 +113,7 @@ function Form() {
             onChange={handleInputChange}
           />
         </label>
-        <br />
         <label>
-          {/* First name:
-          <br /> */}
           <CustomInput
             type="text"
             name="firstName"
@@ -104,10 +122,7 @@ function Form() {
             onChange={handleInputChange}
           />
         </label>
-        <br />
         <label>
-          {/* Last name:
-          <br /> */}
           <CustomInput
             placeHolder="Last Name"
             type="text"
@@ -117,7 +132,6 @@ function Form() {
           />
         </label>
       </div>
-      <br />
       <button
         type="submit"
         className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md m-auto"

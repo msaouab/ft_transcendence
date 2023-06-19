@@ -27,6 +27,7 @@ import {
   import { ChatService } from "src/chat/chat.service";
   import { Inject, forwardRef } from "@nestjs/common";
   import { UserExistsGuard } from "src/guards/user-exists.guard";
+import { PutStatusDto } from "./dto/put.status.dto";
   
   @ApiTags("User")
   @Controller("User")
@@ -158,4 +159,19 @@ import {
     getJoindChannels(@Param("id") id: string) {
       return this.userService.getJoindChannels(id);
     }
+
+    @Put(":id/updatestatus")
+    @UseGuards(AuthenticatedGuard)
+   async  updateStatus(@Param("id") id: string, @Body() body: PutStatusDto, @User() user: Profile) {
+      return await this.userService.updateStatus(user,id, body.status);
+    }
+
+    @Get(":id/notifications")
+    @UseGuards(AuthenticatedGuard)
+    async getUnseenNotifications(@Param("id") id: string) {
+      console.log("getUnseenNotifications")
+      return await this.userService.getUnseenNotifications(id);
+    }
+
+
   }

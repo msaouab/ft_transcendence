@@ -1,3 +1,10 @@
 Dockerfile
 node_modules
 dist
+.vscode/*
+.env
+./src/node_modules
+db
+dist
+.DS_Store
+package-lock.json

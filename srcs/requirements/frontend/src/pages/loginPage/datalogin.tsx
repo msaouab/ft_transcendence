@@ -2,17 +2,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
+import { HOSTNAME } from "../../api/axios";
 // import { History} from "history"
 
 const LdataContainer = styled.div`
-    .spinner {
-  		width: 50px;
-  		height: 50px;
-  		border-radius: 50%;
-  		border: 5px solid rgba(0, 0, 0, 0.1);
-  		border-top-color: var(--goldColor);
-  		animation: spin 1s ease-in-out infinite;
+	.spinner {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		border: 5px solid rgba(0, 0, 0, 0.1);
+		border-top-color: var(--goldColor);
+		animation: spin 1s ease-in-out infinite;
 	}
 	@keyframes spin {
 		to {
@@ -24,64 +25,64 @@ const LdataContainer = styled.div`
 	}
 `;
 
-function	Ldata() {
+function Ldata() {
 	const [loading, setLoading] = useState(true);
 	const [user, printData] = useState({
-		id: '',
-		login: '',
-		firstName: '',
-		lastName: '',
-		status: '',
+		id: "",
+		login: "",
+		firstName: "",
+		lastName: "",
+		status: "",
 	});
 	const navigate = useNavigate();
-    
+
 	useEffect(() => {
 		setLoading(true);
-        const apiUrl = `http://localhost:3000/api/v1/me`
+		const apiUrl = `http://${HOSTNAME}:3000/api/v1/me`;
 		async function fetchData() {
-		try {
-			await axios.get(apiUrl, {
-        	 withCredentials: true,
-        	})
-			.then(response => {
-				if (response.statusText) {
-					printData(response.data);
-					Cookies.set('userid', response.data.id);
-				}
-				setLoading(false);;
-			})
-			.catch(error => {
-			   setLoading(false);
-			   if (error.response.status == 401) {
-				   navigate('/login');
-				 }
-			})
-		} catch (error) {
-			console.log(error);
+			try {
+				await axios
+					.get(apiUrl, {
+						withCredentials: true,
+					})
+					.then((response) => {
+						if (response.statusText) {
+							printData(response.data);
+							Cookies.set("userid", response.data.id);
+						}
+						setLoading(false);
+					})
+					.catch((error) => {
+						setLoading(false);
+						if (error.response.status == 401) {
+							navigate("/login");
+						}
+					});
+			} catch (error) {
+				console.log(error);
+			}
 		}
-	}
-	fetchData();
-		}, []);
+		fetchData();
+	}, []);
 
 	return (
-		<LdataContainer className='l'>
-			{
-				loading ? ( <div className='spinner'></div> ) : (
-					<>
-						<p>{user.id}</p>
-						<p>{user.login}</p>
-						<p>{user.firstName}</p>
-						<p>{user.lastName}</p>
-						<p>{user.status}</p>
-					</>
-				)
-			}
+		<LdataContainer className="l">
+			{loading ? (
+				<div className="spinner"></div>
+			) : (
+				<>
+					<p>{user.id}</p>
+					<p>{user.login}</p>
+					<p>{user.firstName}</p>
+					<p>{user.lastName}</p>
+					<p>{user.status}</p>
+				</>
+			)}
 		</LdataContainer>
-	)
+	);
 }
 
-export	default Ldata
-
+export default Ldata;
 
 // import styled from 'styled-components'
 // import logoBlack from '/logoBlack.svg'
@@ -152,7 +153,7 @@ export	default Ldata
 // 				color: #cbc6c6;
 // 				margin: -10rem;
 // 			}
-			
+
 // 				.prvs a {
 // 					text-decoration: none;
 // 					display: inline-block;
@@ -239,12 +240,10 @@ export	default Ldata
 // 				font-weight: bolder;
 // 			}
 // 		}
-		
+
 // 	}
 
 // `;
-
-
 
 // function	LoginPage() {
 // 		useEffect(() => {
@@ -253,11 +252,11 @@ export	default Ldata
 // 				setActiveLink(storedLink);
 // 			}
 // 		}, []);
-	
+
 // 		useEffect(() => {
 // 			localStorage.setItem('activeLink', activeLink);
 // 		}, [activeLink]);
-	
+
 // 	const handleLinkClick = (link: string) => {
 // 		setActiveLink(link);
 // 	};
@@ -298,7 +297,7 @@ export	default Ldata
 // 			</div>
 
 // 		</div>
-		
+
 // 		</LdataContainer>
 // 	)
 // }

@@ -13,6 +13,8 @@ import { TfaDto } from './dto/Tfa.dto';
 
 
 import { PrivateMessage } from '@prisma/client';
+import { lstat } from 'fs';
+import { HOSTNAME } from 'src/main';
 @Injectable()
 export class UserService {
     constructor(private prisma: PrismaService) { }
@@ -124,10 +126,13 @@ export class UserService {
                 id: id,
             },
             data: {
-                avatar: file.destination + '/' + file.filename,
+                avatar: `http://${HOSTNAME}:3000/` + file.filename,
             },
+            select:{
+                avatar: true
+            }
         });
-
+        return updatePath;
     }
 
     async getImage(id: string) {
@@ -368,5 +373,57 @@ export class UserService {
         });
         return users;
     }
+
+    async updateStatus(user,id ,status) {
+        const me = await this.prisma.user.findFirst({
+            
+            where: {
+                id: id,
+            },
+        });
+        if (!me) {
+            throw new NotFoundException('User not found');
+        }
+        if (user._json.email != me.email) {
+            throw new UnauthorizedException('Unauthorized');
+        }
+        if (status != 'Online' && status != 'Offline' && status != 'Idle' && status != 'DoNotDisturb')
+        {
+            throw new BadRequestException('Wrong status');
+        }
+        return await this.prisma.user.update({
+            where: {
+                id: id,
+            },
+            data: {
+                status: status,
+            },
+        });
+    }
+
+
+
+    /// getUnsenNotifications
+    async getUnseenNotifications(id: string) {
+        // const user = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: id,
+        //     }
+        // });
+        // if (!user) {
+        //     throw new NotFoundException('User not found');
+        // }
+        const notifications = await this.prisma.notification.findMany({
+            where: {
+                user_id: id,      
+            }
+        });
+        // don't change later, this should not be an error
+        // if (!notifications) {
+        //     throw new NotFoundException('Notifications not found');
+        // }
+        return notifications;
+    }
+
 }
     

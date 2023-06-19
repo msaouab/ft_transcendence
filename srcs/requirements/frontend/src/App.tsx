@@ -9,13 +9,16 @@ import { useState } from "react";
 
 import LoginPage from "./pages/loginPage/LoginPage";
 import Profile from "./pages/profile/Profile";
-import Game from "./components/common/Game";
+import Game from "./components/Game/Game";
 import UserSettings from "./pages/user/UserSettings";
 import Chat from "./pages/chat";
 import VerifyPage from "./pages/loginPage/VerifyPage";
 import GameType from "./pages/game/GameType";
 import { GameProvider } from "./provider/GameProvider";
+import StartGame from "./pages/game/StartGame";
 import OtherUserProfile from "./pages/profile/OtherUserProfile";
+import NotFound from "./pages/notFound/NotFound";
+import AuthGuard from "./guards/auth.guard";
 
 // function App() {
 // 	const [bgColor, setBgColor] = useState("#1E1E1E");
@@ -82,7 +85,9 @@ function App() {
 				<Route path="/about" element={<AboutPage />} />
 				<Route path="/login" element={<LoginPage />} />
 				<Route path="/tfa" element={<VerifyPage />} />
-				<Route path="" element={<Layout />}>
+				<Route path="" element={    
+            <Layout />
+        }>
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/profile/:id" element={<OtherUserProfile />} />
 					<Route path="/settings" element={<UserSettings />} />
@@ -90,13 +95,17 @@ function App() {
 					<Route path="/game" element={
 						<GameProvider><GameDashboard /></GameProvider>
 					} />
-					<Route path="/game/10" element={
+					<Route path="/game/startGame" element={
+						<GameProvider><StartGame /></GameProvider>
+					} />
+          <Route path="/game/:id" element={
 						<GameProvider><Game /></GameProvider>
 					} />
 					<Route path="/game-type" element={
 						<GameProvider><GameType /></GameProvider>
 					} />
 				</Route>
+        <Route path="*" element={<NotFound />} />
 			</Routes>
 		</>
 	);

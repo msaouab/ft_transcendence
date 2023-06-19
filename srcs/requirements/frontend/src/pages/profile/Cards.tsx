@@ -2,15 +2,15 @@ import { Link } from "react-router-dom";
 import { useGlobalContext } from "../../provider/AppContext";
 
 const CheckStatus = (stats: string) => {
-  const status = stats?.toLowerCase();
-  if (status == "online") {
+  const status = stats
+  if (status == "Online") {
     return "bg-green-500";
-  } else if (status == "offline") {
+  } else if (status == "DoNotDisturb") {
     return "bg-red-500";
-  } else if (status == "busy") {
-    return "bg-yellow-500";
-  } else if (status == "ingame") {
-    return "bg-blue-500";
+  } else if (status == "Idle") {
+    return "bg-yellow-700";
+  } else if (status == "Offline") {
+    return "bg-gray-500";
   }
 };
 
@@ -28,7 +28,7 @@ export const FreindCard = ({
       className="flex flex-wrap mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]"
     >
       <div className="image ">
-        <img src={avatar} alt="" width={50} />
+        <img src={avatar} alt=""  className="rounded-[50%] w-14 h-14" />
       </div>
       <div className="name text-md xl:text-xl font-[500] capitalize">
         {firstName.slice(0, 1) + "."}{lastName}
@@ -37,7 +37,8 @@ export const FreindCard = ({
         {status}
         <div
           className={`dot w-3 h-3 ${CheckStatus(status)} rounded-full`}
-        ></div>
+        >
+        </div>
       </div>
     </Link>
   );
@@ -75,8 +76,9 @@ export const ChanelCard = ({ channel_name, role, channel_id }: any) => {
 };
 
 export const AchivementCard = ({ name, description, image }: any) => {
+  console.log("image: ", image, "name: ", name, "description: ", description)
   return (
-    <div className="debug h-full min-w-[300px]">
+    <div className=" h-full min-w-[300px]">
       <div className="bg-white lg:w-[80%] w-[95%] m-auto  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
         <div className="image">
           <img src={image} alt="" width={150} />

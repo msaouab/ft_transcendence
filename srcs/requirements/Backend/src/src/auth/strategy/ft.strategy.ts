@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile, VerifyCallback } from 'passport-42';
+import { HOSTNAME } from 'src/main';
 
 @Injectable()
 export class FtStrategy extends PassportStrategy(Strategy, '42') {

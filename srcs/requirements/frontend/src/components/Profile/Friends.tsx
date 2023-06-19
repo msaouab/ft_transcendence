@@ -5,6 +5,7 @@ import styled from "styled-components";
 // import WebFont from 'webfontloader';
 import avatar from '../../../public/default.png'
 import Cookies from 'js-cookie'
+import { HOSTNAME } from "../../api/axios";
 
 const FriendsContainer = styled.div`
    display: grid;
@@ -99,7 +100,7 @@ function	Friends() {
 	const [friends, setFriends] = useState<friendsInterface[]>([]);
 	useEffect(() => {
 		setLoading(true);
-		const apiUrl = `http://localhost:3000/api/v1/User/` + Cookies.get('userid') + '/friends';
+		const apiUrl = `http://${HOSTNAME}:3000/api/v1/User/` + Cookies.get('userid') + '/friends';
 	
 		async function fetchData() {
 			try {
@@ -108,7 +109,7 @@ function	Friends() {
 				})
 				.then(response => {
 					for (let i = 0; i < response.data.length; i++) {
-						axios.get(`http://localhost:3000/api/v1/User/` + response.data[i].friendUser_id, {
+						axios.get(`http://${HOSTNAME}:3000/api/v1/User/` + response.data[i].friendUser_id, {
 							withCredentials: true,
 						})
 						.then(responses => {

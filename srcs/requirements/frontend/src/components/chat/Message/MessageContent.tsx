@@ -9,6 +9,7 @@ import { CiTrash } from 'react-icons/ci';
 import { useState } from 'react';
 import axios from 'axios';
 import ConfirmDelete from '../../common/ConfirmDelete';
+import { HOSTNAME } from '../../../api/axios';
 
 const MessageStyle = styled.div`
 
@@ -81,7 +82,7 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
         // console.log("im trying to delete message with id: ", id);
         // console.log("im trying to delete message with chatRoomId: ", chatRoomId);
         axios.delete(
-            `http://localhost:3000/api/v1/chatrooms/private/${chatRoomId}/message/${id}`,
+            `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${chatRoomId}/message/${id}`,
             { withCredentials: true }
         ).then(res => {
             // console.log(res);

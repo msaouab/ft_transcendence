@@ -10,6 +10,7 @@ import TmpChatBox from './TmpChatBox';
 import Cookies from 'js-cookie';
 import { BiGroup } from 'react-icons/bi';
 import JoinChannel from './JoinChannel';
+import { HOSTNAME } from '../../../api/axios';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
@@ -161,7 +162,7 @@ const SearchBar = () => {
             );
         }
         if ((dropdown || fullScreenDropdown) && !searchConnected) {
-            socket.current = io(`http://localhost:3000/search`);
+            socket.current = io(`http://${HOSTNAME}:3000/search`);
 
             socket.current.on('connect', () => {
                 setSearchConnected(true);
@@ -303,8 +304,8 @@ const SearchBar = () => {
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
-                                                            <Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
-                                                                {/* uncomment later */}
+                                                            <Link to={`/profile/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
+                                                                {/* change later */}
                                                                 {/* <img src={user.avatar} alt="avatar" /> */}
                                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
 

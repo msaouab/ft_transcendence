@@ -3,6 +3,7 @@ import { CiLock, CiWarning } from "react-icons/ci";
 import { useGlobalContext } from '../../../provider/AppContext';
 import { io, Socket } from "socket.io-client";
 import styled from 'styled-components';
+import { HOSTNAME } from '../../../api/axios';
 
 
 
@@ -179,7 +180,7 @@ const JoinChannel = ({ joinChannel, setJoinChannel }: JoinChannelProps) => {
         console.log("password ", password);
         console.log("readyToJoin ", readyToJoin);
         if (!connected) {
-            socket.current = io(`http://localhost:3000/chat`);
+            socket.current = io(`http://${HOSTNAME}:3000/chat`);
             setConnected(true);
             console.log('connected to the server')
         }

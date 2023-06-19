@@ -9,23 +9,22 @@ import { useEffect, useRef, useState } from "react";
 import {io} from "socket.io-client";
 // import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
+import { HOSTNAME } from "../../api/axios";
 // import UserSettings from "../user/UserSettings";
 
 
 const index = () => {
-  const LayoutStyle = styled.div`
-    display: flex;
-    height: 100vh;
-  `;
+	const LayoutStyle = styled.div`
+		display: flex;
+		height: 100vh;
+	`;
 
   const notifySocket = useRef<any>(null);
   const [connected, setConnected] = useState(false);
     
   useEffect(() => {
-    // console.log("IM HERE");
-    // console.log("connected: ", notifySocket);
     if (!connected) {
-      notifySocket.current = io("http://localhost:3000"); 
+      notifySocket.current = io(`http://${HOSTNAME}:3000`); 
     }
     notifySocket.current.on("connect", () => {
       setConnected(true);
@@ -63,7 +62,12 @@ const index = () => {
           </div>
         </div>
         <div className="content  flex-1">
-          <Outlet />
+          <Outlet
+            context={{
+              notifySocket: notifySocket.current,
+              connected: connected,
+            }}
+          />
         </div>
       </div>
     </LayoutStyle>

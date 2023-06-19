@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FriendsImg from "../../assets/friends.png";
 import GameImg from "../../assets/game.png";
 import ChatImg from "../../assets/chat.png";
 import { CiCircleMore } from "react-icons/ci";
 import { AiOutlineUserAdd, AiOutlineUserDelete } from "react-icons/ai";
-import { IoPersonRemoveOutline } from "react-icons/io5";
 import { Top, Status, Main } from "./ProfileStyle";
 
 import AchivementImg1 from "../../assets/achivement1.png";
@@ -14,13 +13,12 @@ import Dice from "../../assets/dice.png";
 import Draw from "../../assets/draw.png";
 import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import instance, {
-  GetAvatar,
   RemoveThisFriendInvite,
   addFriend,
   blockThisUser,
-  blockUser,
+  deleteFreind,
   getAchivements,
   getChannels,
   getFriendsInfo,
@@ -31,24 +29,32 @@ import instance, {
 } from "../../api/axios";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
+import { useOutletContext } from "react-router-dom";
+import {
+  NoAchivements,
+  NoChanel,
+  NoFriend,
+} from "../../components/common/EmptyComponents";
+import { getAvatarUrl } from "../../components/common/CommonFunc";
 
 export const ReusableCardStyle = styled.div`
-  background: linear-gradient(
-    180deg,
-    rgba(233, 217, 144, 0.2379) 0%,
-    rgba(233, 217, 144, 0) 100%
-  );
-  border-radius: 20px 20px 0px 0px;
-  padding: 1rem;
+	background: linear-gradient(
+		180deg,
+		rgba(233, 217, 144, 0.2379) 0%,
+		rgba(233, 217, 144, 0) 100%
+	);
+	border-radius: 20px 20px 0px 0px;
+	padding: 1rem;
 `;
 
 interface friendsInterface {
-  login: string;
-  Status: string;
+	login: string;
+	Status: string;
 }
 
 const OtherUserProfile = () => {
   const { id } = useParams(); // Extract the user ID from the URL params
+  const { notifySocket, connected }: any = useOutletContext();
   const [user, setData] = useState({
     id: "",
     login: "",
@@ -74,6 +80,16 @@ const OtherUserProfile = () => {
   useEffect(() => {
     getAllData();
   }, [userId]);
+
+  useEffect(() => {
+    if (connected) {
+      notifySocket.on("inviteAccepted", (data: any) => {
+        if (data.user_id === userId) {
+          getAllData();
+        }
+      });
+    }
+  }, [connected]);
 
   const getAllData = () => {
     if (id === "") return;
@@ -102,12 +118,11 @@ const OtherUserProfile = () => {
     };
 
     const getUserAvatar = async () => {
-      const data = await GetAvatar(id || "");
+      const data = getAvatarUrl();
       setAvatar(data);
     };
     const isMyFriend = async () => {
       const data = await isFriend(userId || "", id || "");
-      console.log("shfhlsfjsjf", data);
       if (data) setRelationStatus(data);
     };
 
@@ -122,21 +137,31 @@ const OtherUserProfile = () => {
 
   const sendFriendInvitation = async () => {
     const data = await addFriend(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const BlockUser = async () => {
     const data = await blockThisUser(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const unblockUser = async () => {
     const data = await unblockThisUser(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
   const RemoveFriendInvite = async () => {
     const data = await RemoveThisFriendInvite(userId, id || "");
+    getAllData();
+    console.log(data);
+  };
+
+  const DeleteFriend = async () => {
+    const data = await deleteFreind(userId, id || "");
+    getAllData();
     console.log(data);
   };
 
@@ -152,7 +177,10 @@ const OtherUserProfile = () => {
             <AiOutlineUserAdd className="mr-1 text-3xl" />
             Add Friend
           </button>
-          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 ">
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+            onClick={BlockUser}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
             Block User
           </button>
@@ -161,7 +189,10 @@ const OtherUserProfile = () => {
     } else if (relationStatus === "pending") {
       return (
         <div className="w-full px-4 py-2 m-auto">
-          <button className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 " onClick={RemoveFriendInvite}>
+          <button
+            className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
+            onClick={RemoveFriendInvite}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
             Remove Invitation
           </button>
@@ -179,7 +210,10 @@ const OtherUserProfile = () => {
     } else if (relationStatus === "friend") {
       return (
         <div className="w-full p-2 m-auto">
-          <button className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 ">
+          <button
+            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+            onClick={DeleteFriend}
+          >
             <AiOutlineUserDelete className="mr-1 text-3xl" />
             Remove Friend
           </button>
@@ -207,12 +241,20 @@ const OtherUserProfile = () => {
       );
     }
   };
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (relationStatus == "blockedBy") navigate("*");
+  }, []);
 
   const [showFriendRelationMenu, setShowFriendRelationMenu] = useState(false);
-  const FriendRelationMenuAnimation = styled.div``;
   const FriendRelationMenuStyle = styled.div`
     animation: 1s ease-in-out;
   `;
+
+  if (relationStatus === "blockedBy") {
+    navigate("/*");
+  }
 
   return (
     <div className="  w-[100%] flex flex-col gap-5  ">
@@ -231,42 +273,46 @@ const OtherUserProfile = () => {
             <div className="flex gap-10 items-center "></div>
           </div>
         )}
-
-        <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
-          <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-            <img src={Dice} alt="_" width={50} />
-            Games : {rankData?.wins + rankData?.loses + rankData?.draws || "_"}
+        {rankData && (
+          <div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
+            <div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
+              <img src={Dice} alt="_" width={50} />
+              Games :{" "}
+              {rankData?.wins + rankData?.loses + rankData?.draws }
+            </div>
+            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+              <img src={AchivementImg1} width={50} alt="_" />
+              Wins : {rankData?.wins }
+            </div>
+            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+              <img src={Draw} alt="_" width={50} />
+              Draw: {rankData?.draws }
+            </div>
+            <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
+              <img src={Lose} alt="_" width={50} />
+              Lose: {rankData?.loses }
+            </div>
+            <div className="relative text-white ">
+              {showFriendRelationMenu}
+              <CiCircleMore
+                className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
+                onClick={() => {
+                  setShowFriendRelationMenu(!showFriendRelationMenu);
+                }}
+              />
+              {showFriendRelationMenu && (
+                <FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[15rem]   rounded-md shadow-xl shadow-white/10 border z-50">
+                  {FriendRelatioType()}
+                </FriendRelationMenuStyle>
+              )}
+            </div>
           </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={AchivementImg1} width={50} alt="_" />
-            Wins : {rankData?.wins || "_"}
-          </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={Draw} alt="_" width={50} />
-            Draw: {rankData?.draws || "_"}
-          </div>
-          <div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-            <img src={Lose} alt="_" width={50} />
-            Lose: {rankData?.loses || "_"}
-          </div>
-          <div className="relative text-white ">
-            {showFriendRelationMenu}
-            <CiCircleMore
-              className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
-              onClick={() => {
-                setShowFriendRelationMenu(!showFriendRelationMenu);
-              }}
-            />
-            {showFriendRelationMenu && (
-              <FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[15rem]   rounded-md shadow-xl shadow-white/10 border z-50">
-                {FriendRelatioType()}
-              </FriendRelationMenuStyle>
-            )}
-          </div>
-        </div>
+        )}
       </Top>
-      {relationStatus === "blocked" ? (
-        <div>Unblocked this user to see his profile</div>
+      {relationStatus === "blocking" ? (
+        <div className="h-[60rem] w-full flex items-center justify-center text-6xl debug">
+          Unblocked this user to see his profile
+        </div>
       ) : (
         <Main className="midel flex-1  flex flex-col gap-4 items-center  ">
           <div className="stats  flex gap-6 h-[25rem] w-full   ">
@@ -285,9 +331,7 @@ const OtherUserProfile = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className=" h-full flex justify-center items-center text-3xl">
-                    No friends
-                  </div>
+                  <NoFriend />
                 )}
               </div>
             </div>
@@ -306,9 +350,7 @@ const OtherUserProfile = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className=" h-full flex justify-center items-center text-3xl">
-                    No Joined Chanels
-                  </div>
+                  <NoChanel />
                 )}
               </div>
             </div>
@@ -342,8 +384,8 @@ const OtherUserProfile = () => {
                   ></SwiperComponent>
                 </div>
               ) : (
-                <div className=" h-full flex justify-center items-center text-3xl text-center">
-                  No Achivements
+                <div className="flex justify-center items-center  w-full">
+                  <NoAchivements />
                 </div>
               )}
             </div>

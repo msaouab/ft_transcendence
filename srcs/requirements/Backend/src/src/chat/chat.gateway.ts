@@ -27,7 +27,13 @@ import { createMessageDto } from './message/message.dto';
 
 
 @Injectable()
-@WebSocketGateway({ namespace: 'chat' })
+@WebSocketGateway({
+//     cors: {
+//         origin: 'http://' + process.env.HOSTNAME +':5173',
+        
+//  }, 
+ namespace: 'chat'
+})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;

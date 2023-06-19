@@ -19,6 +19,9 @@ CREATE TYPE "MemeberStatusTime" AS ENUM ('Permanent', 'Temporary');
 -- CreateEnum
 CREATE TYPE "InviteStatus" AS ENUM ('Pending', 'Accepted', 'Rejected');
 
+-- CreateEnum
+CREATE TYPE "InviteType" AS ENUM ('Friend', 'Game');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -28,12 +31,18 @@ CREATE TABLE "User" (
     "lastName" TEXT NOT NULL,
     "dateJoined" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated" TIMESTAMP(3) NOT NULL,
+<<<<<<< HEAD:srcs/requirements/Backend/src/prisma/migrations/20230617224705_dev/migration.sql
     "avatar" TEXT NOT NULL DEFAULT '/app/public/default.png',
     "status" "Status" NOT NULL DEFAULT 'Offline',
     "realStatus" BOOLEAN NOT NULL DEFAULT false,
+=======
+    "avatar" TEXT NOT NULL DEFAULT 'http://localhost:3000/default.png',
+    "status" "Status" NOT NULL DEFAULT 'Online',
+>>>>>>> efe7ab0e7102f9987f82ce863ed1cd56955a790a:srcs/requirements/Backend/src/prisma/migrations/20230618200433_dev/migration.sql
     "tfa" BOOLEAN NOT NULL DEFAULT false,
     "otp_verified" BOOLEAN NOT NULL DEFAULT false,
     "otp_base32" TEXT,
+    "realStatus" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -156,6 +165,10 @@ CREATE TABLE "Message" (
 CREATE TABLE "Notification" (
     "notification_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
+    "type" "InviteType" NOT NULL,
+    "sender_id" TEXT,
+    "sender_name" TEXT,
+    "receiver_id" TEXT,
 
     CONSTRAINT "Notification_pkey" PRIMARY KEY ("notification_id")
 );
@@ -178,7 +191,10 @@ CREATE TABLE "GameInvites" (
     "sender_id" TEXT NOT NULL,
     "receiver_id" TEXT NOT NULL,
     "status" "InviteStatus" NOT NULL DEFAULT 'Pending',
-    "validUntil" TIMESTAMP(3) NOT NULL
+    "validUntil" TIMESTAMP(3) NOT NULL,
+    "roomId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "mode" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -310,7 +326,7 @@ ALTER TABLE "MutedMembers" ADD CONSTRAINT "MutedMembers_channel_id_fkey" FOREIGN
 ALTER TABLE "Message" ADD CONSTRAINT "Message_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "Channel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Notification" ADD CONSTRAINT "Notification_notification_id_fkey" FOREIGN KEY ("notification_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Notification" ADD CONSTRAINT "Notification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "GameInvites" ADD CONSTRAINT "GameInvites_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

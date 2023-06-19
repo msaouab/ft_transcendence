@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
+import { HOSTNAME } from "../../../api/axios";
 const DropdownSeachStyle = styled.div`
     background: rgba(217, 217, 217, 0.3);
     border-radius: 10px;
@@ -164,7 +165,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
         }
         if ((fullScreenDropdown) && !searchConnected) {
             // console.log("connecting");
-            socket.current = io(`http://localhost:3000/search`);
+            socket.current = io(`http://${HOSTNAME}:3000/search`);
             socket.current.on('connect', () => {
                 setSearchConnected(true);
                 // console.log("connected");
