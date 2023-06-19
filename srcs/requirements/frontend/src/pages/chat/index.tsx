@@ -67,17 +67,22 @@ const ChatStyle = Styled.div`
 
 `;
 
+import { GroupMessage } from "../../types/message";
+import GroupChatBox from "../../components/chat/GroupChatBox";
 const Chat = () => {
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
     {} as PrivateMessage
   );
+  const [joinedRooms, setJoinedRooms] = React.useState([] as string[]);
+  const [selectedGroupChat, setSelectedGroupChat] = React.useState <GroupMessage>( {} as GroupMessage );
   const [newLatestMessage, setNewLatestMessage] = React.useState<{
     chatRoomId: string;
     message: string;
   }>({} as { chatRoomId: string; message: string });
-  const { privateChatRooms, setChatNotif } = useGlobalContext();
+  const { privateChatRooms, groupChatRooms, setChatNotif } = useGlobalContext();
+  const [selected, setSelected] = React.useState("");
 
 
   useEffect(() => {
@@ -93,7 +98,15 @@ const Chat = () => {
       setConnected(true);
       chatSocket.current.emit('alive', {id: Cookies.get("id")} );
       console.log("connected to the server");
+      console.log("groupChatRooms: ", groupChatRooms);
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("joining the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+      });
     });
+    // chatSocket.current.on('connect', () => {
+    // });
     
        
     
@@ -107,6 +120,12 @@ const Chat = () => {
 
   
     return () => {
+      console.log("disconnected from the server");
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("leaving the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+      });
       chatSocket.current.disconnect();
       setConnected(false);
     };
@@ -173,17 +192,33 @@ const Chat = () => {
         <ChatList
           setSelectedChat={setSelectedChat}
           newLatestMessage={newLatestMessage}
+          setSelectedGroupChat={setSelectedGroupChat}
+          socket={chatSocket}
+          connected={connected}
+          selected={selected}
+          setSelected={setSelected}
         />
       </div>
       <div className="chat-box-wrapper">
-        <ChatBox
-          selectedChat={selectedChat}
-          key={selectedChat.chatRoomid}
-          size="big"
-          setNewLatestMessage={setNewLatestMessage}
-          chatSocket={chatSocket}
-          connected={connected}
-        />
+        {selectedChat.chatRoomid ? (
+          <ChatBox
+            selectedChat={selectedChat}
+            key={selectedChat.chatRoomid}
+            size="big"
+            setNewLatestMessage={setNewLatestMessage}
+            chatSocket={chatSocket}
+            connected={connected}
+          />
+        ) : (
+          <GroupChatBox
+            selectedGroupChat={selectedGroupChat}
+            setSelectedGroupChat={setSelectedGroupChat}
+            socket={chatSocket}
+            connected={connected}
+            key={selectedGroupChat.group_id}
+            joinedRooms={joinedRooms}
+          />
+        )}
       </div>
     </ChatStyle>
   );

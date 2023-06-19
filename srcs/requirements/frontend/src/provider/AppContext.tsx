@@ -13,6 +13,8 @@ interface AppContextType {
   setUserId: React.Dispatch<React.SetStateAction<string>>;
   privateChatRooms: any[];
   setPrivateChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
+  groupChatRooms: any[];
+  setGroupChatRooms: React.Dispatch<React.SetStateAction<any[]>>;
   isTfaEnabled: boolean;
   setIsTfaEnabled: React.Dispatch<React.SetStateAction<boolean>>;
   notifications: any[];
@@ -38,13 +40,17 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
+  // chat context 
+  
+  // chat context
 	const [userStatus, setUserStatus] = useState<string>("");
 	const [userImg, setUserImg] = useState("");
 	const [userId, setUserId] = useState<string>("");
-
+  
 	const [isTfaEnabled, setIsTfaEnabled] = useState<boolean>(false);
 	// chat context
 	const [privateChatRooms, setPrivateChatRooms] = useState([] as any[]);
+  const [groupChatRooms, setGroupChatRooms] = useState([]);
 
   const [chatNotif, setChatNotif] = useState(Cookies.get("chatNotif") ? parseInt(Cookies.get("chatNotif")!) : 0);
   const [gameNotif, setGameNotif] = useState(Cookies.get("gameNotif") ? parseInt(Cookies.get("gameNotif")!) : 0);
@@ -65,6 +71,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setUserId,
     privateChatRooms,
     setPrivateChatRooms,
+    groupChatRooms,
+    setGroupChatRooms,
     isTfaEnabled,
     setIsTfaEnabled,
     notifications,

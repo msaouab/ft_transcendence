@@ -25,4 +25,12 @@ export class ChannelDto {
 
     @ApiProperty()
     limitUsers: number
+
+    @ApiProperty()
+    @IsOptional()
+    description: string
+
+    @ApiProperty()
+    @IsOptional()
+    avatar: string
 }
