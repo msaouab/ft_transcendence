@@ -20,13 +20,15 @@ export class NotificationService {
 
 			if (!user) {
 				console.log("user not found");
-				throw new HttpException("User not found", 404);
+				return;
+				// throw new HttpException("User not found", 404);
 			}
 			// beauty
 			const User = await this.prisma.user.update({
 				where: {
 					id: userId,
 				},
+			
 				data: {
 					realStatus: userStatus,
 				},

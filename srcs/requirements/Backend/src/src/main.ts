@@ -16,13 +16,17 @@ export const HOSTNAME= process.env.HOSTNAME || 'localhost';
 
 // const APP_ROUTE_PREFIX = 'api';
 
+const origin = 'http://localhost:5173';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: {
       origin: 'http://' + HOSTNAME +':5173',
+      // origin: "*",
       credentials: true,
     }
   });
+
+  console.log("the origin is ", 'http://' + HOSTNAME +':5173');
 
   //ejs temp front end
   app.useStaticAssets(join('/','app', 'public'));

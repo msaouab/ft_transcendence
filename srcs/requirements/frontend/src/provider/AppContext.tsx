@@ -23,6 +23,12 @@ interface AppContextType {
   setGameNotif: React.Dispatch<React.SetStateAction<number>>;
   friendChellenge: any;
   setFriendChellenge: React.Dispatch<React.SetStateAction<any[]>>;
+
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  userLoggedId: string;
+  setUserLoggedId: React.Dispatch<React.SetStateAction<string>>;
+
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -47,6 +53,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 	// notification context
 	const [notifications, setNotifications] = useState([] as any[]);
 
+  const [loading, setLoading] = useState(false);
+  const [userLoggedId, setUserLoggedId] = useState("");
+
   const value = {
     userStatus,
     setUserStatus,
@@ -66,8 +75,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setGameNotif,
     friendChellenge,
     setFriendChellenge,
-  };
 
+    loading,
+    setLoading,
+    userLoggedId,
+    setUserLoggedId,
+
+  };
 
 	return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

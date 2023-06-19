@@ -219,7 +219,6 @@ export class ChatService {
 					console.log("the other user is online");
 					const otherClientSocket = clients.get(payload.receiver_id);
 					await otherClientSocket.join(privateRoom.id);
-
 					// emit the event roomJoined to the other user
 					otherClientSocket.emit("roomJoined", { roomId: privateRoom.id });
 				}

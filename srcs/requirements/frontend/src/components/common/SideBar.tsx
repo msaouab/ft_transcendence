@@ -58,6 +58,19 @@ const SideBar = ({
 
 	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
 	// const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
+
+	useEffect(() => {
+		// sending the real status to the server
+		if (connected) {
+			if (notifySocket) {
+				notifySocket.emit("realStatus", {
+					id: Cookies.get("id"),
+					userStatus: true,
+				});
+			}
+		}
+	}, [connected]);
+
 	useEffect(() => {
 		if (connected) {
 			notifySocket.on("chatNotif", (data: any) => {
