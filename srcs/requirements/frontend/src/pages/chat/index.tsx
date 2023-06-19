@@ -80,6 +80,7 @@ const Chat = () => {
     message: string;
   }>({} as { chatRoomId: string; message: string });
   const { privateChatRooms, groupChatRooms, setChatNotif } = useGlobalContext();
+  const [selected, setSelected] = React.useState("");
 
 
   useEffect(() => {
@@ -192,6 +193,8 @@ const Chat = () => {
           setSelectedGroupChat={setSelectedGroupChat}
           socket={chatSocket}
           connected={connected}
+          selected={selected}
+          setSelected={setSelected}
         />
       </div>
       <div className="chat-box-wrapper">

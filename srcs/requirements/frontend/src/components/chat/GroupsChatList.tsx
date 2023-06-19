@@ -38,12 +38,13 @@ interface GroupChatListProps {
   setSelectedChat: (chat: PrivateMessage) => void,
   socket: any,
   connected: boolean,
+  selected: string,
+  setSelected: (selected: string) => void
 }
 
-const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connected }: GroupChatListProps) => {
+const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connected, selected, setSelected }: GroupChatListProps) => {
   const [newChat, setNewChat] = useState(false);
   const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
-  const [selected, setSelected] = useState("");
   const [joinToGroup, setJoinToGroup] = useState(false);
 
   const getGroupChatRooms = async () => {

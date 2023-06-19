@@ -24,12 +24,11 @@ const UsersChatListStyle = styled.div`
 
 `;
 
-const UsersChatList = ({ setSelectedChat, newLatestMessage }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string } }) => {
+const UsersChatList = ({ setSelectedChat, newLatestMessage, selected, setSelected }: { setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string }, selected: string, setSelected: (selected: string) => void }) => {
     // privatChatroom context
     
 
     const {privateChatRooms, setPrivateChatRooms} = useGlobalContext();
-    const [selected, setSelected] = useState<string>('');
 
     const getUser = async (sender_id: string, receiver_id: string): Promise<{ login: string, avatar: string, status : string }> => {
         const userId = sender_id === Cookies.get('id') ? receiver_id : sender_id;

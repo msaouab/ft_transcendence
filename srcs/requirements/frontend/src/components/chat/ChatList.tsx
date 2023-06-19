@@ -53,16 +53,24 @@ interface ChatListProps {
     setSelectedGroupChat: (chat: GroupMessage) => void,
     socket: any,
     connected: boolean
+    selected: string
+    setSelected: (selected: string) => void
 }
 
-const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, socket, connected}: ChatListProps) => {
+const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, socket, connected, selected, setSelected }: ChatListProps) => {
     return (
 
         // <ChatListWrapperStyle>
             <ChatListStyle>
                 {/* <SearchBar /> */}
-                <GroupChatList setSelectedChat={setSelectedChat} setSelectedGroupChat={setSelectedGroupChat} socket={socket} connected={connected} />
-                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+            <GroupChatList 
+                setSelectedChat={setSelectedChat} 
+                setSelectedGroupChat={setSelectedGroupChat} 
+                socket={socket} 
+                connected={connected} 
+                selected={selected} 
+                setSelected={setSelected} />
+            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected} setSelected={setSelected} />
             </ChatListStyle>
         // </ChatListWrapperStyle>
     );
