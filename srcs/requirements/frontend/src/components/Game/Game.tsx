@@ -36,7 +36,7 @@ const Game = () => {
 	const { setTypeRoom, typeRoom, setModeRoom, modeRoom, mysocket } =
 		useGameContext();
 	const location = useLocation();
-	const { user, benome } = location.state;
+	const { user, benome, width } = location.state;
 	// console.log("user:", user, "benome:", benome);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 
@@ -78,7 +78,7 @@ const Game = () => {
 			</PlayerContainer>
 			{mysocket ? (
 				<PingPong
-					// width={payload.width}
+					width={width}
 					// height={payload.height}
 				/>
 			) : (

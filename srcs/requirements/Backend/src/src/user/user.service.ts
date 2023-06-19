@@ -20,6 +20,7 @@ export class UserService {
     constructor(private prisma: PrismaService) { }
 
     async getUser(id: string) {
+        // if (!id) throw new BadRequestException('No id provided');
         const user = await this.prisma.user.findUnique({
             where: {
                 id: id,

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 // import { Socket } from "mysocket?.io-client";
 import { useGameContext } from "../../provider/GameProvider";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 interface PingPongProps {
 	width: number;
@@ -49,12 +50,14 @@ const PlayGround = styled.div`
 
 let ctx: CanvasRenderingContext2D | null;
 
+interface Iprops {
+	width: number;
+}
 // const PingPong = ({ width, height }: PingPongProps) => {
-const PingPong = () => {
+const PingPong = ({ width }: Iprops) => {
 	const navigate = useNavigate();
 	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
-	const [size, setSize] = useState<number | undefined>(0);
 	const [player1X, setPlayer1X] = useState<PlayerState>({} as PlayerState);
 	const [player2X, setPlayer2X] = useState<PlayerState>({} as PlayerState);
 	const [ball, setBall] = useState<BallState>({} as BallState);
@@ -112,6 +115,16 @@ const PingPong = () => {
 		};
 	}, [player1X, player2X, ball]);
 
+	const [width1, setWidth] = useState(0);
+
+	useEffect(() => {
+		let width = window.innerWidth;
+		const height = window.innerHeight;
+		if (width < 700) setWidth(700);
+		else setWidth(width);
+		console.log("111111111", height);
+	}, []);
+
 	useEffect(() => {
 		const resize = () => {
 			const canvas = canvasRef.current;
@@ -120,9 +133,15 @@ const PingPong = () => {
 			const calculatedHeight = (clientWidth * 16) / 9;
 			canvas.width = clientWidth;
 			canvas.height = calculatedHeight;
+			mysocket?.emit("requesteResize", {
+				width: clientWidth,
+				height: calculatedHeight,
+				userId: Cookies.get("userid"),
+			});
 		};
 
 		window.addEventListener("resize", resize);
+		resize();
 		return () => {
 			window.removeEventListener("resize", resize);
 		};
@@ -131,9 +150,10 @@ const PingPong = () => {
 	useEffect(() => {
 		if (canvasRef.current) {
 			const canvas = canvasRef.current;
-			const { clientWidth } = canvas;
+			const { clientWidth, clientHeight } = canvas;
 			const calculatedHeight = (clientWidth * 16) / 9;
 			canvas.height = calculatedHeight;
+			console.log("clientWidth:", clientWidth, "clientHeight:", clientHeight);
 		}
 	}, []);
 
@@ -157,6 +177,7 @@ const PingPong = () => {
 			const data = {
 				x: x,
 				y: y,
+				userId: Cookies.get("userid"),
 				// height: height,
 				// width: width,
 			};
@@ -215,7 +236,6 @@ const PingPong = () => {
 
 	return (
 		<PlayGround className="debug w-full max-w-[683px]">
-
 			<canvas id="myCanvas" ref={canvasRef} className="w-full" />
 		</PlayGround>
 	);

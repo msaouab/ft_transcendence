@@ -66,6 +66,7 @@ const StartGame = () => {
 	const { typeRoom, modeRoom, mysocket, setMySocket, friend } = useGameContext();
 	const [benomeId, setBenomeId] = useState("");
 	const [roomId, setRoomId] = useState("");
+	const [width, setWidth] = useState(0);
 	const [user, setUser] = useState({
 		id: "",
 		login: "",
@@ -78,18 +79,20 @@ const StartGame = () => {
 		type: typeRoom,
 		mode: modeRoom,
 		friend: friend,
+		userId: Cookies.get('id'),
 		// width: 700,
 		// height: 1000,
 	};
 
 	useEffect(() => {
 		const socket = io(`http://${HOSTNAME}:3000/game`, {
-			query: { userId: Cookies.get("id") },
+			query: {userId: Cookies.get('userid')},
 		});
 		setMySocket(socket);
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
 			socket.emit("joinRoom", payload);
+			console.log("payload", payload);
 		});
 		socket.on("disconnect", () => {
 			console.log(socket.id, "disconnected from server");
@@ -98,6 +101,17 @@ const StartGame = () => {
 		return () => {
 			// socket.disconnect();
 		};
+	}, []);
+
+	useEffect(() => {
+
+			let width = window.innerWidth;
+			const height = window.innerHeight;
+			if (width < 700)
+				setWidth(700);
+			else
+				setWidth(width);
+			console.log(width, height);
 	}, []);
 
 	useEffect(() => {
@@ -126,6 +140,7 @@ const StartGame = () => {
 					state: {
 						user: user,
 						benome: Benome,
+						width: width,
 					},
 				});
 			}

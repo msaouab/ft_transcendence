@@ -73,7 +73,7 @@ export const getRankData = async (id: string) => {
 	}
 };
 
-export const getUserInfo = async (id: string) => {
+export const getUserInfo = async (id?: string) => {
 	if (id === "" || id === undefined) {
 		return;
 	}
