@@ -15,6 +15,8 @@ import {
 } from "@material-tailwind/react";
 import Avatar from '../../components/chat/Avatar';
 import { GetChannelInfo } from '../../api/axios';
+import { useGlobalContext } from '../../provider/AppContext'
+import { GroupMessage } from '../../types/message'
 
 interface props {
     open: boolean;
@@ -22,10 +24,11 @@ interface props {
     selectedGroupChat: any;
     socket: any;
     connected: boolean;
+    setSelectedGroupChat: (chat: GroupMessage) => void;
 }
 
 
-const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: props) => {
+const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setSelectedGroupChat }: props) => {
     const [channel, setChannel] = React.useState<any>(null);
     const [channelUsers, setChannelUsers] = React.useState<any>(null);
     const [currentUser, setCurrentUser] = React.useState({} as {
@@ -39,6 +42,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     const [bannedUsers, setBannedUsers] = React.useState<any>(null);
     const [selectedUser, setSelectedUser] = React.useState<any>(null);
     const [openDialog, setOpenDialog] = React.useState(false);
+    const { setGroupChatRooms } = useGlobalContext();
 
 
     const getChannelInfo = async () => {
@@ -86,6 +90,19 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         }
         handleOpen();
     }
+    const handleKickUser = (user: any) => {
+        socket.current.emit("kickUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+        handleOpen();
+    }
+    const handleBanUser = (user: any) => {
+        if (user.role !== "Banned") {
+            socket.current.emit("banUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+        }
+        else {
+            socket.current.emit("unbanUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+        }
+        handleOpen();
+    }
 
     useEffect(() => {
         getChannelInfo();
@@ -129,6 +146,61 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                     return [...prev, data]
                 })
             });
+            socket.current.on("kickChannelUser", (data: any) => {
+                setChannelUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                if (data.id === Cookies.get('id')) {
+                    const newGroupMessage: GroupMessage = {
+                        group_id: selectedGroupChat.group_id,
+                        sender_id: selectedGroupChat.group_id,
+                        name: selectedGroupChat.name,
+                        profileImage: selectedGroupChat.profileImage,
+                        lastMessage: `${data.login} was kicked from the group`,
+                        lastMessageDate: new Date().toISOString(),
+                        role: selectedGroupChat.role,
+                    }
+                    socket.current.emit("sendGroupMessage", newGroupMessage);
+                    socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
+                    setSelectedGroupChat({} as GroupMessage);
+                    setGroupChatRooms((prev: any) => {
+                        return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
+                    })
+                }
+            });
+            socket.current.on("banChannelUser", (data: any) => {
+                setChannelUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                setBannedUsers((prev: any) => {
+                    return [...prev, data]
+                })
+                if (data.id === Cookies.get('id')) {
+                    const newGroupMessage: GroupMessage = {
+                        group_id: selectedGroupChat.group_id,
+                        sender_id: selectedGroupChat.group_id,
+                        name: selectedGroupChat.name,
+                        profileImage: selectedGroupChat.profileImage,
+                        lastMessage: `${data.login} was banned from the group`,
+                        lastMessageDate: new Date().toISOString(),
+                        role: selectedGroupChat.role,
+                    }
+                    socket.current.emit("sendGroupMessage", newGroupMessage);
+                    socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
+                    setSelectedGroupChat({} as GroupMessage);
+                    setGroupChatRooms((prev: any) => {
+                        return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
+                    })
+                }
+            });
+            socket.current.on("unbanChannelUser", (data: any) => {
+                setBannedUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                setChannelUsers((prev: any) => {
+                    return [...prev, data]
+                })
+            });
         }
         return () => {
             if (connected) {
@@ -136,6 +208,9 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 socket.current.off("removeChannelAdmin");
                 socket.current.off("muteChannelUser");
                 socket.current.off("unmuteChannelUser");
+                socket.current.off("kickChannelUser");
+                socket.current.off("banChannelUser");
+                socket.current.off("unbanChannelUser");
             }
         }
     }, [connected])
@@ -242,14 +317,14 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                                     </button>
                                                 )
                                             }
-                                            <button className={`${buttonStyle}  bg-red-800`} >
+                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleKickUser(selectedUser)} >
                                                 Kick
                                             </button>
                                             <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleMuteUser(selectedUser)}>
                                                 {selectedUser && selectedUser.role === "Muted" ? "Unmute" : "Mute"}
                                             </button>
-                                            <button className={`${buttonStyle}  bg-red-800`} >
-                                                Ban
+                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleBanUser(selectedUser)}>
+                                                {selectedUser && selectedUser.role === "Banned" ? "Unban" : "Ban"}
                                             </button>
                                         </div>
                                     </Dialog>
@@ -287,23 +362,23 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                 <div className='text-white/70 flex gap-2 flex-col [&>*]:flex [&>*]:items-center [&>*]:gap-2 overflow-y-scroll h-[45rem]'>
                                     {
                                         bannedUsers && bannedUsers.map((el: any) => (
-                                            <button key={el.user.id} className='hover:bg-white/10 active:bg-white/20 text-left flex  items-center gap-2 px-2 rounded'>
-                                                <Avatar user={el.user} className='w-8 h-8 !bg-blue-500' />
+                                            <button key={el.id} className='hover:bg-white/10 active:bg-white/20 text-left flex  items-center gap-2 px-2 rounded'>
+                                                <Avatar user={el} className='w-8 h-8 !bg-blue-500' />
                                                 <div className='flex-1 flex flex-col p-1'>
                                                     <span className='font-bold '>
-                                                        {el.user.login}
+                                                        {el.login}
                                                     </span>
                                                     <span className='text-xs text-gray-400'>
-                                                        {el.user.status}
+                                                        {el.status}
                                                     </span>
                                                 </div>
                                                 <span className=''>
-                                                    {el.user.role}
+                                                    {el.role}
                                                 </span>
                                                 {
-                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && el.user.id !== currentUser.id &&
+                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && el.id !== currentUser.id &&
                                                     <span className='tools'>
-                                                        <RxDotsVertical className='text-lg' onClick={() => console.log("hello world")} />
+                                                            <RxDotsVertical className='text-lg' onClick={handleChanelUser(el)} />
                                                     </span>
                                                 }
                                             </button>

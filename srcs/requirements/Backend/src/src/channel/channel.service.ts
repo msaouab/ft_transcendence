@@ -273,8 +273,9 @@ export class ChannelService {
                     }
                 })
                 return {
-                    user: user,
-                    status: el.status,
+                    ...user,
+                    role: "Banned",
+                    banStatus: el.status,
                     status_end_time: el.status_end_time
                 }
             }))

@@ -207,6 +207,7 @@ const Chat = () => {
         ) : (
           <GroupChatBox
             selectedGroupChat={selectedGroupChat}
+            setSelectedGroupChat={setSelectedGroupChat}
             socket={chatSocket}
             connected={connected}
             key={selectedGroupChat.group_id}

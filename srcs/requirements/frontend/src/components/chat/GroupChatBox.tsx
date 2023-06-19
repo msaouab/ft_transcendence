@@ -28,6 +28,7 @@ const GroupChatBoxStyle = styled.div`
 
 interface GroupChatBoxProps {
   selectedGroupChat: GroupMessage;
+  setSelectedGroupChat: (chat: GroupMessage) => void;
   socket: any;
   connected: boolean;
   joinedRooms: string[];
@@ -35,6 +36,7 @@ interface GroupChatBoxProps {
 
 const GroupChatBox = ({
   selectedGroupChat,
+  setSelectedGroupChat,
   socket,
   connected,
   joinedRooms,
@@ -159,7 +161,7 @@ const GroupChatBox = ({
         ) : (
           <>
             <div>
-                <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} socket={socket}
+                <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} setSelectedGroupChat={setSelectedGroupChat} socket={socket}
                   connected={connected} />
               <div className="h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60"></div>
             </div>

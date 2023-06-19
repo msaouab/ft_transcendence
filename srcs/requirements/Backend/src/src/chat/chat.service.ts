@@ -711,6 +711,121 @@ export class ChatService {
             client.emit('error', error);
         }
     }
+    async kickUser(client, payload: any, server: Server) {
+        try {
+            const { group_id, userId } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(userId, client);
+            const memberTab = await this.removeMember(client, group_id, userId);
+            if (!memberTab) {
+                const adminTab = await this.removeAdmin(client, group_id, userId);
+                if (!adminTab) {
+                    client.emit('error', 'Admin not removed');
+                }
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.delete({
+                where: {
+                    user_id_channel_id: {
+                        user_id: userId,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            server.to(group_id).emit('kickChannelUser', admin);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async banUser(client, payload: any, server: Server) {
+        try {
+            const { group_id, userId } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(userId, client);
+            const memberTab = await this.removeMember(client, group_id, userId);
+            if (!memberTab) {
+                const adminTab = await this.removeAdmin(client, group_id, userId);
+                if (!adminTab) {
+                    client.emit('error', 'Admin not removed');
+                }
+            }
+            const bannedUser = await this.prisma.bannedMembers.create({
+                data: {
+                    banned_id: userId,
+                    channel_id: group_id,
+                }
+            })
+            if (!bannedUser) {
+                client.emit('error', 'User not banned');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.delete({
+                where: {
+                    user_id_channel_id: {
+                        user_id: userId,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            const res = {
+                ...admin,
+                role: 'Banned',
+                banStatus: bannedUser.status,
+                status_end_time: bannedUser.status_end_time
+            }
+            server.to(group_id).emit('banChannelUser', res);
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async unbanUser(client, payload: any, server: Server) {
+        try {
+            const { group_id, userId } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const admin = await this.getUser(userId, client);
+            const bannedUser = await this.prisma.bannedMembers.delete({
+                where: {
+                    channel_id_banned_id: {
+                        banned_id: userId,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!bannedUser) {
+                client.emit('error', 'User not unbanned');
+            }
+            const memberTab = await this.prisma.membersTab.create({
+                data: {
+                    member_id: userId,
+                    channel_id: group_id,
+                }
+            })
+            if (!memberTab) {
+                client.emit('error', 'User not added to members');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: userId,
+                    channel_name: channel.name,
+                    channel_id: channel.id,
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            server.to(group_id).emit('unbanChannelUser', {
+                ...admin,
+                role: 'Member'
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }
 
 

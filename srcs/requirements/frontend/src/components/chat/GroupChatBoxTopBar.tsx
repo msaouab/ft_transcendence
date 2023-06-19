@@ -30,10 +30,12 @@ const GroupChatBoxTopBarStyle = styled.div`
 
 const GroupChatBoxTopBar = ({
   selectedGroupChat,
+  setSelectedGroupChat,
   socket,
   connected,
 }: {
   selectedGroupChat: GroupMessage;
+  setSelectedGroupChat: (chat: GroupMessage) => void;
   socket: any;
   connected: boolean;
 }) => {
@@ -62,7 +64,7 @@ const GroupChatBoxTopBar = ({
         <CiCircleMore size={30} />
       </div>
       {
-        open && (<ChannelInfo open={open} setOpen={setOpen} selectedGroupChat={selectedGroupChat} socket={socket}
+        open && (<ChannelInfo open={open} setOpen={setOpen} selectedGroupChat={selectedGroupChat} setSelectedGroupChat={setSelectedGroupChat} socket={socket}
           connected={connected} />)
       }
     </GroupChatBoxTopBarStyle>
