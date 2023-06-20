@@ -9,6 +9,13 @@ import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
 import { HOSTNAME } from "../../api/axios";
 import Cookies from "js-cookie";
+
+
+
+import { getAvatarUrl } from "../../components/common/CommonFunc";
+import { singleMessage } from "../../types/message";
+import axios from "axios";
+
 const ChatStyle = Styled.div`
   display: flex;
   flex-direction: row;
@@ -105,11 +112,6 @@ const Chat = () => {
         setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
       });
     });
-    // chatSocket.current.on('connect', () => {
-    // });
-    
-       
-    
 
     chatSocket.current.on("roomJoined", () => {
       console.log("room joined");
@@ -119,16 +121,16 @@ const Chat = () => {
     setChatNotif(0);
 
   
-    return () => {
-      console.log("disconnected from the server");
-      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("leaving the room: ", groupChatRoom.group_id);
-        chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
-        setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
-      });
-      chatSocket.current.disconnect();
-      setConnected(false);
-    };
+    // return () => {
+    //   console.log("disconnected from the server");
+    //   groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+    //     console.log("leaving the room: ", groupChatRoom.group_id);
+    //     chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+    //     setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+    //   });
+    //   chatSocket.current.disconnect();
+    //   setConnected(false);
+    // };
 
 
   }, []);
@@ -186,6 +188,73 @@ const Chat = () => {
       setSelectedChat({} as PrivateMessage);
     }
   }, [privateChatRooms.length]);
+
+
+  const {setPrivateChatRooms} = useGlobalContext();
+  useEffect(() => {
+    if (connected) {
+      chatSocket.current.on("newPrivateMessage", (message: any) => {
+        const getUser = async (
+					sender_id: string,
+					receiver_id: string
+				): Promise<{ login: string; avatar: string; status: string }> => {
+					const userId =
+						sender_id === Cookies.get("id") ? receiver_id : sender_id;
+                    const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
+					const user = await axios.get(
+						url
+					);
+					const avatar = getAvatarUrl();
+					return {
+						login: user.data.login,
+						avatar: avatar,
+						status: user.data.status,
+					};
+				};
+        const checkNew = async () => {
+					if (
+						!privateChatRooms.find(
+							(chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
+						) &&
+						message.sender_id !== Cookies.get("id")
+					) {
+						// const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
+						// // co
+						// const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
+						const { login, avatar, status } = await getUser(
+							message.sender_id,
+							message.receiver_id
+						);
+						const newPrivatRoom: PrivateMessage = {
+							chatRoomid: message.chatRoom_id,
+							messageId: message.id,
+							sender_id: message.sender_id,
+							receiver_id: message.receiver_id,
+							lastMessage: message.content,
+							lastMessageDate: message.dateCreated,
+							seen: message.seen,
+							login: login,
+							profileImage: avatar,
+							blocked: false,
+							status: status,
+						};
+						setPrivateChatRooms((prevState: any) => [
+							...prevState,
+							newPrivatRoom,
+						]);
+					}
+				};
+				checkNew();
+      });
+    }
+  }, [connected]);
+
+
+  // here
+
+
+
+
   return (
     <ChatStyle>
       <div className="chat-list">
@@ -202,6 +271,7 @@ const Chat = () => {
       <div className="chat-box-wrapper">
         {selectedChat.chatRoomid ? (
           <ChatBox
+         
             selectedChat={selectedChat}
             key={selectedChat.chatRoomid}
             size="big"

@@ -70,7 +70,7 @@ const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, soc
                 connected={connected} 
                 selected={selected} 
                 setSelected={setSelected} />
-            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected} setSelected={setSelected} />
+            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage}/>
             </ChatListStyle>
         // </ChatListWrapperStyle>
     );

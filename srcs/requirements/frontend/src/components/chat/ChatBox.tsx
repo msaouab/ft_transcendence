@@ -42,12 +42,17 @@ const ChatBox = ({
 	setNewLatestMessage,
 	chatSocket,
 	connected,
+	
+
 }: {
 	selectedChat: PrivateMessage;
 	size: string;
 	setNewLatestMessage?: any;
 	chatSocket: any;
 	connected: boolean;
+	
+
+
 }) => {
 	let initialState = {
 		messages: [] as singleMessage[],
@@ -82,62 +87,64 @@ const ChatBox = ({
 	};
 
 	useEffect(() => {
+		console.log("chatbox useeffect");
 		if (connected) {
+			console.log("chatbox useeffect connected");
 			chatSocket.current.on("newPrivateMessage", (message: any) => {
-				console.log("new private message", message);
-				// if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
-				const getUser = async (
-					sender_id: string,
-					receiver_id: string
-				): Promise<{ login: string; avatar: string; status: string }> => {
-					const userId =
-						sender_id === Cookies.get("id") ? receiver_id : sender_id;
-                    const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
-					const user = await axios.get(
-						url
-					);
-					const avatar = getAvatarUrl();
-					return {
-						login: user.data.login,
-						avatar: avatar,
-						status: user.data.status,
-					};
-				};
-				// getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
-				const checkNew = async () => {
-					if (
-						!privateChatRooms.find(
-							(chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
-						) &&
-						message.sender_id !== Cookies.get("id")
-					) {
-						// const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
-						// // co
-						// const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
-						const { login, avatar, status } = await getUser(
-							message.sender_id,
-							message.receiver_id
-						);
-						const newPrivatRoom: PrivateMessage = {
-							chatRoomid: message.chatRoom_id,
-							messageId: message.id,
-							sender_id: message.sender_id,
-							receiver_id: message.receiver_id,
-							lastMessage: message.content,
-							lastMessageDate: message.dateCreated,
-							seen: message.seen,
-							login: login,
-							profileImage: avatar,
-							blocked: false,
-							status: status,
-						};
-						setPrivateChatRooms((prevState: any) => [
-							...prevState,
-							newPrivatRoom,
-						]);
-					}
-				};
-				checkNew();
+				// console.log("new private message", message);
+				// // if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
+				// const getUser = async (
+				// 	sender_id: string,
+				// 	receiver_id: string
+				// ): Promise<{ login: string; avatar: string; status: string }> => {
+				// 	const userId =
+				// 		sender_id === Cookies.get("id") ? receiver_id : sender_id;
+                //     const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
+				// 	const user = await axios.get(
+				// 		url
+				// 	);
+				// 	const avatar = getAvatarUrl();
+				// 	return {
+				// 		login: user.data.login,
+				// 		avatar: avatar,
+				// 		status: user.data.status,
+				// 	};
+				// };
+				// // getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
+				// const checkNew = async () => {
+				// 	if (
+				// 		!privateChatRooms.find(
+				// 			(chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
+				// 		) &&
+				// 		message.sender_id !== Cookies.get("id")
+				// 	) {
+				// 		// const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
+				// 		// // co
+				// 		// const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
+				// 		const { login, avatar, status } = await getUser(
+				// 			message.sender_id,
+				// 			message.receiver_id
+				// 		);
+				// 		const newPrivatRoom: PrivateMessage = {
+				// 			chatRoomid: message.chatRoom_id,
+				// 			messageId: message.id,
+				// 			sender_id: message.sender_id,
+				// 			receiver_id: message.receiver_id,
+				// 			lastMessage: message.content,
+				// 			lastMessageDate: message.dateCreated,
+				// 			seen: message.seen,
+				// 			login: login,
+				// 			profileImage: avatar,
+				// 			blocked: false,
+				// 			status: status,
+				// 		};
+				// 		setPrivateChatRooms((prevState: any) => [
+				// 			...prevState,
+				// 			newPrivatRoom,
+				// 		]);
+				// 	}
+				// };
+				// checkNew();
 				setState((prevState: any) => ({
 					...prevState,
 					messages: [message, ...prevState.messages],
@@ -145,9 +152,9 @@ const ChatBox = ({
 				updateSeenStatus([message]);
 			});
 		}
-		return () => {
-			chatSocket.current.off("newPrivateMessage");
-		};
+		// return () => {
+		// 	chatSocket.current.off("newPrivateMessage");
+		// };
 	}, [connected]);
 
 	const { chatRoomid } = selectedChat;
