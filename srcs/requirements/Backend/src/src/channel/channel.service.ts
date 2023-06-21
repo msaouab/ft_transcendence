@@ -274,6 +274,7 @@ export class ChannelService {
                 })
                 return {
                     ...user,
+                    group_id: channelId,
                     role: "Banned",
                     banStatus: el.status,
                     status_end_time: el.status_end_time
@@ -373,6 +374,7 @@ export class ChannelService {
                 })
                 return {
                     ...user,
+                    group_id: channelId,
                     role: "Muted",
                     muteStatus: el.status,
                     status_end_time: el.status_end_time
@@ -565,6 +567,7 @@ export class ChannelService {
                     avatar: el.user.avatar,
                     status: el.user.status,
                     role: el.role,
+                    group_id: channelId,
                 });
             }
             return subscribers;

@@ -603,7 +603,13 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('newChannelAdmin', admin);
+            server.to(group_id).emit('newChannelAdmin', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
@@ -637,7 +643,13 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('removeChannelAdmin', admin);
+            server.to(group_id).emit('removeChannelAdmin', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
@@ -678,7 +690,11 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             const res = {
-                ...admin,
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
                 role: 'Muted',
                 muteStatus: mutedUser.status,
                 status_end_time: mutedUser.status_end_time
@@ -718,7 +734,14 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('unmuteChannelUser', admin);
+            server.to(group_id).emit('unmuteChannelUser', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+                role: 'Member',
+            });
         } catch (error) {
             client.emit('error', error);
         }
@@ -746,7 +769,13 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('kickChannelUser', admin);
+            server.to(group_id).emit('kickChannelUser', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
@@ -784,7 +813,11 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             const res = {
-                ...admin,
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
                 role: 'Banned',
                 banStatus: bannedUser.status,
                 status_end_time: bannedUser.status_end_time
@@ -830,9 +863,14 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
+            console.log('unbanUser: ', admin);
             server.to(group_id).emit('unbanChannelUser', {
-                ...admin,
-                role: 'Member'
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                role: 'Member',
+                group_id: group_id
             });
         } catch (error) {
             client.emit('error', error);

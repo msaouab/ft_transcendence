@@ -7,6 +7,7 @@ import GroupSendMessageBox from "./GroupSendMessageBox";
 import { GetChannelMessages } from "../../api/axios";
 import GroupChatInfiniteScroll from "./GroupChatInfiniteScroll";
 import { useGlobalContext } from "../../provider/AppContext";
+import Cookies from 'js-cookie';
 
 
 const GroupChatBoxStyle = styled.div`
@@ -52,7 +53,7 @@ const GroupChatBox = ({
   const [totalMessages, setTotalMessages] = React.useState(0);
   const [state, setState] = React.useState(intialState);
   const { messages, hasMore, offset } = state;
-  const {  setGroupChatRooms } = useGlobalContext();
+  const { setGroupChatRooms } = useGlobalContext();
   let limit = 20;
 
 
@@ -202,11 +203,11 @@ const GroupChatBox = ({
             />
             {
               selectedGroupChat.role !== "Muted" && (
-                  <GroupSendMessageBox
-                    selectedGroupChat={selectedGroupChat}
-                    socket={socket}
-                    connected={connected}
-                  />
+                <GroupSendMessageBox
+                  selectedGroupChat={selectedGroupChat}
+                  socket={socket}
+                  connected={connected}
+                />
               )
             }
           </>

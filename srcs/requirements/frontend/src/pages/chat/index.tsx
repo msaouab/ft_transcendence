@@ -268,6 +268,94 @@ const Chat = () => {
 
   // here
 
+  useEffect(() => {
+    if (connected)
+    {
+      chatSocket.current.on("newChannelAdmin", (message: any) => {
+        if (message.id === Cookies.get("id")) {
+          const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+          setSelectedGroupChat({
+            ...channel,
+            role: "Admin",
+          });
+          setGroupChatRooms((prev: any) => {
+            return prev.map((chat: any) => {
+              if (chat.group_id === message.group_id) {
+                return { ...chat, role: "Admin" }
+              }
+              return chat;
+            })
+          });
+        }
+      });
+      chatSocket.current.on("removeChannelAdmin", (message: any) => {
+        if (message.id === Cookies.get("id")) {
+          const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+          setSelectedGroupChat({
+            ...channel,
+            role: "Member",
+          });
+          setGroupChatRooms((prev: any) => {
+            return prev.map((chat: any) => {
+              if (chat.group_id === message.group_id) {
+                return { ...chat, role: "Member" }
+              }
+              return chat;
+            })
+          });
+        }
+      });
+      chatSocket.current.on("muteChannelUser", (message: any) => {
+        if (message.id === Cookies.get("id")) {
+          const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+          setSelectedGroupChat({
+            ...channel,
+            role: "Muted",
+          });
+          setGroupChatRooms((prev: any) => {
+            return prev.map((chat: any) => {
+              if (chat.group_id === message.group_id) {
+                return { ...chat, role: "Muted" }
+              }
+              return chat;
+            })
+          });
+        }
+      });
+      chatSocket.current.on("unmuteChannelUser", (message: any) => {
+        if (message.id === Cookies.get("id")) {
+          const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+          setSelectedGroupChat({
+            ...channel,
+            role: "Member",
+          });
+          setGroupChatRooms((prev: any) => {
+            return prev.map((chat: any) => {
+              if (chat.group_id === message.group_id) {
+                return { ...chat, role: "Member" }
+              }
+              return chat;
+            })
+          });
+        }
+      });
+      chatSocket.current.on("kickChannelUser", (message: any) => {
+        if (message.id === Cookies.get("id")) {
+          setSelectedGroupChat({} as GroupMessage);
+          setGroupChatRooms((prev: any) => {
+            return prev.filter((group: any) => group.group_id !== message.group_id)
+          })
+        }
+      });
+    }
+    return () => {
+      chatSocket.current.off("newChannelAdmin");
+      chatSocket.current.off("removeChannelAdmin");
+      chatSocket.current.off("muteChannelUser");
+      chatSocket.current.off("unmuteChannelUser");
+      chatSocket.current.off("kickChannelUser");
+    }
+  }, [connected]);
 
 
 

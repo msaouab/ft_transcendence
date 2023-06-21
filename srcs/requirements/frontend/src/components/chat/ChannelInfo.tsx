@@ -55,6 +55,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                     return data.id === currentUserId
                 });
             }
+            console.log("channel subscribers", res.subscribers[0]);
             setCurrentUser(currentUser);
             setChannel(res.channel);
             setChannelUsers(res.subscribers);
@@ -111,6 +112,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
     useEffect(() => {
         if (connected) {
             socket.current.on("newChannelAdmin", (data: any) => {
+                console.log("newChannelAdmin: ", data);
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
                         return { ...prev, role: "Admin" }
@@ -127,6 +129,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
             });
             socket.current.on("removeChannelAdmin", (data: any) => {
+                console.log("removeChannelAdmin: ", data);
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
                         return { ...prev, role: "Member" }
@@ -143,6 +146,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
             });
             socket.current.on("muteChannelUser", (data: any) => {
+                console.log("muteChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -151,26 +155,13 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
-                        setSelectedGroupChat((prev: any) => {
-                            if (prev.group_id === selectedGroupChat.group_id) {
-                                return { ...prev, role: "Muted" }
-                            }
-                            return prev;
-                        });
-                        setGroupChatRooms((prev: any) => {
-                            return prev.map((chat: any) => {
-                                if (chat.group_id === selectedGroupChat.group_id) {
-                                    return { ...chat, role: "Muted" }
-                                }
-                                return chat;
-                            })
-                        });
                         return { ...prev, role: "Muted" }
                     }
                     return prev;
                 })
             });
             socket.current.on("unmuteChannelUser", (data: any) => {
+                console.log("unmuteChannelUser: ", data);
                 setMutedUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -179,48 +170,36 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
-                        setSelectedGroupChat((prev: any) => {
-                            if (prev.group_id === selectedGroupChat.group_id) {
-                                return { ...prev, role: "Member" }
-                            }
-                            return prev;
-                        });
-                        setGroupChatRooms((prev: any) => {
-                            return prev.map((chat: any) => {
-                                if (chat.group_id === selectedGroupChat.group_id) {
-                                    return { ...chat, role: "Member" }
-                                }
-                                return chat;
-                            })
-                        });
                         return { ...prev, role: "Member" }
                     }
                     return prev;
                 })
             });
             socket.current.on("kickChannelUser", (data: any) => {
+                console.log("kickChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
-                if (data.id === Cookies.get('id')) {
-                    const newGroupMessage: GroupMessage = {
-                        group_id: selectedGroupChat.group_id,
-                        sender_id: selectedGroupChat.group_id,
-                        name: selectedGroupChat.name,
-                        profileImage: selectedGroupChat.profileImage,
-                        lastMessage: `${data.login} was kicked from the group`,
-                        lastMessageDate: new Date().toISOString(),
-                        role: selectedGroupChat.role,
-                    }
-                    socket.current.emit("sendGroupMessage", newGroupMessage);
-                    socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
-                    setSelectedGroupChat({} as GroupMessage);
-                    setGroupChatRooms((prev: any) => {
-                        return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
-                    })
-                }
+                // if (data.id === Cookies.get('id')) {
+                //     const newGroupMessage: GroupMessage = {
+                //         group_id: selectedGroupChat.group_id,
+                //         sender_id: selectedGroupChat.group_id,
+                //         name: selectedGroupChat.name,
+                //         profileImage: selectedGroupChat.profileImage,
+                //         lastMessage: `${data.login} was kicked from the group`,
+                //         lastMessageDate: new Date().toISOString(),
+                //         role: selectedGroupChat.role,
+                //     }
+                //     socket.current.emit("sendGroupMessage", newGroupMessage);
+                //     socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
+                //     setSelectedGroupChat({} as GroupMessage);
+                //     setGroupChatRooms((prev: any) => {
+                //         return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
+                //     })
+                // }
             });
             socket.current.on("banChannelUser", (data: any) => {
+                console.log("banChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -246,6 +225,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 }
             });
             socket.current.on("unbanChannelUser", (data: any) => {
+                console.log("unbanChannelUser: ", data);
                 setBannedUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
