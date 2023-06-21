@@ -106,7 +106,6 @@ export class GameGateway
 		this.roomMap.forEach(async (value, key) => {
 			const userId =
 				client.id === value.socket[0].id ? value.player1.id : value.player2.id;
-			console.log("userId:", value, key);
 			if (
 				value.mode !== "Bot" &&
 				// (value.player1.id === client.handshake.query.userId ||
@@ -207,7 +206,6 @@ export class GameGateway
 				this.roomMap.delete(key);
 			}
 		});
-		console.log("roomMap:", this.roomMap);
 	}
 
 	RoundScore(roomId: string): boolean {
@@ -437,9 +435,6 @@ export class GameGateway
 
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
-		console.log("data:", data);
-		// if (client.handshake.query.userId === undefined) return;
-		// const playerId = client.handshake.query.userId?.toString();
 		const roomId = await this.getRoom(
 			data.userId || client.handshake.query.userId
 		);
@@ -850,7 +845,6 @@ export class GameGateway
 
 	@SubscribeMessage("joinRoom")
 	async handelJoinRoom(client: Socket, payload: any) {
-		console.log(client.handshake.query);
 		const userId = payload.playerId;
 		if (!payload.mode) payload.mode = "Random";
 		if (!payload.type) payload.type = "Time";
@@ -926,43 +920,13 @@ export class GameGateway
 		// room.player2.paddle1.y = 10;
 		room.player2.paddle2.x = data.width / 2 - 40;
 		room.player2.paddle2.y = data.height - 20;
-		this.server.to(room.socket[0].id).emit("responseMouse", room.player1.paddle2);
-		this.server.to(room.socket[1].id).emit("responseMouse", room.player2.paddle2);
 		this.server.to(room.socket[0].id).emit("responsePlayer2", room.player1.paddle1);
-		this.server.to(room.socket[1].id).emit("responsePlayer2", room.player2.paddle1);
+		this.server.to(room.socket[0].id).emit("responseMouse", room.player1.paddle2);
+		if (room.socket.length === 2) {
+			this.server.to(room.socket[1].id).emit("responsePlayer2", room.player2.paddle1);
+			this.server.to(room.socket[1].id).emit("responseMouse", room.player2.paddle2);
+		}
 		// this.server.to(room.socket[0].id).emit("responseResize", data);
 		// this.server.to(room.socket[1].id).emit("responseResize", data);
 	}
 }
-// player1: {
-// 	id: playerId,
-// 	score: 0,
-// 	paddle1: {
-// 		x: payload.width / 2 - 40,
-// 		y: 10,
-// 		width: 80,
-// 		height: 10,
-// 	},
-// 	paddle2: {
-// 		x: payload.width / 2 - 40,
-// 		y: payload.height - 20,
-// 		width: 80,
-// 		height: 10,
-// 	},
-// },
-// player2: {
-// 	id: payload.friend,
-// 	score: 0,
-// 	paddle1: {
-// 		x: payload.width / 2 - 40,
-// 		y: 10,
-// 		width: 80,
-// 		height: 10,
-// 	},
-// 	paddle2: {
-// 		x: payload.width / 2 - 40,
-// 		y: payload.height - 20,
-// 		width: 80,
-// 		height: 10,
-// 	},
-// },

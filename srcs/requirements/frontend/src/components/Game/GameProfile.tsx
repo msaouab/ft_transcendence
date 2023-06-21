@@ -70,7 +70,7 @@ const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
 		return () => {
 			setUserImg("");
 		};
-	}, []);
+	}, [user]);
 
 	return (
 		<PlayerContainer isFirst={isFirst}>

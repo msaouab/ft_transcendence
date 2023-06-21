@@ -92,7 +92,6 @@ const StartGame = () => {
 		socket.on("connect", () => {
 			console.log(socket.id, "connected to server");
 			socket.emit("joinRoom", payload);
-			console.log("payload", payload);
 		});
 		socket.on("disconnect", () => {
 			console.log(socket.id, "disconnected from server");
@@ -111,7 +110,6 @@ const StartGame = () => {
 				setWidth(700);
 			else
 				setWidth(width);
-			console.log(width, height);
 	}, []);
 
 	useEffect(() => {
@@ -135,7 +133,6 @@ const StartGame = () => {
 			}
 			if (Benome && roomId) {
 				isReal = true;
-				console.log("navigating", isReal)
 				navigate(`/game/${roomId}`, {
 					state: {
 						user: user,
@@ -153,11 +150,10 @@ const StartGame = () => {
 		getAllData();
 		return () => {
 			if (!isReal) {
-				console.log("disconnecting", isReal)
 				mysocket?.disconnect();
 			}
 		};
-	}, [mysocket, benomeId]);
+	}, [mysocket, benomeId, userId]);
 
 	return (
 		<StartGameContainer>

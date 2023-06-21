@@ -233,7 +233,6 @@ export const updateUserStatus = async (id: string, status: string) => {
       const res = await instance.put("/User/" + id + "/updatestatus", {
         status,
       });
-      console.log("r000000 ",res.data);
       return res.data;
     } catch (err) {
       console.log(err);

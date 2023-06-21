@@ -75,7 +75,6 @@ import { PutStatusDto } from "./dto/put.status.dto";
     // @UseGuards(AuthenticatedGuard, UserExistsGuard)
     @UseGuards(UserExistsGuard)
     async getGroupChat(@Param("id") id: string) {
-      console.log("getGroupChat");
     }
   
     @Get(":id/rankData")
@@ -169,7 +168,6 @@ import { PutStatusDto } from "./dto/put.status.dto";
     @Get(":id/notifications")
     @UseGuards(AuthenticatedGuard)
     async getUnseenNotifications(@User() user: Profile) {
-      console.log("getUnseenNotifications")
       return await this.userService.getUnseenNotifications(user);
     }
 

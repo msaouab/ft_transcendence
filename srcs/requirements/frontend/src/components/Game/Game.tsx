@@ -37,7 +37,6 @@ const Game = () => {
 		useGameContext();
 	const location = useLocation();
 	const { user, benome, width } = location.state;
-	// console.log("user:", user, "benome:", benome);
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 
 	const payload = {
@@ -59,12 +58,12 @@ const Game = () => {
 		};
 	}, [mysocket]);
 
+
 	// useEffect(() => {
 		// const RoomType = localStorage.getItem("typeRoom");
 		// const RoomMode = localStorage.getItem("modeRoom");
 		// if (RoomType) setTypeRoom(RoomType);
 		// if (RoomMode) setModeRoom(RoomMode);
-		// console.log("2 - mysocket", mysocket);
 	// }, [typeRoom, mysocket]);
 
 	return (

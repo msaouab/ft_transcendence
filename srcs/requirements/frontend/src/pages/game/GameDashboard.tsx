@@ -131,25 +131,25 @@ const HistoryCard = ({ history }: any) => {
 
 	return (
 		<div className="flex justify-between p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
-			<div className="user flex justify-center items-center gap-2">
-				<div className="image">
+			<div className="user flex justify-center items-center gap-2 ">
+				<div className="image w-[45px]">
 					<img
 						src={userImg}
 						alt=""
-						width={45}
-						className="box-border rounded-full aspect-square"
+						
+						className="box-border rounded-full aspect-square w-[100%]"
 					/>
 				</div>
-				<div className="name text-2xl font-[800]">{user.login}</div>
+				<div className="name text-xl font-[500]">{user.login}</div>
 			</div>
-			<div className="score flex gap-5">
-				<div className="text-2xl font-[800]">{player1_pts}</div>
+			<div className="score flex gap-5 text-deep-orange-500">
+				<div className="text-2xl font-[700]">{player1_pts}</div>
 				<p className="border-t-[3px]"> - </p>
-				<div className="text-2xl font-[800]">{player2_pts}</div>
+				<div className="text-2xl font-[700]">{player2_pts}</div>
 			</div>
 			<div className="benome flex justify-center items-center gap-2">
-				<div className="name text-2xl font-[800]">{Benome.login}</div>
-				<div className="image">
+				<div className="name text-xl font-[500]">{Benome.login}</div>
+				<div className="image w-[45px]">
 					<img
 						src={userImg}
 						alt=""
@@ -297,13 +297,11 @@ const GameDashboard = () => {
 		const fetchAllLiveGames = async (): Promise<void> => {
 			const games = await getLiveGame();
 			setLiveGames(games);
-			console.log("games", games);
 		};
 
 		fetchAllHistoryGames();
 		fetchAllLiveGames();
 	}, []);
-	console.log("liveGames", liveGames);
 
 	const Main = styled.div`
 		@media (max-width: 1200px) {
@@ -441,7 +439,7 @@ const GameDashboard = () => {
 					<div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
 						Live Games
 					</div>
-					<div className="achiv-container flex justify-center items-center gap-10   m-auto min-h-[15rem]">
+					<div className="achiv-container flex justify-center items-center gap-10   m-auto min-h-[15rem] ">
 						{liveGames ? (
 							<div className="h-[90%] w-full ">
 								<SwiperComponent

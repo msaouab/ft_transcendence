@@ -88,7 +88,6 @@ const PingPong = ({ width }: Iprops) => {
 			const canvas = canvasRef.current;
 			const width = canvas.clientWidth;
 			const height = canvas.clientHeight;
-			// console.log("width:", width, "height:", height)
 			ctx = canvas.getContext("2d");
 			if (ctx) {
 				ctx.beginPath();
@@ -107,7 +106,6 @@ const PingPong = ({ width }: Iprops) => {
 				drawPlayer(player2X);
 				// ball
 				drawBall(ball);
-				// console.log("ball:", ball);
 			}
 		}
 		return () => {
@@ -122,7 +120,6 @@ const PingPong = ({ width }: Iprops) => {
 		const height = window.innerHeight;
 		if (width < 700) setWidth(700);
 		else setWidth(width);
-		console.log("111111111", height);
 	}, []);
 
 	useEffect(() => {
@@ -153,7 +150,6 @@ const PingPong = ({ width }: Iprops) => {
 			const { clientWidth, clientHeight } = canvas;
 			const calculatedHeight = (clientWidth * 16) / 9;
 			canvas.height = calculatedHeight;
-			console.log("clientWidth:", clientWidth, "clientHeight:", clientHeight);
 		}
 	}, []);
 
@@ -181,7 +177,6 @@ const PingPong = ({ width }: Iprops) => {
 				// height: height,
 				// width: width,
 			};
-			// console.log("data:", data)
 			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
 			else mysocket?.emit("requesteMouse", data);
 		};
@@ -219,14 +214,11 @@ const PingPong = ({ width }: Iprops) => {
 
 	useEffect(() => {
 		mysocket?.on("StartTime", (time) => {
-			console.log(time);
 		});
 		mysocket?.on("responseBall", (ball) => {
 			setBall(ball);
-			// console.log("setball:", ball)
 		});
 		mysocket?.on("responseWinner", (winner) => {
-			console.log(winner);
 			navigate("/game");
 		});
 		return () => {

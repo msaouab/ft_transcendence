@@ -148,8 +148,6 @@ export class BlockedUsersService {
 
 
     async deleteBlockedUser(id: string, blockedUserId: string): Promise<BlockTab> {
-        console.log("The blocker is : ", id);
-        console.log("The blocked is : ", blockedUserId);
         if (!id || !blockedUserId) {
             throw new Error("Missing id or blockedUserId");
         }
