@@ -111,6 +111,12 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
     useEffect(() => {
         if (connected) {
             socket.current.on("newChannelAdmin", (data: any) => {
+                setCurrentUser((prev: any) => {
+                    if (prev.id === data.id) {
+                        return { ...prev, role: "Admin" }
+                    }
+                    return prev;
+                })
                 setChannelUsers((prev: any) => {
                     return prev.map((user: any) => {
                         if (user.id === data.id) {
@@ -121,6 +127,12 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
             });
             socket.current.on("removeChannelAdmin", (data: any) => {
+                setCurrentUser((prev: any) => {
+                    if (prev.id === data.id) {
+                        return { ...prev, role: "Member" }
+                    }
+                    return prev;
+                })
                 setChannelUsers((prev: any) => {
                     return prev.map((user: any) => {
                         if (user.id === data.id) {
@@ -270,7 +282,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                         </TabsHeader>
                         <TabsBody>
                             <TabPanel value={'Subscribers'}>
-                                <div className='text-white/70 flex gap-2 flex-col [&>*]:flex [&>*]:items-center [&>*]:gap-2 overflow-y-scroll h-[45rem]'>
+                                <div className='text-white/70 flex gap-2 flex-col [&>*]:flex [&>*]:items-center [&>*]:gap-2 overflow-y-scroll h-[35rem]'>
                                     {
                                         channelUsers && channelUsers.map((user: any) => (
                                             <button key={user.id} className='hover:bg-white/10 active:bg-white/20 text-left flex  items-center gap-2 px-2 rounded'>
@@ -287,7 +299,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                                                     {user.role}
                                                 </span>
                                                 {
-                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && user.id !== currentUser.id &&
+                                                    (currentUser.role === "Owner" || currentUser.role === "Admin") && user.id !== currentUser.id && user.role !== "Owner" &&
                                                     <span className='tools'>
                                                         <RxDotsVertical className='text-lg' onClick={handleChanelUser(user)} />
                                                     </span>
@@ -378,7 +390,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                                                 {
                                                     (currentUser.role === "Owner" || currentUser.role === "Admin") && el.id !== currentUser.id &&
                                                     <span className='tools'>
-                                                            <RxDotsVertical className='text-lg' onClick={handleChanelUser(el)} />
+                                                        <RxDotsVertical className='text-lg' onClick={handleChanelUser(el)} />
                                                     </span>
                                                 }
                                             </button>
