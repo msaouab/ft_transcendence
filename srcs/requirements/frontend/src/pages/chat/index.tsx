@@ -83,27 +83,28 @@ const Chat = () => {
     {} as PrivateMessage
   );
   const [joinedRooms, setJoinedRooms] = React.useState([] as string[]);
-  const [selectedGroupChat, setSelectedGroupChat] = React.useState <GroupMessage>( {} as GroupMessage );
+  const [selectedGroupChat, setSelectedGroupChat] = React.useState<GroupMessage>({} as GroupMessage);
   const [newLatestMessage, setNewLatestMessage] = React.useState<{
     chatRoomId: string;
     message: string;
   }>({} as { chatRoomId: string; message: string });
   const { privateChatRooms, groupChatRooms, setChatNotif } = useGlobalContext();
   const [selected, setSelected] = React.useState("");
+  const { setGroupChatRooms } = useGlobalContext();
 
 
   useEffect(() => {
     // socket connection
     if (!connected) {
-      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`); 
-   
+      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
+
     }
 
     chatSocket.current.on('connect', () => {
-    
+
       // chatSocket.current.emit('alive', {id: Cookies.get("id")});
       setConnected(true);
-      chatSocket.current.emit('alive', {id: Cookies.get("id")} );
+      chatSocket.current.emit('alive', { id: Cookies.get("id") });
       console.log("connected to the server");
       console.log("groupChatRooms: ", groupChatRooms);
       groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
@@ -120,7 +121,7 @@ const Chat = () => {
     Cookies.set("chatNotif", "0");
     setChatNotif(0);
 
-  
+
     // return () => {
     //   console.log("disconnected from the server");
     //   groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
@@ -190,62 +191,77 @@ const Chat = () => {
   }, [privateChatRooms.length]);
 
 
-  const {setPrivateChatRooms} = useGlobalContext();
+  const { setPrivateChatRooms } = useGlobalContext();
   useEffect(() => {
     if (connected) {
       chatSocket.current.on("newPrivateMessage", (message: any) => {
         const getUser = async (
-					sender_id: string,
-					receiver_id: string
-				): Promise<{ login: string; avatar: string; status: string }> => {
-					const userId =
-						sender_id === Cookies.get("id") ? receiver_id : sender_id;
-                    const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
-					const user = await axios.get(
-						url
-					);
-					const avatar = getAvatarUrl();
-					return {
-						login: user.data.login,
-						avatar: avatar,
-						status: user.data.status,
-					};
-				};
+          sender_id: string,
+          receiver_id: string
+        ): Promise<{ login: string; avatar: string; status: string }> => {
+          const userId =
+            sender_id === Cookies.get("id") ? receiver_id : sender_id;
+          const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
+          const user = await axios.get(
+            url
+          );
+          const avatar = getAvatarUrl();
+          return {
+            login: user.data.login,
+            avatar: avatar,
+            status: user.data.status,
+          };
+        };
         const checkNew = async () => {
-					if (
-						!privateChatRooms.find(
-							(chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
-						) &&
-						message.sender_id !== Cookies.get("id")
-					) {
-						// const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
-						// // co
-						// const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
-						const { login, avatar, status } = await getUser(
-							message.sender_id,
-							message.receiver_id
-						);
-						const newPrivatRoom: PrivateMessage = {
-							chatRoomid: message.chatRoom_id,
-							messageId: message.id,
-							sender_id: message.sender_id,
-							receiver_id: message.receiver_id,
-							lastMessage: message.content,
-							lastMessageDate: message.dateCreated,
-							seen: message.seen,
-							login: login,
-							profileImage: avatar,
-							blocked: false,
-							status: status,
-						};
-						setPrivateChatRooms((prevState: any) => [
-							...prevState,
-							newPrivatRoom,
-						]);
-					}
-				};
-				checkNew();
+          if (
+            !privateChatRooms.find(
+              (chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
+            ) &&
+            message.sender_id !== Cookies.get("id")
+          ) {
+            // const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
+            // // co
+            // const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
+            const { login, avatar, status } = await getUser(
+              message.sender_id,
+              message.receiver_id
+            );
+            const newPrivatRoom: PrivateMessage = {
+              chatRoomid: message.chatRoom_id,
+              messageId: message.id,
+              sender_id: message.sender_id,
+              receiver_id: message.receiver_id,
+              lastMessage: message.content,
+              lastMessageDate: message.dateCreated,
+              seen: message.seen,
+              login: login,
+              profileImage: avatar,
+              blocked: false,
+              status: status,
+            };
+            setPrivateChatRooms((prevState: any) => [
+              ...prevState,
+              newPrivatRoom,
+            ]);
+          }
+        };
+        checkNew();
       });
+      chatSocket.current.on("newMessageG", (message: any) => {
+        setSelectedChat({} as PrivateMessage);
+        setSelectedGroupChat(message);
+        setSelected(message.group_id);
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+          if (index === -1) {
+            return [message, ...prev];
+          }
+          return prev;
+        });
+      });
+    }
+    return () => {
+      chatSocket.current.off("newMessageG");
     }
   }, [connected]);
 
@@ -271,7 +287,7 @@ const Chat = () => {
       <div className="chat-box-wrapper">
         {selectedChat.chatRoomid ? (
           <ChatBox
-         
+
             selectedChat={selectedChat}
             key={selectedChat.chatRoomid}
             size="big"

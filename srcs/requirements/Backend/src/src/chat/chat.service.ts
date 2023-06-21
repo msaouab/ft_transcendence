@@ -838,4 +838,62 @@ export class ChatService {
             client.emit('error', error);
         }
     }
+    async joinPrivateChannel(client, payload: any, server: Server) {
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const memberTab = await this.prisma.membersTab.create({
+                data: {
+                    member_id: user_id,
+                    channel_id: group_id,
+                }
+            })
+            if (!memberTab) {
+                client.emit('error', 'User not added to members');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: user_id,
+                    channel_name: channel.name,
+                    channel_id: channel.id,
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            await this.joinGroupChatRoom(client, { group_id: channel.id }, server);
+            client.emit('newMember', {
+                channel: channel,
+                user: user,
+                role: 'Member',
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async sendMessageG(client, payload: any, server: Server) {
+        try {
+            const { group_id, sender_id, lastMessage } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(sender_id, client);
+            const message = await this.prisma.message.create({
+                data: {
+                    sender_id: sender_id,
+                    receiver_id: group_id,
+                    content: lastMessage,
+                }
+            });
+            if (!message) {
+                client.emit('error', 'Message not sent');
+            }
+            server.to(group_id).emit('newMessageG', {
+                ...payload,
+                lastMessageDate: message.dateCreated,
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }

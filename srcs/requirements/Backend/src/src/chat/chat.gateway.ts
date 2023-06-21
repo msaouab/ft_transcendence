@@ -184,6 +184,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("We've got the event to unban a user: ", payload);
         return await this.chatService.unbanUser(client, payload, this.server);
     }
+    @SubscribeMessage('joinPrivateChannel')
+    async handleJoinPrivateChannel(client: Socket, payload: any) {
+        console.log("We've got the event to join a private channel: ", payload);
+        return await this.chatService.joinPrivateChannel(client, payload, this.server);
+    }
+    @SubscribeMessage('sendMessageG')
+    async handleSendMessageG(client: Socket, payload: any) {
+        console.log("We've got the event to send a message in a group: ", payload);
+        return await this.chatService.sendMessageG(client, payload, this.server);
+    }
 }
 
 

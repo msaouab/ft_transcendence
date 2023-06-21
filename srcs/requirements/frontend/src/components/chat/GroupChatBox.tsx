@@ -60,8 +60,6 @@ const GroupChatBox = ({
     if (!selectedGroupChat.group_id) {
       return [];
     }
-    console.log("group_id", group_id);
-    console.log("group_id", selectedGroupChat.group_id);
     let res = await GetChannelMessages(group_id, limit, offset);
     setTotalMessages(res.count);
     return res.messages;
@@ -150,6 +148,38 @@ const GroupChatBox = ({
     }
   }, [connected]);
 
+  useEffect(() => {
+    if (connected) {
+      socket.current.on("newMessageG", (message: any) => {
+        setSelectedGroupChat(message);
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+          if (index === -1) {
+            return [message, ...prev];
+          }
+          const newGroupChatRooms = [...prev];
+          newGroupChatRooms[index].lastMessage = message.lastMessage;
+          newGroupChatRooms[index].lastMessageDate = message.lastMessageDate;
+          return newGroupChatRooms;
+        });
+        if (selectedGroupChat.group_id === message.group_id) {
+          const getNewMessage = async () => {
+            const newMessage = await GetChannelMessages(selectedGroupChat.group_id, 1, 0);
+            return newMessage.messages[0];
+          }
+          getNewMessage().then((newMessage) => {
+            setState((prevState) => ({
+              ...prevState,
+              messages: [newMessage, ...prevState.messages],
+            }));
+          });
+        }
+      });
+    }
+    return () => {
+      socket.current.off("newMessageG");
+    }
+  }, [connected]);
   return (
     <>
       <GroupChatBoxStyle id="chat-box">
@@ -161,8 +191,8 @@ const GroupChatBox = ({
         ) : (
           <>
             <div>
-                <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} setSelectedGroupChat={setSelectedGroupChat} socket={socket}
-                  connected={connected} />
+              <GroupChatBoxTopBar selectedGroupChat={selectedGroupChat} setSelectedGroupChat={setSelectedGroupChat} socket={socket}
+                connected={connected} />
               <div className="h-px bg-[#B4ABAB] w-[95%] mx-auto opacity-60"></div>
             </div>
             <GroupChatInfiniteScroll

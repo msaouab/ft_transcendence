@@ -7,6 +7,7 @@ import { useGlobalContext } from '../../provider/AppContext';
 import GroupTab from './GroupTab';
 import Cookies from "js-cookie";
 import { GetJoindChannels } from "../../api/axios";
+import { Card, Dialog } from '@material-tailwind/react';
 
 
 const GroupChatListStyle = styled.div`
@@ -111,13 +112,109 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
     }
   }, [connected]);
 
+  const [joinPrivateChannel, setJoinPrivateChannel] = useState(false);
+  const [privateChannelId, setPrivateChannelId] = useState("");
+  const handleJoinPrivateChannel = () => {
+
+    if (privateChannelId === "") return;
+    if (connected) {
+      socket.current.emit("joinPrivateChannel", {
+        group_id: privateChannelId,
+        user_id: Cookies.get("id")
+      });
+    }
+    setJoinPrivateChannel(!joinPrivateChannel);
+    setPrivateChannelId("");
+  };
+
+  useEffect(() => {
+    if (connected) {
+      socket.current.on("newMember", (data: any) => {
+        const newGroupMessage: GroupMessage = {
+          group_id: data.channel.id,
+          sender_id: data.channel.id,
+          name: data.channel.name,
+          profileImage: data.channel.avatar,
+          lastMessage: `${data.user.login} joined the group`,
+          lastMessageDate: new Date().toISOString(),
+          role: data.role,
+        };
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === data.channel.id);
+          if (index === -1) {
+            return [newGroupMessage, ...prev];
+          }
+          const newGroupChatRooms = [...prev];
+          newGroupChatRooms[index].lastMessage = newGroupMessage.lastMessage;
+          newGroupChatRooms[index].lastMessageDate = newGroupMessage.lastMessageDate;
+          return newGroupChatRooms;
+        })
+        setSelectedChat({} as PrivateMessage);
+        setSelected(data.channel.id);
+        socket.current.emit("sendMessageG", newGroupMessage);
+      });
+    }
+    return () => {
+      socket.current.off("newMember");
+    }
+  }, [connected]);
+
+
+  useEffect(() => {
+    if (connected) {
+      socket.current.on("newMessageG", (message: any) => {
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+          if (index === -1) {
+            return [message, ...prev];
+          }
+          return prev;
+        });
+      });
+    }
+    return () => {
+      socket.current.off("newMessageG");
+    }
+  }, [connected]);
+
   return (
     <GroupChatListStyle>
-      <div className="">
+      <div className="flex flex-row justify-between items-center">
         <h1 className="font-bold sm:text-2xl text-white text-xl flex justify-between">
           Groups
-          <Button onClick={() => setNewChat(!newChat)}>New</Button>
         </h1>
+        <div className="flex flex-row gap-2">
+          <Button onClick={() => setNewChat(!newChat)}>New</Button>
+          <Button onClick={() => setJoinPrivateChannel(!joinPrivateChannel)}>Join</Button>
+        </div>
+        <Dialog
+          size="sm"
+          open={joinPrivateChannel}
+          handler={setJoinPrivateChannel}
+          className="flex flex-col justify-center items-center max-w-sm p-5 bg-[#6e6a6a]"
+        >
+          <Card className="w-full max-w-sm p-5 bg-[#6e6a6a] 
+              shadow-none" >
+            <h2 className="text-gray-200 text-2xl text-center mb-2">Join Private Channel</h2>
+            <div className="px-6">
+              <div className="flex flex-col gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter Channel ID"
+                  className="border-2 border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-gray-200
+                      bg-[#6e6a6a] text-gray-200 "
+                  value={privateChannelId}
+                  onChange={(e) => setPrivateChannelId(e.target.value)}
+                />
+                <Button
+                  className="bg-[#6e6a6a] text-gray-200
+                      hover:bg-gray-200 hover:text-gray-800"
+                  onClick={handleJoinPrivateChannel}
+                >Join</Button>
+              </div>
+            </div>
+          </Card>
+        </Dialog>
         <CreateChannel
           setSelectedGroupChat={setSelectedGroupChat}
           show={newChat}

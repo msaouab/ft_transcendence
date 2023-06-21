@@ -115,7 +115,7 @@ const SideBar = ({
 					}
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
-					setUserStatus(response.data.status.tolowoerCase());
+					setUserStatus(response.data.status.toLowerCase());
 				})
 				.catch((error) => {
 					if (error.response.status == 401 || error.response.status == 403) {
