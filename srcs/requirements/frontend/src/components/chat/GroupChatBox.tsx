@@ -200,11 +200,15 @@ const GroupChatBox = ({
               hasMore={hasMore}
               next={next}
             />
-            <GroupSendMessageBox
-              selectedGroupChat={selectedGroupChat}
-              socket={socket}
-              connected={connected}
-            />
+            {
+              selectedGroupChat.role !== "Muted" && (
+                  <GroupSendMessageBox
+                    selectedGroupChat={selectedGroupChat}
+                    socket={socket}
+                    connected={connected}
+                  />
+              )
+            }
           </>
         )}
       </GroupChatBoxStyle>

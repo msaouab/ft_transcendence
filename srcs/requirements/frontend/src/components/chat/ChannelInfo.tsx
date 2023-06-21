@@ -149,6 +149,26 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 setMutedUsers((prev: any) => {
                     return [...prev, data]
                 })
+                setCurrentUser((prev: any) => {
+                    if (prev.id === data.id) {
+                        setSelectedGroupChat((prev: any) => {
+                            if (prev.group_id === selectedGroupChat.group_id) {
+                                return { ...prev, role: "Muted" }
+                            }
+                            return prev;
+                        });
+                        setGroupChatRooms((prev: any) => {
+                            return prev.map((chat: any) => {
+                                if (chat.group_id === selectedGroupChat.group_id) {
+                                    return { ...chat, role: "Muted" }
+                                }
+                                return chat;
+                            })
+                        });
+                        return { ...prev, role: "Muted" }
+                    }
+                    return prev;
+                })
             });
             socket.current.on("unmuteChannelUser", (data: any) => {
                 setMutedUsers((prev: any) => {
@@ -156,6 +176,26 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 })
                 setChannelUsers((prev: any) => {
                     return [...prev, data]
+                })
+                setCurrentUser((prev: any) => {
+                    if (prev.id === data.id) {
+                        setSelectedGroupChat((prev: any) => {
+                            if (prev.group_id === selectedGroupChat.group_id) {
+                                return { ...prev, role: "Member" }
+                            }
+                            return prev;
+                        });
+                        setGroupChatRooms((prev: any) => {
+                            return prev.map((chat: any) => {
+                                if (chat.group_id === selectedGroupChat.group_id) {
+                                    return { ...chat, role: "Member" }
+                                }
+                                return chat;
+                            })
+                        });
+                        return { ...prev, role: "Member" }
+                    }
+                    return prev;
                 })
             });
             socket.current.on("kickChannelUser", (data: any) => {
