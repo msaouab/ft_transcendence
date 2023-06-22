@@ -431,6 +431,12 @@ const Chat = () => {
           console.log(err);
         }
       });
+      chatSocket.current.on("channelDeleted", (message: any) => {
+          setSelectedGroupChat({} as GroupMessage);
+          setGroupChatRooms((prev: any) => {
+            return prev.filter((group: any) => group.group_id !== message.group_id)
+          })
+      });
     }
     return () => {
       chatSocket.current.off("newChannelAdmin");

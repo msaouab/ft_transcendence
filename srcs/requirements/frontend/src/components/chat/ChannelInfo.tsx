@@ -108,9 +108,14 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         socket.current.emit("leaveChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
     }
 
+    const handleDeleteChannel = () => {
+        console.log("delete channel");
+        socket.current.emit("deleteChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
+    }
+
     useEffect(() => {
         getChannelInfo();
-    }, [])
+    }, [selectedGroupChat.group_id])
 
     useEffect(() => {
         if (connected) {
@@ -217,6 +222,10 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                     setOpen(false);
                 }
             });
+            socket.current.on("channelDeleted", (data: any) => {
+                console.log("channelDeleted: ", data);
+                setOpen(false);
+            });
         }
         return () => {
             if (connected) {
@@ -228,6 +237,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 socket.current.off("banChannelUser");
                 socket.current.off("unbanChannelUser");
                 socket.current.off("memberLeaveChannel");
+                socket.current.off("channelDeleted");
             }
         }
     }, [connected])
@@ -410,7 +420,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 <div className='flex items-center justify-center gap-4 w-full p-1'>
                     {
                         currentUser.role === "Owner" && (
-                            <button className={`${buttonStyle}  bg-red-800 m-0 w-[11rem] flex-1 hover:scale-[unset]`} onClick={()=> console.log("Delete the Channel")}>
+                            <button className={`${buttonStyle}  bg-red-800 m-0 w-[11rem] flex-1 hover:scale-[unset]`} onClick={() => handleDeleteChannel()}>
                                 Delete Channel
                             </button>
                         )

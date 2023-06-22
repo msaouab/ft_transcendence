@@ -1003,4 +1003,73 @@ export class ChatService {
             client.emit('error', error);
         }
     }
+    async deleteChannel(client, payload: any, server: Server) {
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const deletedChannelMembersTab = await this.prisma.membersTab.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelMembersTab) {
+                client.emit('error', 'Channel not deleted from members tab');
+            }
+            const deletedChannelBannedTab = await this.prisma.bannedMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelBannedTab) {
+                client.emit('error', 'Channel not deleted from banned tab');
+            }
+            const deletedChannelMutedTab = await this.prisma.mutedMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelMutedTab) {
+                client.emit('error', 'Channel not deleted from muted tab');
+            }
+            const deletedChannelAdminsTab = await this.prisma.adminMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelAdminsTab) {
+                client.emit('error', 'Channel not deleted from admins tab');
+            }
+            const deletedMessages = await this.prisma.message.deleteMany({
+                where: {
+                    receiver_id: group_id
+                }
+            })
+            if (!deletedMessages) {
+                client.emit('error', 'Channel messages not deleted');
+            }
+            const deletedChannel = await this.prisma.channel.delete({
+                where: {
+                    id: group_id
+                }
+            })
+            if (!deletedChannel) {
+                client.emit('error', 'Channel not deleted');
+            }
+            const joinedChannel = await this.prisma.channelsJoinTab.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!joinedChannel) {
+                client.emit('error', 'Channel not deleted from joined tab');
+            }
+            console.log("------------------- all deleted -------------------");
+            server.to(group_id).emit('channelDeleted', {
+                group_id: group_id
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }
