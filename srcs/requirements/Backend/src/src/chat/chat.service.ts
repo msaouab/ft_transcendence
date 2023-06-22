@@ -10,6 +10,7 @@ import { PrismaService } from "prisma/prisma.service";
 import { Socket, Server } from "socket.io";
 import { createHash } from "crypto";
 import { PrivateChatRoom, PrivateMessage, BlockTab } from "@prisma/client";
+import * as bcrypt from 'bcrypt';
 
 // dto's
 import { createMessageDto } from "./message/message.dto";
@@ -17,6 +18,7 @@ import { PostPrivateChatRoomDto } from "./dto/postPrivateChatRoom";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 import { clients as onlineClients } from "src/notify/notify.gateway";
+import e from "express";
 // import { clients } from 'src/notify/notify.gateway';
 
 // a type
@@ -477,8 +479,12 @@ export class ChatService {
             throw new HttpException('Channel not found', 404);
         }
         try {
-            if (type === 'Secret' && channel.password !== password) {
-                throw new HttpException('Wrong password', 400);
+            if (type === 'Secret') {
+                const isPasswordMatch = await bcrypt.compare(password, channel.password);
+                if (!isPasswordMatch) {
+                    client.emit('error', 'Password does not match');
+                    return;
+                }
             }
             const memberTab = await this.prisma.membersTab.create({
                 data: {

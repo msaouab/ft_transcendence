@@ -5,6 +5,7 @@ import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import { log } from "console";
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable({})
@@ -18,11 +19,12 @@ export class ChannelService {
             throw new ForbiddenException("There is no ID in cookies");
         await this.UserService.getUser(userId)
         try {
+            const hashedPassword = await bcrypt.hash(dto.password, 10); // Hash the password using bcrypt
             const channel = await this.prisma.channel.create({
                 data: {
                     name: dto.name,
                     chann_type: dto.status,
-                    password: dto.password,
+                    password: hashedPassword,
                     owner_id: userId,
                     limit_members: -1,
                     description: dto.description,
