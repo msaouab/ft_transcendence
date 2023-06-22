@@ -940,4 +940,67 @@ export class ChatService {
             client.emit('error', error);
         }
     }
+    async removeMeuted(client, payload: any, server: Server) {
+        try {
+            const { group_id, user_id } = payload;
+            const mutedUser = await this.prisma.mutedMembers.delete({
+                where: {
+                    channel_id_muted_id: {
+                        muted_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!mutedUser) {
+                client.emit('error', 'User not unmuted');
+            }
+            return mutedUser;
+        }
+        catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async leaveChannel(client, payload: any, server: Server) {
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const joindChannel = await this.prisma.channelsJoinTab.delete({
+                where: {
+                    user_id_channel_id: {
+                        user_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            if (joindChannel.role === 'Member') {
+                const memberTab = await this.removeMember(client, group_id, user_id);
+                if (!memberTab) {
+                    client.emit('error', 'Member not removed');
+                }
+            } else if (joindChannel.role === 'Admin') {
+                const adminTab = await this.removeAdmin(client, group_id, user_id);
+                if (!adminTab) {
+                    client.emit('error', 'Admin not removed');
+                }
+            } else if (joindChannel.role === "Muted") {
+                const mutedTab = await this.removeMeuted(client, group_id, user_id);
+                if (!mutedTab) {
+                    client.emit('error', 'Muted not removed');
+                }
+            }
+            server.to(group_id).emit('memberLeaveChannel', {
+                avatar: user.avatar,
+                id: user.id,
+                login: user.login,
+                status: user.status,
+                group_id: group_id
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
 }

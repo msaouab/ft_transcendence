@@ -46,7 +46,6 @@ interface GroupChatListProps {
 const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connected, selected, setSelected }: GroupChatListProps) => {
   const [newChat, setNewChat] = useState(false);
   const { groupChatRooms, setGroupChatRooms } = useGlobalContext();
-  const [joinToGroup, setJoinToGroup] = useState(false);
 
   const getGroupChatRooms = async () => {
     let id = Cookies.get("id");
@@ -60,7 +59,6 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
       );
       if (groupChatRooms.length === 0) {
         setGroupChatRooms(res);
-        setJoinToGroup(true);
       }
       else {
         setGroupChatRooms(res);
@@ -74,20 +72,6 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
     getGroupChatRooms();
   }, []);
 
-  useEffect(() => {
-    if (connected) {
-      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("joining the room: ", groupChatRoom.group_id);
-        socket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
-      });
-    }
-    return () => {
-      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("leaving the room: ", groupChatRoom.group_id);
-        socket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
-      });
-    }
-  }, [joinToGroup]);
 
   useEffect(() => {
     if (connected) {

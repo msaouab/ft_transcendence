@@ -7,7 +7,6 @@ import GroupSendMessageBox from "./GroupSendMessageBox";
 import { GetChannelMessages } from "../../api/axios";
 import GroupChatInfiniteScroll from "./GroupChatInfiniteScroll";
 import { useGlobalContext } from "../../provider/AppContext";
-import Cookies from 'js-cookie';
 
 
 const GroupChatBoxStyle = styled.div`
@@ -66,11 +65,6 @@ const GroupChatBox = ({
     return res.messages;
   };
 
-  useEffect(() => {
-    if (connected && !joinedRooms.includes(selectedGroupChat.group_id)) {
-      socket.current.emit("joinGroupRoom", { group_id: selectedGroupChat.group_id });
-    }
-  }, [selectedGroupChat.group_id]);
 
   const next = () => {
     getMessages().then((newMessages) => {

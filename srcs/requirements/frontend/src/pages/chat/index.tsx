@@ -246,7 +246,20 @@ const Chat = () => {
         };
         checkNew();
       });
+    }
+  }, [connected]);
+
+
+  useEffect(() => {
+    if (connected) {
+      console.log("joining the room from global context");
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("joining the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+      });
       chatSocket.current.on("newMessageG", (message: any) => {
+        console.log("new group message: ", message);
         setSelectedChat({} as PrivateMessage);
         setSelectedGroupChat(message);
         setSelected(message.group_id);
@@ -255,21 +268,30 @@ const Chat = () => {
           if (index === -1) {
             return [message, ...prev];
           }
-          return prev;
+          const newGroupChatRooms = [...prev];
+          newGroupChatRooms[index].lastMessage = message.lastMessage;
+          newGroupChatRooms[index].lastMessageDate = message.lastMessageDate;
+          return newGroupChatRooms;
         });
       });
     }
     return () => {
-      chatSocket.current.off("newMessageG");
+      if (connected) {
+        console.log("leaving the room from global context");
+        groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+          console.log("leaving the room: ", groupChatRoom.group_id);
+          chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+          setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+        });
+        chatSocket.current.off("newMessageG");
+      }
     }
-  }, [connected]);
-
+  }, [groupChatRooms.length]);
 
   // here
 
   useEffect(() => {
-    if (connected)
-    {
+    if (connected) {
       chatSocket.current.on("newChannelAdmin", (message: any) => {
         if (message.id === Cookies.get("id")) {
           const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
@@ -380,6 +402,35 @@ const Chat = () => {
           }
         }
       });
+      chatSocket.current.on("memberLeaveChannel", (message: any) => {
+        try {
+          if (message.id === Cookies.get('id')) {
+            console.log("member leave channel message: ", groupChatRooms);
+            setSelectedGroupChat({} as GroupMessage);
+            let channel: GroupMessage = {} as GroupMessage;
+            setGroupChatRooms((prev: any) => {
+              return prev.filter((group: any) => {
+                if (group.group_id !== message.group_id) {
+                  return { ...group };
+                }
+                channel = { ...group };
+                return false;
+              })
+            })
+            chatSocket.current.emit("leaveGroupRoom", { group_id: message.group_id });
+            chatSocket.current.emit("sendMessageG", {
+              ...channel,
+              sender_id: channel.group_id,
+              lastMessage: `${message.login} has left the channel`,
+              lastMessageDate: new Date().toISOString(),
+              role: "Server",
+
+            });
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      });
     }
     return () => {
       chatSocket.current.off("newChannelAdmin");
@@ -387,6 +438,9 @@ const Chat = () => {
       chatSocket.current.off("muteChannelUser");
       chatSocket.current.off("unmuteChannelUser");
       chatSocket.current.off("kickChannelUser");
+      chatSocket.current.off("banChannelUser");
+      chatSocket.current.off("unbanChannelUser");
+      chatSocket.current.off("memberLeaveChannel");
     }
   }, [connected]);
 

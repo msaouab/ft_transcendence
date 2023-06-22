@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react'
+import React, { useEffect } from "react"
 import { AiOutlineEdit, AiOutlineClose, AiOutlineLink } from 'react-icons/ai'
 import { RxDotsVertical } from 'react-icons/rx'
 import Cookies from 'js-cookie'
@@ -103,6 +103,11 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         handleOpen();
     }
 
+    const handleLeaveChannel = () => {
+        console.log("leave channel");
+        socket.current.emit("leaveChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
+    }
+
     useEffect(() => {
         getChannelInfo();
     }, [])
@@ -178,6 +183,9 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
+                if (data.id === Cookies.get("id")) {
+                    setOpen(false);
+                }
             });
             socket.current.on("banChannelUser", (data: any) => {
                 console.log("banChannelUser: ", data);
@@ -197,6 +205,18 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                     return [...prev, data]
                 })
             });
+            socket.current.on("memberLeaveChannel", (data: any) => {
+                console.log("memberLeaveChannel: ", data);
+                setChannelUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                setMutedUsers((prev: any) => {
+                    return prev.filter((user: any) => user.id !== data.id)
+                })
+                if (data.id === Cookies.get("id")) {
+                    setOpen(false);
+                }
+            });
         }
         return () => {
             if (connected) {
@@ -207,6 +227,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 socket.current.off("kickChannelUser");
                 socket.current.off("banChannelUser");
                 socket.current.off("unbanChannelUser");
+                socket.current.off("memberLeaveChannel");
             }
         }
     }, [connected])
@@ -384,6 +405,19 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                             </TabPanel>
                         </TabsBody>
                     </Tabs>
+                </div>
+                {/* delete and leave channel bottuns */}
+                <div className='flex items-center justify-center gap-4 w-full p-1'>
+                    {
+                        currentUser.role === "Owner" && (
+                            <button className={`${buttonStyle}  bg-red-800 m-0 w-[11rem] flex-1 hover:scale-[unset]`} onClick={()=> console.log("Delete the Channel")}>
+                                Delete Channel
+                            </button>
+                        )
+                    }
+                    <button className={`${buttonStyle}  bg-red-800 m-0 w-[11rem] flex-1 hover:scale-[unset]`} onClick={() => handleLeaveChannel()}>
+                        Leave Channel
+                    </button>
                 </div>
             </Drawer>
         </div>
