@@ -15,7 +15,6 @@ import {
 } from "@material-tailwind/react";
 import Avatar from '../../components/chat/Avatar';
 import { GetChannelInfo } from '../../api/axios';
-import { useGlobalContext } from '../../provider/AppContext'
 import { GroupMessage } from '../../types/message'
 
 interface props {
@@ -28,7 +27,7 @@ interface props {
 }
 
 
-const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setSelectedGroupChat }: props) => {
+const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: props) => {
     const [channel, setChannel] = React.useState<any>(null);
     const [channelUsers, setChannelUsers] = React.useState<any>(null);
     const [currentUser, setCurrentUser] = React.useState({} as {
@@ -42,7 +41,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
     const [bannedUsers, setBannedUsers] = React.useState<any>(null);
     const [selectedUser, setSelectedUser] = React.useState<any>(null);
     const [openDialog, setOpenDialog] = React.useState(false);
-    const { setGroupChatRooms } = useGlobalContext();
 
 
     const getChannelInfo = async () => {
@@ -180,23 +178,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
-                // if (data.id === Cookies.get('id')) {
-                //     const newGroupMessage: GroupMessage = {
-                //         group_id: selectedGroupChat.group_id,
-                //         sender_id: selectedGroupChat.group_id,
-                //         name: selectedGroupChat.name,
-                //         profileImage: selectedGroupChat.profileImage,
-                //         lastMessage: `${data.login} was kicked from the group`,
-                //         lastMessageDate: new Date().toISOString(),
-                //         role: selectedGroupChat.role,
-                //     }
-                //     socket.current.emit("sendGroupMessage", newGroupMessage);
-                //     socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
-                //     setSelectedGroupChat({} as GroupMessage);
-                //     setGroupChatRooms((prev: any) => {
-                //         return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
-                //     })
-                // }
             });
             socket.current.on("banChannelUser", (data: any) => {
                 console.log("banChannelUser: ", data);
@@ -206,23 +187,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected, setS
                 setBannedUsers((prev: any) => {
                     return [...prev, data]
                 })
-                if (data.id === Cookies.get('id')) {
-                    const newGroupMessage: GroupMessage = {
-                        group_id: selectedGroupChat.group_id,
-                        sender_id: selectedGroupChat.group_id,
-                        name: selectedGroupChat.name,
-                        profileImage: selectedGroupChat.profileImage,
-                        lastMessage: `${data.login} was banned from the group`,
-                        lastMessageDate: new Date().toISOString(),
-                        role: selectedGroupChat.role,
-                    }
-                    socket.current.emit("sendGroupMessage", newGroupMessage);
-                    socket.current.emit("leaveGroupRoom", { group_id: selectedGroupChat.group_id });
-                    setSelectedGroupChat({} as GroupMessage);
-                    setGroupChatRooms((prev: any) => {
-                        return prev.filter((group: any) => group.group_id !== selectedGroupChat.group_id)
-                    })
-                }
             });
             socket.current.on("unbanChannelUser", (data: any) => {
                 console.log("unbanChannelUser: ", data);

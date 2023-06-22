@@ -22,62 +22,62 @@ import { clients as onlineClients } from "src/notify/notify.gateway";
 // a type
 @Injectable()
 export class ChatService {
-	constructor(
-		private prisma: PrismaService // private MessageService: MessageServic
+    constructor(
+        private prisma: PrismaService // private MessageService: MessageServic
 	) {}
 
-	// a map that contain the id of the user and it's websocket object
+    // a map that contain the id of the user and it's websocket object
 
-	async createPrivateChatRoom(
-		postreatePrivateChatRoomDto: PostPrivateChatRoomDto
-	) {
-		const { senderId, receiverId } = postreatePrivateChatRoomDto;
-		const hashedRoomName = await this.getRoomId(senderId, receiverId);
-		let privateChatRoom = await this.prisma.privateChatRoom.create({
-			data: {
-				id: hashedRoomName,
-				sender_id: senderId,
-				receiver_id: receiverId,
-			},
-		});
-		if (!privateChatRoom) {
-			throw new HttpException("Private chat already exist", 409);
-		}
-		return privateChatRoom;
-	}
+    async createPrivateChatRoom(
+        postreatePrivateChatRoomDto: PostPrivateChatRoomDto
+    ) {
+        const { senderId, receiverId } = postreatePrivateChatRoomDto;
+        const hashedRoomName = await this.getRoomId(senderId, receiverId);
+        let privateChatRoom = await this.prisma.privateChatRoom.create({
+            data: {
+                id: hashedRoomName,
+                sender_id: senderId,
+                receiver_id: receiverId,
+            },
+        });
+        if (!privateChatRoom) {
+            throw new HttpException("Private chat already exist", 409);
+        }
+        return privateChatRoom;
+    }
 
-	async deletePrivateChatRoom(id: string, userId: string) {
-		/*
+    async deletePrivateChatRoom(id: string, userId: string) {
+        /*
             error handling:
                 * if the private chat room doesn't exist
                 * if the user is not authorized to delete the private chat room (not the sender or receiver)
         */
-		// try {
+        // try {
 
-		const privateChatRoom = await this.prisma.privateChatRoom.findUnique({
-			where: {
-				id: id,
-			},
-		});
-		if (!privateChatRoom) {
-			throw new HttpException("Private chat room not found", 404);
-		}
-		if (
-			privateChatRoom.sender_id != userId &&
-			privateChatRoom.receiver_id != userId
-		) {
-			throw new HttpException("Unauthorized", 401);
-		}
-		// we're using cascade delete, so we don't need to delete the messages manually
-		const deletedPrivateChatRoom = await this.prisma.privateChatRoom.delete({
-			where: {
-				id: id,
-			},
-		});
-		return deletedPrivateChatRoom;
-	}
+        const privateChatRoom = await this.prisma.privateChatRoom.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!privateChatRoom) {
+            throw new HttpException("Private chat room not found", 404);
+        }
+        if (
+            privateChatRoom.sender_id != userId &&
+            privateChatRoom.receiver_id != userId
+        ) {
+            throw new HttpException("Unauthorized", 401);
+        }
+        // we're using cascade delete, so we don't need to delete the messages manually
+        const deletedPrivateChatRoom = await this.prisma.privateChatRoom.delete({
+            where: {
+                id: id,
+            },
+        });
+        return deletedPrivateChatRoom;
+    }
 
-	/* joinPrivateChatRoom(senderId: string, receiverId: string) 
+    /* joinPrivateChatRoom(senderId: string, receiverId: string) 
         will be called when senderId joins the private chat room
         it createa a new private chat room if it doesn't exist
         and set the lastSentMessage to current time
@@ -792,15 +792,6 @@ export class ChatService {
                     client.emit('error', 'Admin not removed');
                 }
             }
-            const bannedUser = await this.prisma.bannedMembers.create({
-                data: {
-                    banned_id: userId,
-                    channel_id: group_id,
-                }
-            })
-            if (!bannedUser) {
-                client.emit('error', 'User not banned');
-            }
             const joindChannel = await this.prisma.channelsJoinTab.delete({
                 where: {
                     user_id_channel_id: {
@@ -811,6 +802,16 @@ export class ChatService {
             })
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
+            }
+            const bannedUser = await this.prisma.bannedMembers.create({
+                data: {
+                    banned_id: userId,
+                    channel_id: group_id,
+                }
+            })
+            if (!bannedUser) {
+                console.log('bannedUser: ', bannedUser);
+                client.emit('error', 'User not banned');
             }
             const res = {
                 avatar: admin.avatar,
@@ -863,7 +864,6 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            console.log('unbanUser: ', admin);
             server.to(group_id).emit('unbanChannelUser', {
                 avatar: admin.avatar,
                 id: admin.id,

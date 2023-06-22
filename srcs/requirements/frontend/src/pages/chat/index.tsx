@@ -7,13 +7,12 @@ import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { PrivateMessage } from "../../types/message";
 import { useGlobalContext } from "../../provider/AppContext";
-import { HOSTNAME } from "../../api/axios";
+import { GetJoindChannels, HOSTNAME } from "../../api/axios";
 import Cookies from "js-cookie";
 
 
 
 import { getAvatarUrl } from "../../components/common/CommonFunc";
-import { singleMessage } from "../../types/message";
 import axios from "axios";
 
 const ChatStyle = Styled.div`
@@ -345,6 +344,40 @@ const Chat = () => {
           setGroupChatRooms((prev: any) => {
             return prev.filter((group: any) => group.group_id !== message.group_id)
           })
+        }
+      });
+      chatSocket.current.on("banChannelUser", (message: any) => {
+        if (message.id === Cookies.get('id')) {
+          setSelectedGroupChat({} as GroupMessage);
+          setGroupChatRooms((prev: any) => {
+            return prev.filter((group: any) => group.group_id !== message.group_id)
+          })
+        }
+      });
+      chatSocket.current.on("unbanChannelUser", (message: any) => {
+        if (message.id === Cookies.get('id')) {
+          try {
+            const getJoindChannels = async () => {
+              const channels = await GetJoindChannels(message.id);
+              const res = await Promise.all(
+                channels.map(async (channel: any) => {
+                  return { ...channel };
+                })
+              );
+              return res;
+            };
+            getJoindChannels().then((res) => {
+              const channel = res.find((chat: any) => chat.group_id === message.group_id);
+              setSelectedChat({} as PrivateMessage);
+              setSelectedGroupChat(channel);
+              setGroupChatRooms(res);
+            }).catch((err) => {
+              console.log(err);
+            });
+          }
+          catch (err) {
+            console.log(err);
+          }
         }
       });
     }
