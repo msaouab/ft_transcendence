@@ -258,6 +258,20 @@ const Chat = () => {
         chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
         setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
       });
+    }
+    return () => {
+      if (connected) {
+        groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+          console.log("leaving the room: ", groupChatRoom.group_id);
+          chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+          setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+        });
+      }
+    }
+  }, [groupChatRooms.length]);
+
+  useEffect(() => {
+    if (connected) {
       chatSocket.current.on("newMessageG", (message: any) => {
         console.log("new group message: ", message);
         setSelectedChat({} as PrivateMessage);
@@ -277,16 +291,10 @@ const Chat = () => {
     }
     return () => {
       if (connected) {
-        console.log("leaving the room from global context");
-        groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-          console.log("leaving the room: ", groupChatRoom.group_id);
-          chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
-          setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
-        });
         chatSocket.current.off("newMessageG");
       }
     }
-  }, [groupChatRooms.length]);
+  }, [connected]);
 
   // here
 
@@ -432,10 +440,10 @@ const Chat = () => {
         }
       });
       chatSocket.current.on("channelDeleted", (message: any) => {
-          setSelectedGroupChat({} as GroupMessage);
-          setGroupChatRooms((prev: any) => {
-            return prev.filter((group: any) => group.group_id !== message.group_id)
-          })
+        setSelectedGroupChat({} as GroupMessage);
+        setGroupChatRooms((prev: any) => {
+          return prev.filter((group: any) => group.group_id !== message.group_id)
+        })
       });
     }
     return () => {
@@ -450,6 +458,22 @@ const Chat = () => {
     }
   }, [connected]);
 
+  useEffect(() => {
+    if (connected) {
+      chatSocket.current.on("channelCreated", (message: any) => {
+        console.log("channel created message: ", message);
+        setGroupChatRooms((prev: any) => {
+          return [...prev, message];
+        });
+        setSelectedGroupChat(message);
+        setSelectedChat({} as PrivateMessage);
+        setSelected(message.group_id);
+      });
+    }
+    return () => {
+      chatSocket.current.off("channelCreated");
+    }
+  }), [connected]
 
 
   return (

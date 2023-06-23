@@ -199,13 +199,16 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
             </div>
           </Card>
         </Dialog>
-        <CreateChannel
-          setSelectedGroupChat={setSelectedGroupChat}
-          show={newChat}
-          setShow={setNewChat}
-          socket={socket}
-          connected={connected}
-        />
+        {
+          newChat && (<CreateChannel
+            setSelectedGroupChat={setSelectedGroupChat}
+            show={newChat}
+            setShow={setNewChat}
+            socket={socket}
+            connected={connected}
+          />)
+        }
+        
       </div>
       <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
       <div className="">

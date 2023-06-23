@@ -9,7 +9,7 @@ import { Body, HttpException, Injectable, Param, Query } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
 import { Socket, Server } from "socket.io";
 import { createHash } from "crypto";
-import { PrivateChatRoom, PrivateMessage, BlockTab } from "@prisma/client";
+import { PrivateChatRoom, PrivateMessage, BlockTab, Prisma } from "@prisma/client";
 import * as bcrypt from 'bcrypt';
 
 // dto's
@@ -19,6 +19,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 import { clients as onlineClients } from "src/notify/notify.gateway";
 import e from "express";
+import { ChannelDto } from "./dto/createChannel.dto";
 // import { clients } from 'src/notify/notify.gateway';
 
 // a type
@@ -1064,12 +1065,66 @@ export class ChatService {
             if (!joinedChannel) {
                 client.emit('error', 'Channel not deleted from joined tab');
             }
-            console.log("------------------- all deleted -------------------");
             server.to(group_id).emit('channelDeleted', {
                 group_id: group_id
             });
         } catch (error) {
             client.emit('error', error);
+        }
+    }
+    async createChannel(client, payload: ChannelDto, server: Server) {
+        const { name, status, password, limitUsers, description, avatar, owner } = payload;
+        const ownerUser = await this.getUser(owner, client);
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+            const channel = await this.prisma.channel.create({
+                data: {
+                    name: name,
+                    chann_type: status,
+                    password: hashedPassword,
+                    owner_id: owner,
+                    limit_members: -1,
+                    description: description,
+                    avatar: avatar
+                }
+            });
+            if (!channel) {
+                client.emit('error', 'Channel not created');
+            }
+            const channelJoinTab = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: owner,
+                    channel_name: name,
+                    channel_id: channel.id,
+                    role: 'Owner',
+                }
+            });
+            if (!channelJoinTab) {
+                client.emit('error', 'Channel not created in join tab');
+            }
+            const message = await this.prisma.message.create({
+                data: {
+                    sender_id: channel.id,
+                    receiver_id: channel.id,
+                    content: `${ownerUser.login} created channel`,
+                }
+            });
+            client.emit('channelCreated', {
+                group_id: channel.id,
+                sender_id: channel.id,
+                name: channel.name,
+                profileImage: channel.avatar,
+                lastMessage: message.content,
+                lastMessageDate: message.dateCreated,
+                role: "Server",
+            });
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+                client.emit('errorExistChannel', 'Channel already exist');
+            }
+            else {
+                client.emit('error', error);
+            }
         }
     }
 }

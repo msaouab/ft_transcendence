@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { CiImport } from "react-icons/ci";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import ChannelTypes from "./ChannelTypes";
-import { CreateChannel, HOSTNAME, PostChannelAvatar } from "../../../api/axios";
-import { GroupMessage } from "../../../types/message";
+import { HOSTNAME, PostChannelAvatar } from "../../../api/axios";
+import Cookies from "js-cookie";
 
 const ModelStyle = styled.div`
   width: 100%;
@@ -164,7 +164,6 @@ const Model = (props: ModelProps) => {
   const [channel, setChannel] = useState(initialChannel);
   const [type, setType] = useState("Public");
   const [exeption, setExeption] = useState(false);
-  const [groupMessage, setGroupMessage] = useState<GroupMessage>({} as GroupMessage);
 
   const handelChange = (e: any) => {
     e.preventDefault();
@@ -183,44 +182,39 @@ const Model = (props: ModelProps) => {
 
   const createChannel = async (e: any) => {
     e.preventDefault();
-    CreateChannel({
-      name: channel.name,
-      status: type,
-      password: channel.password,
-      limitUsers: 0,
-      description: channel.description,
-      avatar: channel.avatar || `http://${HOSTNAME}:3000/default.png`,
-    },
-    ).then((res) => {
-      console.log(res);
-      const { id, name, avatar, dateCreated } = res;
-      console.log(id, name, avatar, dateCreated);
-      setGroupMessage({
-        group_id: id,
-        sender_id: id,
-        name: name,
-        profileImage: avatar,
-        lastMessage: "Channel Created",
-        lastMessageDate: dateCreated,
-        role: "Owner",
+    if (props.connected) {
+      props.socket.current.emit("createChannel", {
+        name: channel.name,
+        status: type,
+        password: channel.password,
+        limitUsers: 0,
+        description: channel.description,
+        avatar: channel.avatar || `http://${HOSTNAME}:3000/default.png`,
+        owner: Cookies.get("id"),
       });
-      setChannel(initialChannel);
-      setType("Public");
-      setExeption(false);
-    }).catch(() => {
-      setExeption(true);
     }
-    );
   };
 
   useEffect(() => {
-    if (props.connected && groupMessage.group_id) {
-      props.socket.current.emit("joinGroupRoom", { group_id: groupMessage.group_id })
-      props.socket.current.emit("sendGroupMessage", groupMessage)
-      setGroupMessage({} as GroupMessage);
-      props.setShow(false);
+    if (props.connected) {
+      console.log("channelCreated");
+      props.socket.current.on("channelCreated", (data: any) => {
+        console.log("channelCreated", data);
+        props.setShow(false);
+      });
+      props.socket.current.on("errorExistChannel", (data: any) => {
+        console.log("errorExistChannel", data);
+        setExeption(true);
+      });
     }
-  }, [groupMessage]);
+
+    return () => {
+      if (props.connected) {
+        props.socket.current.off("channelCreated");
+        props.socket.current.off("errorExistChannel");
+      }
+    }
+  }, [props.connected]);
 
   return (
     <ModelStyle show={props.show}>
@@ -248,7 +242,7 @@ const Model = (props: ModelProps) => {
             />
 
             {channel.avatar !== "" ? (
-              <img src={channel.avatar} alt="avatar" className="avatar-img"/>
+              <img src={channel.avatar} alt="avatar" className="avatar-img" />
             ) : (
               <CiImport />
             )}
