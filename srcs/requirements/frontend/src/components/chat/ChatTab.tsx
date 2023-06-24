@@ -95,7 +95,7 @@ const ChatTab = ({ privateMessage, selected }:
                 </Link>
                 {/* </div> */}
                 <div className="chat-tab__info__last-message text-xs font-thin opacity-50">
-                    {privateMessage.lastMessage.length > 25 ? privateMessage.lastMessage.slice(0, 25) + '...' : privateMessage.lastMessage}
+                    {privateMessage.lastMessage.length > 15 ? privateMessage.lastMessage.slice(0, 15) + '...' : privateMessage.lastMessage}
                 </div>
             </div>
 

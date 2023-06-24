@@ -211,61 +211,67 @@ const Chat = () => {
             status: user.data.status,
           };
         };
-        const checkNew = async () => {
-          if (
-            !privateChatRooms.find(
-              (chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
-            ) &&
-            message.sender_id !== Cookies.get("id")
-          ) {
-            // const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
-            // // co
-            // const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
-            const { login, avatar, status } = await getUser(
-              message.sender_id,
-              message.receiver_id
-            );
-            const newPrivatRoom: PrivateMessage = {
-              chatRoomid: message.chatRoom_id,
-              messageId: message.id,
-              sender_id: message.sender_id,
-              receiver_id: message.receiver_id,
-              lastMessage: message.content,
-              lastMessageDate: message.dateCreated,
-              seen: message.seen,
-              login: login,
-              profileImage: avatar,
-              blocked: false,
-              status: status,
-            };
-            setPrivateChatRooms((prevState: any) => [
-              ...prevState,
-              newPrivatRoom,
-            ]);
-          }
+        const getUserFunc = async () => {
+          const { login, avatar, status } = await getUser(
+            message.sender_id,
+            message.receiver_id
+          );
+          const newPrivatRoom: PrivateMessage = {
+            chatRoomid: message.chatRoom_id,
+            messageId: message.id,
+            sender_id: message.sender_id,
+            receiver_id: message.receiver_id,
+            lastMessage: message.content,
+            lastMessageDate: message.dateCreated,
+            seen: message.seen,
+            login: login,
+            profileImage: avatar,
+            blocked: false,
+            status: status,
+          };
+          setPrivateChatRooms((prevState: any) => {
+            const index = prevState.findIndex( (chatRoom: PrivateMessage) => chatRoom.chatRoomid === message.chatRoom_id);
+            if (index === -1) {
+              return [newPrivatRoom, ...prevState];
+            }
+            const newPrivateChatRooms = [...prevState];
+            newPrivateChatRooms[index].lastMessage = message.content;
+            newPrivateChatRooms[index].lastMessageDate = message.dateCreated;
+            return newPrivateChatRooms;
+          });
         };
-        checkNew();
+        getUserFunc();
       });
-      chatSocket.current.on("newMessageG", (message: any) => {
-        setSelectedChat({} as PrivateMessage);
-        setSelectedGroupChat(message);
-        setSelected(message.group_id);
-        setGroupChatRooms(prev => {
-          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
-          if (index === -1) {
-            return [message, ...prev];
-          }
-          return prev;
-        });
-      });
-    }
-    return () => {
-      chatSocket.current.off("newMessageG");
+      
     }
   }, [connected]);
 
 
   // here
+
+  useEffect(() => {
+    if (connected) {
+    chatSocket.current.on("newMessageG", (message: any) => {
+      setSelectedChat({} as PrivateMessage);
+      setSelectedGroupChat(message);
+      setSelected(message.group_id);
+      setGroupChatRooms(prev => {
+        const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+        if (index === -1) {
+          return [message, ...prev];
+        }
+        return prev;
+      });
+    });
+  }
+
+  if (connected) {
+    return () => {
+      chatSocket.current.off("newMessageG");
+    }
+  }
+
+  }, [connected]);
 
   useEffect(() => {
     if (connected) {
