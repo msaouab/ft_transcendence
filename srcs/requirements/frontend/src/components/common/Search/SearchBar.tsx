@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import { BiGroup } from 'react-icons/bi';
 import JoinChannel from './JoinChannel';
 import { HOSTNAME } from '../../../api/axios';
+import { getAvatarUrlById } from '../CommonFunc';
 // import {use}
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
@@ -306,10 +307,10 @@ const SearchBar = () => {
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/profile/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
                                                                 {/* change later */}
-                                                                {/* <img src={user.avatar} alt="avatar" /> */}
                                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
 
-                                                                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+                                                                <img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+                                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
                                                                     {/* </div> */}
                                                                     <div className="search-result-info ">
                                                                         <h1 className="text-xl font-bold ">{user.login}</h1>
@@ -349,7 +350,7 @@ const SearchBar = () => {
                                                 const isInChannel = channel.users.some((user: any) => {
                                                     return user.user_id === Cookies.get('id');
                                                 });
-                                                console.log("channel: ", channel)
+                                                // console.log("channel: ", channel)
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
@@ -357,7 +358,7 @@ const SearchBar = () => {
                                                                 <div className="search-result-avatar">
                                                                     {/* uncomment later */}
                                                                     {/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
-                                                                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+                                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
                                                                 </div>
                                                                 <div className="search-result-info">
                                                                     <h1 className="text-xl font-bold ">{channel.name}</h1>

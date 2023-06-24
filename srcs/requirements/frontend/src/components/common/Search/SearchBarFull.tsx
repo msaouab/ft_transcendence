@@ -10,6 +10,8 @@ import { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 import { HOSTNAME } from "../../../api/axios";
+import { getAvatarUrlById } from '../CommonFunc';
+
 const DropdownSeachStyle = styled.div`
     background: rgba(217, 217, 217, 0.3);
     border-radius: 10px;
@@ -34,7 +36,6 @@ const DropdownSeachStyle = styled.div`
     // should be scrollable
     overflow-y: scroll;
     overflow-x: hidden;
-
     @media (max-width: 800px) {
         padding-top: 20px;
         padding-bottom: 20px;
@@ -285,8 +286,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
                                                 {/* change later */}
                                                 {/* <img src={user.avatar} alt="avatar" /> */}
                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
+                                                <img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
 
-                                                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
                                                     {/* </div> */}
                                                     <div className="search-result-info ">
                                                         <h1
