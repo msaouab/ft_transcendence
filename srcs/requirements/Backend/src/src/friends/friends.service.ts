@@ -7,6 +7,8 @@ import { FriendshipExistsException } from "src/exceptions/FriendshipExist.except
 // imported services
 import { UserService } from "src/user/user.service";
 import { DeleteFriendshipDto } from "./dto/delete-friendship.dto";
+import { clients as onlineClientsMap } from "src/notify/notify.gateway";
+
 
 @Injectable()
 export class FriendsService {
@@ -114,6 +116,15 @@ export class FriendsService {
     });
     if (!freindship) {
       throw new HttpException("friendship not exist", 404);
+    }
+
+    if (onlineClientsMap.has(friendUser_id)) {
+      const socket = onlineClientsMap.get(friendUser_id);
+      socket.emit("inviteAccepted", );
+    }
+    if (onlineClientsMap.has(user_id)) {
+      const socket = onlineClientsMap.get(user_id);
+      socket.emit("inviteAccepted", );
     }
     // delete friendship
     return await this.prisma.friendsTab.delete({

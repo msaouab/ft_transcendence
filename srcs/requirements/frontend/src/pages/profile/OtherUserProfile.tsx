@@ -61,6 +61,7 @@ const OtherUserProfile = () => {
     firstName: "",
     lastName: "",
     status: "",
+    avatar: "",
   });
   const [rankData, setRankData] = useState({
     wins: "",
@@ -85,20 +86,18 @@ const OtherUserProfile = () => {
   useEffect(() => {
     if (connected) {
       notifySocket.on("inviteAccepted", (data: any) => {
-        if (data.user_id === userId) {
           getAllData();
-        }
       });
     }
   }, [connected]);
 
   const getAllData = () => {
-    if (id === "") return;
-
     const friendsData = async () => {
       const data = await getFriendsInfo(id as string);
       setFriends(data);
     };
+    if (id === "") return;
+
     const joinedChannelData = async () => {
       const data = await getChannels(id as string);
       setJoinedChannel(data);
@@ -137,33 +136,28 @@ const OtherUserProfile = () => {
   };
 
   const sendFriendInvitation = async () => {
-    const data = await addFriend(userId, id);
+    const data = await addFriend(userId, id as string);
     getAllData();
-    console.log(data);
   };
 
   const BlockUser = async () => {
-    const data = await blockThisUser(userId, id);
+    const data = await blockThisUser(userId, id as string);
     getAllData();
-    console.log(data);
   };
 
   const unblockUser = async () => {
-    const data = await unblockThisUser(userId, id);
+    const data = await unblockThisUser(userId, id as string);
     getAllData();
-    console.log(data);
   };
 
   const RemoveFriendInvite = async () => {
     const data = await RemoveThisFriendInvite(userId, id);
     getAllData();
-    console.log(data);
   };
 
   const DeleteFriend = async () => {
-    const data = await deleteFreind(userId, id);
+    const data = await deleteFreind(userId, id as string);
     getAllData();
-    console.log(data);
   };
 
   // a function that returns the type of the relation between the current user and the user whose profile is being viewed and

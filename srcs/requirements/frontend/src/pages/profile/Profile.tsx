@@ -71,30 +71,28 @@ const Profile = () => {
     getAllData();
   }, [userId]);
 
-  const getAllData = () => {
-    const friendsData = async () => {
-      const data = await getFriendsInfo(userId);
-      setFriends(data);
-    };
-    const joinedChannelData = async () => {
-      const data = await getChannels(userId);
-      setJoinedChannel(data);
-    };
-    const achivementsData = async () => {
-      const data = await getAchivements(userId);
-      setAchivements(data);
-    };
+  const friendsData = async () => {
+    const data = await getFriendsInfo(userId);
+    setFriends(data);
+  };
+  const joinedChannelData = async () => {
+    const data = await getChannels(userId);
+    setJoinedChannel(data);
+  };
+  const achivementsData = async () => {
+    const data = await getAchivements(userId);
+    setAchivements(data);
+  };
+  const getUserData = async () => {
+    const data = await getUserInfo(userId);
+    setData(data);
+  };
 
+  const getAllData = () => {
     const rankData = async () => {
       const data = await getRankData(userId);
       setRankData(data);
     };
-
-    const getUserData = async () => {
-      const data = await getUserInfo(userId);
-      setData(data);
-    };
-
     friendsData();
     joinedChannelData();
     achivementsData();
@@ -102,14 +100,12 @@ const Profile = () => {
     getUserData();
   };
 
-  console.log("user status inside profile is ", achivements);
 
   useEffect(() => {
     if (connected) {
       notifySocket.on("inviteAccepted", (data: any) => {
-        if (data.user_id === userId) {
-          getAllData();
-        }
+        friendsData();
+        
       });
     }
   }, [connected]);
@@ -312,7 +308,7 @@ const Profile = () => {
             Achievements
           </div>
           <div className="achiv-container flex gap-10   m-auto min-h-[20rem]">
-            {achivements ? (
+            {achivements && achivements.length ? (
               <div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
                 <SwiperComponent
                   slides={achivements.map((achivement, index) => (
@@ -321,7 +317,7 @@ const Profile = () => {
                 ></SwiperComponent>
               </div>
             ) : (
-              <div className="flex justify-center items-center w-full">
+              <div className="flex justify-center items-center w-full ">
                 <NoAchivements />
               </div>
             )}
