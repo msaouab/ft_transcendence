@@ -230,7 +230,7 @@ const SearchBar = () => {
         }
         );
         setSearch(searchProp);
-        socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
+        socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') });        // console.log("search", searchProp });
     };
     const handleDropdown = () => {
         setDropdown(!dropdown);
@@ -294,7 +294,7 @@ const SearchBar = () => {
                                                 <div className="search-results-header flex flex-row items-center w-full justify-between">
                                                     <h1 className="text-base font-bold text-zinc-800 w-auto text-left justify-between" > People</h1>
                                                     <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900 w-auto">
-                                                        <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline mr-1 " >See more</a>
+                                                        {/* <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline mr-1 " >See more</a> */}
                                                     </div>
                                                 </div>
 
@@ -338,10 +338,6 @@ const SearchBar = () => {
                                             searchResults['channels'] && searchResults['channels'].length > 0 ? (
                                                 <div className="search-results-header mt-3 flex flex-row items-center w-full justify-between">
                                                     <h1 className='text-base font-bold text-zinc-800 w-9/12 text-left' >Channels</h1>
-
-                                                    <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                                        <Link to={`/search?entity=channels&keyword=${search}`} className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-1" >See more</Link>
-                                                    </div>
                                                 </div>
                                             ) : null
                                         }
@@ -350,21 +346,20 @@ const SearchBar = () => {
                                                 const isInChannel = channel.users.some((user: any) => {
                                                     return user.user_id === Cookies.get('id');
                                                 });
+
                                                 // console.log("channel: ", channel)
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
-                                                            <Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
+                                                            <div  className="flex flex-row flex-start items-center gap-4 w-full">
                                                                 <div className="search-result-avatar">
-                                                                    {/* uncomment later */}
-                                                                    {/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
-                                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
+                                                                    <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" />
                                                                 </div>
                                                                 <div className="search-result-info">
                                                                     <h1 className="text-xl font-bold ">{channel.name}</h1>
                                                                     <p className="text-zinc-900" > {channel.chann_type}</p>
                                                                 </div>
-                                                            </Link>
+                                                            </div>
                                                         </div>
                                                         <div className="chat-button flex justify-center items-center mr-1">
                                                             {

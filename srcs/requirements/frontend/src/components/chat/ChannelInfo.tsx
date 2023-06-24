@@ -87,7 +87,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                     return data.id === currentUserId
                 });
             }
-            console.log("channel subscribers", res);
             setCurrentUser(currentUser);
             setChannel(res.channel);
             setChannelUsers(res.subscribers);
@@ -363,9 +362,9 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 >
                     {
                         channel && channelUsers && (
-                            <div className='absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/40 to-transparent p-1'>
-                                <h1 className='text-gray-900 text-xl'>{channel.name}</h1>
-                                <p className='text-gray-700'>{
+                            <div className='absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/90 to-transparent p-1 '>
+                                <h1 className='text-black text-xl'>{channel.name}</h1>
+                                <p className='text-black'>{
                                     channelUsers.length === 1 ? (
                                         `${channelUsers.length} member`
                                     ) : (
@@ -377,20 +376,22 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                         )
                     }
                 </div>
-                <button className='flex items-center aspect-square 
-                        hover:bg-white/10 active:bg-white/20 h-16' >
-                    <span className='flex justify-center items-center h-full aspect-square'>
-                        <AiOutlineLink className='text-xl ' />
-                    </span>
-                    <span className='flex-1 flex flex-col text-left p-1 gap-1'>
-                        <span className='font-bold '>
-                            https://discord.gg/2Y8bQ4
-                        </span>
-                        <span className='text-xs text-gray-400'>
-                            Click to copy
-                        </span>
-                    </span>
-                </button>
+                {
+                    channel && channel?.chann_type === "Private" && (
+                        <div className='flex items-center aspect-square 
+                        hover:bg-white/10  h-16' >
+                            <span className='flex justify-center items-center h-full aspect-square'>
+                                <AiOutlineLink className='text-xl ' />
+                            </span>
+                            <span className='flex-1 flex flex-col text-left p-1 gap-1'>
+                                <span className='font-bold'>
+                                    {channel.id}
+                                </span>
+                            </span>
+                        </div>
+                    )
+                }
+
                 <div className='flex-1 flex flex-col gap-2 p-2 overflow-auto '>
                     <Tabs value="Subscribers">
                         <TabsHeader

@@ -11,6 +11,8 @@ import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 import { HOSTNAME } from "../../../api/axios";
 import { getAvatarUrlById } from '../CommonFunc';
+import JoinChannel from './JoinChannel';
+import { BiGroup } from 'react-icons/bi';
 
 const DropdownSeachStyle = styled.div`
     background: rgba(217, 217, 217, 0.3);
@@ -145,6 +147,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 	const [search, setSearch] = useState<string>('');
 	let [searchConnected, setSearchConnected] = useState<boolean>(false);
 	let [searchResults, setSearchResults] = useState<any[]>([]);
+	const [joinChannel, setJoinChannel] = useState({});
 	let socket = useRef<any>(null);
 	useEffect(() => {
 		if (socket.current) {
@@ -188,10 +191,22 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 		}
 		);
 		setSearch(searchProp);
-		socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
+		socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') });        // console.log("search", searchProp });
 	};
 
 
+	const handleJoinChannel = (channel: any) => {
+		setJoinChannel({
+			channel: {
+				id: channel.id,
+				name: channel.name,
+				type: channel.chann_type,
+				password: channel.password,
+				avatar: channel.avatar,
+			},
+			userId: Cookies.get('id'),
+		});
+	}
 
 
 	// const 
@@ -264,13 +279,13 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 							searchResults['users'] && searchResults['users'].length > 0 ? (
 								<div className="search-results-header flex flex-row items-center w-full justify-between">
 									<h1 className="text-base font-bold text-zinc-800 w-9/12 text-left">People</h1>
-									<div className="search-see-more  gap-2 cursor-pointer hover:text-zinc-900 self-end">
+									{/* <div className="search-see-more  gap-2 cursor-pointer hover:text-zinc-900 self-end">
 										<Link
 											to={`/search?entity=users&keyword=${search}`}
 											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
 										>See more</Link>
 
-									</div>
+									</div> */}
 								</div>
 
 							) : null
@@ -333,37 +348,49 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 										className='text-base font-bold text-zinc-800 w-9/12 text-left'
 									>Channels</h1>
 
-									<div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
+									{/* <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
 										<Link
 											to={`/search?entity=channels&keyword=${search}`}
 											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
 										>See more</Link>
-									</div>
+									</div> */}
 								</div>
 							) : null
 						}
 						{
 							searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
-								return (
+								const isInChannel = channel.users.some((user: any) => {
+									return user.user_id === Cookies.get('id');
+								});
 
+								// console.log("channel: ", channel)
+								return (
 									<div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
 										<div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
-											<Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
+											<div className="flex flex-row flex-start items-center gap-4 w-full">
 												<div className="search-result-avatar">
-													{/* change later */}
-													{/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
-													<img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+													<img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" />
 												</div>
 												<div className="search-result-info">
-													<h1
-														className="text-xl font-bold "
-													>{channel.name}</h1>
-													<p
-														className="text-zinc-900"
-													> {channel.chann_type}</p>
+													<h1 className="text-xl font-bold ">{channel.name}</h1>
+													<p className="text-zinc-900" > {channel.chann_type}</p>
 												</div>
-
-											</Link>
+											</div>
+										</div>
+										<div className="chat-button flex justify-center items-center mr-1">
+											{
+												isInChannel ? (null) : (
+													<a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
+														e.preventDefault();
+														// setDropdown(false);
+														setSearch('');
+														setSearchResults([]);
+														handleJoinChannel(channel);
+													}}>
+														<BiGroup className="chat-icon " size={30} />
+													</a>
+												)
+											}
 										</div>
 									</div>
 								)
@@ -371,7 +398,9 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 						}
 					</div>
 				</div >
-
+				{
+					Object.keys(joinChannel).length !== 0 && (<JoinChannel joinChannel={joinChannel} setJoinChannel={setJoinChannel} />)
+				}
 			</DropdownSeachStyle >
 		)
 	)
