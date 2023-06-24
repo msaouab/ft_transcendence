@@ -113,7 +113,6 @@ const SideBar = ({
 					}
 					if (response.statusText) {
 					}
-					console.log("=======>response.data.avatar", response.data);
 					setUserImg(response.data.avatar);
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);

@@ -36,8 +36,7 @@ const Game = () => {
 	const { setTypeRoom, typeRoom, setModeRoom, modeRoom, mysocket } =
 		useGameContext();
 	const location = useLocation();
-	const { user, benome } = location.state;
-	// console.log("user:", user, "benome:", benome);
+	const { user, benome, width } = location.state;
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 
 	const payload = {
@@ -59,18 +58,20 @@ const Game = () => {
 		};
 	}, [mysocket]);
 
+	// console.log("user:", user);
+
+
 	// useEffect(() => {
 		// const RoomType = localStorage.getItem("typeRoom");
 		// const RoomMode = localStorage.getItem("modeRoom");
 		// if (RoomType) setTypeRoom(RoomType);
 		// if (RoomMode) setModeRoom(RoomMode);
-		// console.log("2 - mysocket", mysocket);
 	// }, [typeRoom, mysocket]);
 
 	return (
 		<CanvasContainer isFirst>
 			<PlayerContainer isFirst height={payload.height} width={payload.width}>
-				{user ? (
+				{user && benome ? (
 					<GameProfile user={user} isFirst={true} score={score.player1} />
 				) : (
 					<p>Loading...</p>
@@ -78,14 +79,14 @@ const Game = () => {
 			</PlayerContainer>
 			{mysocket ? (
 				<PingPong
-					width={payload.width}
-					height={payload.height}
+					// width={width}
+					// height={payload.height}
 				/>
 			) : (
 				<p>Loading...</p>
 			)}
 			<PlayerContainer height={payload.height} width={payload.width}>
-				{benome ? (
+				{benome && user ? (
 					<GameProfile user={benome} isFirst={false} score={score.player2} />
 				) : (
 					<p>Loading...</p>

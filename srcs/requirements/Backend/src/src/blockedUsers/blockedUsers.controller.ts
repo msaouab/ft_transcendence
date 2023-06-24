@@ -46,8 +46,6 @@ export class BlockedUsersController {
     async deleteBlockedUsers(@Param('id') id: string, @Param('idBlockedUser') blockedUserId: string) {
         const blockedUsers = await this.BlockedUsersService.deleteBlockedUser(id, blockedUserId);
         return blockedUsers
-        // console.log("deleteBlockedUsers");
-        // console.log(BlockedUserDto);
     }
 
 }

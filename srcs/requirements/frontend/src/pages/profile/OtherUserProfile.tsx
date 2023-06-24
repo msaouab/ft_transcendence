@@ -15,25 +15,25 @@ import Lose from "../../assets/lose.png";
 import { useGlobalContext } from "../../provider/AppContext";
 import { useEffect, useState } from "react";
 import instance, {
-  RemoveThisFriendInvite,
-  addFriend,
-  blockThisUser,
-  deleteFreind,
-  getAchivements,
-  getChannels,
-  getFriendsInfo,
-  getRankData,
-  getUserInfo,
-  isFriend,
-  unblockThisUser,
+	RemoveThisFriendInvite,
+	addFriend,
+	blockThisUser,
+	deleteFreind,
+	getAchivements,
+	getChannels,
+	getFriendsInfo,
+	getRankData,
+	getUserInfo,
+	isFriend,
+	unblockThisUser,
 } from "../../api/axios";
 import SwiperComponent from "../../components/common/Slider";
 import { FreindCard, GameCard, AchivementCard, ChanelCard } from "./Cards";
 import { useOutletContext } from "react-router-dom";
 import {
-  NoAchivements,
-  NoChanel,
-  NoFriend,
+	NoAchivements,
+	NoChanel,
+	NoFriend,
 } from "../../components/common/EmptyComponents";
 import { getAvatarUrl } from "../../components/common/CommonFunc";
 
@@ -71,12 +71,12 @@ const OtherUserProfile = () => {
     rank: "",
   });
 
-  const [friends, setFriends] = useState<friendsInterface[]>([]);
-  const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
-  const [achivements, setAchivements] = useState<friendsInterface[]>([]);
-  const [avatar, setAvatar] = useState("");
-  const { userId } = useGlobalContext();
-  const [relationStatus, setRelationStatus] = useState("");
+	const [friends, setFriends] = useState<friendsInterface[]>([]);
+	const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
+	const [achivements, setAchivements] = useState<friendsInterface[]>([]);
+	const [avatar, setAvatar] = useState("");
+	const { userId } = useGlobalContext();
+	const [relationStatus, setRelationStatus] = useState("");
 
   useEffect(() => {
     getAllData();
@@ -126,14 +126,14 @@ const OtherUserProfile = () => {
       if (data) setRelationStatus(data);
     };
 
-    friendsData();
-    joinedChannelData();
-    achivementsData();
-    rankData();
-    getUserData();
-    getUserAvatar();
-    isMyFriend();
-  };
+		friendsData();
+		joinedChannelData();
+		achivementsData();
+		rankData();
+		getUserData();
+		getUserAvatar();
+		isMyFriend();
+	};
 
   const sendFriendInvitation = async () => {
     const data = await addFriend(userId, id as string);
@@ -160,96 +160,96 @@ const OtherUserProfile = () => {
     getAllData();
   };
 
-  // a function that returns the type of the relation between the current user and the user whose profile is being viewed and
-  const FriendRelatioType = () => {
-    if (relationStatus === "notFriend") {
-      return (
-        <div className="w-full p-2 ">
-          <button
-            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3  border-blue-gray-50"
-            onClick={sendFriendInvitation}
-          >
-            <AiOutlineUserAdd className="mr-1 text-3xl" />
-            Add Friend
-          </button>
-          <button
-            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
-            onClick={BlockUser}
-          >
-            <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Block User
-          </button>
-        </div>
-      );
-    } else if (relationStatus === "pending") {
-      return (
-        <div className="w-full px-4 py-2 m-auto">
-          <button
-            className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
-            onClick={RemoveFriendInvite}
-          >
-            <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Invitation
-          </button>
-          <hr className="opacity-50 "></hr>
+	// a function that returns the type of the relation between the current user and the user whose profile is being viewed and
+	const FriendRelatioType = () => {
+		if (relationStatus === "notFriend") {
+			return (
+				<div className="w-full p-2 ">
+					<button
+						className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3  border-blue-gray-50"
+						onClick={sendFriendInvitation}
+					>
+						<AiOutlineUserAdd className="mr-1 text-3xl" />
+						Add Friend
+					</button>
+					<button
+						className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+						onClick={BlockUser}
+					>
+						<AiOutlineUserDelete className="mr-1 text-3xl" />
+						Block User
+					</button>
+				</div>
+			);
+		} else if (relationStatus === "pending") {
+			return (
+				<div className="w-full px-4 py-2 m-auto">
+					<button
+						className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
+						onClick={RemoveFriendInvite}
+					>
+						<AiOutlineUserDelete className="mr-1 text-3xl" />
+						Remove Invitation
+					</button>
+					<hr className="opacity-50 "></hr>
 
-          <button
-            className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
-            onClick={BlockUser}
-          >
-            <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Block User
-          </button>
-        </div>
-      );
-    } else if (relationStatus === "friend") {
-      return (
-        <div className="w-full p-2 m-auto">
-          <button
-            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
-            onClick={DeleteFriend}
-          >
-            <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Remove Friend
-          </button>
-          <hr></hr>
-          <button
-            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
-            onClick={BlockUser}
-          >
-            <AiOutlineUserDelete className="mr-1 text-3xl" />
-            Block User
-          </button>
-        </div>
-      );
-    } else {
-      return (
-        <div className="w-full p-2 m-auto">
-          <button
-            className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
-            onClick={unblockUser}
-          >
-            <AiOutlineUserAdd className="mr-1 text-3xl" />
-            Unblock
-          </button>
-        </div>
-      );
-    }
-  };
-  const navigate = useNavigate();
+					<button
+						className="hover:scale-105 text-white  py-2 rounded-md flex items-center gap-3 "
+						onClick={BlockUser}
+					>
+						<AiOutlineUserDelete className="mr-1 text-3xl" />
+						Block User
+					</button>
+				</div>
+			);
+		} else if (relationStatus === "friend") {
+			return (
+				<div className="w-full p-2 m-auto">
+					<button
+						className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+						onClick={DeleteFriend}
+					>
+						<AiOutlineUserDelete className="mr-1 text-3xl" />
+						Remove Friend
+					</button>
+					<hr></hr>
+					<button
+						className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+						onClick={BlockUser}
+					>
+						<AiOutlineUserDelete className="mr-1 text-3xl" />
+						Block User
+					</button>
+				</div>
+			);
+		} else {
+			return (
+				<div className="w-full p-2 m-auto">
+					<button
+						className="hover:scale-105 text-white px-4 py-2 rounded-md flex items-center gap-3 "
+						onClick={unblockUser}
+					>
+						<AiOutlineUserAdd className="mr-1 text-3xl" />
+						Unblock
+					</button>
+				</div>
+			);
+		}
+	};
+	const navigate = useNavigate();
 
-  useEffect(() => {
-    if (relationStatus == "blockedBy") navigate("*");
-  }, []);
+	useEffect(() => {
+		if (relationStatus == "blockedBy") navigate("*");
+	}, []);
 
-  const [showFriendRelationMenu, setShowFriendRelationMenu] = useState(false);
-  const FriendRelationMenuStyle = styled.div`
-    animation: 1s ease-in-out;
-  `;
+	const [showFriendRelationMenu, setShowFriendRelationMenu] = useState(false);
+	const FriendRelationMenuStyle = styled.div`
+		animation: 1s ease-in-out;
+	`;
 
-  if (relationStatus === "blockedBy") {
-    navigate("/*");
-  }
+	if (relationStatus === "blockedBy") {
+		navigate("/*");
+	}
 
   return (
     <>

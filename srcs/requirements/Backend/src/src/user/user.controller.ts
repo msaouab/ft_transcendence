@@ -75,7 +75,6 @@ import { PutStatusDto } from "./dto/put.status.dto";
     // @UseGuards(AuthenticatedGuard, UserExistsGuard)
     @UseGuards(UserExistsGuard)
     async getGroupChat(@Param("id") id: string) {
-      console.log("getGroupChat");
     }
   
     @Get(":id/rankData")

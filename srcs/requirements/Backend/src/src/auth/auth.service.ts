@@ -38,7 +38,7 @@ export class AuthService {
                     email:  user._json.email,
                     firstName:  user.name.givenName,
                     lastName:  user.name.familyName,
-                    avatar: `${HOSTNAME}:3000/default.png`,
+                    avatar: `http://${HOSTNAME}:3000/default.png`,
                     status: 'Online',
                     otp_base32: encryptedString,
                 },

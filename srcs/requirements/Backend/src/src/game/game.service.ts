@@ -198,7 +198,6 @@ export class GameService {
 				status: "Pending",
 			},
 		});
-		console.log("invites:", invites);
 		return invites;
 	}
 	async getFriendsLiveGames(user) {

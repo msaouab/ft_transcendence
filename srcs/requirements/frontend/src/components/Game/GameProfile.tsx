@@ -1,13 +1,16 @@
-import { GetAvatar } from "../../api/axios";
+import { GetAvatar, getUserInfo } from "../../api/axios";
 import styled from "styled-components";
 import { useEffect, useState } from "react";
 import Moulinete from "../../assets/Moulinette42.jpeg";
+import { getAvatarUrl, getAvatarUrlById } from "../common/CommonFunc";
+import Cookies from "js-cookie";
 
 interface GameProfileProps {
 	user: {
 		id: string;
 		login: string;
 		status: string;
+		avatar: string;
 	};
 	isFirst?: boolean;
 	score?: number;
@@ -37,7 +40,6 @@ const PlayerContainer = styled.div<{ isFirst?: boolean }>`
 		padding: 0;
 		justify-content: space-around;
 		align-items: center;
-		border: 1px solid red;
 		width: 100%;
 		flex-direction: ${({ isFirst }) => (isFirst ? "row-reverse" : "row")};
 		.score {
@@ -56,27 +58,17 @@ const ScoreContainer = styled.div`
 `;
 
 const GameProfile = ({ user, isFirst, score }: GameProfileProps) => {
-	const [userImg, setUserImg] = useState<string>("");
+	const [userInfos, setUserInfos] = useState<any>({} as any);
 
 	useEffect(() => {
-		const getAvatarImg = async (id: string) => {
-			if (user.id !== "Bot") {
-				const userImg = await GetAvatar(id);
-				setUserImg(userImg || "");
-			}
-		};
-		if (user.id === "Bot") setUserImg(Moulinete);
-		getAvatarImg(user.id);
-		return () => {
-			setUserImg("");
-		};
-	}, []);
+		if (user.id === "Bot") user.avatar = Moulinete;
+	}, [user]);
 
 	return (
 		<PlayerContainer isFirst={isFirst}>
 			<ScoreContainer className="score">{score}</ScoreContainer>
 			<div className="useInfo">
-				<img src={userImg} alt="avatar" className="circle-image" />
+				<img src={user?.avatar} alt="avatar" className="circle-image" />
 				<p className="login">{user.login}</p>
 			</div>
 		</PlayerContainer>

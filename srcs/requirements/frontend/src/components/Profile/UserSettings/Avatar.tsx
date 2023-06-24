@@ -21,7 +21,6 @@ function Avatar() {
 	const [open, setOpen] = useState(false);
 	const handelOpen = () => {
 		setOpen(!open);
-		console.log(open);
 	};
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,16 +38,13 @@ function Avatar() {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		console.log("File selected:");
 		if (!selectedFile) {
-			console.log("No file selected");
 			return;
 		}
 		handelOpen();
 
     PostAvatar(selectedFile)
       .then((res: any) => {
-        console.log("File uploaded!:", res.data);
         setUserImg(res.data.avatar);
         notify("success");
         setSelectedFile(null);

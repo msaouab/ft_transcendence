@@ -37,10 +37,6 @@ import { ApiTags } from '@nestjs/swagger';
     @UseGuards(AuthenticatedGuard)
     @Render('profile')
     profile(@User() user: Profile) {
-      console.log(user.username);
-      console.log(user._json.email);
-      console.log(user.name.givenName);
-      console.log(user.name.familyName);
       return { user };
     }
     @Get('logout')

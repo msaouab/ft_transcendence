@@ -14,7 +14,6 @@ function VerifyPage() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formData);
     const number = formData.toString();
     instance
       .put(`/user/${Cookies.get("userid")}/2fa/verify`, { number })
