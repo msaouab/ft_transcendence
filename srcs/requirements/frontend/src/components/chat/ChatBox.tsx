@@ -3,6 +3,8 @@ import React from "react";
 // import socket from '../../socket';
 import { useEffect } from "react";
 import Cookies from "js-cookie";
+import { GetJoindChannels } from "../../api/axios";
+
 
 const ChatBoxStyle = styled.div`
 	background: transparent;
@@ -25,7 +27,7 @@ const ChatBoxStyle = styled.div`
 `;
 
 import { useGlobalContext } from "../../provider/AppContext";
-import { PrivateMessage } from "../../types/message";
+import { GroupMessage, PrivateMessage } from "../../types/message";
 import { singleMessage } from "../../types/message";
 // components
 import ChatBoxTopBar from "./ChatBoxToBar";
@@ -42,7 +44,9 @@ const ChatBox = ({
 	setNewLatestMessage,
 	chatSocket,
 	connected,
-	
+	selectedGroupChat,
+    setSelectedGroupChat,
+	setSelectedChat,
 
 }: {
 	selectedChat: PrivateMessage;
@@ -50,6 +54,10 @@ const ChatBox = ({
 	setNewLatestMessage?: any;
 	chatSocket: any;
 	connected: boolean;
+
+	selectedGroupChat: GroupMessage;
+	setSelectedGroupChat: any;
+	setSelectedChat: any;
 	
 
 
@@ -61,7 +69,7 @@ const ChatBox = ({
 		totalMessages: 0,
 	};
 
-	const { privateChatRooms, setPrivateChatRooms } = useGlobalContext();
+	const { privateChatRooms, setPrivateChatRooms, groupChatRooms, setGroupChatRooms } = useGlobalContext();
 
 	const updateSeenStatus = (messages: singleMessage[]) => {
 		messages.forEach((message: any) => {
@@ -85,6 +93,8 @@ const ChatBox = ({
 			}
 		});
 	};
+
+	
 
 	useEffect(() => {
 		console.log("chatbox useeffect");
@@ -155,6 +165,208 @@ const ChatBox = ({
 		// return () => {
 		// 	chatSocket.current.off("newPrivateMessage");
 		// };
+	}, [connected]);
+
+	useEffect(() => {
+		if (connected) {
+			chatSocket.current.on("newChannelAdmin", (message: any) => {
+				if (message.id === Cookies.get("id")) {
+					const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+					setSelectedGroupChat({
+						...channel,
+						role: "Admin",
+					});
+					setGroupChatRooms((prev: any) => {
+						return prev.map((chat: any) => {
+							if (chat.group_id === message.group_id) {
+								return { ...chat, role: "Admin" }
+							}
+							return chat;
+						})
+					});
+				}
+			});
+			chatSocket.current.on("removeChannelAdmin", (message: any) => {
+				if (message.id === Cookies.get("id")) {
+					const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+					setSelectedGroupChat({
+						...channel,
+						role: "Member",
+					});
+					setGroupChatRooms((prev: any) => {
+						return prev.map((chat: any) => {
+							if (chat.group_id === message.group_id) {
+								return { ...chat, role: "Member" }
+							}
+							return chat;
+						})
+					});
+				}
+			});
+			chatSocket.current.on("muteChannelUser", (message: any) => {
+				if (message.id === Cookies.get("id")) {
+					const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+					if (selectedGroupChat.group_id === message.group_id) {
+						setSelectedGroupChat({
+							...channel,
+							role: "Muted",
+						});
+					}
+					setGroupChatRooms((prev: any) => {
+						return prev.map((chat: any) => {
+							if (chat.group_id === message.group_id) {
+								return { ...chat, role: "Muted" }
+							}
+							return chat;
+						})
+					});
+				}
+			});
+			chatSocket.current.on("unmuteChannelUser", (message: any) => {
+				if (message.id === Cookies.get("id")) {
+					const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
+					if (selectedGroupChat.group_id === message.group_id) {
+						setSelectedGroupChat({
+							...channel,
+							role: "Member",
+						});
+					}
+					setGroupChatRooms((prev: any) => {
+						return prev.map((chat: any) => {
+							if (chat.group_id === message.group_id) {
+								return { ...chat, role: "Member" }
+							}
+							return chat;
+						})
+					});
+				}
+			});
+			chatSocket.current.on("kickChannelUser", (message: any) => {
+				if (message.id === Cookies.get("id")) {
+					setSelectedGroupChat({} as GroupMessage);
+					setGroupChatRooms((prev: any) => {
+						return prev.filter((group: any) => group.group_id !== message.group_id)
+					})
+				}
+			});
+			chatSocket.current.on("banChannelUser", (message: any) => {
+				if (message.id === Cookies.get('id')) {
+					setSelectedGroupChat({} as GroupMessage);
+					setGroupChatRooms((prev: any) => {
+						return prev.filter((group: any) => group.group_id !== message.group_id)
+					})
+				}
+			});
+			chatSocket.current.on("unbanChannelUser", (message: any) => {
+				if (message.id === Cookies.get('id')) {
+					try {
+						const getJoindChannels = async () => {
+							const channels = await GetJoindChannels(message.id);
+							const res = await Promise.all(
+								channels.map(async (channel: any) => {
+									return { ...channel };
+								})
+							);
+							return res;
+						};
+						getJoindChannels().then((res) => {
+							const channel = res.find((chat: any) => chat.group_id === message.group_id);
+							setSelectedChat({} as PrivateMessage);
+							setSelectedGroupChat(channel);
+							setGroupChatRooms(res);
+						}).catch((err) => {
+							console.log(err);
+						});
+					}
+					catch (err) {
+						console.log(err);
+					}
+				}
+			});
+			chatSocket.current.on("memberLeaveChannel", (message: any) => {
+				try {
+					if (message.id === Cookies.get('id')) {
+						console.log("member leave channel message: ", groupChatRooms);
+						setSelectedGroupChat({} as GroupMessage);
+						let channel: GroupMessage = {} as GroupMessage;
+						setGroupChatRooms((prev: any) => {
+							return prev.filter((group: any) => {
+								if (group.group_id !== message.group_id) {
+									return { ...group };
+								}
+								channel = { ...group };
+								return false;
+							})
+						})
+						chatSocket.current.emit("leaveGroupRoom", { group_id: message.group_id });
+						chatSocket.current.emit("sendMessageG", {
+							...channel,
+							sender_id: channel.group_id,
+							lastMessage: `${message.login} has left the channel`,
+							lastMessageDate: new Date().toISOString(),
+							role: "Server",
+
+						});
+					}
+				} catch (err) {
+					console.log(err);
+				}
+			});
+			chatSocket.current.on("channelDeleted", (message: any) => {
+				setSelectedGroupChat({} as GroupMessage);
+				setGroupChatRooms((prev: any) => {
+					return prev.filter((group: any) => group.group_id !== message.group_id)
+				})
+			});
+
+			chatSocket.current.on("newMessageG", (message: any) => {
+				setSelectedChat({} as PrivateMessage);
+				setSelectedGroupChat(message);
+				// setSelected(message.group_id);
+				setGroupChatRooms(prev => {
+					const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+					if (index === -1) {
+						return [message, ...prev];
+					}
+					return prev;
+				});
+			});
+
+			chatSocket.current.on("newGroupMessage", (data: any) => {
+				// console.log("jkadhsjkdhsakjldsaklsd", data);
+				setGroupChatRooms(prev => {
+					const index = prev.findIndex((group: GroupMessage) => group.group_id === data.group_id);
+					if (index === -1) {
+						return [data, ...prev];
+					}
+					const newGroupChatRooms = [...prev];
+					newGroupChatRooms[index].lastMessage = data.lastMessage;
+					newGroupChatRooms[index].lastMessageDate = data.lastMessageDate;
+					return newGroupChatRooms;
+				})
+				setSelectedChat({} as PrivateMessage);
+				// setSelected(data.group_id);
+				setSelectedGroupChat(data);
+			});
+		}
+		return () => {
+			if (connected) {
+				// groupChatRooms.forEach((group: any) => {
+				// 	chatSocket.current.emit("leaveGroupRoom", { group_id: group.group_id });
+				// });
+				chatSocket.current.off("newMessage");
+				chatSocket.current.off("newMessageG");
+				chatSocket.current.off("newGroupMessage");
+				chatSocket.current.off("muteChannelUser");
+				chatSocket.current.off("unmuteChannelUser");
+				chatSocket.current.off("kickChannelUser");
+				chatSocket.current.off("banChannelUser");
+				chatSocket.current.off("unbanChannelUser");
+				chatSocket.current.off("memberLeaveChannel");
+				chatSocket.current.off("channelDeleted");
+				chatSocket.current.off("newGroupMessage");
+			}
+		}
 	}, [connected]);
 
 	const { chatRoomid } = selectedChat;

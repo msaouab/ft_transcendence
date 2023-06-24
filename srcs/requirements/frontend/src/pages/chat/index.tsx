@@ -91,6 +91,21 @@ const Chat = () => {
   const [selected, setSelected] = React.useState("");
   const { setGroupChatRooms } = useGlobalContext();
 
+  const getGroupChatRooms = async () => {
+    let id = Cookies.get("id");
+    if (!id) return;
+    try {
+      const channels = await GetJoindChannels(id);
+      const res = await Promise.all(
+        channels.map(async (channel: any) => {
+          return { ...channel };
+        })
+      );
+      return res;
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     // socket connection
@@ -105,12 +120,26 @@ const Chat = () => {
       setConnected(true);
       chatSocket.current.emit('alive', { id: Cookies.get("id") });
       console.log("connected to the server");
-      console.log("groupChatRooms: ", groupChatRooms);
-      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("joining the room: ", groupChatRoom.group_id);
-        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
-        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+
+      getGroupChatRooms().then((res: any) => {
+        console.log("res: ", res);
+        setGroupChatRooms(res);
+        res.forEach((groupChatRoom: GroupMessage) => {
+          console.log("joining the room: ", groupChatRoom.group_id);
+          chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+          setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+        });
+      }).catch(err => {
+        console.log(err);
       });
+
+
+
+      // groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+      //   console.log("joining the room: ", groupChatRoom.group_id);
+      //   chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+      //   setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+      // });
     });
 
     chatSocket.current.on("roomJoined", () => {
@@ -398,32 +427,30 @@ const Chat = () => {
           return prev.filter((group: any) => group.group_id !== message.group_id)
         })
       });
-
-      chatSocket.current.on("newMessageG", (message: any) => {
-        setSelectedChat({} as PrivateMessage);
-        setSelectedGroupChat(message);
-        setSelected(message.group_id);
-        setGroupChatRooms(prev => {
-          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
-          if (index === -1) {
-            return [message, ...prev];
-          }
-          return prev;
-        });
-      });
     }
     return () => {
-      chatSocket.current.off("newChannelAdmin");
-      chatSocket.current.off("removeChannelAdmin");
-      chatSocket.current.off("muteChannelUser");
-      chatSocket.current.off("unmuteChannelUser");
-      chatSocket.current.off("kickChannelUser");
-      chatSocket.current.off("banChannelUser");
-      chatSocket.current.off("unbanChannelUser");
-      chatSocket.current.off("memberLeaveChannel");
-      chatSocket.current.off("channelDeleted");
+      if (connected) {
+        chatSocket.current.off("muteChannelUser");
+        chatSocket.current.off("unmuteChannelUser");
+        chatSocket.current.off("kickChannelUser");
+        chatSocket.current.off("banChannelUser");
+        chatSocket.current.off("unbanChannelUser");
+        chatSocket.current.off("memberLeaveChannel");
+        chatSocket.current.off("channelDeleted");
+        chatSocket.current.off("newGroupMessage");
+      }
     }
-  }, [connected]);
+  }, [connected && groupChatRooms.length !== 0]);
+
+
+  // useEffect(() => {
+  //   if (connected) {
+      
+  //   }
+  //   // return () => {
+  //   //   chatSocket.current.off("newGroupMessage");
+  //   // }
+  // }, [connected]);
 
   useEffect(() => {
     if (connected) {
@@ -458,13 +485,15 @@ const Chat = () => {
       <div className="chat-box-wrapper">
         {selectedChat.chatRoomid ? (
           <ChatBox
-
+            setSelectedChat={setSelectedChat}
             selectedChat={selectedChat}
             key={selectedChat.chatRoomid}
             size="big"
             setNewLatestMessage={setNewLatestMessage}
             chatSocket={chatSocket}
             connected={connected}
+            selectedGroupChat={selectedGroupChat}
+            setSelectedGroupChat={setSelectedGroupChat}
           />
         ) : (
           <GroupChatBox

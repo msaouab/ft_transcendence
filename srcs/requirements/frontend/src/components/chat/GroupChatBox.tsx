@@ -29,6 +29,7 @@ const GroupChatBoxStyle = styled.div`
 `;
 
 interface GroupChatBoxProps {
+  setSelected: (selected: string) => void;
   selectedGroupChat: GroupMessage;
   setSelectedGroupChat: (chat: GroupMessage) => void;
   socket: any;
@@ -142,6 +143,9 @@ const GroupChatBox = ({
               messages: [newMessage, ...prevState.messages],
             }));
           })
+        }
+        else {
+          setSelectedGroupChat(data);
         }
       });
     }
