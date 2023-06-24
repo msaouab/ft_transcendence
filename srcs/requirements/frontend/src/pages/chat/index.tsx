@@ -42,6 +42,7 @@ const ChatStyle = Styled.div`
     min-height: 100%;
     flex-direction: column;
     align-items: center;
+    gap: 20px;
     padding-inline: 15px;
     padding-bottom: 10px;
     @media screen and (min-width: 720px) and (max-width: 770px) {
@@ -50,15 +51,14 @@ const ChatStyle = Styled.div`
     .chat-list {
       
       width: 100%;
-      height: auto;
-      max-height: 40%;
+      height: 50%;
       margin: 0 auto;
     }
     
     .chat-box-wrapper {
       width: 100%;
-      height: auto;
-      min-height: 30vh;
+      height: 50%;      
+      /* min-height: 30vh; */
       margin-top: 0;
     }
   }
@@ -470,8 +470,8 @@ const Chat = () => {
   }), [connected]
 
   return (
-    <ChatStyle>
-      <div className="chat-list">
+    <ChatStyle className="">
+      <div className="chat-list  ">
         <ChatList
           setSelectedChat={setSelectedChat}
           newLatestMessage={newLatestMessage}

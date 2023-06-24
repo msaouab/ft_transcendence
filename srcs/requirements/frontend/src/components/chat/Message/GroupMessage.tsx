@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { getDateChat } from '../../common/CommonFunc';
-
+import { LuGamepad2 } from 'react-icons/lu';
 
 
 interface MessageContainerProps {
@@ -51,6 +51,7 @@ const MessageContainer = styled.div<MessageContainerProps>`
     .message {
       padding: 10px;
       text-align: left;
+      word-break: break-word;
     }
     .titlelogin {
       display: flex;
@@ -106,16 +107,47 @@ const MessageContainer = styled.div<MessageContainerProps>`
 
 `;
 
+const GameInviteStyle = styled.div`
+    margin: 0 0px 0 10px;
+    align-self: center;
+`;
+
+const MessageContentStyle = styled.div`
+  display: flex;
+  .game__icon {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  &:hover {
+      .game__icon {
+          transition: all 0.3s ease-in-out;
+          opacity: 1;
+          width: 30px;
+          height: 30px;
+          font-size: 1.3rem;
+      }
+  }
+`;
+
 interface MessageProps {
   message: any
   sender: string;
   avatar: string;
   role: string;
 }
+import Cookies from 'js-cookie';
+
 
 const Message = ({ avatar, role, message, sender }: MessageProps) => {
 
   const { sender_name, content, dateCreated } = message;
+
+  const handleGameInvite = () => {
+    console.log("sender_id: ", Cookies.get('id'));
+    console.log("receiver_id: ", message.sender_id);
+    console.log("im trying to send game invite to user with id: ", message.sender_id);
+  }
 
   return (
     <MessageContainer sender={sender}>
@@ -127,33 +159,41 @@ const Message = ({ avatar, role, message, sender }: MessageProps) => {
               <p className="mx-4 message__date">{getDateChat(dateCreated)}</p>
             </div>
           </div>
-        )) : (<>
-          {avatar !== "" && sender === 'Friend' && (
-            <img
-              className="imgavatar"
-                src={message.sender_avatar}
-              alt="user"
-            />
-          )}
-          <div className="data-container">
-            <div className="titlelogin">
-              {sender_name !== "" && <span>{sender_name}</span>}
-              {role !== "" && <span>{role}</span>}
+        )) : (
+          <MessageContentStyle>
+            {avatar !== "" && sender === 'Friend' && (
+              <img
+                className="imgavatar"
+                  src={message.sender_avatar}
+                alt="user"
+              />
+            )}
+            <div className="data-container">
+              <div className="titlelogin">
+                {sender_name !== "" && <span>{sender_name}</span>}
+                {role !== "" && <span>{role}</span>}
+              </div>
+              <div className="message">
+                {content}
+                <br />
+                <p className="mx-4 message__date">{getDateChat(dateCreated)}</p>
+              </div>
             </div>
-            <div className="message">
-              {content}
-              <br />
-              <p className="mx-4 message__date">{getDateChat(dateCreated)}</p>
-            </div>
-          </div>
             {avatar !== "" && sender === "User" && (
-            <img
-              className="imgavatar"
-                src={message.sender_avatar}
-              alt="user"
-            />
-          )}
-        </>
+              <img
+                className="imgavatar"
+                  src={message.sender_avatar}
+                alt="user"
+              />
+            )}
+            {
+              sender === "Friend" && (
+                <GameInviteStyle onClick={() => handleGameInvite()}>
+                  <LuGamepad2 className="game__icon text-gray-400 cursor-pointer  hover:text-green-500 transition ease-in-out duration-150" />
+                </GameInviteStyle>
+              )
+            }
+          </MessageContentStyle>
         )}
 
     </MessageContainer>

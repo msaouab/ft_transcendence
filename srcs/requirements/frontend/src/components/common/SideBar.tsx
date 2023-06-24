@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Logo from "/logo.svg";
 import {
@@ -53,7 +53,12 @@ const SideBar = ({
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
-	const [menuIndex, setMenuIndex] = useState<number>(2);
+	const location = useLocation();
+	console.log("location", location.pathname);
+	const routes = ["/chat", "/game", "/profile", "/settings"];
+	const [menuIndex, setMenuIndex] = useState<number>(
+		routes.indexOf(location.pathname)
+	);
 	// const
 
 	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();

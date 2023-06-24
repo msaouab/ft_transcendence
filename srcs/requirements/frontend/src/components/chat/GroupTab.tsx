@@ -89,7 +89,7 @@ const GroupTab = ({
                 </h3>
                 <div className="chat-tab__info__last-message text-xs font-thin opacity-50">
                     {groupMessage.lastMessage.length > 25
-                        ? groupMessage.lastMessage.slice(0, 25) + "..."
+                        ? groupMessage.lastMessage.slice(0, 10) + "..."
                         : groupMessage.lastMessage}
                 </div>
             </div>

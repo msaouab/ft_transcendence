@@ -56,14 +56,15 @@ export const GameCard = () => {
 	);
 };
 
-export const ChanelCard = ({ channel_name, role, channel_id }: any) => {
+export const ChanelCard = ({ name, role, channel_id, profileImage }: any) => {
 	return (
 		<Link to={`/chat/${channel_id}`}>
-			<div className="flex justify-around flex-wrap  mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]">
-				<div className="chanelname  font-[500]">
+			<div className="flex justify-between flex-wrap  mx-2 p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white	min-h-[4rem]">
+				<div className="chanelname  font-[500] flex items-center gap-2">
+					<img src={profileImage} alt="" className="w-[40px] aspect-square rounded-[50%]" />
 					<span className="">Name: </span>
 					<span className="text-[#a5842f] text-xl capitalize">
-						{channel_name}
+						{name}
 					</span>
 				</div>
 				<div className="chanelname  font-[500]">

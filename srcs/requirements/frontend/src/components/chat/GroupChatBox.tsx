@@ -29,7 +29,6 @@ const GroupChatBoxStyle = styled.div`
 `;
 
 interface GroupChatBoxProps {
-  setSelected: (selected: string) => void;
   selectedGroupChat: GroupMessage;
   setSelectedGroupChat: (chat: GroupMessage) => void;
   socket: any;

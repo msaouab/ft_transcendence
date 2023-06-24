@@ -15,15 +15,21 @@ const GroupChatListStyle = styled.div`
     height: 100%;
     background: rgba(217, 217, 217, 0.3);
     border-radius: 25px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 10px;
+    .scroll{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 5px;
+      overflow-y: scroll;
+      height: 100%;
+      width: 100%;
+    }
 `;
 
 const Button = styled.button`
     cursor: pointer;
-    color: #fff;
+    color: #151515;
     background: rgb(233, 217, 144);
     border: transparent;
     border-radius: 0.25rem;
@@ -163,6 +169,7 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
 
   return (
     <GroupChatListStyle>
+      <div className="scroll">
       <div className="flex flex-row justify-between items-center">
         <h1 className="font-bold sm:text-2xl text-white text-xl flex justify-between">
           Groups
@@ -210,7 +217,6 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
         }
         
       </div>
-      <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
       <div className="">
         {groupChatRooms.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center ">
@@ -252,6 +258,7 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
             );
           })
         )}
+      </div>
       </div>
     </GroupChatListStyle>
   );

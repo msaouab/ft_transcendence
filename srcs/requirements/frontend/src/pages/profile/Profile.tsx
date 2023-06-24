@@ -283,6 +283,7 @@ const Profile = () => {
               {joinedChannel && joinedChannel.length ? (
                 <div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
                   {joinedChannel.map((chanel, index) => (
+                    console.log("eieiueiueiueieu : ",chanel),
                     <ChanelCard key={index} {...chanel} />
                   ))}
                 </div>

@@ -10,6 +10,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import ConfirmDelete from '../../common/ConfirmDelete';
 import { HOSTNAME } from '../../../api/axios';
+import { LuGamepad2 } from 'react-icons/lu';
+import { useNavigate } from "react-router-dom";
 
 const MessageStyle = styled.div`
 
@@ -44,6 +46,21 @@ display: flex;
         height: 20px;
         font-size: 1.2rem;
 
+    }
+}
+
+.game__icon {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+&:hover {
+    .game__icon {
+        transition: all 0.3s ease-in-out;
+        opacity: 1;
+        width: 25px;
+        height: 25px;
+        font-size: 1.3rem;
     }
 }
 `;
@@ -98,6 +115,15 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
         });
     }
 
+    const navigate = useNavigate();
+
+    const handleGameInvite = () => {
+        console.log("sender_id: ", Cookies.get('id'));
+        console.log("receiver_id: ", sender_id);
+        console.log("im trying to send game invite to user with id: ", sender_id);
+        navigate("/game/startGame", {});
+    }
+
     return (
         <div className='flex flex-col'>
             <MessageContentStyle sender_id={sender_id} id={id}>
@@ -111,6 +137,13 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
                         <DeletIconStyle sender_id={sender_id} id={id} onClick={() => setShowDeleteModal({ ...showDeleteModal, show: true })}>
                             <CiTrash className="delete__icon text-gray-400 cursor-pointer  hover:text-red-500 transition ease-in-out duration-150" />
                         </DeletIconStyle>
+                    }
+                    {
+                        sender_id !== Cookies.get('id') && (
+                            <DeletIconStyle sender_id={sender_id} id={id} onClick={() => handleGameInvite()}>
+                                <LuGamepad2 className="game__icon text-gray-400 cursor-pointer  hover:text-green-500 transition ease-in-out duration-150" />
+                            </DeletIconStyle>
+                        )
                     }
                 </MessageContentWrapper>
             </MessageContentStyle >
