@@ -121,16 +121,16 @@ const Chat = () => {
     setChatNotif(0);
 
 
-    // return () => {
-    //   console.log("disconnected from the server");
-    //   groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-    //     console.log("leaving the room: ", groupChatRoom.group_id);
-    //     chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
-    //     setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
-    //   });
-    //   chatSocket.current.disconnect();
-    //   setConnected(false);
-    // };
+    return () => {
+      console.log("disconnected from the server");
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("leaving the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+      });
+      chatSocket.current.disconnect();
+      setConnected(false);
+    };
 
 
   }, []);
@@ -246,34 +246,7 @@ const Chat = () => {
         };
         checkNew();
       });
-    }
-  }, [connected]);
-
-
-  useEffect(() => {
-    if (connected) {
-      console.log("joining the room from global context");
-      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("joining the room: ", groupChatRoom.group_id);
-        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
-        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
-      });
-    }
-    return () => {
-      if (connected) {
-        groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-          console.log("leaving the room: ", groupChatRoom.group_id);
-          chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
-          setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
-        });
-      }
-    }
-  }, [groupChatRooms.length]);
-
-  useEffect(() => {
-    if (connected) {
       chatSocket.current.on("newMessageG", (message: any) => {
-        console.log("new group message: ", message);
         setSelectedChat({} as PrivateMessage);
         setSelectedGroupChat(message);
         setSelected(message.group_id);
@@ -282,19 +255,15 @@ const Chat = () => {
           if (index === -1) {
             return [message, ...prev];
           }
-          const newGroupChatRooms = [...prev];
-          newGroupChatRooms[index].lastMessage = message.lastMessage;
-          newGroupChatRooms[index].lastMessageDate = message.lastMessageDate;
-          return newGroupChatRooms;
+          return prev;
         });
       });
     }
     return () => {
-      if (connected) {
-        chatSocket.current.off("newMessageG");
-      }
+      chatSocket.current.off("newMessageG");
     }
   }, [connected]);
+
 
   // here
 
@@ -337,10 +306,12 @@ const Chat = () => {
       chatSocket.current.on("muteChannelUser", (message: any) => {
         if (message.id === Cookies.get("id")) {
           const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
-          setSelectedGroupChat({
-            ...channel,
-            role: "Muted",
-          });
+          if (selectedGroupChat.group_id === message.group_id) {
+            setSelectedGroupChat({
+              ...channel,
+              role: "Muted",
+            });
+          }
           setGroupChatRooms((prev: any) => {
             return prev.map((chat: any) => {
               if (chat.group_id === message.group_id) {
@@ -354,10 +325,12 @@ const Chat = () => {
       chatSocket.current.on("unmuteChannelUser", (message: any) => {
         if (message.id === Cookies.get("id")) {
           const channel = groupChatRooms.find((chat: any) => chat.group_id === message.group_id);
-          setSelectedGroupChat({
-            ...channel,
-            role: "Member",
-          });
+          if (selectedGroupChat.group_id === message.group_id) {
+            setSelectedGroupChat({
+              ...channel,
+              role: "Member",
+            });
+          }
           setGroupChatRooms((prev: any) => {
             return prev.map((chat: any) => {
               if (chat.group_id === message.group_id) {
@@ -455,6 +428,7 @@ const Chat = () => {
       chatSocket.current.off("banChannelUser");
       chatSocket.current.off("unbanChannelUser");
       chatSocket.current.off("memberLeaveChannel");
+      chatSocket.current.off("channelDeleted");
     }
   }, [connected]);
 
@@ -474,7 +448,6 @@ const Chat = () => {
       chatSocket.current.off("channelCreated");
     }
   }), [connected]
-
 
   return (
     <ChatStyle>
