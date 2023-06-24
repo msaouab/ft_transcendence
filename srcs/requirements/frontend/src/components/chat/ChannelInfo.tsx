@@ -50,6 +50,8 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     const [openDialog, setOpenDialog] = React.useState(false);
     const [openBanTimeDialog, setOpenBanTimeDialog] = React.useState(false);
     const [banTime, setBanTime] = React.useState("");
+    const [openMuteTimeDialog, setOpenMuteTimeDialog] = React.useState(false);
+    const [muteTime, setMuteTime] = React.useState("");
     const handleOpenBanTimeDialog = (user: any) => {
         if (openBanTimeDialog === true && banTime === "")
             return;
@@ -60,6 +62,16 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
             setOpenDialog(false);
         }
         setOpenBanTimeDialog(!openBanTimeDialog);
+    }
+    const handleOpenMuteTimeDialog = (user: any) => {
+        if (openMuteTimeDialog === true && muteTime === "")
+            return;
+        if (openMuteTimeDialog === true && muteTime !== "") {
+            socket.current.emit("muteUser", { group_id: selectedGroupChat.group_id, userId: user.id, muteTime: muteTime });
+            setMuteTime("");
+            setOpenDialog(false);
+        }
+        setOpenMuteTimeDialog(!openMuteTimeDialog);
     }
     const [password, setPassword] = useState("");
 
@@ -85,7 +97,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     }
 
     const handleOpen = () => {
-        if (openBanTimeDialog === false) {
+        if (openBanTimeDialog === false && openMuteTimeDialog === false) {
             setOpenDialog(!openDialog);
         }
     }
@@ -106,12 +118,12 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
 
     const handleMuteUser = (user: any) => {
         if (user.role !== "Muted") {
-            socket.current.emit("muteUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+            setOpenMuteTimeDialog(true);
         }
         else {
             socket.current.emit("unmuteUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+            handleOpen();
         }
-        handleOpen();
     }
     const handleKickUser = (user: any) => {
         socket.current.emit("kickUser", { group_id: selectedGroupChat.group_id, userId: user.id });
@@ -484,6 +496,25 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                     <button className={`${buttonStyle}  bg-green-800 flex-1`} onClick={() => {
                                         setBanTime("");
                                         setOpenBanTimeDialog(false);
+                                    }}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </Dialog>
+                            {/* /// choosing mute time dialog ///// */}
+                            <Dialog key={selectedGroupChat.group_id} size="sm" open={openMuteTimeDialog} handler={() => {
+                                setMuteTime("");
+                                setOpenMuteTimeDialog(false);
+                            }} className="flex flex-col gap-4 items-center justify-center p-10 " >
+                                <h1 className="text-gray-700 text-xl font-[700] text-center">Enter mute time for this user</h1>
+                                <Input type="number" label="Enter the mute time in minutes" value={muteTime} onChange={(e) => setMuteTime(e.target.value)} className="w-full " />
+                                <div className="w-full  flex items-center justify-between gap-4">
+                                    <button className={`${buttonStyle}  bg-red-800 flex-1`} onClick={() => handleOpenMuteTimeDialog(selectedUser)}>
+                                        Mute
+                                    </button>
+                                    <button className={`${buttonStyle}  bg-green-800 flex-1`} onClick={() => {
+                                        setMuteTime("");
+                                        setOpenMuteTimeDialog(false);
                                     }}>
                                         Cancel
                                     </button>

@@ -413,6 +413,7 @@ export class ChatService {
 
     async sendGroupMessage(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
         const message = await this.createMessage(payload);
         const newGroupMessage = {
@@ -431,6 +432,7 @@ export class ChatService {
 
     async joinGroupChatRoom(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -448,6 +450,7 @@ export class ChatService {
 
     async leaveGroupChatRoom(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -465,6 +468,7 @@ export class ChatService {
 
     async addChannelMember(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { channel_id, user_id, type, password } = payload;
         console.log(channel_id, user_id, type, password);
         const user = await this.prisma.user.findUnique({
@@ -587,6 +591,7 @@ export class ChatService {
 
     async addChannelAdmin(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -628,6 +633,7 @@ export class ChatService {
     }
     async removeChannelAdmin(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -669,7 +675,8 @@ export class ChatService {
     }
     async muteUser(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
-        const { group_id, userId } = payload;
+        await this.unMuteUsers(client, server);
+        const { group_id, userId, muteTime } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
             const admin = await this.getUser(userId, client);
@@ -680,10 +687,14 @@ export class ChatService {
                     client.emit('error', 'Admin not removed');
                 }
             }
+            const endMuteTime = new Date();
+            endMuteTime.setMinutes(endMuteTime.getMinutes() + parseInt(muteTime));
             const mutedUser = await this.prisma.mutedMembers.create({
                 data: {
                     muted_id: userId,
                     channel_id: group_id,
+                    status_end_time: endMuteTime,
+                    status: 'Temporary'
                 }
             })
             if (!mutedUser) {
@@ -720,6 +731,7 @@ export class ChatService {
     }
     async unmuteUser(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -763,6 +775,7 @@ export class ChatService {
     }
     async kickUser(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -798,6 +811,7 @@ export class ChatService {
     }
     async banUser(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, userId, banTime } = payload;
             // the banTime is in minutes like 2 minutes, 5 minutes
@@ -856,6 +870,7 @@ export class ChatService {
     }
     async unbanUser(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -906,6 +921,7 @@ export class ChatService {
     }
     async joinPrivateChannel(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -942,6 +958,7 @@ export class ChatService {
     }
     async sendMessageG(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, sender_id, lastMessage } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -966,6 +983,7 @@ export class ChatService {
     }
     async removeMeuted(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const mutedUser = await this.prisma.mutedMembers.delete({
@@ -987,6 +1005,7 @@ export class ChatService {
     }
     async leaveChannel(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -1031,6 +1050,7 @@ export class ChatService {
     }
     async deleteChannel(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -1100,6 +1120,7 @@ export class ChatService {
     }
     async createChannel(client, payload: ChannelDto, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { name, status, password, limitUsers, description, avatar, owner } = payload;
         const ownerUser = await this.getUser(owner, client);
         try {
@@ -1183,8 +1204,34 @@ export class ChatService {
         }
     }
 
+    // unMute users if the now date is greater than the muted date
+    async unMuteUsers(client, server: Server) {
+        try {
+            const mutedUsers = await this.prisma.mutedMembers.findMany({
+                where: {
+                    status_end_time: {
+                        lte: new Date()
+                    }
+                }
+            });
+            if (!mutedUsers) {
+                client.emit('MutedError', 'Muted users not found');
+                return;
+            }
+            for (let i = 0; i < mutedUsers.length; i++) {
+                this.unmuteUser(client, {
+                    userId: mutedUsers[i].muted_id,
+                    group_id: mutedUsers[i].channel_id
+                }, server);
+            }
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
     async updateChannelPassword(client, payload: any, server: Server) {
         await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, password } = payload;
             const channel = await this.getChannel(client, group_id);
