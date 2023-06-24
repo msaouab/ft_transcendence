@@ -76,7 +76,6 @@ export const ChanelCard = ({ channel_name, role, channel_id }: any) => {
 };
 
 export const AchivementCard = ({ name, description, image }: any) => {
-  console.log("image: ", image, "name: ", name, "description: ", description)
   return (
     <div className=" h-full min-w-[300px]">
       <div className="bg-white lg:w-[80%] w-[95%] m-auto  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
