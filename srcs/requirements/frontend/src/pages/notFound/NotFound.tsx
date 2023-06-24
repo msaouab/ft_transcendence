@@ -9,7 +9,7 @@ const NotFound: React.FC = () => {
       <img src={ErrorSvg} alt="404" className="w-96" />
       <p className="text-lg mt-10 text-gray-600">Oops! The page you're looking for doesn't exist.</p>
       <Link
-        to="/profile"
+        to="/"
       >
         Back to Home
       </Link>

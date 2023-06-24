@@ -113,6 +113,7 @@ const SideBar = ({
 					}
 					if (response.statusText) {
 					}
+					setUserImg(response.data.avatar);
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
 					setUserStatus(response.data.status.toLowerCase());
@@ -126,8 +127,8 @@ const SideBar = ({
 			console.log(error);
 		}
 		// console.log("ppppppp", userId);
-		const res = await GetAvatar(userId);
-		setUserImg(res);
+		// const res = await GetAvatar(userId);
+		// setUserImg(res);
 	}
 
 	useEffect(() => {

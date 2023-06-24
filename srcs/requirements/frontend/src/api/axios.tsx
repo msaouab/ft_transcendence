@@ -2,7 +2,6 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 export const HOSTNAME = import.meta.env.VITE_API_URL || "localhost";
-console.log("HOSTNAME", import.meta.env.VITE_API_URL);
 
 const instance = axios.create({
 	baseURL: "http://" + HOSTNAME + ":3000/api/v1",
@@ -34,6 +33,7 @@ export const PostAvatar = async (file: File) => {
 };
 
 export const getFriendsInfo = async (id: string) => {
+  if (!id) return;
 	try {
 		const res = await instance.get("/user/" + id + "/friends/info");
 		return res.data;
@@ -43,6 +43,7 @@ export const getFriendsInfo = async (id: string) => {
 };
 
 export const getChannels = async (id: string) => {
+  if (!id) return;
 	try {
 		const res = await instance.get("/User/" + id + "/channels");
 		return res.data;
@@ -73,7 +74,7 @@ export const getRankData = async (id: string) => {
 	}
 };
 
-export const getUserInfo = async (id: string) => {
+export const getUserInfo = async (id?: string) => {
 	if (id === "" || id === undefined) {
 		return;
 	}
@@ -233,7 +234,6 @@ export const updateUserStatus = async (id: string, status: string) => {
       const res = await instance.put("/User/" + id + "/updatestatus", {
         status,
       });
-      console.log("r000000 ",res.data);
       return res.data;
     } catch (err) {
       console.log(err);

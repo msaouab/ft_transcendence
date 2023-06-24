@@ -1,5 +1,3 @@
-// <<<<<<< Dev
-
 import { HttpException, Injectable } from "@nestjs/common";
 import {
 	SubscribeMessage,

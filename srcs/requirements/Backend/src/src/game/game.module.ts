@@ -11,7 +11,6 @@ import { PrismaModule } from "prisma/prisma.module";
 import { AchvService } from "src/achievements/achv.service";
 
 
-// console.log({GameGateway});
 
 @Module({
 	imports: [UserModule, PrismaModule],

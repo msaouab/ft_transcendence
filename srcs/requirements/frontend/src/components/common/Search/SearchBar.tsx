@@ -309,7 +309,7 @@ const SearchBar = () => {
                                                                 {/* change later */}
                                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
 
-                                                                <img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+                                                                    <img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
                                                                     {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
                                                                     {/* </div> */}
                                                                     <div className="search-result-info ">
@@ -319,16 +319,16 @@ const SearchBar = () => {
                                                                 </div>
                                                             </Link>
                                                         </div>
-                                                        { user.id === Cookies.get('id') ? null :
-                                                        <div className="chat-button flex justify-center items-center mr-1">
-                                                            <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
-                                                                e.preventDefault();
-                                                                handleTempChat(user);
-                                                            }}>
-                                                                <CiChat2 className="chat-icon " size={30} />
-                                                            </a>
-                                                        </div>
-                                             }
+                                                        {user.id === Cookies.get('id') ? null :
+                                                            <div className="chat-button flex justify-center items-center mr-1">
+                                                                <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    handleTempChat(user);
+                                                                }}>
+                                                                    <CiChat2 className="chat-icon " size={30} />
+                                                                </a>
+                                                            </div>
+                                                        }
 
                                                     </div>
                                                 )

@@ -91,6 +91,8 @@ export class GameGateway
 		type: "Time" | "Round";
 		mode: "Random" | "Friend" | "Bot";
 		time: number;
+		height: number;
+		width: number;
 	};
 
 	afterInit(server: any) {
@@ -101,20 +103,20 @@ export class GameGateway
 	}
 	async handleDisconnect(client: Socket) {
 		console.log(`Client disconnected: ${client.id}`);
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
 		this.roomMap.forEach(async (value, key) => {
+			const userId =
+				client.id === value.socket[0].id ? value.player1.id : value.player2.id;
 			if (
 				value.mode !== "Bot" &&
-				(value.player1.id === userId ||
-					value.player2.id === userId)
+				// (value.player1.id === client.handshake.query.userId ||
+				// value.player2.id === client.handshake.query.userId)
+				(client.id === value.socket[0].id || client.id === value.socket[1].id)
 			) {
-				// const userId = userId;
 				const opponentId =
 					value.player1.id === userId ? value.player2.id : value.player1.id;
 
 				if (userId) {
-					const player = await this.UserService.getUser(userId.toString());
+					const player = await this.UserService.getUser(userId);
 					if (player) {
 						await this.prisma.user.update({
 							where: { id: player.id },
@@ -177,34 +179,33 @@ export class GameGateway
 				value.status = "Finished";
 				client.leave(key);
 				this.roomMap.delete(key);
-				// const userId = userId;
-				const player = await this.UserService.getUser(userId);
-				if (player) {
-					await this.prisma.user.update({
-						where: { id: player.id },
-						data: { status: "Online" },
-					});
-				}
-				const existingGame = await this.prisma.game.findUnique({
-					where: { id: key },
-				});
-				if (existingGame) {
-					const updateGame = await this.prisma.game.update({
-						where: { id: key },
-						data: {
-							gameStatus: "Finished",
-							player1_pts: value.player1.score,
-							player2_pts: value.player2.score,
-						},
-					});
-				}
+				// const playerId = playerId;
+				// const player = await this.UserService.getUser(client.handshake.query.userId?.toString());
+				// if (player) {
+				// 	await this.prisma.user.update({
+				// 		where: { id: player.id },
+				// 		data: { status: "Online" },
+				// 	});
+				// }
+				// const existingGame = await this.prisma.game.findUnique({
+				// 	where: { id: key },
+				// });
+				// if (existingGame) {
+				// 	const updateGame = await this.prisma.game.update({
+				// 		where: { id: key },
+				// 		data: {
+				// 			gameStatus: "Finished",
+				// 			player1_pts: value.player1.score,
+				// 			player2_pts: value.player2.score,
+				// 		},
+				// 	});
+				// }
 			}
 			if (value.status === "Finished") {
 				client.leave(key);
 				this.roomMap.delete(key);
 			}
 		});
-		console.log("Note Disconnected Map", this.roomMap, client.id);
 	}
 
 	RoundScore(roomId: string): boolean {
@@ -218,17 +219,12 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 60;
+			return (lastTime - room.time) / 1000 >= 600;
 		}
 		return false;
 	}
 
-	async handleBall(
-		client: Socket,
-		roomId: string,
-		width: number,
-		height: number
-	) {
+	async handleBall(client: Socket, roomId: string) {
 		const room = this.roomMap.get(roomId);
 		room.time = new Date().getTime();
 		// const { socket, ball, player1, player2 } = room;
@@ -242,10 +238,10 @@ export class GameGateway
 			const newX = room.ball.x + room.ball.dx;
 			const newY = room.ball.y + room.ball.dy;
 			// wall collision
-			if (newX - room.ball.r <= 0 || newX + room.ball.r >= width) {
+			if (newX - room.ball.r <= 0 || newX + room.ball.r >= room.width) {
 				room.ball.dx = -room.ball.dx;
 			}
-			if (newY - room.ball.r <= 0 || newY + room.ball.r >= height) {
+			if (newY - room.ball.r <= 0 || newY + room.ball.r >= room.height) {
 				room.ball.dy = -room.ball.dy;
 			}
 			// paddle collision
@@ -265,13 +261,13 @@ export class GameGateway
 			}
 			// score
 			if (newY - room.ball.r <= 0) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.player1.score++;
 			}
-			if (newY + room.ball.r >= height) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+			if (newY + room.ball.r >= room.height) {
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.player2.score++;
 			}
 			room.ball.x += room.ball.dx;
@@ -288,8 +284,8 @@ export class GameGateway
 			};
 			this.server.to(room.socket[0].id).emit("responseBall", client1Ball);
 			// Reverse ball position for client 2
-			client2Ball.x = width - client2Ball.x;
-			client2Ball.y = height - client2Ball.y;
+			client2Ball.x = room.width - client2Ball.x;
+			client2Ball.y = room.height - client2Ball.y;
 			this.server.to(room.socket[1].id).emit("responseBall", client2Ball);
 			this.server.to(room.socket[0].id).emit("responseScore", score);
 			this.server.to(room.socket[1].id).emit("responseScore", revScore);
@@ -309,16 +305,16 @@ export class GameGateway
 		}, 1000 / 60);
 	}
 
-	async getRoom(userId: string): Promise<string | undefined> {
+	async getRoom(playerId: string): Promise<string | undefined> {
 		let roomId: string | undefined;
 		this.roomMap.forEach((value, key) => {
-			if (value.player1.id === userId || value.player2.id === userId)
+			if (value.player1.id === playerId || value.player2.id === playerId)
 				roomId = key;
 		});
 		return roomId;
 	}
 
-	PlayvsBot(client: any, roomId: any, width: any, height: any) {
+	PlayvsBot(client: any, roomId: any) {
 		const room = this.roomMap.get(roomId);
 		room.time = new Date().getTime();
 		this.server.to(client.id).emit("StartTime", room.time);
@@ -328,11 +324,11 @@ export class GameGateway
 				clearInterval(intervalId);
 				return;
 			}
-			let OldY = height / 2;
+			let OldY = room.height / 2;
 			if (room.ball.y <= OldY) {
 				if (
 					room.ball.x >= room.player1.paddle1.x &&
-					room.player1.paddle1.x <= width - 80
+					room.player1.paddle1.x <= room.width - 80
 				) {
 					room.player1.paddle1.x += 12;
 				}
@@ -347,9 +343,9 @@ export class GameGateway
 			const newX = room.ball.x + room.ball.dx;
 			const newY = room.ball.y + room.ball.dy;
 			// wall collision
-			if (newX - room.ball.r <= 0 || newX + room.ball.r >= width)
+			if (newX - room.ball.r <= 0 || newX + room.ball.r >= room.width)
 				room.ball.dx = -room.ball.dx;
-			// if (newY - room.ball.r <= 0 || newY + room.ball.r >= height)
+			// if (newY - room.ball.r <= 0 || newY + room.ball.r >= room.height)
 			// room.ball.dy = -room.ball.dy;
 			// paddle collision
 			if (
@@ -368,15 +364,15 @@ export class GameGateway
 				room.ball.dy = Math.abs(room.ball.dy);
 			// score
 			if (newY - room.ball.r <= 0) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.ball.dx = room.ball.dx;
 				room.ball.dy = room.ball.dy;
 				room.player1.score++;
 			}
-			if (newY + room.ball.r >= height) {
-				room.ball.x = width / 2;
-				room.ball.y = height / 2;
+			if (newY + room.ball.r >= room.height) {
+				room.ball.x = room.width / 2;
+				room.ball.y = room.height / 2;
 				room.ball.dx = -room.ball.dx;
 				room.ball.dy = -room.ball.dy;
 				room.player2.score++;
@@ -407,16 +403,16 @@ export class GameGateway
 
 	@SubscribeMessage("requesteBot")
 	async handlePlayer(client: Socket, data: any) {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
-		const roomId = await this.getRoom(userId);
+		// if (client.handshake.query.userId === undefined) return;
+		// const playerId = client.handshake.query.userId?.toString();
+		const roomId = await this.getRoom(data.userId);
 		if (!roomId || this.roomMap.get(roomId).player1.id === "") return;
-		const room = this.roomMap.get(roomId);
+		const room = this.roomMap.get(roomId || data.userId);
 		if (
 			data.x >= 0 &&
-			data.x <= data.width &&
-			data.y <= data.height &&
-			data.y >= data.height / 2
+			data.x <= room.width &&
+			data.y <= room.height &&
+			data.y >= room.height / 2
 		) {
 			if (client.id === room.socket[0].id) {
 				if (room.player1.paddle2.x >= data.x) {
@@ -426,7 +422,7 @@ export class GameGateway
 						.emit("responseMouse", room.player1.paddle2);
 				} else if (
 					room.player1.paddle2.x <= data.x - 50 &&
-					room.player1.paddle2.x <= data.width - room.player1.paddle2.width
+					room.player1.paddle2.x <= room.width - room.player1.paddle2.width
 				) {
 					room.player1.paddle2.x += 12;
 					this.server
@@ -439,9 +435,9 @@ export class GameGateway
 
 	@SubscribeMessage("requesteMouse")
 	async handleKey(client: Socket, data: any) {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
-		const roomId = await this.getRoom(userId);
+		const roomId = await this.getRoom(
+			data.userId || client.handshake.query.userId
+		);
 		if (
 			!roomId ||
 			this.roomMap.get(roomId).player1.id === "" ||
@@ -451,10 +447,10 @@ export class GameGateway
 			return;
 		}
 		const room = this.roomMap.get(roomId);
-		const { x, width, y, height } = data;
+		const { x, y } = data;
 		const { player1, player2, socket } = room;
 
-		if (x >= 0 && x <= width && y <= height && y >= height / 2) {
+		if (x >= 0 && x <= room.width && y <= room.height && y >= room.height / 2) {
 			if (client.id === socket[0].id) {
 				if (player1.paddle2.x >= x) {
 					player1.paddle2.x -= 12;
@@ -463,10 +459,10 @@ export class GameGateway
 					this.server.to(socket[1].id).emit("responsePlayer2", player2.paddle1);
 				} else if (
 					player1.paddle2.x <= x - 50 &&
-					player1.paddle2.x <= width - player1.paddle2.width
-				) {
-					player1.paddle2.x += 12;
-					player2.paddle1.x -= 12;
+					player1.paddle2.x <= room.width - player1.paddle2.width
+					) {
+						player1.paddle2.x += 12;
+						player2.paddle1.x -= 12;
 					this.server.to(socket[0].id).emit("responseMouse", player1.paddle2);
 					this.server.to(socket[1].id).emit("responsePlayer2", player2.paddle1);
 				}
@@ -478,8 +474,8 @@ export class GameGateway
 					this.server.to(socket[0].id).emit("responsePlayer2", player1.paddle1);
 				} else if (
 					player2.paddle2.x <= x - 50 &&
-					player2.paddle2.x <= width - player2.paddle2.width
-				) {
+					player2.paddle2.x <= room.width - player2.paddle2.width
+					) {
 					player2.paddle2.x += 12;
 					player1.paddle1.x -= 12;
 					this.server.to(socket[1].id).emit("responseMouse", player2.paddle2);
@@ -490,37 +486,39 @@ export class GameGateway
 	}
 
 	AvailableRoom(client: Socket, payload, roomMap: any): boolean {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
+		// if (client.handshake.query.userId === undefined) return;
+		// const playerId = client.handshake.query.userId?.toString();
 		let availableRoom = false;
+		const width = 700;
+		const height = (width * 16) / 9;
 		if (roomMap.size > 0) {
 			roomMap.forEach((value, key) => {
 				if (
 					value.members === 1 &&
 					value.type === payload.type &&
 					value.mode === payload.mode &&
-					value.player1.id !== userId
+					value.player1.id !== payload.userId
 				) {
 					value.members++;
 					value.player2 = {
-						id: userId,
+						id: payload.userId,
 						score: 0,
 						paddle1: {
-							x: payload.width / 2 - 40,
+							x: width / 2 - 40,
 							y: 10,
 							width: 80,
 							height: 10,
 						},
 						paddle2: {
-							x: payload.width / 2 - 40,
-							y: payload.height - 20,
+							x: width / 2 - 40,
+							y: height - 20,
 							width: 80,
 							height: 10,
 						},
 					};
 					value.ball = {
-						x: payload.width / 2,
-						y: payload.height / 2,
+						x: width / 2,
+						y: height / 2,
 						r: 10,
 						dx: 4,
 						dy: 4,
@@ -538,7 +536,7 @@ export class GameGateway
 						.to(value.socket[1].id)
 						.emit("BenomeId", value.player1.id, key);
 					this.createPrismaGame(key, value);
-					this.handleBall(client, key, payload.width, payload.height);
+					this.handleBall(client, key);
 					availableRoom = true;
 				}
 			});
@@ -547,30 +545,30 @@ export class GameGateway
 	}
 
 	CreateRandomRoom(client: Socket, payload) {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
+		// if (client.handshake.query.userId === undefined) return;
+		// const playerId = client.handshake.query.userId?.toString();
 		const availableRoom = this.AvailableRoom(client, payload, this.roomMap);
-		console.log("availableRoom", availableRoom);
 		if (!availableRoom) {
+			const width = 700;
+			const height = (width * 16) / 9;
 			const key = createHash("sha256")
 				.update(Date.now().toString())
 				.digest("hex");
-			console.log(key);
 			this.roomMap.set(key, {
 				members: 1,
 				socket: [client],
 				player1: {
-					id: userId,
+					id: payload.userId,
 					score: 0,
 					paddle1: {
-						x: payload.width / 2 - 40,
+						x: width / 2 - 40,
 						y: 10,
 						width: 80,
 						height: 10,
 					},
 					paddle2: {
-						x: payload.width / 2 - 40,
-						y: payload.height - 20,
+						x: width / 2 - 40,
+						y: height - 20,
 						width: 80,
 						height: 10,
 					},
@@ -579,14 +577,14 @@ export class GameGateway
 					id: "",
 					score: 0,
 					paddle1: {
-						x: payload.width / 2 - 40,
+						x: width / 2 - 40,
 						y: 10,
 						width: 80,
 						height: 10,
 					},
 					paddle2: {
-						x: payload.width / 2 - 40,
-						y: payload.height - 20,
+						x: width / 2 - 40,
+						y: height - 20,
 						width: 80,
 						height: 10,
 					},
@@ -595,13 +593,16 @@ export class GameGateway
 				type: payload.type,
 				mode: payload.mode,
 				time: 0,
+				height: height,
+				width: width,
 			});
 		}
 	}
 
 	CreateBotRoom(client: Socket, payload) {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
+		const userId = payload.userId;
+		const width = 700;
+		const height = (width * 16) / 9;
 		const key = createHash("sha256")
 			.update(Date.now().toString())
 			.digest("hex");
@@ -613,14 +614,14 @@ export class GameGateway
 				id: userId,
 				score: 0,
 				paddle1: {
-					x: payload.width / 2 - 40,
+					x: width / 2 - 40,
 					y: 10,
 					width: 80,
 					height: 10,
 				},
 				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
+					x: width / 2 - 40,
+					y: height - 40,
 					width: 80,
 					height: 10,
 				},
@@ -629,21 +630,21 @@ export class GameGateway
 				id: "Bot",
 				score: 0,
 				paddle1: {
-					x: payload.width / 2 - 40,
+					x: width / 2 - 40,
 					y: 10,
 					width: 80,
 					height: 10,
 				},
 				paddle2: {
-					x: payload.width / 2 - 40,
-					y: payload.height - 20,
+					x: width / 2 - 40,
+					y: height - 20,
 					width: 80,
 					height: 10,
 				},
 			},
 			ball: {
-				x: payload.width / 2,
-				y: payload.height / 2,
+				x: width / 2,
+				y: height / 2,
 				r: 10,
 				dx: 4,
 				dy: 4,
@@ -654,20 +655,22 @@ export class GameGateway
 			type: payload.type,
 			mode: payload.mode,
 			time: new Date().getTime(),
+			height: height,
+			width: width,
 		});
 		client.join(key);
 		this.server
 			.to(client.id)
 			.emit("BenomeId", this.roomMap.get(key).player2.id, key);
 		if (this.roomMap.get(key).player1.id) {
-			this.PlayvsBot(client, key, payload.width, payload.height);
+			this.PlayvsBot(client, key);
 		}
 	}
 
-	async CreateInviteGame(userId: string, payload, key: string) {
+	async CreateInviteGame(playerId: string, payload, key: string) {
 		try {
-			const FindUser = await this.UserService.getUser(userId);
-			if (!FindUser) throw new BadRequestException("User not found", userId);
+			const FindUser = await this.UserService.getUser(playerId);
+			if (!FindUser) throw new BadRequestException("User not found", playerId);
 			if (FindUser.status !== "Online") {
 				throw new BadRequestException("User is not online");
 			}
@@ -686,7 +689,6 @@ export class GameGateway
 					mode: payload.mode,
 				},
 			});
-			console.log("createInvite", createInvite);
 		} catch (err) {
 			console.log(err);
 		}
@@ -704,42 +706,42 @@ export class GameGateway
 				// where: { roomId: key},
 				data: { status: "Accepted" },
 			});
-			console.log("updateInvite", updateInvite);
 		} catch (err) {
 			console.log(err);
 		}
 	}
 
-	async AcceptInviteGame(client, userId: string, payload) {
+	async AcceptInviteGame(client, playerId: string, payload) {
 		let availableRoom = false;
+		const width = 700;
+		const height = (width * 16) / 9;
 		if (this.roomMap.size > 0) {
 			this.roomMap.forEach((value, key) => {
-				console.log(value.player2.id, "===", userId);
 				if (
 					value.type === payload.type &&
 					value.mode === payload.mode &&
-					value.player2.id === userId
+					value.player2.id === playerId
 				) {
 					value.members++;
 					value.player2 = {
-						id: userId,
+						id: playerId,
 						score: 0,
 						paddle1: {
-							x: payload.width / 2 - 40,
+							x: width / 2 - 40,
 							y: 10,
 							width: 80,
 							height: 10,
 						},
 						paddle2: {
-							x: payload.width / 2 - 40,
-							y: payload.height - 20,
+							x: width / 2 - 40,
+							y: height - 20,
 							width: 80,
 							height: 10,
 						},
 					};
 					value.ball = {
-						x: payload.width / 2,
-						y: payload.height / 2,
+						x: width / 2,
+						y: height / 2,
 						r: 10,
 						dx: 4,
 						dy: 4,
@@ -758,7 +760,7 @@ export class GameGateway
 						.emit("BenomeId", value.player1.id, key);
 					this.updateInviteGame(key);
 					this.createPrismaGame(key, value);
-					this.handleBall(client, key, payload.width, payload.height);
+					this.handleBall(client, key);
 					availableRoom = true;
 				}
 			});
@@ -767,17 +769,20 @@ export class GameGateway
 	}
 
 	async CreateFriendRoom(client: Socket, payload) {
-		if (client.handshake.query.userId === undefined) return;
-		const userId = client.handshake.query.userId.toString();
-		console.log("userId", userId);
 		const FindBenome = await this.UserService.getUser(payload.friend);
 		if (!FindBenome) throw new BadRequestException("User not found");
 		if (FindBenome.status === "InGame")
 			throw new ForbiddenException("User is already in game");
 		if (FindBenome.status === "Offline")
 			throw new ForbiddenException("User is offline");
-		const AvailableRoom = this.AcceptInviteGame(client, userId, payload);
+		const AvailableRoom = this.AcceptInviteGame(
+			client,
+			payload.userId,
+			payload
+		);
 		if ((await AvailableRoom) === false) {
+			const width = 700;
+			const height = (width * 16) / 9;
 			const key = createHash("sha256")
 				.update(Date.now().toString())
 				.digest("hex");
@@ -787,17 +792,17 @@ export class GameGateway
 				members: 1,
 				socket: [client],
 				player1: {
-					id: userId,
+					id: payload.userId,
 					score: 0,
 					paddle1: {
-						x: payload.width / 2 - 40,
+						x: width / 2 - 40,
 						y: 10,
 						width: 80,
 						height: 10,
 					},
 					paddle2: {
-						x: payload.width / 2 - 40,
-						y: payload.height - 20,
+						x: width / 2 - 40,
+						y: height - 20,
 						width: 80,
 						height: 10,
 					},
@@ -806,21 +811,21 @@ export class GameGateway
 					id: payload.friend,
 					score: 0,
 					paddle1: {
-						x: payload.width / 2 - 40,
+						x: width / 2 - 40,
 						y: 10,
 						width: 80,
 						height: 10,
 					},
 					paddle2: {
-						x: payload.width / 2 - 40,
-						y: payload.height - 20,
+						x: width / 2 - 40,
+						y: height - 20,
 						width: 80,
 						height: 10,
 					},
 				},
 				ball: {
-					x: payload.width / 2,
-					y: payload.height / 2,
+					x: width / 2,
+					y: height / 2,
 					r: 10,
 					dx: 4,
 					dy: 4,
@@ -831,21 +836,22 @@ export class GameGateway
 				type: payload.type,
 				mode: payload.mode,
 				time: 0,
+				width: width,
+				height: height,
 			});
 			if (onlineClientsMap.has(payload.friend)) {
 				const friendSocket = onlineClientsMap.get(payload.friend);
 				friendSocket.emit("gameNotif", { num: 1 });
-				this.CreateInviteGame(userId, payload, key);
+				this.CreateInviteGame(payload.userId, payload, key);
 			}
 		}
 	}
 
 	@SubscribeMessage("joinRoom")
 	async handelJoinRoom(client: Socket, payload: any) {
-		if (!payload.mode)
-			payload.mode = "Random";
-		if (!payload.type)
-			payload.type = "Time";
+		const userId = payload.playerId;
+		if (!payload.mode) payload.mode = "Random";
+		if (!payload.type) payload.type = "Time";
 		if (payload.type && payload.mode) {
 			if (payload.mode === "Random") {
 				this.CreateRandomRoom(client, payload);
@@ -855,22 +861,6 @@ export class GameGateway
 				this.CreateFriendRoom(client, payload);
 			}
 		}
-		// this.roomMap.forEach(async (value, key) => {
-		// 	if (value.status === "Finished") {
-		// 		const updateGame = await this.prisma.game.update({
-		// 			where: {
-						// id: key,
-		// 			},
-		// 			data: {
-		// 				gameStatus: "Finished",
-		// 				player1_pts: value.player1.score,
-		// 				player2_pts: value.player2.score,
-		// 			}
-		// 		})
-		// 		this.achvService.CheckAchv(updateGame.player1_id, updateGame.player2_id, updateGame.player1_pts, updateGame.player2_pts);
-		// 		this.roomMap.delete(key);
-		// 	}
-		// });
 	}
 
 	async createPrismaGame(key, room) {
@@ -898,9 +888,31 @@ export class GameGateway
 					gameStatus: "OnGoing",
 				},
 			});
-			console.log("Game created", newRoom);
 		} catch (e) {
 			console.log(e);
+		}
+	}
+	@SubscribeMessage("requesteResize")
+	async handleResize(client: Socket, data: any) {
+		const roomId = await this.getRoom(
+			data.userId || client.handshake.query.userId
+		);
+		if (!roomId) return;
+		const room = this.roomMap.get(roomId);
+		// room.width = data.width;
+		// room.height = data.height;
+		const calculatedHeight = (data.width / 16) * 9;
+		room.player1.paddle1.x = data.width / 2 - 40;
+		room.player1.paddle2.y = data.height - 20;
+		room.player1.paddle2.x = data.width / 2 - 40;
+		room.player2.paddle1.x = data.width / 2 - 40;
+		room.player2.paddle2.x = data.width / 2 - 40;
+		room.player2.paddle2.y = data.height - 20;
+		this.server.to(room.socket[0].id).emit("responsePlayer2", room.player1.paddle1);
+		this.server.to(room.socket[0].id).emit("responseMouse", room.player1.paddle2);
+		if (room.socket.length === 2) {
+			this.server.to(room.socket[1].id).emit("responsePlayer2", room.player2.paddle1);
+			this.server.to(room.socket[1].id).emit("responseMouse", room.player2.paddle2);
 		}
 	}
 }

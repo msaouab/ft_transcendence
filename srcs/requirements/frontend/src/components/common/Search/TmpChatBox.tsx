@@ -51,13 +51,11 @@ const TmpChatBox = ({
 		if (!connected) {
 			chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
 			setConnected(true);
-			console.log("connected to the server");
 		}
 	}, []);
 
 	useEffect(() => {
 		if (dummySelectedChat && dummySelectedChat.chatRoomid) {
-			console.log("joining the room");
 			const payload = {
 				senderId: dummySelectedChat.sender_id,
 				receiverId: dummySelectedChat.receiver_id,
@@ -67,7 +65,6 @@ const TmpChatBox = ({
 
 		return () => {
 			if (dummySelectedChat && dummySelectedChat.chatRoomid) {
-				console.log("leaving the room");
 				const payload = {
 					senderId: dummySelectedChat.sender_id,
 					receiverId: dummySelectedChat.receiver_id,
@@ -117,14 +114,12 @@ const TmpChatBox = ({
 						status: status,
 					});
 				} else {
-					// console.log('chat room does not exist', res)
 					axios
 						.post(`http://${HOSTNAME}:3000/api/v1/chatrooms/private`, {
 							senderId: sender_id,
 							receiverId: receiver_id,
 						})
 						.then(async (res) => {
-							// console.log('chat room created', res);
 							const { status, avatar } = await getUser(sender_id, receiver_id);
 							setDummySelectedChat({
 								chatRoomid: res.data.id,

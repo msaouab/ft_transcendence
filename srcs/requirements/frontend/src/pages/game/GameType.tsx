@@ -10,6 +10,7 @@ import NoFriendsImg from "../../assets/noFriends.png";
 import styled from "styled-components";
 import PlayWithMe from "../../assets/playWithMe.png";
 import { IoCloseCircleSharp } from "react-icons/io5";
+import Cookies from "js-cookie";
 
 const Games = [
 	{
@@ -29,6 +30,21 @@ const Games = [
 	},
 ];
 
+const ImgAnimation = styled.img`
+animation: bounce 2s infinite;
+@keyframes bounce {
+	0% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+`;
+
 const GameTypeCard = ({ title, description, imgPath }: any) => {
 	return (
 		<div className="bg-white shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 w-full h-full">
@@ -43,7 +59,7 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 	);
 };
 
-const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
+const FreindCard = ({ id, avatar, login, fname, lname, status }: any) => {
 	const navigate = useNavigate();
 	const { setFriend, typeRoom, modeRoom, friend } = useGameContext();
 	const [userImg, setUserImg] = useState<string>("");
@@ -64,7 +80,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 			const rank = await getRankData(id);
 			setRankData(rank);
 		};
-		getAvatarImg(id);
+		// getAvatarImg(id);
 		getRankUser(id);
 		return () => {
 			setUserImg("");
@@ -75,7 +91,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 		<div className="flex justify-around w-full text-black flex-wrap gap-6">
 			<div className="flex gap-2">
 				<img
-					src={userImg}
+					src={avatar}
 					alt="frindImg"
 					width={40}
 					className=" w-9 aspect-square rounded-full "
@@ -87,7 +103,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 					className="flex items-center border gap-2 p-1"
 					onClick={() => {
 						setFriend(id);
-						navigate("/game/startGame", payload);
+						navigate("/game/startGame");
 					}}
 					disabled={status !== "Online"}
 				>
@@ -104,7 +120,6 @@ const GameType = () => {
 
 	const navigate = useNavigate();
 	const handleModeGame = (benome: string) => {
-		console.log("benome: ", benome)
 		localStorage.setItem("typeRoom", benome);
 		setModeRoom(benome);
 	};
@@ -114,8 +129,15 @@ const GameType = () => {
 	};
 
 	const [friends, setFriends] = useState([]);
+	const [id, setId] = useState("");
+
+	useEffect(() => {
+		setId(Cookies.get("id") as string);
+	}, []);
+
 	const getFriendsData = () => {
-		getFriendsInfo(userId || "").then((res) => {
+		if (!id) alert("you must login first");
+		getFriendsInfo(id).then((res) => {
 			setFriends(res);
 		});
 	};
@@ -130,21 +152,6 @@ const GameType = () => {
 		lastName?: string;
 		status?: string;
 	}
-
-	const ImgAnimation = styled.img`
-		animation: bounce 2s infinite;
-		@keyframes bounce {
-			0% {
-				transform: translateY(0);
-			}
-			50% {
-				transform: translateY(-5px);
-			}
-			100% {
-				transform: translateY(0);
-			}
-		}
-	`;
 
 	return (
 		<div className="h-full w-full flex flex-col items-center gap-5">
@@ -162,7 +169,7 @@ const GameType = () => {
 							<FreindCard
 								key={index}
 								id={item.id}
-								img={item.avatar}
+								avatar={item.avatar}
 								login={item.login}
 								fname={item.firstName}
 								lname={item.lastName}
@@ -208,6 +215,32 @@ const GameType = () => {
 					</div>
 				))}
 			</div>
+			{/* <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
+        <div className="border rounded-2xl flex-1 p-4 h-full">
+          <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
+            Global Rank
+          </h1>
+          <div className="ranks flex flex-col gap-2 overflow-y-scroll h-[90%]">
+            {Array(10)
+              .fill(0)
+              .map((item, index) => (
+                <FreindCard name="koko" points="1337" rank={index+1} />
+              ))}
+          </div>
+        </div>
+        <div className="border rounded-2xl flex-1 p-4 h-full">
+          <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
+            Friend Rank
+          </h1>
+          <div className="ranks flex flex-col gap-2 overflow-y-scroll h-[90%]">
+            {Array(10)
+              .fill(0)
+              .map((item, index) => (
+                <FreindCard name="koko" points="1337" />
+              ))}
+          </div>
+        </div>
+      </div> */}
 		</div>
 	);
 };

@@ -66,33 +66,27 @@ const StartGame = () => {
 	const { typeRoom, modeRoom, mysocket, setMySocket, friend } = useGameContext();
 	const [benomeId, setBenomeId] = useState("");
 	const [roomId, setRoomId] = useState("");
-	const [user, setUser] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
+	const [width, setWidth] = useState(0);
+	const [user, setUser] = useState({});
 
 	const payload = {
 		type: typeRoom,
 		mode: modeRoom,
 		friend: friend,
-		width: 700,
-		height: 1000,
+		userId: Cookies.get('id'),
+		// width: 700,
+		// height: 1000,
 	};
 
 	useEffect(() => {
 		const socket = io(`http://${HOSTNAME}:3000/game`, {
-			query: { userId: Cookies.get("id") },
+			query: {userId: Cookies.get('userid')},
 		});
 		setMySocket(socket);
 		socket.on("connect", () => {
-			console.log(socket.id, "connected to server");
 			socket.emit("joinRoom", payload);
 		});
 		socket.on("disconnect", () => {
-			console.log(socket.id, "disconnected from server");
 			socket.emit("leaveRoom", payload);
 		});
 		return () => {
@@ -101,9 +95,20 @@ const StartGame = () => {
 	}, []);
 
 	useEffect(() => {
+
+			let width = window.innerWidth;
+			const height = window.innerHeight;
+			if (width < 700)
+				setWidth(700);
+			else
+				setWidth(width);
+	}, []);
+
+	useEffect(() => {
 		let isReal = false;
 		const getAllData = async () => {
-			const userdata = await getUserInfo(userId);
+			const userdata = await getUserInfo(payload.userId);
+			console.log("payload.userId:", userdata)
 			setUser(userdata);
 			let Benome;
 			//  = await getUserInfo(benomeId);
@@ -121,11 +126,11 @@ const StartGame = () => {
 			}
 			if (Benome && roomId) {
 				isReal = true;
-				console.log("navigating", isReal)
 				navigate(`/game/${roomId}`, {
 					state: {
-						user: user,
+						user: userdata,
 						benome: Benome,
+						width: width,
 					},
 				});
 			}
@@ -138,11 +143,10 @@ const StartGame = () => {
 		getAllData();
 		return () => {
 			if (!isReal) {
-				console.log("disconnecting", isReal)
 				mysocket?.disconnect();
 			}
 		};
-	}, [mysocket, benomeId]);
+	}, [mysocket, benomeId, userId]);
 
 	return (
 		<StartGameContainer>

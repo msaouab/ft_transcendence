@@ -51,7 +51,6 @@ export class ChatController {
     @ApiQuery({ name: 'userId', required: false, description: 'return only messages from this user' })
     @ApiParam({ name: 'id', required: true, description: 'id of the private chat room' })
     async getPrivateChatMessages(@Param('id') id: string, @Query('limit') limit: string, @Query('offset') offset: string, @Query('seen') seen: string, @Query('userId') userId: string) {
-        // console.log("limit: ", limit, "offset: ", offset);
         const privateChatMessages = await this.ChatService.getPrivateChatMessages(id, { limit, offset, seen, userId });
         return privateChatMessages;
     }
@@ -72,8 +71,6 @@ export class ChatController {
 
     @Get("/group/:id")
     async getGroupChat(@Param('id') id: string) {
-        console.log("getGroupChat");
-        // console.log(id);
         // const groupChat = await this.ChatService.getGroupChatRooms(id);
         // return groupChat;
     }

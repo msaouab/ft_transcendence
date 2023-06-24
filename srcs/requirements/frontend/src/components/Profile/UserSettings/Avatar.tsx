@@ -21,7 +21,6 @@ function Avatar() {
 	const [open, setOpen] = useState(false);
 	const handelOpen = () => {
 		setOpen(!open);
-		console.log(open);
 	};
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,16 +38,13 @@ function Avatar() {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		console.log("File selected:");
 		if (!selectedFile) {
-			console.log("No file selected");
 			return;
 		}
 		handelOpen();
 
     PostAvatar(selectedFile)
       .then((res: any) => {
-        console.log("File uploaded!:", res.data);
         setUserImg(res.data.avatar);
         notify("success");
         setSelectedFile(null);
@@ -62,7 +58,8 @@ function Avatar() {
 
   return (
     <div className="flex flex-col items-center gap-5 mt-10">
-      <img src={userImg} alt="" width={200} />
+
+      <img src={userImg} alt=""   className="rounded-[50%] border w-[200px] aspect-square object-cover"/>
       <label>
         <div className="border  rounded-md overflow-hidden h-[3rem] border-dashed border-gray-500 relative flex items-center bg-slate-300/10">
           <input
@@ -105,7 +102,7 @@ function Avatar() {
         className="flex flex-col gap-4 items-center justify-center p-10"
       >
         {imgPreview && (
-          <img src={imgPreview as string} alt="" width={100} className="p-4" />
+          <img src={imgPreview as string} alt="" width={200} className="p-4" />
         )}
         <button
           className="bg-cyan-800 py-2 px-4 mt-4 shadow-md shadow-white/10 hover:scale-105 transition-all ease-in-out duration-200 rounded-md text-blue-gray-50 text-lg"

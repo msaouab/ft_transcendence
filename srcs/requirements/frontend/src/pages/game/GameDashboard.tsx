@@ -43,6 +43,51 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 	);
 };
 
+const Main = styled.div`
+	@media (max-width: 1200px) {
+		flex-direction: column;
+		.stats {
+			height: unset;
+			min-height: fit-content;
+			justify-content: center;
+			align-items: center;
+			flex-wrap: wrap;
+			& > div {
+				max-width: 70%;
+				min-width: 360px;
+				max-height: 500px;
+			}
+		}
+		.achievements {
+			width: 70%;
+			.achiv-container {
+				display: flex;
+				flex-direction: column;
+			}
+		}
+	}
+	@media (max-width: 850px) {
+		flex-direction: column;
+		.stats {
+			height: unset;
+			min-height: fit-content;
+			justify-content: center;
+			align-items: center;
+			flex-wrap: wrap;
+			& > div {
+				max-width: 90%;
+				min-width: 360px;
+				max-height: 500px;
+			}
+		}
+		.achievements {
+			width: 90%;
+			.achiv-container {
+			}
+		}
+	}
+`;
+
 interface ChalengerCardProps {
 	name: string;
 }
@@ -70,9 +115,10 @@ export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 		};
 		const getUser = async (id: string) => {
 			const userInfo = await getUserInfo(id);
+			console.log("userInfo", userInfo);
 			setUser(userInfo);
 		};
-		getAvatarImg(id);
+		// getAvatarImg(id);
 		getUser(id);
 		return () => {
 			setUserImg("");
@@ -83,7 +129,7 @@ export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
 			<div className="image">
 				<img
-					src={userImg}
+					src={user.avatar}
 					alt=""
 					width={45}
 					className="box-border rounded-full aspect-square"
@@ -122,7 +168,7 @@ const HistoryCard = ({ history }: any) => {
 			const benomeInfo = await getUserInfo(id2);
 			if (benomeInfo) setBenome(benomeInfo);
 		};
-		getAvatarImg(player1_id);
+		// getAvatarImg(player1_id);
 		getUser(player1_id, player2_id);
 		return () => {
 			setUserImg("");
@@ -131,27 +177,26 @@ const HistoryCard = ({ history }: any) => {
 
 	return (
 		<div className="flex justify-between p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
-			<div className="user flex justify-center items-center gap-2">
-				<div className="image">
+			<div className="user flex justify-center items-center gap-2 ">
+				<div className="image w-[45px]">
 					<img
-						src={userImg}
+						src={user.avatar}
 						alt=""
-						width={45}
-						className="box-border rounded-full aspect-square"
+						className="box-border rounded-full aspect-square w-[100%]"
 					/>
 				</div>
-				<div className="name text-2xl font-[800]">{user.login}</div>
+				<div className="name text-xl font-[500]">{user.login}</div>
 			</div>
-			<div className="score flex gap-5">
-				<div className="text-2xl font-[800]">{player1_pts}</div>
+			<div className="score flex gap-5 text-deep-orange-500">
+				<div className="text-2xl font-[700]">{player1_pts}</div>
 				<p className="border-t-[3px]"> - </p>
-				<div className="text-2xl font-[800]">{player2_pts}</div>
+				<div className="text-2xl font-[700]">{player2_pts}</div>
 			</div>
 			<div className="benome flex justify-center items-center gap-2">
-				<div className="name text-2xl font-[800]">{Benome.login}</div>
-				<div className="image">
+				<div className="name text-xl font-[500]">{Benome.login}</div>
+				<div className="image w-[45px]">
 					<img
-						src={userImg}
+						src={Benome.avatar}
 						alt=""
 						width={45}
 						className="box-border rounded-full aspect-square"
@@ -187,7 +232,7 @@ const GameCard = (props: GameCardProps) => {
 			const benomeInfo = await getUserInfo(id2);
 			if (benomeInfo) setBenome(benomeInfo);
 		};
-		getAvatarImg(player1_id);
+		// getAvatarImg(player1_id);
 		getUser(player1_id, player2_id);
 		return () => {
 			setUserImg("");
@@ -297,58 +342,12 @@ const GameDashboard = () => {
 		const fetchAllLiveGames = async (): Promise<void> => {
 			const games = await getLiveGame();
 			setLiveGames(games);
-			console.log("games", games);
 		};
 
 		fetchAllHistoryGames();
 		fetchAllLiveGames();
 	}, []);
-	console.log("liveGames", liveGames);
 
-	const Main = styled.div`
-		@media (max-width: 1200px) {
-			flex-direction: column;
-			.stats {
-				height: unset;
-				min-height: fit-content;
-				justify-content: center;
-				align-items: center;
-				flex-wrap: wrap;
-				& > div {
-					max-width: 70%;
-					min-width: 360px;
-					max-height: 500px;
-				}
-			}
-			.achievements {
-				width: 70%;
-				.achiv-container {
-					display: flex;
-					flex-direction: column;
-				}
-			}
-		}
-		@media (max-width: 850px) {
-			flex-direction: column;
-			.stats {
-				height: unset;
-				min-height: fit-content;
-				justify-content: center;
-				align-items: center;
-				flex-wrap: wrap;
-				& > div {
-					max-width: 90%;
-					min-width: 360px;
-					max-height: 500px;
-				}
-			}
-			.achievements {
-				width: 90%;
-				.achiv-container {
-				}
-			}
-		}
-	`;
 	return (
 		<div className="  w-[100%] flex flex-col gap-5  ">
 			<Main className="midel flex-1  flex flex-col gap-4 items-center  ">
@@ -441,7 +440,7 @@ const GameDashboard = () => {
 					<div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
 						Live Games
 					</div>
-					<div className="achiv-container flex justify-center items-center gap-10   m-auto min-h-[15rem]">
+					<div className="achiv-container flex justify-center items-center gap-10   m-auto min-h-[15rem] ">
 						{liveGames ? (
 							<div className="h-[90%] w-full ">
 								<SwiperComponent

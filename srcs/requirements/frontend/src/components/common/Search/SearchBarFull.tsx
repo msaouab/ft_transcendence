@@ -142,239 +142,239 @@ opacity: 0.5;
 `;
 
 const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { fullScreenDropdown: boolean, searchBarRef: any, handleTempChat: any }) => {
-    const [search, setSearch] = useState<string>('');
-    let [searchConnected, setSearchConnected] = useState<boolean>(false);
-    let [searchResults, setSearchResults] = useState<any[]>([]);
-    let socket = useRef<any>(null);
-    useEffect(() => {
-        if (socket.current) {
-            socket.current.on('disconnect', () => {
-                setSearchConnected(false);
-                // console.log("disconnected");
-            }
-            );
-        }
+	const [search, setSearch] = useState<string>('');
+	let [searchConnected, setSearchConnected] = useState<boolean>(false);
+	let [searchResults, setSearchResults] = useState<any[]>([]);
+	let socket = useRef<any>(null);
+	useEffect(() => {
+		if (socket.current) {
+			socket.current.on('disconnect', () => {
+				setSearchConnected(false);
+				// console.log("disconnected");
+			}
+			);
+		}
 
 
-        if (!fullScreenDropdown && searchConnected) {
-            // console.log("disconnecting");
-            socket.current.disconnect();
-            setSearchConnected(false);
-            // reset search results
-            setSearchResults([]);
-            setSearch('');
-        }
-        if ((fullScreenDropdown) && !searchConnected) {
-            // console.log("connecting");
-            socket.current = io(`http://${HOSTNAME}:3000/search`);
-            socket.current.on('connect', () => {
-                setSearchConnected(true);
-                // console.log("connected");
-            });
-        }
-    }, [fullScreenDropdown]);
-
-
-
-    const handleSearch = (searchProp: string) => {
-        // console.log("Handle search")
-        if (!searchConnected) {
-            // console.log("not connected");
-            return null;
-        }
-        socket.current.on('searchInfo', (data: any) => {
-            // console.log("searchInfo", data);
-            setSearchResults(data);
-        }
-        );
-        setSearch(searchProp);
-        socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
-    };
+		if (!fullScreenDropdown && searchConnected) {
+			// console.log("disconnecting");
+			socket.current.disconnect();
+			setSearchConnected(false);
+			// reset search results
+			setSearchResults([]);
+			setSearch('');
+		}
+		if ((fullScreenDropdown) && !searchConnected) {
+			// console.log("connecting");
+			socket.current = io(`http://${HOSTNAME}:3000/search`);
+			socket.current.on('connect', () => {
+				setSearchConnected(true);
+				// console.log("connected");
+			});
+		}
+	}, [fullScreenDropdown]);
 
 
 
+	const handleSearch = (searchProp: string) => {
+		// console.log("Handle search")
+		if (!searchConnected) {
+			// console.log("not connected");
+			return null;
+		}
+		socket.current.on('searchInfo', (data: any) => {
+			// console.log("searchInfo", data);
+			setSearchResults(data);
+		}
+		);
+		setSearch(searchProp);
+		socket.current.emit("search", { search: searchProp, limit: 3 });        // console.log("search", searchProp });
+	};
 
-    // const 
-    return (
 
-        // {
-        fullScreenDropdown && (
-            <DropdownSeachStyle className="full-screen-dropdown-search" ref={searchBarRef}>
-                <SearchBarStyle className="full-screen-search-bar w-full">
-                    {/* <div className="search-bar-container  "> */}
-                        <div className="search-bar-icon">
-                        </div>
-                        <div className="search-bar-input flex flex-row items-center gap-4 w-full 
+
+
+	// const 
+	return (
+
+		// {
+		fullScreenDropdown && (
+			<DropdownSeachStyle className="full-screen-dropdown-search" ref={searchBarRef}>
+				<SearchBarStyle className="full-screen-search-bar w-full">
+					{/* <div className="search-bar-container  "> */}
+					<div className="search-bar-icon">
+					</div>
+					<div className="search-bar-input flex flex-row items-center gap-4 w-full 
                         ">
-                            <div className="search-bar-search-icon">
-                                <CiSearch
-                                    className="search-icon"
-                                    size={30}
-                                // onClick={() => setFullScreenDropdown(false)}
-                                />
-                            </div>
+						<div className="search-bar-search-icon">
+							<CiSearch
+								className="search-icon"
+								size={30}
+							// onClick={() => setFullScreenDropdown(false)}
+							/>
+						</div>
 
-                            <input
-                                type="text"
-                                placeholder="Search"
-                                className="text-base font-bold text-zinc-800 text-left outline-none "
-                                value={search}
-                                onChange={(e) => handleSearch(e.target.value)}
-                            />
-                        </div>
-                        <div className="search-bar-search-icon">
-                            <CiCircleRemove
-                                className="close-icon"
-                                size={30}
-                                onClick={() => setSearch('')}
-                            />
-
-
-                        {/* </div> */}
-                    </div>
-
-                </SearchBarStyle>
-                <div className="mt-5 w-full h-full">
-
-                    {
-                        !searchResults['users'] && !searchResults['channels'] && (
-                            <div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
-                                <h1
-                                    className="text-2xl font-bold text-black-500 w-9/12 text-center" > type something it doesn't have to make sense.
-                                </h1>
-                                <CiLollipop className="search-icon" size={50} color='#ffff' opacity={1} />
-
-                            </div>
-                        )
-                    }
-                    {
-                        searchResults['users'] && searchResults['users'].length === 0 &&
-                            searchResults['channels'] && searchResults['channels'].length === 0 ? (
-                            <div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
-                                <h1 className="text-2xl font-bold text-black-500 w-9/12 text-center" > Nope, can't find it. Did you check under the couch. </h1>
-                                <CiFaceMeh className="face-meh-icon" size={50} />
-
-                            </div>
-                        ) : null
-                    }
+						<input
+							type="text"
+							placeholder="Search"
+							className="text-base font-bold text-zinc-800 text-left outline-none "
+							value={search}
+							onChange={(e) => handleSearch(e.target.value)}
+						/>
+					</div>
+					<div className="search-bar-search-icon">
+						<CiCircleRemove
+							className="close-icon"
+							size={30}
+							onClick={() => setSearch('')}
+						/>
 
 
-                    <div className="search-results">
-                        {
-                            searchResults['users'] && searchResults['users'].length > 0 ? (
-                                <div className="search-results-header flex flex-row items-center w-full justify-between">
-                                    <h1 className="text-base font-bold text-zinc-800 w-9/12 text-left">People</h1>
-                                    <div className="search-see-more  gap-2 cursor-pointer hover:text-zinc-900 self-end">
-                                        <Link
-                                            to={`/search?entity=users&keyword=${search}`}
-                                            className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-                                        >See more</Link>
+						{/* </div> */}
+					</div>
 
-                                    </div>
-                                </div>
+				</SearchBarStyle>
+				<div className="mt-5 w-full h-full">
 
-                            ) : null
-                        }
-                        {
+					{
+						!searchResults['users'] && !searchResults['channels'] && (
+							<div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
+								<h1
+									className="text-2xl font-bold text-black-500 w-9/12 text-center" > type something it doesn't have to make sense.
+								</h1>
+								<CiLollipop className="search-icon" size={50} color='#ffff' opacity={1} />
 
-                            searchResults['users'] && searchResults['users'].map((user: any, index: number) => {
-                                return (
+							</div>
+						)
+					}
+					{
+						searchResults['users'] && searchResults['users'].length === 0 &&
+							searchResults['channels'] && searchResults['channels'].length === 0 ? (
+							<div className="search-results-none-message flex flex-col mt-5 items-center w-ful h-full">
+								<h1 className="text-2xl font-bold text-black-500 w-9/12 text-center" > Nope, can't find it. Did you check under the couch. </h1>
+								<CiFaceMeh className="face-meh-icon" size={50} />
 
-                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
-                                        <div className="search-result-avatar w-full flex flex-row rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
-                                            <Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
-                                                {/* change later */}
-                                                {/* <img src={user.avatar} alt="avatar" /> */}
-                                                <div className="flex flex-row flex-start items-center gap-4 w-full">
-                                                <img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
-
-                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
-                                                    {/* </div> */}
-                                                    <div className="search-result-info ">
-                                                        <h1
-                                                            className="text-xl font-bold "
-                                                        >{user.login}</h1>
-                                                        <p
-                                                            className="text-zinc-900"
-                                                        >{user.firstName} {user.lastName}</p>
-                                                    </div>
-                                                </div>
-                                                
-                                            </Link>
-                                            { user.id === Cookies.get('id') ? null :
-
-                                                    <div className="chat-button flex justify-center items-center mr-1">
-                                                    <a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={
-                                                        (e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            handleTempChat(user);
-                                                        }
-                                                    }>
-                                                        <CiChat2 className="chat-icon " size={30} />
-                                                    </a>
-
-                                                </div>
-                                                }
-                                        </div>
-                                    </div>
-                                )
-                            })
+							</div>
+						) : null
+					}
 
 
-                        }
+					<div className="search-results">
+						{
+							searchResults['users'] && searchResults['users'].length > 0 ? (
+								<div className="search-results-header flex flex-row items-center w-full justify-between">
+									<h1 className="text-base font-bold text-zinc-800 w-9/12 text-left">People</h1>
+									<div className="search-see-more  gap-2 cursor-pointer hover:text-zinc-900 self-end">
+										<Link
+											to={`/search?entity=users&keyword=${search}`}
+											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
+										>See more</Link>
 
-                        {
-                            searchResults['channels'] && searchResults['channels'].length > 0 ? (
+									</div>
+								</div>
 
-                                <div className="search-results-header mt-3 flex flex-row items-center w-ful justify-between" >
-                                    <h1
+							) : null
+						}
+						{
 
-                                        className='text-base font-bold text-zinc-800 w-9/12 text-left'
-                                    >Channels</h1>
+							searchResults['users'] && searchResults['users'].map((user: any, index: number) => {
+								return (
 
-                                    <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-                                        <Link
-                                            to={`/search?entity=channels&keyword=${search}`}
-                                            className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-                                        >See more</Link>
-                                    </div>
-                                </div>
-                            ) : null
-                        }
-                        {
-                            searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
-                                return (
+									<div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
+										<div className="search-result-avatar w-full flex flex-row rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
+											<Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
+												{/* change later */}
+												{/* <img src={user.avatar} alt="avatar" /> */}
+												<div className="flex flex-row flex-start items-center gap-4 w-full">
+													<img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
 
-                                    <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
-                                        <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
-                                            <Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
-                                                <div className="search-result-avatar">
-                                                    {/* change later */}
-                                                    {/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
-                                                    <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
-                                                </div>
-                                                <div className="search-result-info">
-                                                    <h1
-                                                        className="text-xl font-bold "
-                                                    >{channel.name}</h1>
-                                                    <p
-                                                        className="text-zinc-900"
-                                                    > {channel.chann_type}</p>
-                                                </div>
+													{/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
+													{/* </div> */}
+													<div className="search-result-info ">
+														<h1
+															className="text-xl font-bold "
+														>{user.login}</h1>
+														<p
+															className="text-zinc-900"
+														>{user.firstName} {user.lastName}</p>
+													</div>
+												</div>
 
-                                            </Link>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                </div >
+											</Link>
+											{user.id === Cookies.get('id') ? null :
 
-            </DropdownSeachStyle >
-        )
-    )
+												<div className="chat-button flex justify-center items-center mr-1">
+													<a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={
+														(e) => {
+															e.preventDefault();
+															e.stopPropagation();
+															handleTempChat(user);
+														}
+													}>
+														<CiChat2 className="chat-icon " size={30} />
+													</a>
+
+												</div>
+											}
+										</div>
+									</div>
+								)
+							})
+
+
+						}
+
+						{
+							searchResults['channels'] && searchResults['channels'].length > 0 ? (
+
+								<div className="search-results-header mt-3 flex flex-row items-center w-ful justify-between" >
+									<h1
+
+										className='text-base font-bold text-zinc-800 w-9/12 text-left'
+									>Channels</h1>
+
+									<div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
+										<Link
+											to={`/search?entity=channels&keyword=${search}`}
+											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
+										>See more</Link>
+									</div>
+								</div>
+							) : null
+						}
+						{
+							searchResults['channels'] && searchResults['channels'].map((channel: any, index: number) => {
+								return (
+
+									<div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
+										<div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
+											<Link to={`/user/${channel.id}`} className="flex flex-row flex-start items-center gap-4 w-full">
+												<div className="search-result-avatar">
+													{/* change later */}
+													{/* <img src={channel.avatar} alt="avatar" className="rounded-full w-10 h-10" /> */}
+													<img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+												</div>
+												<div className="search-result-info">
+													<h1
+														className="text-xl font-bold "
+													>{channel.name}</h1>
+													<p
+														className="text-zinc-900"
+													> {channel.chann_type}</p>
+												</div>
+
+											</Link>
+										</div>
+									</div>
+								)
+							})
+						}
+					</div>
+				</div >
+
+			</DropdownSeachStyle >
+		)
+	)
 }
 
 
