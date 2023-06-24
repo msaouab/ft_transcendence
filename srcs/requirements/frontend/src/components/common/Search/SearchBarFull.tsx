@@ -286,7 +286,7 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 												{/* change later */}
 												{/* <img src={user.avatar} alt="avatar" /> */}
 												<div className="flex flex-row flex-start items-center gap-4 w-full">
-													<img src={getAvatarUrlById(user.id)} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
+													<img src={user.avatar} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
 
 													{/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
 													{/* </div> */}

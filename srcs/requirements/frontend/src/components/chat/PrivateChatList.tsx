@@ -39,8 +39,8 @@ const UsersChatList = ({
 		const userId = sender_id === Cookies.get("id") ? receiver_id : sender_id;
 		const user = await axios.get(`http://${HOSTNAME}:3000/api/v1/user/${userId}`);
 		// cons
-		const avatar = getAvatarUrl();
-		return { login: user.data.login, avatar: avatar, status: user.data.status };
+		// const avatar = getAvatarUrl();
+		return { login: user.data.login, avatar: user.data.avatar, status: user.data.status };
 		// return user.data
 	};
 

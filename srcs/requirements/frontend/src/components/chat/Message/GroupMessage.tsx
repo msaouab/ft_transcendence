@@ -131,7 +131,7 @@ const Message = ({ avatar, role, message, sender }: MessageProps) => {
           {avatar !== "" && sender === 'Friend' && (
             <img
               className="imgavatar"
-              src={avatar}
+                src={message.sender_avatar}
               alt="user"
             />
           )}
@@ -149,7 +149,7 @@ const Message = ({ avatar, role, message, sender }: MessageProps) => {
             {avatar !== "" && sender === "User" && (
             <img
               className="imgavatar"
-              src={avatar}
+                src={message.sender_avatar}
               alt="user"
             />
           )}

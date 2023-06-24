@@ -84,29 +84,29 @@ async function main() {
 			login: "ren-nasr",
 		},
 	});
-	const privateChatRoom = await prisma.privateChatRoom.create({
-		data: {
-			id: await getRoomId(user1.id, user2.id),
-			sender_id: user1.id,
-			receiver_id: user2.id,
-		},
-	});
-	for (let j = 0; j < 50; j++) {
-		let sender = Math.random() >= 0.5 ? user1 : user2;
-		let receiver = sender.id === user1.id ? user2 : user1;
-		let content = messages[Math.floor(Math.random() * messages.length)];
-		const privateMessage = await prisma.privateMessage.create({
-			data: {
-				sender_id: sender.id,
-				receiver_id: receiver.id,
-				chatRoom_id: privateChatRoom.id,
-				dateCreated: new Date(),
-				content: content,
-				seen: Math.random() >= 0.5 ? true : false,
-				id: sender.id + receiver.id + Date.now().toString(),
-			},
-		});
-	}
+	// const privateChatRoom = await prisma.privateChatRoom.create({
+	// 	data: {
+	// 		id: await getRoomId(user1.id, user2.id),
+	// 		sender_id: user1.id,
+	// 		receiver_id: user2.id,
+	// 	},
+	// });
+	// for (let j = 0; j < 50; j++) {
+	// 	let sender = Math.random() >= 0.5 ? user1 : user2;
+	// 	let receiver = sender.id === user1.id ? user2 : user1;
+	// 	let content = messages[Math.floor(Math.random() * messages.length)];
+	// 	const privateMessage = await prisma.privateMessage.create({
+	// 		data: {
+	// 			sender_id: sender.id,
+	// 			receiver_id: receiver.id,
+	// 			chatRoom_id: privateChatRoom.id,
+	// 			dateCreated: new Date(),
+	// 			content: content,
+	// 			seen: Math.random() >= 0.5 ? true : false,
+	// 			id: sender.id + receiver.id + Date.now().toString(),
+	// 		},
+	// 	});
+	// }
 	//create an array of object each object contains name and description attributes
 	const achievements = [
 		{
