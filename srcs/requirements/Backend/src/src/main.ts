@@ -27,7 +27,6 @@ async function bootstrap() {
   });
 
   console.log("the origin is ", 'http://' + HOSTNAME +':5173');
-
   //ejs temp front end
   app.useStaticAssets(join('/','app', 'public'));
   app.setBaseViewsDir(join('/','app', 'views'));
