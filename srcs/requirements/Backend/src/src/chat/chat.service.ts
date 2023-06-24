@@ -412,6 +412,7 @@ export class ChatService {
     }
 
     async sendGroupMessage(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id } = payload;
         const message = await this.createMessage(payload);
         const newGroupMessage = {
@@ -429,6 +430,7 @@ export class ChatService {
     }
 
     async joinGroupChatRoom(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -445,6 +447,7 @@ export class ChatService {
     }
 
     async leaveGroupChatRoom(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -461,6 +464,7 @@ export class ChatService {
     }
 
     async addChannelMember(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { channel_id, user_id, type, password } = payload;
         console.log(channel_id, user_id, type, password);
         const user = await this.prisma.user.findUnique({
@@ -537,7 +541,7 @@ export class ChatService {
                 }
             });
             if (!user) {
-                client.emit('error', 'User not found');
+                client.emit('UserError', 'User not found');
             }
             return user;
         } catch (error) {
@@ -582,6 +586,7 @@ export class ChatService {
     }
 
     async addChannelAdmin(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -622,6 +627,7 @@ export class ChatService {
         }
     }
     async removeChannelAdmin(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -662,6 +668,7 @@ export class ChatService {
         }
     }
     async muteUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -712,6 +719,7 @@ export class ChatService {
         }
     }
     async unmuteUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -754,6 +762,7 @@ export class ChatService {
         }
     }
     async kickUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -788,8 +797,10 @@ export class ChatService {
         }
     }
     async banUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
-            const { group_id, userId } = payload;
+            const { group_id, userId, banTime } = payload;
+            // the banTime is in minutes like 2 minutes, 5 minutes
             const channel = await this.getChannel(client, group_id);
             const admin = await this.getUser(userId, client);
             const memberTab = await this.removeMember(client, group_id, userId);
@@ -810,10 +821,18 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
+            const end_time = new Date();
+            console.log('typeof end_time: ', typeof banTime);
+            console.log('end_time: ', end_time);
+            // banTime is string
+            end_time.setMinutes(end_time.getMinutes() + parseInt(banTime));
+            console.log('end_time: ', end_time);
             const bannedUser = await this.prisma.bannedMembers.create({
                 data: {
                     banned_id: userId,
                     channel_id: group_id,
+                    status_end_time: end_time,
+                    status: 'Temporary'
                 }
             })
             if (!bannedUser) {
@@ -836,6 +855,7 @@ export class ChatService {
         }
     }
     async unbanUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -849,7 +869,7 @@ export class ChatService {
                 }
             })
             if (!bannedUser) {
-                client.emit('error', 'User not unbanned');
+                client.emit('bannedError', 'User not unbanned');
             }
             const memberTab = await this.prisma.membersTab.create({
                 data: {
@@ -871,6 +891,7 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
+            console.log('bannedUser: ', bannedUser);
             server.to(group_id).emit('unbanChannelUser', {
                 avatar: admin.avatar,
                 id: admin.id,
@@ -884,6 +905,7 @@ export class ChatService {
         }
     }
     async joinPrivateChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -919,6 +941,7 @@ export class ChatService {
         }
     }
     async sendMessageG(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, sender_id, lastMessage } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -942,6 +965,7 @@ export class ChatService {
         }
     }
     async removeMeuted(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const mutedUser = await this.prisma.mutedMembers.delete({
@@ -962,6 +986,7 @@ export class ChatService {
         }
     }
     async leaveChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -1005,6 +1030,7 @@ export class ChatService {
         }
     }
     async deleteChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, user_id } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -1073,6 +1099,7 @@ export class ChatService {
         }
     }
     async createChannel(client, payload: ChannelDto, server: Server) {
+        await this.unbanUsers(client, server);
         const { name, status, password, limitUsers, description, avatar, owner } = payload;
         const ownerUser = await this.getUser(owner, client);
         try {
@@ -1131,7 +1158,33 @@ export class ChatService {
         }
     }
 
+    // unban users if the now date is greater than the banned date
+    async unbanUsers(client, server: Server) {
+        try {
+            const bannedUsers = await this.prisma.bannedMembers.findMany({
+                where: {
+                    status_end_time: {
+                        lte: new Date()
+                    }
+                }
+            });
+            if (!bannedUsers) {
+                client.emit('BannedError', 'Banned users not found');
+                return;
+            }
+            for (let i = 0; i < bannedUsers.length; i++) {
+                this.unbanUser(client, {
+                    userId: bannedUsers[i].banned_id,
+                    group_id: bannedUsers[i].channel_id
+                }, server);
+            }
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
     async updateChannelPassword(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
         try {
             const { group_id, password } = payload;
             const channel = await this.getChannel(client, group_id);

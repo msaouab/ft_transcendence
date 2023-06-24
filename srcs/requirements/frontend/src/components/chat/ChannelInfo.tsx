@@ -55,7 +55,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
             return;
         if (openBanTimeDialog === true && banTime !== "") {
             console.log("this user will be banned for: ", banTime);
-            socket.current.emit("banUser", { group_id: selectedGroupChat.group_id, userId: user.id });
+            socket.current.emit("banUser", { group_id: selectedGroupChat.group_id, userId: user.id, banTime: banTime });
             setBanTime("");
             setOpenDialog(false);
         }
@@ -275,6 +275,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 socket.current.off("unbanChannelUser");
                 socket.current.off("memberLeaveChannel");
                 socket.current.off("channelDeleted");
+                socket.current.off("channelUpdated");
             }
         }
     }, [connected])
@@ -283,9 +284,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
 
     ///// owner fuctions
     const [openOwnerDialog, setOpenOwnerDialog] = useState(false);
-    const handelOpenOwnerDialog = () => {
-        setOpenOwnerDialog(true);
-    }
 
 
     return (
@@ -478,7 +476,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                 setOpenBanTimeDialog(false);
                             }} className="flex flex-col gap-4 items-center justify-center p-10 " >
                                 <h1 className="text-gray-700 text-xl font-[700] text-center">Enter ban time for this user</h1>
-                                <Input type="number" label="Time" value={banTime} onChange={(e) => setBanTime(e.target.value)} className="w-full" />
+                                <Input type="number" label="Enter the ban time in minutes" value={banTime} onChange={(e) => setBanTime(e.target.value)} className="w-full " />
                                 <div className="w-full  flex items-center justify-between gap-4">
                                     <button className={`${buttonStyle}  bg-red-800 flex-1`} onClick={() => handleOpenBanTimeDialog(selectedUser)}>
                                         Ban

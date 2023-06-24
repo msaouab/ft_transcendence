@@ -247,32 +247,6 @@ const Chat = () => {
   }, [connected]);
 
 
-  // here
-
-  useEffect(() => {
-    if (connected) {
-    chatSocket.current.on("newMessageG", (message: any) => {
-      setSelectedChat({} as PrivateMessage);
-      setSelectedGroupChat(message);
-      setSelected(message.group_id);
-      setGroupChatRooms(prev => {
-        const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
-        if (index === -1) {
-          return [message, ...prev];
-        }
-        return prev;
-      });
-    });
-  }
-
-  if (connected) {
-    return () => {
-      chatSocket.current.off("newMessageG");
-    }
-  }
-
-  }, [connected]);
-
   useEffect(() => {
     if (connected) {
       chatSocket.current.on("newChannelAdmin", (message: any) => {
@@ -423,6 +397,19 @@ const Chat = () => {
         setGroupChatRooms((prev: any) => {
           return prev.filter((group: any) => group.group_id !== message.group_id)
         })
+      });
+
+      chatSocket.current.on("newMessageG", (message: any) => {
+        setSelectedChat({} as PrivateMessage);
+        setSelectedGroupChat(message);
+        setSelected(message.group_id);
+        setGroupChatRooms(prev => {
+          const index = prev.findIndex((group: GroupMessage) => group.group_id === message.group_id);
+          if (index === -1) {
+            return [message, ...prev];
+          }
+          return prev;
+        });
       });
     }
     return () => {
