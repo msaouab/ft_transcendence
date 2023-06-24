@@ -113,9 +113,11 @@ const SideBar = ({
 					}
 					if (response.statusText) {
 					}
+					console.log("=======>response.data.avatar", response.data);
+					setUserImg(response.data.avatar);
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
-					setUserStatus(response.data.status.tolowoerCase());
+					setUserStatus(response.data.status);
 				})
 				.catch((error) => {
 					if (error.response.status == 401 || error.response.status == 403) {
@@ -126,8 +128,8 @@ const SideBar = ({
 			console.log(error);
 		}
 		// console.log("ppppppp", userId);
-		const res = await GetAvatar(userId);
-		setUserImg(res);
+		// const res = await GetAvatar(userId);
+		// setUserImg(res);
 	}
 
 	useEffect(() => {
