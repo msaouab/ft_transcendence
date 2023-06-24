@@ -209,6 +209,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("We've got the event to create a new channel: ", payload);
         return await this.chatService.createChannel(client, payload, this.server);
     }
+    @SubscribeMessage('updateChannelPassword')
+    async handleUpdateChannelPassword(client: Socket, payload: any) {
+        console.log("We've got the event to update a channel password: ", payload);
+        return await this.chatService.updateChannelPassword(client, payload, this.server);
+    }
 }
 
 

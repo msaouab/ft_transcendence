@@ -1,8 +1,12 @@
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
 import { AiOutlineClose, AiOutlineLink } from 'react-icons/ai'
 import { RxDotsVertical } from 'react-icons/rx'
 import Cookies from 'js-cookie'
+import { AiOutlineCloseCircle } from "react-icons/ai";
+import { MdDeleteOutline } from "react-icons/md";
+import "../chat/CreateChannel/style.scss"
+
 
 import Drawer from '../../components/chat/drawer'
 import {
@@ -13,11 +17,12 @@ import {
     TabPanel,
     Dialog,
     Input,
-    Checkbox,
+    Button,
 } from "@material-tailwind/react";
 import Avatar from '../../components/chat/Avatar';
 import { GetChannelInfo } from '../../api/axios';
 import { GroupMessage } from '../../types/message'
+// import UpdateChannelInfo  from '../chat/CreateChannel/updateChannelInfo'
 
 interface props {
     open: boolean;
@@ -56,8 +61,11 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         }
         setOpenBanTimeDialog(!openBanTimeDialog);
     }
+    const [password, setPassword] = useState("");
+
 
     const getChannelInfo = async () => {
+        setPassword("");
         await GetChannelInfo(selectedGroupChat.group_id).then(res => {
             const currentUserId = Cookies.get('id') as string;
             let currentUser;
@@ -124,12 +132,21 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         socket.current.emit("leaveChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
     }
 
+    const updateChannelPassword = (e: any) => {
+        e.preventDefault();
+        console.log("update channel password");
+        socket.current.emit("updateChannelPassword", { group_id: selectedGroupChat.group_id, password: password });
+        setPassword("");
+        setOpenOwnerDialog(false);
+    }
+
     const handleDeleteChannel = () => {
         console.log("delete channel");
         socket.current.emit("deleteChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
     }
 
     useEffect(() => {
+        setPassword("");
         getChannelInfo();
     }, [selectedGroupChat.group_id])
 
@@ -242,6 +259,10 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 console.log("channelDeleted: ", data);
                 setOpen(false);
             });
+            socket.current.on("channelUpdated", (data: any) => {
+                console.log("channelUpdated: ", data);
+                setChannel(data);
+            });
         }
         return () => {
             if (connected) {
@@ -265,13 +286,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     const handelOpenOwnerDialog = () => {
         setOpenOwnerDialog(true);
     }
-    const ownerChangeChanelInfo = () => {
-        handelOpenOwnerDialog();
-    }
-    //// chanel password
-    const [password, setPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [removePassword, setRemovePassword] = useState(false);
 
 
     return (
@@ -286,42 +300,72 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                         Channels Info
                     </div>
                 </div>
-                <Dialog key={selectedGroupChat.group_id} size="sm" open={openOwnerDialog} handler={handelOpenOwnerDialog} className="flex flex-col gap-4 items-center justify-center p-10 " >
+                <Dialog open={openOwnerDialog} handler={() => {
+                    if (channel && channel?.chann_type !== "Secret") {
+                        setPassword("");
+                    }
+                    setOpenOwnerDialog(false);
+                }} className="bg-[#6e6a6a] min-h-[15rem] flex flex-col " >
+                    <AiOutlineCloseCircle
+                        className="close-btn"
+                        onClick={() => {
+                            if (channel && channel?.chann_type !== "Secret") {
+                                setPassword("");
+                            }
+                            setOpenOwnerDialog(false);
+                        }}
+                    />
+                    <div className="inputBox px-[2rem] flex justify-center items-center">
+                        {
+                            channel && channel?.chann_type === "Secret" && (
+                                <MdDeleteOutline className="text-4xl mr-[1rem] hover:text-red-500"
+                                    onClick={() => { setPassword("") }}
+                                />
+                            )
+                        }
+                        <input
+                            type="password"
+                            id="Channel Password"
+                            placeholder="Channel Password"
+                            name="name"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        /></div>
+                    <div className="px-[2rem] flex justify-center items-center">
+                        {
+                            channel && channel?.chann_type === "Secret" ? (
+                                <Button className="btn !mx-[2rem]" disabled={!(password.length === 0 || password !== channel.password)}
+                                    onClick={updateChannelPassword}
+                                >
+                                    update password
+                                </Button>) : (
+                                <Button className="btn !mx-[2rem]" disabled={password.length == 0} onClick={updateChannelPassword}>
+                                    set password
+                                </Button>)
+                        }
+                    </div>
+                </Dialog>
+                <div className='w-full aspect-square bg-gray-500 relative'
+                    style={{
+                        backgroundImage: `url(${channel?.avatar})`,
+                        backgroundSize: "cover"
+                    }}
+                >
                     {
-                        channel && channel?.chann_type === "Secret" ? (
-                            <div>
-                                <Input label="Change Password" type="password" value={password} onChange={
-                                    (e: any) => {
-                                        setPassword(e.target.value);
-                                        if (e.target.value === channel.password) {
-                                            setRemovePassword(true);
-                                        } else {
-                                            setRemovePassword(false);
-                                        }
-                                    }
-                                } />
-                                <Checkbox label="Remove Password" checked={removePassword} onChange={
-                                    (e: any) => {
-                                        setRemovePassword(e.target.checked);
-                                        if (e.target.checked) {
-                                            setNewPassword("");
-                                        }
-                                    }
-                                } />
-                            </div>
-                        ) : (
-                            <div>
-                                <Input label="Set Password" type="password" value={newPassword} onChange={
-                                    (e: any) => {
-                                        setNewPassword(e.target.value);
-                                    }
-                                } />
+                        channel && channelUsers && (
+                            <div className='absolute bottom-0 left-0 w-full bg-gradient-to-t from-white/40 to-transparent p-1'>
+                                <h1 className='text-gray-900 text-xl'>{channel.name}</h1>
+                                <p className='text-gray-700'>{
+                                    channelUsers.length === 1 ? (
+                                        `${channelUsers.length} member`
+                                    ) : (
+                                        `${channelUsers.length} members`
+                                    )
+                                }
+                                </p>
                             </div>
                         )
                     }
-                </Dialog>
-                <div className='w-full aspect-square bg-gray-500'>
-                    <img src={channel?.avatar} alt="" className='w-full h-full object-cover' />
                 </div>
                 <button className='flex items-center aspect-square 
                         hover:bg-white/10 active:bg-white/20 h-16' >
@@ -382,7 +426,11 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                                 {
                                                     (currentUser.role === "Owner" && currentUser.id === user.id) &&
                                                     <span className='tools'>
-                                                        <RxDotsVertical className='text-lg' onClick={ownerChangeChanelInfo} />
+                                                        <RxDotsVertical className='text-lg' onClick={() => {
+                                                            console.log("channel?.password", channel);
+                                                            setPassword(channel?.password || "");
+                                                            setOpenOwnerDialog(true);
+                                                        }} />
                                                     </span>
                                                 }
                                             </button>
@@ -392,7 +440,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                             </TabPanel>
                             {
                                 currentUser && (
-                                    <Dialog  size="sm" open={openDialog} handler={handleOpen} className="flex flex-col gap-4 items-center justify-center p-10 " >
+                                    <Dialog size="sm" open={openDialog} handler={handleOpen} className="flex flex-col gap-4 items-center justify-center p-10 " >
                                         <div className='flex flex-col gap-2 items-center justify-center'>
                                             <Avatar user={selectedUser} className='w-16 h-16 !bg-blue-500' />
                                             <span className='font-bold text-xl'>
@@ -404,7 +452,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                         </div>
                                         <div className='flex gap-6 items-center justify-center w-full flex-wrap max-w-[50rem]'>
                                             {
-                                                currentUser.role === "Owner" && selectedUser &&  selectedUser.role !== "Muted" && selectedUser.role !== "Banned" && (
+                                                currentUser.role === "Owner" && selectedUser && selectedUser.role !== "Muted" && selectedUser.role !== "Banned" && (
                                                     <button className={`${buttonStyle}  bg-cyan-800`} onClick={() => handleAdminRole(selectedUser)}>
                                                         {(selectedUser && selectedUser.role === "Admin") ? "Remove Admin" : "Make Admin"}
                                                     </button>

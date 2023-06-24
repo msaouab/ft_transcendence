@@ -1076,7 +1076,10 @@ export class ChatService {
         const { name, status, password, limitUsers, description, avatar, owner } = payload;
         const ownerUser = await this.getUser(owner, client);
         try {
-            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+            let hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+            if (password === ''){
+                hashedPassword = "";
+            }
             const channel = await this.prisma.channel.create({
                 data: {
                     name: name,
@@ -1125,6 +1128,47 @@ export class ChatService {
             else {
                 client.emit('error', error);
             }
+        }
+    }
+
+    async updateChannelPassword(client, payload: any, server: Server) {
+        try {
+            const { group_id, password } = payload;
+            const channel = await this.getChannel(client, group_id);
+            let updatedChannel;
+            if (channel.password !== '' && password === '') {
+                updatedChannel = await this.prisma.channel.update({
+                    where: {
+                        id: group_id
+                    },
+                    data: {
+                        password: "",
+                        chann_type: 'Public',
+                    }
+                })
+            }
+            else {
+                let hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+                updatedChannel = await this.prisma.channel.update({
+                    where: {
+                        id: group_id
+                    },
+                    data: {
+                        password: hashedPassword,
+                        chann_type: 'Secret',
+                    }
+                });
+            }
+            if (!updatedChannel) {
+                client.emit('error', 'Channel not updated');
+            }
+            server.to(group_id).emit('channelUpdated', {
+                ...channel,
+                password: updatedChannel.password,
+                chann_type: updatedChannel.chann_type,
+            });
+        } catch (error) {
+            client.emit('error', error);
         }
     }
 }
