@@ -80,6 +80,7 @@ export class BlockedUsersService {
                     }
                 ]
             },
+        
         });
         if (checkBlock.length > 0) {
             throw new ConflictException("you already blocked this user");

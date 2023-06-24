@@ -303,13 +303,43 @@ export class UserService {
     }
 
     async getJoindChannels(id: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: id },
-            include: { channelsJoined: true }
-        })
-        if (user === null)
-            throw new NotFoundException('No User was found with id provided');
-        return user.channelsJoined;
+        try {
+            const user = await this.prisma.user.findUnique({
+                where: { id: id },
+                include: { channelsJoined: true }
+            })
+            if (user === null)
+                throw new NotFoundException('No User was found with id provided');
+            const channels = [];
+            for (const channel of user.channelsJoined) {
+                const lastMessage = await this.prisma.message.findFirst({
+                    where: {
+                        receiver_id: channel.channel_id
+                    },
+                    orderBy: {
+                        dateCreated: 'desc'
+                    }
+                })
+                console.log("you have to verify if returnd message is the last message of the channel");
+                const chnl = await this.prisma.channel.findUnique({
+                    where: {
+                        id: channel.channel_id
+                    }
+                });
+                channels.push({
+                    group_id: channel.channel_id,
+                    name: channel.channel_name,
+                    sender_id: lastMessage?.sender_id,
+                    role: channel.role,
+                    lastMessage: lastMessage?.content,
+                    lastMessageDate: lastMessage?.dateCreated.toISOString(),
+                    profileImage: chnl?.avatar,
+                })
+            }
+            return channels;
+        } catch (error) {
+            throw error;
+        }
     }
 
     async deleteChannel(channelId: string, userId: string) {
@@ -374,25 +404,24 @@ export class UserService {
 
 
     /// getUnsenNotifications
-    async getUnseenNotifications(ft_user) {
-        const user = await this.prisma.user.findUnique({
-            where: {
-                email: ft_user._json.email,
-            }
-        });
-        if (!user) {
-            throw new NotFoundException('User nwwwot found');
-        }
+    async getUnseenNotifications(id: string) {
+        // const user = await this.prisma.user.findUnique({
+        //     where: {
+        //         id: id,
+        //     }
+        // });
+        // if (!user) {
+        //     throw new NotFoundException('User not found');
+        // }
         const notifications = await this.prisma.notification.findMany({
             where: {
-                user_id: user.id,
-                
+                user_id: id,      
             }
         });
-
-        if (!notifications) {
-            throw new NotFoundException('Notifications not found');
-        }
+        // don't change later, this should not be an error
+        // if (!notifications) {
+        //     throw new NotFoundException('Notifications not found');
+        // }
         return notifications;
     }
 

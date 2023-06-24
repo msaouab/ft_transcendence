@@ -23,6 +23,7 @@ enum ChanRoles {
   Admin
   Owner
   Member
+  Muted
 }
 
 enum ChanType {
@@ -161,6 +162,8 @@ model Channel {
   id            String          @id @default(uuid())
   name          String          @unique
   dateCreated   DateTime        @default(now())
+  avatar        String          @default("default.png")
+  description   String?
   chann_type    ChanType
   owner_id      String
   password      String?

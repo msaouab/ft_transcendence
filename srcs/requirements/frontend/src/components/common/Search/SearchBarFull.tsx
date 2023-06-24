@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
+import { HOSTNAME } from "../../../api/axios";
 const DropdownSeachStyle = styled.div`
 	background: rgba(217, 217, 217, 0.3);
 	border-radius: 10px;

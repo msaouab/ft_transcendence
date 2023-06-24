@@ -76,6 +76,7 @@ export const ChanelCard = ({ channel_name, role, channel_id }: any) => {
 };
 
 export const AchivementCard = ({ name, description, image }: any) => {
+<<<<<<< HEAD
 	return (
 		<div className=" h-full min-w-[170px]  md:min-w-[300px]  md:max-w-[400px]">
 			<div className=" bg-white lg:w-[80%] w-[95%] m-auto  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
@@ -89,4 +90,19 @@ export const AchivementCard = ({ name, description, image }: any) => {
 			</div>
 		</div>
 	);
+=======
+  return (
+    <div className=" h-full min-w-[300px]">
+      <div className="bg-white lg:w-[80%] w-[95%] m-auto  shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 h-full">
+        <div className="image">
+          <img src={image} alt="" width={150} />
+        </div>
+        <div className="title text-center font-bold text-xl  text-red-500">
+          {name}
+        </div>
+        <div className="description text-center">{description}</div>
+      </div>
+    </div>
+  );
+>>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 };

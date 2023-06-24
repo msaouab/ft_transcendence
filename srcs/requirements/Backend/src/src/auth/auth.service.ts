@@ -21,6 +21,7 @@ import { HOSTNAME } from "src/main";
 export class AuthService {
 	constructor(private prisma: PrismaService) {}
 
+<<<<<<< HEAD
 	async signup(user, res) {
 		try {
 			const find_user = await this.prisma.user.findUnique({
@@ -57,6 +58,43 @@ export class AuthService {
 		}
 		return this.login(user, res);
 	}
+=======
+            const find_user = await this.prisma.user.findUnique({
+                where: {
+                    login: user.username,
+                },
+            })
+            if (find_user) {
+                return this.login(user,res);
+            }
+            const Cryptr = require('cryptr');
+            const cryptr = new Cryptr(process.env.SECRET )
+            const secret = authenticator.generateSecret();
+            const encryptedString = cryptr.encrypt(secret);
+            const token = authenticator.generate(encryptedString);
+            const createUser = await this.prisma.user.create({
+                data: {
+                    login: user.username,
+                    email:  user._json.email,
+                    firstName:  user.name.givenName,
+                    lastName:  user.name.familyName,
+                    avatar: `${HOSTNAME}:3000/default.png`,
+                    status: 'Online',
+                    otp_base32: encryptedString,
+                },
+            })
+            const createUserRankingData = await this.prisma.rankingData.create({
+                data: {
+                    user_id: createUser.id,
+                },
+            })
+            }
+        catch (e) {
+            console.log(e);
+        }
+        return this.login(user,res);
+    }
+>>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 
 	async logout(user, res) {
 		if (!user) throw new NotFoundException("User not found");

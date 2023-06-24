@@ -3,7 +3,7 @@ import GroupChatList from './GroupsChatList';
 import UsersChatList from './PrivateChatList';
 
 
-import { PrivateMessage } from '../../types/message';
+import { PrivateMessage, GroupMessage } from '../../types/message';
 
 const ChatListStyle = styled.div`
     background: transparent;
@@ -47,16 +47,30 @@ const ChatListWrapperStyle = styled.div`
 //    }
     `
 
-const ChatList = ({ setSelectedChat, newLatestMessage }: {
-    setSelectedChat: (chat: PrivateMessage) => void, newLatestMessage: { chatRoomId: string, message: string }
-}) => {
+interface ChatListProps {
+    setSelectedChat: (chat: PrivateMessage) => void,
+    newLatestMessage: { chatRoomId: string, message: string },
+    setSelectedGroupChat: (chat: GroupMessage) => void,
+    socket: any,
+    connected: boolean
+    selected: string
+    setSelected: (selected: string) => void
+}
+
+const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, socket, connected, selected, setSelected }: ChatListProps) => {
     return (
 
         // <ChatListWrapperStyle>
             <ChatListStyle>
                 {/* <SearchBar /> */}
-                <GroupChatList />
-                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+            <GroupChatList 
+                setSelectedChat={setSelectedChat} 
+                setSelectedGroupChat={setSelectedGroupChat} 
+                socket={socket} 
+                connected={connected} 
+                selected={selected} 
+                setSelected={setSelected} />
+            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected} setSelected={setSelected} />
             </ChatListStyle>
         // </ChatListWrapperStyle>
     );

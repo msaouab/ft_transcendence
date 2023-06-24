@@ -659,7 +659,6 @@ export class GameGateway
 			width: width,
 		});
 		client.join(key);
-		console.log(this.roomMap.get(key))
 		this.server
 			.to(client.id)
 			.emit("BenomeId", this.roomMap.get(key).player2.id, key);

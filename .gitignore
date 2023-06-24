@@ -5,5 +5,5 @@ db
 dist
 .DS_Store
 package-lock.json
-/prisma/migrations/*
+srcs/requirements/Backend/src/prisma/migrations/*
 srcs/requirements/Backend/src/public/*

@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto } from "./dto";
+import { BannedMemberDto, ChannelDto, MemberDto, JoinMemberDto, MessagesDto } from "./dto";
 import { Request } from "express";
 import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
@@ -24,14 +24,16 @@ export class ChannelService {
                     chann_type: dto.status,
                     password: dto.password,
                     owner_id: userId,
-                    limit_members: -1
+                    limit_members: -1,
+                    description: dto.description,
+                    avatar: dto.avatar
                 }
             })
             this.UserService.addChannel(channel.id, channel.name, userId, "Owner");
             return channel;
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-                throw new ForbiddenException("There is already a channel with the name provided");
+                throw new HttpException("Channel already exists", HttpStatus.CONFLICT);
             }
             throw error;
         }
@@ -250,15 +252,37 @@ export class ChannelService {
     }
 
     async getBannedMembers(channelId: string) {
-        await this.getChannelById(channelId);
-        const bannedTab = await this.prisma.bannedMembers.findMany({
-            where: { channel_id: channelId },
-            select: { banned_id: true }
-        })
-        if (bannedTab !== null)
-            return bannedTab.map((el) => el.banned_id)
-        else
-            return []
+        try {
+            await this.getChannelById(channelId);
+            const bannedTab = await this.prisma.bannedMembers.findMany({
+                where: { channel_id: channelId },
+                select: {
+                    banned_id: true,
+                    status: true,
+                    status_end_time: true
+                },
+            })
+            const bannedMembers = await Promise.all(bannedTab.map(async (el) => {
+                const user = await this.prisma.user.findUnique({
+                    where: { id: el.banned_id },
+                    select: {
+                        id: true,
+                        login: true,
+                        avatar: true,
+                        status: true,
+                    }
+                })
+                return {
+                    ...user,
+                    role: "Banned",
+                    banStatus: el.status,
+                    status_end_time: el.status_end_time
+                }
+            }))
+            return bannedMembers;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async unbanMember(channelId: string, dto: MemberDto) {
@@ -327,15 +351,37 @@ export class ChannelService {
     }
 
     async getMutedMembers(channelId: string) {
-        await this.getChannelById(channelId);
-        const mutedTab = await this.prisma.mutedMembers.findMany({
-            where: { channel_id: channelId },
-            select: { muted_id: true }
-        })
-        if (mutedTab !== null)
-            return mutedTab.map((el) => el.muted_id)
-        else
-            return []
+        try {
+            await this.getChannelById(channelId);
+            const mutedTab = await this.prisma.mutedMembers.findMany({
+                where: { channel_id: channelId },
+                select: {
+                    muted_id: true,
+                    status: true,
+                    status_end_time: true
+                },
+            })
+            const mutedMembers = await Promise.all(mutedTab.map(async (el) => {
+                const user = await this.prisma.user.findUnique({
+                    where: { id: el.muted_id },
+                    select: {
+                        id: true,
+                        login: true,
+                        avatar: true,
+                        status: true,
+                    }
+                })
+                return {
+                    ...user,
+                    role: "Muted",
+                    muteStatus: el.status,
+                    status_end_time: el.status_end_time
+                }
+            }))
+            return mutedMembers;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async unmuteMember(channelId: string, dto: MemberDto) {
@@ -399,8 +445,8 @@ export class ChannelService {
                                 OR: [
                                     { members: { some: { member_id: userId } } },
                                     { owner_id: userId },
-                                    { adminstrators : { some: { admin_id: userId } } },
-                                    { mutedMembers : { some: { muted_id: userId } } },
+                                    { adminstrators: { some: { admin_id: userId } } },
+                                    { mutedMembers: { some: { muted_id: userId } } },
                                 ]
                             }
                         ]
@@ -416,5 +462,131 @@ export class ChannelService {
             }
         });
         return channels;
+    }
+
+    async getMessages(channelId: string, dto: MessagesDto) {
+        await this.getChannelById(channelId);
+        const { limit, offset } = dto;
+        const take: number = limit ? Number(limit) : 10;
+        const skip: number = offset ? Number(offset) : 0;
+
+        const messages: {
+            id: string,
+            group_id: string,
+            sender_id: string,
+            sender_name: string,
+            sender_avatar: string,
+            content: string,
+            dateCreated: string,
+            role: string,
+        }[] = [];
+        try {
+            const res = await this.prisma.message.findMany({
+                where: {
+                    receiver_id: channelId
+                },
+                orderBy: {
+                    dateCreated: 'desc'
+                },
+                take: take,
+                skip: skip,
+            });
+            const allMessages = await this.prisma.message.count({
+                where: {
+                    receiver_id: channelId
+                }
+            });
+            for (const message of res) {
+                let joindChannel = null;
+                if (message.sender_id !== channelId) {
+                    joindChannel = await this.prisma.channelsJoinTab.findFirst({
+                        where: {
+                            channel_id: channelId,
+                            user_id: message.sender_id
+                        },
+                        include: {
+                            user: {
+                                select: {
+                                    login: true,
+                                    avatar: true,
+                                }
+                            }
+                        }
+                    });
+                }
+                messages.push({
+                    id: message.id,
+                    group_id: message.receiver_id,
+                    sender_id: message.sender_id,
+                    sender_name: joindChannel ? joindChannel.user.login : "Server",
+                    sender_avatar: joindChannel ? joindChannel.user.avatar : "Server",
+                    content: message.content,
+                    dateCreated: message.dateCreated.toISOString(),
+                    role: joindChannel ? joindChannel.role : "Server",
+                })
+            }
+            return {
+                messages: messages,
+                count: allMessages
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async getAllSubscribers(channelId: string) {
+        try {
+            const subscribersRes = await this.prisma.channelsJoinTab.findMany({
+                where: {
+                    channel_id: channelId,
+                    OR: [
+                        { role: "Member" },
+                        { role: "Admin" },
+                        { role: "Owner" },
+                    ]
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true,
+                            login: true,
+                            avatar: true,
+                            status: true,
+                        }
+                    },
+                    role: true,
+                }
+            });
+            const subscribers = [];
+            for (const el of subscribersRes) {
+                subscribers.push({
+                    id: el.user.id,
+                    login: el.user.login,
+                    avatar: el.user.avatar,
+                    status: el.user.status,
+                    role: el.role,
+                });
+            }
+            return subscribers;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async channelInfo(channelId: string) {
+        try {
+            const channel = await this.getChannelById(channelId);
+            const subscribers = await this.getAllSubscribers(channelId);
+            const bannedMembers = await this.getBannedMembers(channelId);
+            const mutedMembers = await this.getMutedMembers(channelId);
+            return {
+                channel: channel,
+                subscribers: subscribers,
+                bannedMembers: bannedMembers,
+                mutedMembers: mutedMembers,
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
 }

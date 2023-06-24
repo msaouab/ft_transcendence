@@ -67,7 +67,10 @@ const ChatStyle = Styled.div`
 
 `;
 
+import { GroupMessage } from "../../types/message";
+import GroupChatBox from "../../components/chat/GroupChatBox";
 const Chat = () => {
+<<<<<<< HEAD
 	let chatSocket = useRef(null);
 	const [connected, setConnected] = React.useState<boolean>(false);
 	const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
@@ -170,6 +173,160 @@ const Chat = () => {
 			</div>
 		</ChatStyle>
 	);
+=======
+  let chatSocket = useRef(null);
+  const [connected, setConnected] = React.useState<boolean>(false);
+  const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
+    {} as PrivateMessage
+  );
+  const [joinedRooms, setJoinedRooms] = React.useState([] as string[]);
+  const [selectedGroupChat, setSelectedGroupChat] = React.useState <GroupMessage>( {} as GroupMessage );
+  const [newLatestMessage, setNewLatestMessage] = React.useState<{
+    chatRoomId: string;
+    message: string;
+  }>({} as { chatRoomId: string; message: string });
+  const { privateChatRooms, groupChatRooms, setChatNotif } = useGlobalContext();
+  const [selected, setSelected] = React.useState("");
+
+
+  useEffect(() => {
+    // socket connection
+    if (!connected) {
+      chatSocket.current = io(`http://${HOSTNAME}:3000/chat`); 
+   
+    }
+
+    chatSocket.current.on('connect', () => {
+    
+      // chatSocket.current.emit('alive', {id: Cookies.get("id")});
+      setConnected(true);
+      chatSocket.current.emit('alive', {id: Cookies.get("id")} );
+      console.log("connected to the server");
+      console.log("groupChatRooms: ", groupChatRooms);
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("joining the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
+      });
+    });
+    // chatSocket.current.on('connect', () => {
+    // });
+    
+       
+    
+
+    chatSocket.current.on("roomJoined", () => {
+      console.log("room joined");
+    });
+
+    Cookies.set("chatNotif", "0");
+    setChatNotif(0);
+
+  
+    return () => {
+      console.log("disconnected from the server");
+      groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
+        console.log("leaving the room: ", groupChatRoom.group_id);
+        chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
+        setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
+      });
+      chatSocket.current.disconnect();
+      setConnected(false);
+    };
+
+
+  }, []);
+
+  useEffect(() => {
+    if (selectedChat.chatRoomid) {
+      console.log("joining the room");
+      const payload = {
+        currentId: Cookies.get("id"),
+        senderId: selectedChat.sender_id,
+        receiverId: selectedChat.receiver_id,
+      };
+      chatSocket.current.emit("joinRoom", payload);
+    }
+    return () => {
+      if (selectedChat.chatRoomid) {
+        console.log("leaving the room");
+        const payload = {
+          currentId: Cookies.get("id"),
+          senderId: selectedChat.sender_id,
+          receiverId: selectedChat.receiver_id,
+        };
+        chatSocket.current.emit("leaveRoom", payload);
+
+      }
+    };
+  }, [selectedChat.chatRoomid]);
+
+  useEffect(() => {
+    if (!selectedChat.chatRoomid) {
+      // console.log("no chat room selected from global context");
+      return;
+    }
+    for (let i = 0; i < privateChatRooms.length; i++) {
+      if (privateChatRooms[i].chatRoomid === selectedChat.chatRoomid) {
+        return;
+      }
+    }
+
+    // if there are available chat rooms, select the closest one by date
+    if (privateChatRooms.length > 0) {
+      let closestChatRoom = privateChatRooms[0];
+      let closestDate = new Date(closestChatRoom.latest_message_date);
+      for (let i = 1; i < privateChatRooms.length; i++) {
+        let date = new Date(privateChatRooms[i].latest_message_date);
+        if (date > closestDate) {
+          closestChatRoom = privateChatRooms[i];
+          closestDate = date;
+        }
+      }
+      // console.log("selecting the closest chat room");
+      setSelectedChat(closestChatRoom);
+      return;
+    } else {
+      setSelectedChat({} as PrivateMessage);
+    }
+  }, [privateChatRooms.length]);
+  return (
+    <ChatStyle>
+      <div className="chat-list">
+        <ChatList
+          setSelectedChat={setSelectedChat}
+          newLatestMessage={newLatestMessage}
+          setSelectedGroupChat={setSelectedGroupChat}
+          socket={chatSocket}
+          connected={connected}
+          selected={selected}
+          setSelected={setSelected}
+        />
+      </div>
+      <div className="chat-box-wrapper">
+        {selectedChat.chatRoomid ? (
+          <ChatBox
+            selectedChat={selectedChat}
+            key={selectedChat.chatRoomid}
+            size="big"
+            setNewLatestMessage={setNewLatestMessage}
+            chatSocket={chatSocket}
+            connected={connected}
+          />
+        ) : (
+          <GroupChatBox
+            selectedGroupChat={selectedGroupChat}
+            setSelectedGroupChat={setSelectedGroupChat}
+            socket={chatSocket}
+            connected={connected}
+            key={selectedGroupChat.group_id}
+            joinedRooms={joinedRooms}
+          />
+        )}
+      </div>
+    </ChatStyle>
+  );
+>>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 };
 
 export default Chat;

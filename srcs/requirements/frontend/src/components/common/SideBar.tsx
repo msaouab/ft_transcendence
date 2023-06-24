@@ -58,6 +58,19 @@ const SideBar = ({
 
 	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
 	// const [chatNotif, setChatNotif] = useState(parseInt(Cookies.get("chatNotif") || "0"));
+
+	useEffect(() => {
+		// sending the real status to the server
+		if (connected) {
+			if (notifySocket) {
+				notifySocket.emit("realStatus", {
+					id: Cookies.get("id"),
+					userStatus: true,
+				});
+			}
+		}
+	}, [connected]);
+
 	useEffect(() => {
 		if (connected) {
 			notifySocket.on("chatNotif", (data: any) => {
@@ -100,9 +113,11 @@ const SideBar = ({
 					}
 					if (response.statusText) {
 					}
+					console.log("=======>response.data.avatar", response.data);
+					setUserImg(response.data.avatar);
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
-					setUserStatus(response.data.status.tolowoerCase());
+					setUserStatus(response.data.status);
 				})
 				.catch((error) => {
 					if (error.response.status == 401 || error.response.status == 403) {
@@ -113,8 +128,8 @@ const SideBar = ({
 			console.log(error);
 		}
 		// console.log("ppppppp", userId);
-		const res = await GetAvatar(userId);
-		setUserImg(res);
+		// const res = await GetAvatar(userId);
+		// setUserImg(res);
 	}
 
 	useEffect(() => {

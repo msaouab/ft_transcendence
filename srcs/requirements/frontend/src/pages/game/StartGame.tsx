@@ -90,11 +90,9 @@ const StartGame = () => {
 		});
 		setMySocket(socket);
 		socket.on("connect", () => {
-			console.log(socket.id, "connected to server");
 			socket.emit("joinRoom", payload);
 		});
 		socket.on("disconnect", () => {
-			console.log(socket.id, "disconnected from server");
 			socket.emit("leaveRoom", payload);
 		});
 		return () => {
