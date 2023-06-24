@@ -53,24 +53,6 @@ interface friendsInterface {
 }
 
 const OtherUserProfile = () => {
-<<<<<<< HEAD
-	const { id } = useParams(); // Extract the user ID from the URL params
-	const { notifySocket, connected }: any = useOutletContext();
-	const [user, setData] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
-	const [rankData, setRankData] = useState({
-		wins: "",
-		loses: "",
-		draws: "",
-		level: "",
-		rank: "",
-	});
-=======
   const { id } = useParams(); // Extract the user ID from the URL params
   const { notifySocket, connected }: any = useOutletContext();
   const [user, setData] = useState({
@@ -88,7 +70,6 @@ const OtherUserProfile = () => {
     level: "",
     rank: "",
   });
->>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 
 	const [friends, setFriends] = useState<friendsInterface[]>([]);
 	const [joinedChannel, setJoinedChannel] = useState<friendsInterface[]>([]);
@@ -97,56 +78,6 @@ const OtherUserProfile = () => {
 	const { userId } = useGlobalContext();
 	const [relationStatus, setRelationStatus] = useState("");
 
-<<<<<<< HEAD
-	useEffect(() => {
-		getAllData();
-	}, [userId]);
-
-	useEffect(() => {
-		if (connected) {
-			notifySocket.on("inviteAccepted", (data: any) => {
-				if (data.user_id === userId) {
-					getAllData();
-				}
-			});
-		}
-	}, [connected]);
-
-	const getAllData = () => {
-		if (id === "") return;
-
-		const friendsData = async () => {
-			const data = await getFriendsInfo(id || "");
-			setFriends(data);
-		};
-		const joinedChannelData = async () => {
-			const data = await getChannels(id || "");
-			setJoinedChannel(data);
-		};
-		const achivementsData = async () => {
-			const data = await getAchivements(id || "");
-			setAchivements(data);
-		};
-
-		const rankData = async () => {
-			const data = await getRankData(id || "");
-			setRankData(data);
-		};
-
-		const getUserData = async () => {
-			const data = await getUserInfo(id || "");
-			setData(data);
-		};
-
-		const getUserAvatar = async () => {
-			const data = getAvatarUrl();
-			setAvatar(data);
-		};
-		const isMyFriend = async () => {
-			const data = await isFriend(userId || "", id || "");
-			if (data) setRelationStatus(data);
-		};
-=======
   useEffect(() => {
     getAllData();
     if (id === userId) navigate("/profile"); // If the user is trying to access his own profile, redirect him to the profile page
@@ -194,7 +125,6 @@ const OtherUserProfile = () => {
       const data = await isFriend(userId, id as string);
       if (data) setRelationStatus(data);
     };
->>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 
 		friendsData();
 		joinedChannelData();
@@ -205,32 +135,6 @@ const OtherUserProfile = () => {
 		isMyFriend();
 	};
 
-<<<<<<< HEAD
-	const sendFriendInvitation = async () => {
-		const data = await addFriend(userId, id || "");
-		getAllData();
-	};
-
-	const BlockUser = async () => {
-		const data = await blockThisUser(userId, id || "");
-		getAllData();
-	};
-
-	const unblockUser = async () => {
-		const data = await unblockThisUser(userId, id || "");
-		getAllData();
-	};
-
-	const RemoveFriendInvite = async () => {
-		const data = await RemoveThisFriendInvite(userId, id || "");
-		getAllData();
-	};
-
-	const DeleteFriend = async () => {
-		const data = await deleteFreind(userId, id || "");
-		getAllData();
-	};
-=======
   const sendFriendInvitation = async () => {
     const data = await addFriend(userId, id as string);
     getAllData();
@@ -255,7 +159,6 @@ const OtherUserProfile = () => {
     const data = await deleteFreind(userId, id as string);
     getAllData();
   };
->>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 
 	// a function that returns the type of the relation between the current user and the user whose profile is being viewed and
 	const FriendRelatioType = () => {
@@ -348,145 +251,6 @@ const OtherUserProfile = () => {
 		navigate("/*");
 	}
 
-<<<<<<< HEAD
-	return (
-		<div className="  w-[100%] flex flex-col gap-5  ">
-			<Top className="top   h-[6rem]   flex  flex-wrap  items-center  gap-10 border-b border-white/50 pb-2 ">
-				{user && (
-					<Status className="" userStatus={user.status.toLowerCase()}>
-						{avatar && <img src={avatar} alt="" className="" />}
-					</Status>
-				)}
-				{user && (
-					<div className="description flex flex-col  text-center justify-center ">
-						<div className="name md:text-4xl text-xl  font-[800] capitalize ">
-							{user.firstName} {user.lastName}
-						</div>
-						<div className="name  font-[400] ">{user.login}</div>
-						<div className="flex gap-10 items-center "></div>
-					</div>
-				)}
-				{rankData && (
-					<div className="gamesInfo  h-full justify-self-stretch flex-1 flex flex-wrap justify-around  gap-2  items-center">
-						<div className="gamesNumber flex   items-center gap-4 text-xl font-[600]">
-							<img src={Dice} alt="_" width={50} />
-							Games : {rankData?.wins + rankData?.loses + rankData?.draws}
-						</div>
-						<div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-							<img src={AchivementImg1} width={50} alt="_" />
-							Wins : {rankData?.wins}
-						</div>
-						<div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-							<img src={Draw} alt="_" width={50} />
-							Draw: {rankData?.draws}
-						</div>
-						<div className="gamesNumber flex items-center gap-4 text-xl font-[600]">
-							<img src={Lose} alt="_" width={50} />
-							Lose: {rankData?.loses}
-						</div>
-						<div className="relative text-white ">
-							{showFriendRelationMenu}
-							<CiCircleMore
-								className="text-4xl bg-[#434242] rounded-[50%] cursor-pointer hover:scale-105 transition-all"
-								onClick={() => {
-									setShowFriendRelationMenu(!showFriendRelationMenu);
-								}}
-							/>
-							{showFriendRelationMenu && (
-								<FriendRelationMenuStyle className="absolute top-12  right-0 bg-[#434242] w-[15rem]   rounded-md shadow-xl shadow-white/10 border z-50">
-									{FriendRelatioType()}
-								</FriendRelationMenuStyle>
-							)}
-						</div>
-					</div>
-				)}
-			</Top>
-			{relationStatus === "blocking" ? (
-				<div className="h-[60rem] w-full flex items-center justify-center text-6xl debug">
-					Unblocked this user to see his profile
-				</div>
-			) : (
-				<Main className="midel flex-1  flex flex-col gap-4 items-center  ">
-					<div className="stats  flex gap-6 h-[25rem] w-full   ">
-						<div className="friends flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4  h-[25rem] ">
-							<div className="top border-b border-white/50  h-[5rem]  ">
-								<div className="title text-2xl font-[600] flex  gap-2  items-center ">
-									<img src={FriendsImg} alt="" width={50} />
-									Friends
-								</div>
-							</div>
-							<div className="chanel h-full  py-2 ">
-								{friends && friends.length > 0 ? (
-									<div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
-										{friends.map((Friend, index) => (
-											<FreindCard key={index} {...Friend} />
-										))}
-									</div>
-								) : (
-									<NoFriend />
-								)}
-							</div>
-						</div>
-						<div className="chanels flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
-							<div className="top border-b border-white/50  h-[5rem]  ">
-								<div className="title text-2xl font-[600] flex gap-2  items-center">
-									<img src={ChatImg} alt="" width={50} />
-									Chanels
-								</div>
-							</div>
-							<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-								{joinedChannel && joinedChannel.length ? (
-									<div className="flex flex-col  gap-5 overflow-y-scroll h-full ">
-										{joinedChannel.map((chanel, index) => (
-											<ChanelCard key={index} {...chanel} />
-										))}
-									</div>
-								) : (
-									<NoChanel />
-								)}
-							</div>
-						</div>
-						<div className="last-games flex-1  flex flex-col gap-2 rounded-lg border border-gray-300 p-4 h-[25rem]">
-							<div className="top border-b border-white/50  h-[5rem]">
-								<div className="title text-2xl font-[600] flex gap-2  items-center">
-									<img src={GameImg} alt="" width={50} />
-									Last Games
-								</div>
-							</div>
-							<div className="chanel h-full overflow-y-scroll py-2 flex flex-col gap-2">
-								{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-									(e: any, index: number) => (
-										<GameCard key={index} />
-									)
-								)}
-							</div>
-						</div>
-					</div>
-					<div className="achievements border border-gray-300-100 rounded-xl p-4   h-[40%]  w-[70%] m-auto">
-						<div className="title bo text-4xl mb-4 font-[600]   gap-2  items-center flex-1 text-center underline flex justify-center ">
-							Achievements
-						</div>
-						<div className="achiv-container flex gap-10   m-auto ">
-							{achivements && achivements.length ? (
-								<div className="h-[90%] w-full max-h-[400px] border border-white/50 rounded-xl shadow-sm shadow-white">
-									<SwiperComponent
-										slides={achivements.map((achivement, index) => (
-											<AchivementCard key={index} {...achivement} />
-										))}
-									></SwiperComponent>
-								</div>
-							) : (
-								<div className="flex justify-center items-center  w-full">
-									<NoAchivements />
-								</div>
-							)}
-						</div>
-					</div>
-				</Main>
-			)}
-		</div>
-	);
-=======
   return (
     <>
       {relationStatus === "blocking" ? (
@@ -632,7 +396,6 @@ const OtherUserProfile = () => {
       )}
     </>
   );
->>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 };
 
 export default OtherUserProfile;

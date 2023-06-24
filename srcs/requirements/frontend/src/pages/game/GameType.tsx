@@ -59,7 +59,7 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 	);
 };
 
-const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
+const FreindCard = ({ id, avatar, login, fname, lname, status }: any) => {
 	const navigate = useNavigate();
 	const { setFriend, typeRoom, modeRoom, friend } = useGameContext();
 	const [userImg, setUserImg] = useState<string>("");
@@ -80,7 +80,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 			const rank = await getRankData(id);
 			setRankData(rank);
 		};
-		getAvatarImg(id);
+		// getAvatarImg(id);
 		getRankUser(id);
 		return () => {
 			setUserImg("");
@@ -91,7 +91,7 @@ const FreindCard = ({ id, img, login, fname, lname, status }: any) => {
 		<div className="flex justify-around w-full text-black flex-wrap gap-6">
 			<div className="flex gap-2">
 				<img
-					src={userImg}
+					src={avatar}
 					alt="frindImg"
 					width={40}
 					className=" w-9 aspect-square rounded-full "
@@ -169,7 +169,7 @@ const GameType = () => {
 							<FreindCard
 								key={index}
 								id={item.id}
-								img={item.avatar}
+								avatar={item.avatar}
 								login={item.login}
 								fname={item.firstName}
 								lname={item.lastName}

@@ -149,7 +149,7 @@ const PingPong = () => {
 			setPlayer1X(playerPosition);
 		});
 		mysocket?.on("responsePlayer2", (playerPosition) => {
-			const serverWidth = 679;
+			const serverWidth = 700;
 			const serverHeight = (serverWidth * 16) / 9;
 			const clientWidth = canvasRef.current!.clientWidth;
 			const clientHeight = (clientWidth / serverWidth) * serverHeight;
@@ -205,7 +205,7 @@ const PingPong = () => {
 	}, [mysocket, ball]);
 
 	return (
-		<PlayGround className="debug w-full max-w-[683px]">
+		<PlayGround className=" w-full max-w-[683px]">
 			<canvas id="myCanvas" ref={canvasRef} className="w-full" />
 		</PlayGround>
 	);

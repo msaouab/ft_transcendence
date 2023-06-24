@@ -70,110 +70,6 @@ const ChatStyle = Styled.div`
 import { GroupMessage } from "../../types/message";
 import GroupChatBox from "../../components/chat/GroupChatBox";
 const Chat = () => {
-<<<<<<< HEAD
-	let chatSocket = useRef(null);
-	const [connected, setConnected] = React.useState<boolean>(false);
-	const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
-		{} as PrivateMessage
-	);
-	const [newLatestMessage, setNewLatestMessage] = React.useState<{
-		chatRoomId: string;
-		message: string;
-	}>({} as { chatRoomId: string; message: string });
-	const { privateChatRooms, setChatNotif } = useGlobalContext();
-
-	useEffect(() => {
-		// socket connection
-		if (!connected) {
-			chatSocket.current = io(`http://${HOSTNAME}:3000/chat`);
-		}
-
-		chatSocket.current.on("connect", () => {
-			// chatSocket.current.emit('alive', {id: Cookies.get("id")});
-			setConnected(true);
-			chatSocket.current.emit("alive", { id: Cookies.get("id") });
-			console.log("connected to the server");
-		});
-
-		chatSocket.current.on("roomJoined", () => {});
-
-		Cookies.set("chatNotif", "0");
-		setChatNotif(0);
-
-		return () => {
-			chatSocket.current.disconnect();
-			setConnected(false);
-		};
-	}, []);
-
-	useEffect(() => {
-		if (selectedChat.chatRoomid) {
-			const payload = {
-				currentId: Cookies.get("id"),
-				senderId: selectedChat.sender_id,
-				receiverId: selectedChat.receiver_id,
-			};
-			chatSocket.current.emit("joinRoom", payload);
-		}
-		return () => {
-			if (selectedChat.chatRoomid) {
-				const payload = {
-					currentId: Cookies.get("id"),
-					senderId: selectedChat.sender_id,
-					receiverId: selectedChat.receiver_id,
-				};
-			}
-		};
-	}, [selectedChat.chatRoomid]);
-
-	useEffect(() => {
-		if (!selectedChat.chatRoomid) {
-			return;
-		}
-		for (let i = 0; i < privateChatRooms.length; i++) {
-			if (privateChatRooms[i].chatRoomid === selectedChat.chatRoomid) {
-				return;
-			}
-		}
-
-		// if there are available chat rooms, select the closest one by date
-		if (privateChatRooms.length > 0) {
-			let closestChatRoom = privateChatRooms[0];
-			let closestDate = new Date(closestChatRoom.latest_message_date);
-			for (let i = 1; i < privateChatRooms.length; i++) {
-				let date = new Date(privateChatRooms[i].latest_message_date);
-				if (date > closestDate) {
-					closestChatRoom = privateChatRooms[i];
-					closestDate = date;
-				}
-			}
-			setSelectedChat(closestChatRoom);
-			return;
-		} else {
-			setSelectedChat({} as PrivateMessage);
-		}
-	}, [privateChatRooms.length]);
-	return (
-		<ChatStyle>
-			<div className="chat-list">
-				<ChatList
-					setSelectedChat={setSelectedChat}
-					newLatestMessage={newLatestMessage}
-				/>
-			</div>
-			<div className="chat-box-wrapper">
-				<ChatBox
-					selectedChat={selectedChat}
-					key={selectedChat.chatRoomid}
-					size="big"
-					setNewLatestMessage={setNewLatestMessage}
-					chatSocket={chatSocket}
-					connected={connected}
-				/>
-			</div>
-		</ChatStyle>
-	);
-=======
   let chatSocket = useRef(null);
   const [connected, setConnected] = React.useState<boolean>(false);
   const [selectedChat, setSelectedChat] = React.useState<PrivateMessage>(
@@ -326,7 +222,6 @@ const Chat = () => {
       </div>
     </ChatStyle>
   );
->>>>>>> bfa770c8b1cda6e7a7032ca64afb5542320fd747
 };
 
 export default Chat;

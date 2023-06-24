@@ -58,6 +58,8 @@ const Game = () => {
 		};
 	}, [mysocket]);
 
+	// console.log("user:", user);
+
 
 	// useEffect(() => {
 		// const RoomType = localStorage.getItem("typeRoom");
@@ -69,7 +71,7 @@ const Game = () => {
 	return (
 		<CanvasContainer isFirst>
 			<PlayerContainer isFirst height={payload.height} width={payload.width}>
-				{user ? (
+				{user && benome ? (
 					<GameProfile user={user} isFirst={true} score={score.player1} />
 				) : (
 					<p>Loading...</p>
@@ -77,14 +79,14 @@ const Game = () => {
 			</PlayerContainer>
 			{mysocket ? (
 				<PingPong
-					width={width}
+					// width={width}
 					// height={payload.height}
 				/>
 			) : (
 				<p>Loading...</p>
 			)}
 			<PlayerContainer height={payload.height} width={payload.width}>
-				{benome ? (
+				{benome && user ? (
 					<GameProfile user={benome} isFirst={false} score={score.player2} />
 				) : (
 					<p>Loading...</p>

@@ -67,13 +67,7 @@ const StartGame = () => {
 	const [benomeId, setBenomeId] = useState("");
 	const [roomId, setRoomId] = useState("");
 	const [width, setWidth] = useState(0);
-	const [user, setUser] = useState({
-		id: "",
-		login: "",
-		firstName: "",
-		lastName: "",
-		status: "",
-	});
+	const [user, setUser] = useState({});
 
 	const payload = {
 		type: typeRoom,
@@ -113,7 +107,8 @@ const StartGame = () => {
 	useEffect(() => {
 		let isReal = false;
 		const getAllData = async () => {
-			const userdata = await getUserInfo(userId);
+			const userdata = await getUserInfo(payload.userId);
+			console.log("payload.userId:", userdata)
 			setUser(userdata);
 			let Benome;
 			//  = await getUserInfo(benomeId);
@@ -133,7 +128,7 @@ const StartGame = () => {
 				isReal = true;
 				navigate(`/game/${roomId}`, {
 					state: {
-						user: user,
+						user: userdata,
 						benome: Benome,
 						width: width,
 					},

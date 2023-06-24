@@ -57,8 +57,10 @@ const SwiperComponent: React.FC<SwiperProps> = ({ slides }) => {
 		spaceBetween: 10,
 		slidesPerView: 2,
 		centeredSlides: true,
-		onSwiper: (swiper: any) => console.log(swiper),
-		onSlideChange: () => console.log("slide change"),
+		// onSwiper: (swiper: any) => {
+		// 	onSlideChange: () => console.log("slide change")}
+		// onSwiper: (swiper: any) => console.log(swiper),
+		// onSlideChange: () => console.log("slide change"),
 	};
 
 	return (

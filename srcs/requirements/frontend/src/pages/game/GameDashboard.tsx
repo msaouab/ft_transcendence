@@ -115,9 +115,10 @@ export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 		};
 		const getUser = async (id: string) => {
 			const userInfo = await getUserInfo(id);
+			console.log("userInfo", userInfo);
 			setUser(userInfo);
 		};
-		getAvatarImg(id);
+		// getAvatarImg(id);
 		getUser(id);
 		return () => {
 			setUserImg("");
@@ -128,7 +129,7 @@ export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 		<div className="flex p-2 gap-4 items-center bg-white rounded-lg text-gray-600 relative shadow-sm shadow-white min-h-[5rem]">
 			<div className="image">
 				<img
-					src={userImg}
+					src={user.avatar}
 					alt=""
 					width={45}
 					className="box-border rounded-full aspect-square"
@@ -167,7 +168,7 @@ const HistoryCard = ({ history }: any) => {
 			const benomeInfo = await getUserInfo(id2);
 			if (benomeInfo) setBenome(benomeInfo);
 		};
-		getAvatarImg(player1_id);
+		// getAvatarImg(player1_id);
 		getUser(player1_id, player2_id);
 		return () => {
 			setUserImg("");
@@ -179,7 +180,7 @@ const HistoryCard = ({ history }: any) => {
 			<div className="user flex justify-center items-center gap-2 ">
 				<div className="image w-[45px]">
 					<img
-						src={userImg}
+						src={user.avatar}
 						alt=""
 						className="box-border rounded-full aspect-square w-[100%]"
 					/>
@@ -195,7 +196,7 @@ const HistoryCard = ({ history }: any) => {
 				<div className="name text-xl font-[500]">{Benome.login}</div>
 				<div className="image w-[45px]">
 					<img
-						src={userImg}
+						src={Benome.avatar}
 						alt=""
 						width={45}
 						className="box-border rounded-full aspect-square"
@@ -231,7 +232,7 @@ const GameCard = (props: GameCardProps) => {
 			const benomeInfo = await getUserInfo(id2);
 			if (benomeInfo) setBenome(benomeInfo);
 		};
-		getAvatarImg(player1_id);
+		// getAvatarImg(player1_id);
 		getUser(player1_id, player2_id);
 		return () => {
 			setUserImg("");

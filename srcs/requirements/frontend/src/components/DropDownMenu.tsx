@@ -68,12 +68,8 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
   };
   
   useEffect(() => {
-    // console.log("heeeeeeeeeeeeeee: ", userStatus);
     if (connected) {
-    // console.log("connected to the server notify");
-      // console.log("current: ", notifySocket);
       if (notifySocket) {
-        // console.log("we're emmiting the event status");
       notifySocket.emit("realStatus", {
         id: Cookies.get("id"),
         userStatus: true,
@@ -82,7 +78,6 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
     }
     }
     else if (!connected) {
-      // console.log("we're emmiting the event status");
       if (notifySocket) {
       notifySocket.emit("realStatus", {
         id: Cookies.get("id"),
@@ -94,34 +89,6 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
   }, [connected]);
 
 
-  // useEffect(() => {
-  // console.log("hello im being called to upadate user status");
-  // console.log("userStatus: ", userStatus);
-  // setUserStatus(userStatus);
-
-  // }, [userStatus] );
-  
-  // console.log("userStatus", userStatus);
-  // const status  = Cookies.get('status')
-  // if (userStatus !== '')
-  // {
-  // console.log("userStatus", userStatus);
-  // if (connected) 
-  // {
-  //   notifySocket && notifySocket.current.on("connect", () => {
-  //     console.log("connected to the server notify"); 
-  //     // notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
-
-  //   });
-  //   // console.log("im here user status", userStatus);
-  // }
-// }  
-
-// notifySocket.current.on("connect", () => {
-//   console.log("connected to the server notify");
-//   notifySocket.current.emit('status', {id: Cookies.get('id'), userStatus: "Online"});
-// });
-  
 
 
   useEffect(() => {
