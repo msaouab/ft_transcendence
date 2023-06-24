@@ -43,6 +43,51 @@ const GameTypeCard = ({ title, description, imgPath }: any) => {
 	);
 };
 
+const Main = styled.div`
+	@media (max-width: 1200px) {
+		flex-direction: column;
+		.stats {
+			height: unset;
+			min-height: fit-content;
+			justify-content: center;
+			align-items: center;
+			flex-wrap: wrap;
+			& > div {
+				max-width: 70%;
+				min-width: 360px;
+				max-height: 500px;
+			}
+		}
+		.achievements {
+			width: 70%;
+			.achiv-container {
+				display: flex;
+				flex-direction: column;
+			}
+		}
+	}
+	@media (max-width: 850px) {
+		flex-direction: column;
+		.stats {
+			height: unset;
+			min-height: fit-content;
+			justify-content: center;
+			align-items: center;
+			flex-wrap: wrap;
+			& > div {
+				max-width: 90%;
+				min-width: 360px;
+				max-height: 500px;
+			}
+		}
+		.achievements {
+			width: 90%;
+			.achiv-container {
+			}
+		}
+	}
+`;
+
 interface ChalengerCardProps {
 	name: string;
 }
@@ -136,7 +181,6 @@ const HistoryCard = ({ history }: any) => {
 					<img
 						src={userImg}
 						alt=""
-						
 						className="box-border rounded-full aspect-square w-[100%]"
 					/>
 				</div>
@@ -303,50 +347,6 @@ const GameDashboard = () => {
 		fetchAllLiveGames();
 	}, []);
 
-	const Main = styled.div`
-		@media (max-width: 1200px) {
-			flex-direction: column;
-			.stats {
-				height: unset;
-				min-height: fit-content;
-				justify-content: center;
-				align-items: center;
-				flex-wrap: wrap;
-				& > div {
-					max-width: 70%;
-					min-width: 360px;
-					max-height: 500px;
-				}
-			}
-			.achievements {
-				width: 70%;
-				.achiv-container {
-					display: flex;
-					flex-direction: column;
-				}
-			}
-		}
-		@media (max-width: 850px) {
-			flex-direction: column;
-			.stats {
-				height: unset;
-				min-height: fit-content;
-				justify-content: center;
-				align-items: center;
-				flex-wrap: wrap;
-				& > div {
-					max-width: 90%;
-					min-width: 360px;
-					max-height: 500px;
-				}
-			}
-			.achievements {
-				width: 90%;
-				.achiv-container {
-				}
-			}
-		}
-	`;
 	return (
 		<div className="  w-[100%] flex flex-col gap-5  ">
 			<Main className="midel flex-1  flex flex-col gap-4 items-center  ">

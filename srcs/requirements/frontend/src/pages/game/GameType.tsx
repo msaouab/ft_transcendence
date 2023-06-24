@@ -30,6 +30,21 @@ const Games = [
 	},
 ];
 
+const ImgAnimation = styled.img`
+animation: bounce 2s infinite;
+@keyframes bounce {
+	0% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
+	100% {
+		transform: translateY(0);
+	}
+}
+`;
+
 const GameTypeCard = ({ title, description, imgPath }: any) => {
 	return (
 		<div className="bg-white shadow-gray-400/50 shadow-md rounded-lg p-2 text-gray-700 flex flex-col gap-4 justify-center items-center hover:scale-105 transition-all duration-200 w-full h-full">
@@ -138,21 +153,6 @@ const GameType = () => {
 		status?: string;
 	}
 
-	const ImgAnimation = styled.img`
-		animation: bounce 2s infinite;
-		@keyframes bounce {
-			0% {
-				transform: translateY(0);
-			}
-			50% {
-				transform: translateY(-5px);
-			}
-			100% {
-				transform: translateY(0);
-			}
-		}
-	`;
-
 	return (
 		<div className="h-full w-full flex flex-col items-center gap-5">
 			<div
@@ -215,7 +215,7 @@ const GameType = () => {
 					</div>
 				))}
 			</div>
-			<div className="rank flex justify-center h-[30rem] w-full gap-10 ">
+			{/* <div className="rank flex justify-center h-[30rem] w-full gap-10 ">
         <div className="border rounded-2xl flex-1 p-4 h-full">
           <h1 className="text-xl font-bold border-b-2 border-white pb-2 mb-2">
             Global Rank
@@ -240,7 +240,7 @@ const GameType = () => {
               ))}
           </div>
         </div>
-      </div>
+      </div> */}
 		</div>
 	);
 };

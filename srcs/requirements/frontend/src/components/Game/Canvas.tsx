@@ -50,38 +50,13 @@ const PlayGround = styled.div`
 
 let ctx: CanvasRenderingContext2D | null;
 
-interface Iprops {
-	width: number;
-}
-// const PingPong = ({ width, height }: PingPongProps) => {
-const PingPong = ({ width }: Iprops) => {
+const PingPong = () => {
 	const navigate = useNavigate();
 	const { modeRoom, mysocket } = useGameContext();
 	const canvasRef = useRef<HTMLCanvasElement | null>(null);
 	const [player1X, setPlayer1X] = useState<PlayerState>({} as PlayerState);
 	const [player2X, setPlayer2X] = useState<PlayerState>({} as PlayerState);
 	const [ball, setBall] = useState<BallState>({} as BallState);
-	// const [player1X, setPlayer1X] = useState<PlayerState>({
-	// 	x: width / 2 - 40,
-	// 	y: height - 20,
-	// 	width: 80,
-	// 	height: 10,
-	// });
-	// const [player2X, setPlayer2X] = useState<PlayerState>({
-	// 	x: width / 2 - 40,
-	// 	y: 10,
-	// 	width: 80,
-	// 	height: 10,
-	// });
-	// const [ball, setBall] = useState({
-	// 	x: width / 2,
-	// 	y: height / 2,
-	// 	r: 10,
-	// 	dx: 1,
-	// 	dy: 1,
-	// 	speed: 4,
-	// 	c: "#fff",
-	// });
 
 	useEffect(() => {
 		if (canvasRef.current) {
@@ -113,15 +88,6 @@ const PingPong = ({ width }: Iprops) => {
 		};
 	}, [player1X, player2X, ball]);
 
-	const [width1, setWidth] = useState(0);
-
-	useEffect(() => {
-		let width = window.innerWidth;
-		const height = window.innerHeight;
-		if (width < 700) setWidth(700);
-		else setWidth(width);
-	}, []);
-
 	useEffect(() => {
 		const resize = () => {
 			const canvas = canvasRef.current;
@@ -130,11 +96,6 @@ const PingPong = ({ width }: Iprops) => {
 			const calculatedHeight = (clientWidth * 16) / 9;
 			canvas.width = clientWidth;
 			canvas.height = calculatedHeight;
-			mysocket?.emit("requesteResize", {
-				width: clientWidth,
-				height: calculatedHeight,
-				userId: Cookies.get("userid"),
-			});
 		};
 
 		window.addEventListener("resize", resize);
@@ -142,15 +103,6 @@ const PingPong = ({ width }: Iprops) => {
 		return () => {
 			window.removeEventListener("resize", resize);
 		};
-	}, []);
-
-	useEffect(() => {
-		if (canvasRef.current) {
-			const canvas = canvasRef.current;
-			const { clientWidth, clientHeight } = canvas;
-			const calculatedHeight = (clientWidth * 16) / 9;
-			canvas.height = calculatedHeight;
-		}
 	}, []);
 
 	const drawPlayer = (player: PlayerState) => {
@@ -167,15 +119,16 @@ const PingPong = ({ width }: Iprops) => {
 			const clientY = e.clientY;
 			const canvas = canvasRef.current;
 			if (!canvas) return;
+			const serverWidth = 700;
+			const clientWidth = canvasRef.current!.clientWidth;
+			const scaleX = clientWidth / serverWidth;
 			const rect = canvas.getBoundingClientRect();
-			const x = clientX - rect.left;
-			const y = clientY - rect.top;
+			const x = (clientX) / scaleX - rect.left;
+			const y = (clientY - rect.top);
 			const data = {
 				x: x,
 				y: y,
 				userId: Cookies.get("userid"),
-				// height: height,
-				// width: width,
 			};
 			if (modeRoom === "Bot") mysocket?.emit("requesteBot", data);
 			else mysocket?.emit("requesteMouse", data);
@@ -185,11 +138,29 @@ const PingPong = ({ width }: Iprops) => {
 			handleMouseMove as unknown as EventListener
 		);
 		mysocket?.on("responseMouse", (playerPosition) => {
+			const serverWidth = 700;
+			const serverHeight = (serverWidth * 16) / 9;
+			const clientWidth = canvasRef.current!.clientWidth;
+			const clientHeight = (clientWidth / serverWidth) * serverHeight;
+			const scaleX = clientWidth / serverWidth;
+			const scaleY = clientHeight / serverHeight;
+			playerPosition.x = playerPosition.x * scaleX;
+			playerPosition.y = playerPosition.y * scaleY;
 			setPlayer1X(playerPosition);
 		});
 		mysocket?.on("responsePlayer2", (playerPosition) => {
+			const serverWidth = 679;
+			const serverHeight = (serverWidth * 16) / 9;
+			const clientWidth = canvasRef.current!.clientWidth;
+			const clientHeight = (clientWidth / serverWidth) * serverHeight;
+			// const clientHeight = canvasRef.current!.clientHeight;
+			const scaleX = clientWidth / serverWidth;
+			const scaleY = clientHeight / serverHeight;
+			playerPosition.x = playerPosition.x * scaleX;
+			playerPosition.y = playerPosition.y * scaleY;
 			setPlayer2X(playerPosition);
 		});
+
 		return () => {
 			document.removeEventListener(
 				"mousemove",
@@ -199,8 +170,6 @@ const PingPong = ({ width }: Iprops) => {
 			mysocket?.off("responsePlayer2");
 		};
 	}, [mysocket, player1X, player2X, ball]);
-
-	//	render the ball and get the new position of the ball from the server
 
 	const drawBall = (ball: BallState) => {
 		if (ctx) {
@@ -213,9 +182,18 @@ const PingPong = ({ width }: Iprops) => {
 	};
 
 	useEffect(() => {
-		mysocket?.on("StartTime", (time) => {
-		});
+		mysocket?.on("StartTime", (time) => {});
 		mysocket?.on("responseBall", (ball) => {
+			const serverWidth = 700;
+			const serverHeight = (serverWidth / 16) * 9;
+			const clientWidth = canvasRef.current!.clientWidth;
+			const clientHeight = (clientWidth / serverWidth) * serverHeight;
+
+			const widthScale = clientWidth / serverWidth;
+			const heightScale = clientHeight / serverHeight;
+
+			ball.x = ball.x * widthScale;
+			ball.y = ball.y * heightScale;
 			setBall(ball);
 		});
 		mysocket?.on("responseWinner", (winner) => {
