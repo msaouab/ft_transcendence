@@ -1,0 +1,88 @@
+   .close-btn {
+       margin-bottom: 2rem;
+       font-size: 2.6rem;
+       margin: 1rem;
+       cursor: pointer;
+       color: #e9d990;
+   }
+   .close-btn:hover {
+    scale: 1.2;
+    transition: scale 1s ease-in-out;
+   }
+
+
+   .inputBox {
+    position: relative;
+       margin-bottom: 1.5rem;
+       label {
+           display: block;
+           padding: 0 0.25rem;
+           position: absolute;
+           left: 0.75rem;
+           top: 0.9375rem;
+           background-color: #6e6a6a;
+           font-size: 1rem;
+           font-weight: 400;
+           color: white;
+           transition: transform 0.15s ease-out, color 0.15s ease-out;
+           cursor: text;
+           pointer-events: none;
+           transform-origin: left center;
+           white-space: nowrap;
+       }
+
+       input:focus~label,
+       input:not(:placeholder-shown)~label {
+           transform: scale(0.75) translate(-0.5rem, -2.25rem);
+       }
+
+       input {
+           --border-width: 1px;
+           width: 100%;
+           height: 3.375rem;
+           padding: calc(0.75rem - var(--border-width)) calc(0.9rem - var(--border-width));
+           border: 2px solid #b4b4b460;
+           background: #6e6a6a;
+           border-radius: 5px;
+           outline: none;
+           transition: 0.3s all;
+           word-break: break-word;
+           color: white;
+           font-size: 1rem;
+           line-height: 1.25rem;
+
+           ::placeholder {
+               color: transparent;
+           }
+
+           &:focus {
+               border-color: rgb(233, 217, 144);
+               box-shadow: inset 0 0 0 1px rgb(233, 217, 144);
+           }
+
+           &:hover {
+               border-color: rgb(233, 217, 144);
+           }
+
+           &:hover~label,
+           &:focus~label {
+               color: rgb(233, 217, 144);
+           }
+       }
+   }
+
+.btn {
+             height: 3.375rem;
+             border: none;
+        
+             outline: none;
+             background: rgb(233, 217, 144);
+             border-radius: 5px;
+             font-size: 1rem;
+             color: #6e6a6a;
+             cursor: pointer;
+             transition: 0.3s all;
+             &:hover {
+                 box-shadow: 0 0 0 2px rgb(233, 217, 144);
+             }
+         }

@@ -320,7 +320,6 @@ export class UserService {
                         dateCreated: 'desc'
                     }
                 })
-                console.log("you have to verify if returnd message is the last message of the channel");
                 const chnl = await this.prisma.channel.findUnique({
                     where: {
                         id: channel.channel_id

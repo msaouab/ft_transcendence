@@ -28,7 +28,6 @@ const DropDownMenu = ({ notifySocket, connected }: Props) => {
         await instance
           .get("/logout")
           .then((response) => {
-            console.log(response);
           })
           .catch((error) => {
             console.log(error);

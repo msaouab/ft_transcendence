@@ -9,7 +9,8 @@ import { Body, HttpException, Injectable, Param, Query } from "@nestjs/common";
 import { PrismaService } from "prisma/prisma.service";
 import { Socket, Server } from "socket.io";
 import { createHash } from "crypto";
-import { PrivateChatRoom, PrivateMessage, BlockTab } from "@prisma/client";
+import { PrivateChatRoom, PrivateMessage, BlockTab, Prisma } from "@prisma/client";
+import * as bcrypt from 'bcrypt';
 
 // dto's
 import { createMessageDto } from "./message/message.dto";
@@ -17,67 +18,69 @@ import { PostPrivateChatRoomDto } from "./dto/postPrivateChatRoom";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 
 import { clients as onlineClients } from "src/notify/notify.gateway";
+import e from "express";
+import { ChannelDto } from "./dto/createChannel.dto";
 // import { clients } from 'src/notify/notify.gateway';
 
 // a type
 @Injectable()
 export class ChatService {
-	constructor(
-		private prisma: PrismaService // private MessageService: MessageServic
+    constructor(
+        private prisma: PrismaService // private MessageService: MessageServic
 	) {}
 
-	// a map that contain the id of the user and it's websocket object
+    // a map that contain the id of the user and it's websocket object
 
-	async createPrivateChatRoom(
-		postreatePrivateChatRoomDto: PostPrivateChatRoomDto
-	) {
-		const { senderId, receiverId } = postreatePrivateChatRoomDto;
-		const hashedRoomName = await this.getRoomId(senderId, receiverId);
-		let privateChatRoom = await this.prisma.privateChatRoom.create({
-			data: {
-				id: hashedRoomName,
-				sender_id: senderId,
-				receiver_id: receiverId,
-			},
-		});
-		if (!privateChatRoom) {
-			throw new HttpException("Private chat already exist", 409);
-		}
-		return privateChatRoom;
-	}
+    async createPrivateChatRoom(
+        postreatePrivateChatRoomDto: PostPrivateChatRoomDto
+    ) {
+        const { senderId, receiverId } = postreatePrivateChatRoomDto;
+        const hashedRoomName = await this.getRoomId(senderId, receiverId);
+        let privateChatRoom = await this.prisma.privateChatRoom.create({
+            data: {
+                id: hashedRoomName,
+                sender_id: senderId,
+                receiver_id: receiverId,
+            },
+        });
+        if (!privateChatRoom) {
+            throw new HttpException("Private chat already exist", 409);
+        }
+        return privateChatRoom;
+    }
 
-	async deletePrivateChatRoom(id: string, userId: string) {
-		/*
+    async deletePrivateChatRoom(id: string, userId: string) {
+        /*
             error handling:
                 * if the private chat room doesn't exist
                 * if the user is not authorized to delete the private chat room (not the sender or receiver)
         */
-		// try {
+        // try {
 
-		const privateChatRoom = await this.prisma.privateChatRoom.findUnique({
-			where: {
-				id: id,
-			},
-		});
-		if (!privateChatRoom) {
-			throw new HttpException("Private chat room not found", 404);
-		}
-		if (
-			privateChatRoom.sender_id != userId &&
-			privateChatRoom.receiver_id != userId
-		) {
-			throw new HttpException("Unauthorized", 401);
-		}
-		// we're using cascade delete, so we don't need to delete the messages manually
-		const deletedPrivateChatRoom = await this.prisma.privateChatRoom.delete({
-			where: {
-				id: id,
-			},
-		});
-		return deletedPrivateChatRoom;
-	}
+        const privateChatRoom = await this.prisma.privateChatRoom.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        if (!privateChatRoom) {
+            throw new HttpException("Private chat room not found", 404);
+        }
+        if (
+            privateChatRoom.sender_id != userId &&
+            privateChatRoom.receiver_id != userId
+        ) {
+            throw new HttpException("Unauthorized", 401);
+        }
+        // we're using cascade delete, so we don't need to delete the messages manually
+        const deletedPrivateChatRoom = await this.prisma.privateChatRoom.delete({
+            where: {
+                id: id,
+            },
+        });
+        return deletedPrivateChatRoom;
+    }
 
-	/* joinPrivateChatRoom(senderId: string, receiverId: string) 
+    /* joinPrivateChatRoom(senderId: string, receiverId: string) 
         will be called when senderId joins the private chat room
         it createa a new private chat room if it doesn't exist
         and set the lastSentMessage to current time
@@ -119,9 +122,6 @@ export class ChatService {
         }
         // console.log("We're joining the private chat room id: ", privateChatRoom.id);
         await client.join(privateChatRoom.id);
-        console.log(
-            `User with id: ${senderId} joined the private chat room: ${privateChatRoom.id}`
-        );
         return privateChatRoom;
     }
 
@@ -147,9 +147,6 @@ export class ChatService {
                 },
             });
             client.leave(privateChatRoom.id);
-            console.log(
-                `User with id: ${senderId} left the private chat room: ${privateChatRoom.id}`
-            );
             return privateChatRoom;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
@@ -216,10 +213,8 @@ export class ChatService {
                 take: 1,
             });
             if (messages.length == 0) {
-                console.log("this is the first message");
                 // check if the other user is online
                 if (clients.has(payload.receiver_id)) {
-                    console.log("the other user is online");
                     const otherClientSocket = clients.get(payload.receiver_id);
                     await otherClientSocket.join(privateRoom.id);
                     // emit the event roomJoined to the other user
@@ -247,7 +242,6 @@ export class ChatService {
                     lastUpdatedTime: new Date(),
                 },
             });
-            console.log("We're sending the event to room: ", privateRoom);
             // if not both sockets are connected , we send a private
             server.to(privateRoom.id).emit("newPrivateMessage", message);
         } catch (error) {
@@ -258,12 +252,8 @@ export class ChatService {
         }
         // if receiver is online notify him
         if (onlineClients.has(payload.receiver_id)) {
-            console.log("receiver is online and we're sending him a notification");
             const otherClientSocket = onlineClients.get(payload.receiver_id);
-            console.log("We're sending the chatNotif event to the other client");
             otherClientSocket.emit("chatNotif", { num: 1 });
-        } else {
-            console.log("receiver is offline");
         }
     }
 
@@ -409,6 +399,8 @@ export class ChatService {
     }
 
     async sendGroupMessage(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
         const message = await this.createMessage(payload);
         const newGroupMessage = {
@@ -426,6 +418,8 @@ export class ChatService {
     }
 
     async joinGroupChatRoom(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -437,11 +431,12 @@ export class ChatService {
             throw new HttpException('Group chat room not found', 404);
         }
         await client.join(group_id);
-        console.log("The client has joined the room: ", group_id);
         return channel;
     }
 
     async leaveGroupChatRoom(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id } = payload;
 
         const channel = await this.prisma.channel.findFirst({
@@ -453,13 +448,13 @@ export class ChatService {
             throw new HttpException('Group chat room not found', 404);
         }
         await client.leave(group_id);
-        console.log("The client has left the room: ", group_id);
         return channel;
     }
 
     async addChannelMember(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { channel_id, user_id, type, password } = payload;
-        console.log(channel_id, user_id, type, password);
         const user = await this.prisma.user.findUnique({
             where: {
                 id: user_id
@@ -477,8 +472,12 @@ export class ChatService {
             throw new HttpException('Channel not found', 404);
         }
         try {
-            if (type === 'Secret' && channel.password !== password) {
-                throw new HttpException('Wrong password', 400);
+            if (type === 'Secret') {
+                const isPasswordMatch = await bcrypt.compare(password, channel.password);
+                if (!isPasswordMatch) {
+                    client.emit('error', 'Password does not match');
+                    return;
+                }
             }
             const memberTab = await this.prisma.membersTab.create({
                 data: {
@@ -530,7 +529,7 @@ export class ChatService {
                 }
             });
             if (!user) {
-                client.emit('error', 'User not found');
+                client.emit('UserError', 'User not found');
             }
             return user;
         } catch (error) {
@@ -575,6 +574,8 @@ export class ChatService {
     }
 
     async addChannelAdmin(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -603,12 +604,20 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('newChannelAdmin', admin);
+            server.to(group_id).emit('newChannelAdmin', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
     }
     async removeChannelAdmin(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -637,13 +646,21 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('removeChannelAdmin', admin);
+            server.to(group_id).emit('removeChannelAdmin', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
     }
     async muteUser(client, payload: any, server: Server) {
-        const { group_id, userId } = payload;
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        const { group_id, userId, muteTime } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
             const admin = await this.getUser(userId, client);
@@ -654,10 +671,14 @@ export class ChatService {
                     client.emit('error', 'Admin not removed');
                 }
             }
+            const endMuteTime = new Date();
+            endMuteTime.setMinutes(endMuteTime.getMinutes() + parseInt(muteTime));
             const mutedUser = await this.prisma.mutedMembers.create({
                 data: {
                     muted_id: userId,
                     channel_id: group_id,
+                    status_end_time: endMuteTime,
+                    status: 'Temporary'
                 }
             })
             if (!mutedUser) {
@@ -678,7 +699,11 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             const res = {
-                ...admin,
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
                 role: 'Muted',
                 muteStatus: mutedUser.status,
                 status_end_time: mutedUser.status_end_time
@@ -689,6 +714,8 @@ export class ChatService {
         }
     }
     async unmuteUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         const { group_id, userId } = payload;
         try {
             const channel = await this.getChannel(client, group_id);
@@ -718,12 +745,21 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('unmuteChannelUser', admin);
+            server.to(group_id).emit('unmuteChannelUser', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+                role: 'Member',
+            });
         } catch (error) {
             client.emit('error', error);
         }
     }
     async kickUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -746,14 +782,23 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            server.to(group_id).emit('kickChannelUser', admin);
+            server.to(group_id).emit('kickChannelUser', {
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
+            });
         } catch (error) {
             client.emit('error', error);
         }
     }
     async banUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
-            const { group_id, userId } = payload;
+            const { group_id, userId, banTime } = payload;
+            // the banTime is in minutes like 2 minutes, 5 minutes
             const channel = await this.getChannel(client, group_id);
             const admin = await this.getUser(userId, client);
             const memberTab = await this.removeMember(client, group_id, userId);
@@ -762,15 +807,6 @@ export class ChatService {
                 if (!adminTab) {
                     client.emit('error', 'Admin not removed');
                 }
-            }
-            const bannedUser = await this.prisma.bannedMembers.create({
-                data: {
-                    banned_id: userId,
-                    channel_id: group_id,
-                }
-            })
-            if (!bannedUser) {
-                client.emit('error', 'User not banned');
             }
             const joindChannel = await this.prisma.channelsJoinTab.delete({
                 where: {
@@ -783,8 +819,25 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
+            const end_time = new Date();
+            end_time.setMinutes(end_time.getMinutes() + parseInt(banTime));
+            const bannedUser = await this.prisma.bannedMembers.create({
+                data: {
+                    banned_id: userId,
+                    channel_id: group_id,
+                    status_end_time: end_time,
+                    status: 'Temporary'
+                }
+            })
+            if (!bannedUser) {
+                client.emit('error', 'User not banned');
+            }
             const res = {
-                ...admin,
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                group_id: group_id,
                 role: 'Banned',
                 banStatus: bannedUser.status,
                 status_end_time: bannedUser.status_end_time
@@ -795,6 +848,8 @@ export class ChatService {
         }
     }
     async unbanUser(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
         try {
             const { group_id, userId } = payload;
             const channel = await this.getChannel(client, group_id);
@@ -808,7 +863,7 @@ export class ChatService {
                 }
             })
             if (!bannedUser) {
-                client.emit('error', 'User not unbanned');
+                client.emit('bannedError', 'User not unbanned');
             }
             const memberTab = await this.prisma.membersTab.create({
                 data: {
@@ -831,8 +886,364 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             server.to(group_id).emit('unbanChannelUser', {
-                ...admin,
-                role: 'Member'
+                avatar: admin.avatar,
+                id: admin.id,
+                login: admin.login,
+                status: admin.status,
+                role: 'Member',
+                group_id: group_id
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async joinPrivateChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const memberTab = await this.prisma.membersTab.create({
+                data: {
+                    member_id: user_id,
+                    channel_id: group_id,
+                }
+            })
+            if (!memberTab) {
+                client.emit('error', 'User not added to members');
+            }
+            const joindChannel = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: user_id,
+                    channel_name: channel.name,
+                    channel_id: channel.id,
+                    role: 'Member'
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            await this.joinGroupChatRoom(client, { group_id: channel.id }, server);
+            client.emit('newMember', {
+                channel: channel,
+                user: user,
+                role: 'Member',
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async sendMessageG(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, sender_id, lastMessage } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(sender_id, client);
+            const message = await this.prisma.message.create({
+                data: {
+                    sender_id: sender_id,
+                    receiver_id: group_id,
+                    content: lastMessage,
+                }
+            });
+            if (!message) {
+                client.emit('error', 'Message not sent');
+            }
+            server.to(group_id).emit('newMessageG', {
+                ...payload,
+                lastMessageDate: message.dateCreated,
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async removeMeuted(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, user_id } = payload;
+            const mutedUser = await this.prisma.mutedMembers.delete({
+                where: {
+                    channel_id_muted_id: {
+                        muted_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!mutedUser) {
+                client.emit('error', 'User not unmuted');
+            }
+            return mutedUser;
+        }
+        catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async leaveChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const joindChannel = await this.prisma.channelsJoinTab.delete({
+                where: {
+                    user_id_channel_id: {
+                        user_id: user_id,
+                        channel_id: group_id
+                    }
+                }
+            })
+            if (!joindChannel) {
+                client.emit('error', 'Channel not joined');
+            }
+            if (joindChannel.role === 'Member') {
+                const memberTab = await this.removeMember(client, group_id, user_id);
+                if (!memberTab) {
+                    client.emit('error', 'Member not removed');
+                }
+            } else if (joindChannel.role === 'Admin') {
+                const adminTab = await this.removeAdmin(client, group_id, user_id);
+                if (!adminTab) {
+                    client.emit('error', 'Admin not removed');
+                }
+            } else if (joindChannel.role === "Muted") {
+                const mutedTab = await this.removeMeuted(client, group_id, user_id);
+                if (!mutedTab) {
+                    client.emit('error', 'Muted not removed');
+                }
+            }
+            server.to(group_id).emit('memberLeaveChannel', {
+                avatar: user.avatar,
+                id: user.id,
+                login: user.login,
+                status: user.status,
+                group_id: group_id
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async deleteChannel(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, user_id } = payload;
+            const channel = await this.getChannel(client, group_id);
+            const user = await this.getUser(user_id, client);
+            const deletedChannelMembersTab = await this.prisma.membersTab.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelMembersTab) {
+                client.emit('error', 'Channel not deleted from members tab');
+            }
+            const deletedChannelBannedTab = await this.prisma.bannedMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelBannedTab) {
+                client.emit('error', 'Channel not deleted from banned tab');
+            }
+            const deletedChannelMutedTab = await this.prisma.mutedMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelMutedTab) {
+                client.emit('error', 'Channel not deleted from muted tab');
+            }
+            const deletedChannelAdminsTab = await this.prisma.adminMembers.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!deletedChannelAdminsTab) {
+                client.emit('error', 'Channel not deleted from admins tab');
+            }
+            const deletedMessages = await this.prisma.message.deleteMany({
+                where: {
+                    receiver_id: group_id
+                }
+            })
+            if (!deletedMessages) {
+                client.emit('error', 'Channel messages not deleted');
+            }
+            const deletedChannel = await this.prisma.channel.delete({
+                where: {
+                    id: group_id
+                }
+            })
+            if (!deletedChannel) {
+                client.emit('error', 'Channel not deleted');
+            }
+            const joinedChannel = await this.prisma.channelsJoinTab.deleteMany({
+                where: {
+                    channel_id: group_id
+                }
+            })
+            if (!joinedChannel) {
+                client.emit('error', 'Channel not deleted from joined tab');
+            }
+            server.to(group_id).emit('channelDeleted', {
+                group_id: group_id
+            });
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+    async createChannel(client, payload: ChannelDto, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        const { name, status, password, limitUsers, description, avatar, owner } = payload;
+        const ownerUser = await this.getUser(owner, client);
+        try {
+            let hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+            if (password === ''){
+                hashedPassword = "";
+            }
+            const channel = await this.prisma.channel.create({
+                data: {
+                    name: name,
+                    chann_type: status,
+                    password: hashedPassword,
+                    owner_id: owner,
+                    limit_members: -1,
+                    description: description,
+                    avatar: avatar
+                }
+            });
+            if (!channel) {
+                client.emit('error', 'Channel not created');
+            }
+            const channelJoinTab = await this.prisma.channelsJoinTab.create({
+                data: {
+                    user_id: owner,
+                    channel_name: name,
+                    channel_id: channel.id,
+                    role: 'Owner',
+                }
+            });
+            if (!channelJoinTab) {
+                client.emit('error', 'Channel not created in join tab');
+            }
+            const message = await this.prisma.message.create({
+                data: {
+                    sender_id: channel.id,
+                    receiver_id: channel.id,
+                    content: `${ownerUser.login} created channel`,
+                }
+            });
+            client.emit('channelCreated', {
+                group_id: channel.id,
+                sender_id: channel.id,
+                name: channel.name,
+                profileImage: channel.avatar,
+                lastMessage: message.content,
+                lastMessageDate: message.dateCreated,
+                role: "Server",
+            });
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+                client.emit('errorExistChannel', 'Channel already exist');
+            }
+            else {
+                client.emit('error', error);
+            }
+        }
+    }
+
+    // unban users if the now date is greater than the banned date
+    async unbanUsers(client, server: Server) {
+        try {
+            const bannedUsers = await this.prisma.bannedMembers.findMany({
+                where: {
+                    status_end_time: {
+                        lte: new Date()
+                    }
+                }
+            });
+            if (!bannedUsers) {
+                client.emit('BannedError', 'Banned users not found');
+                return;
+            }
+            for (let i = 0; i < bannedUsers.length; i++) {
+                this.unbanUser(client, {
+                    userId: bannedUsers[i].banned_id,
+                    group_id: bannedUsers[i].channel_id
+                }, server);
+            }
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
+    // unMute users if the now date is greater than the muted date
+    async unMuteUsers(client, server: Server) {
+        try {
+            const mutedUsers = await this.prisma.mutedMembers.findMany({
+                where: {
+                    status_end_time: {
+                        lte: new Date()
+                    }
+                }
+            });
+            if (!mutedUsers) {
+                client.emit('MutedError', 'Muted users not found');
+                return;
+            }
+            for (let i = 0; i < mutedUsers.length; i++) {
+                this.unmuteUser(client, {
+                    userId: mutedUsers[i].muted_id,
+                    group_id: mutedUsers[i].channel_id
+                }, server);
+            }
+        } catch (error) {
+            client.emit('error', error);
+        }
+    }
+
+    async updateChannelPassword(client, payload: any, server: Server) {
+        await this.unbanUsers(client, server);
+        await this.unMuteUsers(client, server);
+        try {
+            const { group_id, password } = payload;
+            const channel = await this.getChannel(client, group_id);
+            let updatedChannel;
+            if (channel.password !== '' && password === '') {
+                updatedChannel = await this.prisma.channel.update({
+                    where: {
+                        id: group_id
+                    },
+                    data: {
+                        password: "",
+                        chann_type: 'Public',
+                    }
+                })
+            }
+            else {
+                let hashedPassword = await bcrypt.hash(password, 10); // Hash the password using bcrypt
+                updatedChannel = await this.prisma.channel.update({
+                    where: {
+                        id: group_id
+                    },
+                    data: {
+                        password: hashedPassword,
+                        chann_type: 'Secret',
+                    }
+                });
+            }
+            if (!updatedChannel) {
+                client.emit('error', 'Channel not updated');
+            }
+            server.to(group_id).emit('channelUpdated', {
+                ...channel,
+                password: updatedChannel.password,
+                chann_type: updatedChannel.chann_type,
             });
         } catch (error) {
             client.emit('error', error);

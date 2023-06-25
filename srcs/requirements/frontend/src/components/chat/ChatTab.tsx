@@ -90,12 +90,12 @@ const ChatTab = ({ privateMessage, selected }:
             </div>
             <div className="chat-tab__info">
                 {/* <div className="chat-tab__info__name font-black "> */}
-                <Link to={`/user/${otherUserId}`} className="chat-tab__info__name font-black hover:underline">
+                <Link to={`/profile/${otherUserId}`} className="chat-tab__info__name font-black hover:underline">
                     {privateMessage.login}
                 </Link>
                 {/* </div> */}
                 <div className="chat-tab__info__last-message text-xs font-thin opacity-50">
-                    {privateMessage.lastMessage.length > 25 ? privateMessage.lastMessage.slice(0, 25) + '...' : privateMessage.lastMessage}
+                    {privateMessage.lastMessage.length > 15 ? privateMessage.lastMessage.slice(0, 15) + '...' : privateMessage.lastMessage}
                 </div>
             </div>
 

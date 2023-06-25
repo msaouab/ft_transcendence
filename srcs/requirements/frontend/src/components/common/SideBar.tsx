@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Logo from "/logo.svg";
 import {
@@ -53,7 +53,11 @@ const SideBar = ({
 }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const { setUserStatus, setUserImg, setUserId, userId } = useGlobalContext();
-	const [menuIndex, setMenuIndex] = useState<number>(2);
+	const location = useLocation();
+	const routes = ["/chat", "/game", "/profile", "/settings"];
+	const [menuIndex, setMenuIndex] = useState<number>(
+		routes.indexOf(location.pathname)
+	);
 	// const
 
 	const { setChatNotif, chatNotif, gameNotif, setGameNotif } = useGlobalContext();
@@ -73,25 +77,22 @@ const SideBar = ({
 
 	useEffect(() => {
 		if (connected) {
-			notifySocket.on("chatNotif", (data: any) => {
-				if (window.location.pathname != "/chat") {
-					const prevNotif = chatNotif;
-					const num = parseInt(data.num) + prevNotif;
-					setChatNotif(num);
-					Cookies.set("chatNotif", String(num));
-				}
-			});
-			notifySocket.on("gameNotif", (data: any) => {
-				console.log("GameInvite received", data);
-				if (window.location.pathname != "/game") {
-					const prevNotif = gameNotif;
-					const num = parseInt(data.num) + prevNotif;
-					setGameNotif(num);
-					Cookies.set("gameNotif", String(num));
-					console.log("game", num)
-				}
-				console.log("gameNotif", gameNotif)
-			});
+		notifySocket.on("chatNotif", (data: any) => {
+			if (window.location.pathname != "/chat") {
+				const prevNotif = chatNotif;
+				const num = parseInt(data.num) + prevNotif;
+				setChatNotif(num);
+				Cookies.set("chatNotif", String(num));
+			}
+		});
+		notifySocket.on("gameNotif", (data: any) => {
+			if (window.location.pathname != "/game") {
+				const prevNotif = gameNotif;
+				const num = parseInt(data.num) + prevNotif;
+				setGameNotif(num);
+				Cookies.set("gameNotif", String(num));
+			}
+		});
 		}
 	}, [chatNotif, gameNotif]);
 	const handleToggleSidebar = () => {
@@ -116,7 +117,7 @@ const SideBar = ({
 					setUserImg(response.data.avatar);
 					Cookies.set("userid", response.data.id);
 					setUserId(response.data.id);
-					setUserStatus(response.data.status);
+					setUserStatus(response.data.status.toLowerCase());
 				})
 				.catch((error) => {
 					if (error.response.status == 401 || error.response.status == 403) {
@@ -153,17 +154,15 @@ const SideBar = ({
 	return (
 		<div className=" ">
 			<div
-				className={`${
-					isSidebarOpen ? "block" : "hidden"
-				} transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
+				className={`${isSidebarOpen ? "block" : "hidden"
+					} transition duration-500 ease-in-out shadow w-screen h-[] backdrop-blur-sm bg-black/50 absolute top-0 left-0 z-40`}
 			></div>
 
 			<div
-				className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  fixed top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${
-					isSidebarOpen
+				className={`sideBar   z-40 pt-5 px-4  h-10 md:h-full  fixed top-0 left-0   md:bg-[#434242] md:shadow-md md:shadow-white/30 ${isSidebarOpen
 						? "w-full bg-[#434242]  md:w-60 h-full   transition-all duration-300 ease-out "
 						: "md:w-20   transition-all duration-300 ease-out "
-				}`}
+					}`}
 			>
 				<div className="burger cursor-pointer text-white text-3xl  mb-10 flex justify-center ">
 					{isSidebarOpen ? (
@@ -176,20 +175,18 @@ const SideBar = ({
 					)}
 				</div>
 				<div
-					className={`routes mt- flex flex-col gap-5  relative ${
-						isSidebarOpen ? "" : "md:flex flex-col gap-5 hidden "
-					} `}
+					className={`routes mt- flex flex-col gap-5  relative ${isSidebarOpen ? "" : "md:flex flex-col gap-5 hidden "
+						} `}
 				>
 					{Routes.map((route, index) => {
 						return (
 							<Link
 								to={route.link}
 								key={index}
-								className={`${
-									isSidebarOpen
+								className={`${isSidebarOpen
 										? "flex justify-start items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"
 										: "flex justify-center items-center w-full h-12 px-4 rounded-md hover:bg-gray-700 cursor-pointer transition-all duration-300 ease-out"
-								} ${index == menuIndex ? "bg-gray-600" : ""} `}
+									} ${index == menuIndex ? "bg-gray-600" : ""} `}
 								onClick={() => {
 									setMenuIndex(index);
 									setIsSidebarOpen(false);

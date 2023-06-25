@@ -27,14 +27,12 @@ export class MessageConroller {
     }
     @Delete("/private/:id/message/:msgId")
     async deletePrivateChatMessages(@Param('id') id: string, @Param('msgId') msgId: string, @Req() req: Request) {
-        console.log("deletePrivateChatMessages");
         // console.log("req", req);
         return await this.MessageService.deletePrivateChatMessage(id, msgId, req);
 
     }
     @Put("/private/:id/message/:msgId")
     async updatePrivateChatMessages(@Param('id') id: string, @Param('msgId') msgId: string, @Body() body: updateMessageDto) {
-        console.log("updatePrivateChatMessages");
         return await this.MessageService.updatePrivateChatMessage(id, msgId, body);
     }
 

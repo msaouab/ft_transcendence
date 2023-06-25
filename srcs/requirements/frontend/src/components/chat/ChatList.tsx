@@ -6,7 +6,7 @@ import UsersChatList from './PrivateChatList';
 import { PrivateMessage, GroupMessage } from '../../types/message';
 
 const ChatListStyle = styled.div`
-    background: transparent;
+    /* background: transparent;
     // border: 1 solid #fff;
     // width: 100%;
     // height: 100%;
@@ -31,7 +31,7 @@ const ChatListStyle = styled.div`
 
     @media (max-width: 768px) {
         padding: 10px;
-    }
+    } */
 
 `;
 
@@ -61,17 +61,25 @@ const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, soc
     return (
 
         // <ChatListWrapperStyle>
-            <ChatListStyle>
-                {/* <SearchBar /> */}
-            <GroupChatList 
-                setSelectedChat={setSelectedChat} 
-                setSelectedGroupChat={setSelectedGroupChat} 
-                socket={socket} 
-                connected={connected} 
-                selected={selected} 
-                setSelected={setSelected} />
-            <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected} setSelected={setSelected} />
-            </ChatListStyle>
+        <ChatListStyle className='h-full flex flex-col gap-2 p-2 '>
+            {/* <SearchBar /> */}
+            <div className='h-[50%] flex-1 '>
+
+                <GroupChatList
+
+                    setSelectedChat={setSelectedChat}
+                    setSelectedGroupChat={setSelectedGroupChat}
+                    socket={socket}
+                    connected={connected}
+                    selected={selected}
+                    setSelected={setSelected} />
+            </div>
+            <div className='h-[50%] flex-1'>
+                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected}
+                    setSelected={setSelected} />
+
+            </div>
+        </ChatListStyle>
         // </ChatListWrapperStyle>
     );
 };

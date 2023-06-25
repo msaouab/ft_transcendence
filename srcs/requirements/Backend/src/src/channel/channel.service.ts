@@ -5,6 +5,7 @@ import { PrismaService } from "prisma/prisma.service";
 import { Prisma } from "@prisma/client";
 import { UserService } from "src/user/user.service";
 import { log } from "console";
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable({})
@@ -18,11 +19,12 @@ export class ChannelService {
             throw new ForbiddenException("There is no ID in cookies");
         await this.UserService.getUser(userId)
         try {
+            const hashedPassword = await bcrypt.hash(dto.password, 10); // Hash the password using bcrypt
             const channel = await this.prisma.channel.create({
                 data: {
                     name: dto.name,
                     chann_type: dto.status,
-                    password: dto.password,
+                    password: hashedPassword,
                     owner_id: userId,
                     limit_members: -1,
                     description: dto.description,
@@ -274,6 +276,7 @@ export class ChannelService {
                 })
                 return {
                     ...user,
+                    group_id: channelId,
                     role: "Banned",
                     banStatus: el.status,
                     status_end_time: el.status_end_time
@@ -373,6 +376,7 @@ export class ChannelService {
                 })
                 return {
                     ...user,
+                    group_id: channelId,
                     role: "Muted",
                     muteStatus: el.status,
                     status_end_time: el.status_end_time
@@ -498,6 +502,7 @@ export class ChannelService {
             });
             for (const message of res) {
                 let joindChannel = null;
+                let user = null;
                 if (message.sender_id !== channelId) {
                     joindChannel = await this.prisma.channelsJoinTab.findFirst({
                         where: {
@@ -513,13 +518,22 @@ export class ChannelService {
                             }
                         }
                     });
+                    user = await this.prisma.user.findFirst({
+                        where: {
+                            id: message.sender_id
+                        },
+                        select: {
+                            login: true,
+                            avatar: true,
+                        }
+                    })
                 }
                 messages.push({
                     id: message.id,
                     group_id: message.receiver_id,
                     sender_id: message.sender_id,
-                    sender_name: joindChannel ? joindChannel.user.login : "Server",
-                    sender_avatar: joindChannel ? joindChannel.user.avatar : "Server",
+                    sender_name: user ? user.login : "Server",
+                    sender_avatar: user ? user.avatar : "Server",
                     content: message.content,
                     dateCreated: message.dateCreated.toISOString(),
                     role: joindChannel ? joindChannel.role : "Server",
@@ -565,6 +579,7 @@ export class ChannelService {
                     avatar: el.user.avatar,
                     status: el.user.status,
                     role: el.role,
+                    group_id: channelId,
                 });
             }
             return subscribers;

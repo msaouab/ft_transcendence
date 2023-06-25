@@ -10,27 +10,38 @@ import Cookies from "js-cookie";
 import { useGlobalContext } from "../../provider/AppContext";
 import { getAvatarUrl } from "../common/CommonFunc";
 const UsersChatListStyle = styled.div`
-	width: 100%;
-	height: 100%;
-	background: rgba(217, 217, 217, 0.3);
-	border-radius: 25px;
-	padding: 20px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
+ width: 100%;
+    height: 100%;
+    background: rgba(217, 217, 217, 0.3);
+    border-radius: 25px;
+    padding: 10px;
+    .scroll{
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 5px;
+      overflow-y: scroll;
+      height: 100%;
+      width: 100%;
+    }
+
 `;
 
 const UsersChatList = ({
 	setSelectedChat,
 	newLatestMessage,
+	selected,
+    setSelected,
 }: {
 	setSelectedChat: (chat: PrivateMessage) => void;
 	newLatestMessage: { chatRoomId: string; message: string };
+	selected: string;
+	setSelected: (selected: string) => void
 }) => {
 	// privatChatroom context
 
 	const { privateChatRooms, setPrivateChatRooms } = useGlobalContext();
-	const [selected, setSelected] = useState<string>("");
+	// const [selected, setSelected] = useState<string>("");
 
 	const getUser = async (
 		sender_id: string,
@@ -39,8 +50,8 @@ const UsersChatList = ({
 		const userId = sender_id === Cookies.get("id") ? receiver_id : sender_id;
 		const user = await axios.get(`http://${HOSTNAME}:3000/api/v1/user/${userId}`);
 		// cons
-		const avatar = getAvatarUrl();
-		return { login: user.data.login, avatar: avatar, status: user.data.status };
+		// const avatar = getAvatarUrl();
+		return { login: user.data.login, avatar: user.data.avatar, status: user.data.status };
 		// return user.data
 	};
 
@@ -139,61 +150,63 @@ const UsersChatList = ({
 
 	return (
 		<UsersChatListStyle>
-			<div className="flex justify-between">
-				<h1 className="font-bold sm:text-2xl text-white text-xl">People</h1>
-				{/* add newmessage action later */}
-			</div>
-			<div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div>
-			<div className="">
-				{privateChatRooms.length === 0 ? (
-					<div className="flex flex-col items-center justify-center h-full text-center ">
-						<div
-							className="
-                        sm:text-xl text-white max-w-[200px] "
-						>
-							Your chat history is looking a little empty
-						</div>
-						<div>
+			<div className="scroll">
+				<div className="flex justify-between">
+					<h1 className="font-bold sm:text-2xl text-white text-xl mb-1">People</h1>
+					{/* add newmessage action later */}
+				</div>
+				{/* <div className="h-px mt-[-10px] shadow-lg bg-[#A8A8A8] w-[99%] mx-auto opacity-60"></div> */}
+				<div className="">
+					{privateChatRooms.length === 0 ? (
+						<div className="flex flex-col items-center justify-center h-full text-center ">
 							<div
-								className="text-base text-[#A8A8A8] max-w-[200px]
-                            "
+								className="
+                        sm:text-xl text-white max-w-[200px] "
 							>
-								make use of the search bar
+								Your chat history is looking a little empty
+							</div>
+							<div>
+								<div
+									className="text-base text-[#A8A8A8] max-w-[200px]
+                            "
+								>
+									make use of the search bar
+								</div>
 							</div>
 						</div>
-					</div>
-				) : (
-					privateChatRooms.map((props: PrivateMessage) => {
-						return (
-							<div
-								key={props.chatRoomid}
-								onClick={() => {
-									setSelectedChat(props);
-									setSelected(props.chatRoomid);
-								}}
-							>
-								{/* if the chat is currently selected , show the selected style
+					) : (
+						privateChatRooms.map((props: PrivateMessage) => {
+							return (
+								<div
+									key={props.chatRoomid}
+									onClick={() => {
+										setSelectedChat(props);
+										setSelected(props.chatRoomid);
+									}}
+								>
+									{/* if the chat is currently selected , show the selected style
                                     else show the normal style
 
                                      */}
-								<ChatTab
-									privateMessage={props}
-									key={props.chatRoomid}
-									selected={props.chatRoomid === selected}
-								/>
-								{/* <ChatTab privateMessage={props} key={props.chatRoomid} selected={false} /> */}
-								{/* seperator should show under all compontes excpet the last one */}
-								{props.chatRoomid !==
-								privateChatRooms[privateChatRooms.length - 1].chatRoomid ? (
-									<div
-										className="h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 mb-1.5
+									<ChatTab
+										privateMessage={props}
+										key={props.chatRoomid}
+										selected={props.chatRoomid === selected}
+									/>
+									{/* <ChatTab privateMessage={props} key={props.chatRoomid} selected={false} /> */}
+									{/* seperator should show under all compontes excpet the last one */}
+									{props.chatRoomid !==
+										privateChatRooms[privateChatRooms.length - 1].chatRoomid ? (
+										<div
+											className="h-px bg-[#B4ABAB] w-[99%] mx-auto mt-1.5 mb-1.5
                                          opacity-60"
-									></div>
-								) : null}
-							</div>
-						);
-					})
-				)}
+										></div>
+									) : null}
+								</div>
+							);
+						})
+					)}
+				</div>
 			</div>
 		</UsersChatListStyle>
 	);
