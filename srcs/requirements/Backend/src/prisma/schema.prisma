@@ -4,6 +4,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -22,6 +23,7 @@ enum ChanRoles {
   Admin
   Owner
   Member
+  Muted
 }
 
 enum ChanType {
@@ -37,9 +39,10 @@ enum GameStatus {
 
 enum Rank {
   Novice
-  Intermediate
-  Advanced
+  Veteran
+  Rif_Rebellion
   Master
+  Sahara_Tuareg
 }
 
 enum MemeberStatusTime {
@@ -53,6 +56,11 @@ enum InviteStatus {
   Rejected
 }
 
+enum InviteType {
+  Friend
+  Game
+}
+
 // type  attributes att functions
 model User {
   id             String            @id @default(uuid())
@@ -60,11 +68,13 @@ model User {
   email          String            @unique
   firstName      String
   lastName       String
-  password       String
   dateJoined     DateTime          @default(now())
   updated        DateTime          @updatedAt()
-  avatar         String            @default("<ralative_path>")
-  status         Status            @default(Offline)
+  avatar         String            @default("http://localhost:3000/default.png")
+  status         Status            @default(Online)
+  tfa            Boolean           @default(false)
+  otp_verified   Boolean           @default(false)
+  otp_base32     String?
   friends        FriendsTab[]      @relation("friendsTabRelation")
   blockedUsers   BlockTab[]        @relation("blockTabRelation")
   channelsJoined ChannelsJoinTab[] @relation("channelsJoinTabRelation")
@@ -72,17 +82,25 @@ model User {
   rankingData    RankingData[]     @relation("rankingDataRelation")
   notification   Notification[]    @relation("notificationRelation")
 
-  frendshipInvites FrindshipInvites[] @relation("frindshipInvitesRelation")
-  gameInvites      GameInvites[]      @relation("gameInvitesRelation")
-  // @@
-  // GameHistoryTab   GameHistoryTab[]
+  frendshipInvites FriendshipInvites[] @relation("friendshipInvitesRelation")
+  gameInvites      GameInvites[]       @relation("gameInvitesRelation")
+  // relation to chat 
+  MsgSender        PrivateMessage[]    @relation("privateMessageRelationSender")
+  MsgReceiver      PrivateMessage[]    @relation("privateChatRoomRelationReceiver")
+
+  // relation to privatchatroom
+  privateChatRoomSender   PrivateChatRoom[] @relation("senderRelation")
+  privateChatRoomReceiver PrivateChatRoom[] @relation("receiverRelation")
+
+  realStatus Boolean @default(false)
 }
 
-model FrindshipInvites {
+model FriendshipInvites {
   sender_id   String
   receiver_id String
-  sender      User         @relation("frindshipInvitesRelation", fields: [sender_id], references: [id])
+  sender      User         @relation("friendshipInvitesRelation", fields: [sender_id], references: [id])
   status      InviteStatus @default(Pending)
+  createdAt   DateTime     @default(now())
 
   @@unique([sender_id, receiver_id])
 }
@@ -92,44 +110,60 @@ model FriendsTab {
   user          User   @relation("friendsTabRelation", fields: [user_id], references: [id])
   friendUser_id String
 
-  // friendUinviteStringInvite      Message[] @relation("privateMessageRelation")
-  friendsMessage PrivateMessage[] @relation("privateMessageRelation")
-
   @@unique([user_id, friendUser_id])
 }
 
 model PrivateMessage {
-  id          String     @id @default(uuid())
-  dateCreated DateTime   @default(now())
+  id          String          @id @default(uuid())
+  dateCreated DateTime        @default(now())
+  content     String //not empty
+  seen        Boolean         @default(false)
+  chatRoom_id String
+  sender      User            @relation("privateMessageRelationSender", fields: [sender_id], references: [id])
   sender_id   String
   receiver_id String
-  content     String //not empty
-  seen        Boolean    @default(false)
-  friendsTab  FriendsTab @relation("privateMessageRelation", fields: [sender_id, receiver_id], references: [user_id, friendUser_id])
+  receiver    User            @relation("privateChatRoomRelationReceiver", fields: [receiver_id], references: [id])
+  chatRoom    PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id], onDelete: Cascade)
+  // chatRoom PrivateChatRoom @relation("privateChatRoomRelation", fields: [chatRoom_id], references: [id])
+}
+
+model PrivateChatRoom {
+  id              String           @id
+  sender_id       String
+  receiver_id     String
+  messages        PrivateMessage[] @relation("privateChatRoomRelation")
+  // adding this to be able to sort the chat rooms by newest message
+  lastUpdatedTime DateTime         @default(now())
+  sender          User             @relation("senderRelation", fields: [sender_id], references: [id]) //
+  receiver        User             @relation("receiverRelation", fields: [receiver_id], references: [id]) // receiver        User                  @relation("privateChatRoomRelation", fields: [receiver_id], references: [id])
+  blocked         Boolean          @default(false)
 }
 
 model BlockTab {
   user_id        String
   user           User   @relation("blockTabRelation", fields: [user_id], references: [id])
   blockedUser_id String
-
-  @@unique([user_id, blockedUser_id])
+  uuid           String @unique  @default(uuid())
+  // we need to change the blocktab pk , as a user can block user while he is blocked by him
+  
 }
 
 model ChannelsJoinTab {
   user_id      String
   user         User      @relation("channelsJoinTabRelation", fields: [user_id], references: [id])
-  channel_id   String    @unique()
+  channel_id   String
   channel_name String
   role         ChanRoles
 
-  @@index([channel_id], name: "channel_id")
+  @@unique([user_id, channel_id])
 }
 
 model Channel {
   id            String          @id @default(uuid())
   name          String          @unique
   dateCreated   DateTime        @default(now())
+  avatar        String          @default("default.png")
+  description   String?
   chann_type    ChanType
   owner_id      String
   password      String?
@@ -199,9 +233,13 @@ model Message {
 model Notification {
   notification_id String @id @default(uuid())
   user_id         String
-  user            User   @relation("notificationRelation", fields: [notification_id], references: [id])
-  // invite_data InviteData[] @relation("InviteDataRelation")
+  user            User   @relation("notificationRelation", fields: [user_id], references: [id])
+  type            InviteType 
+  sender_id       String?
+  sender_name     String?
+  receiver_id     String?
 }
+
 
 model Game {
   id          String           @id @default(uuid())
@@ -221,6 +259,9 @@ model GameInvites {
   sender      User         @relation("gameInvitesRelation", fields: [sender_id], references: [id])
   status      InviteStatus @default(Pending)
   validUntil  DateTime
+  roomId      String
+  type        String
+  mode        String
 
   @@unique([sender_id, receiver_id])
 }
@@ -228,10 +269,14 @@ model GameInvites {
 model RankingData {
   user_id                  String                    @unique
   user                     User                      @relation("rankingDataRelation", fields: [user_id], references: [id])
+  games                    Int                       @default(0)
   wins                     Int                       @default(0)
   loses                    Int                       @default(0)
   draws                    Int                       @default(0)
-  level                    Int                       @default(0)
+  xp                       Float                     @default(0)
+  winning_streak           Int                       @default(0)
+  losing_streak            Int                       @default(0)
+  points                   Int                       @default(0)
   rank                     Rank                      @default(Novice)
   achievements_assignement AchievementsAssignement[]
 }
@@ -240,16 +285,18 @@ model Achievements {
   achievement_id           Int                       @id @default(autoincrement())
   name                     String
   description              String
+  image                    String                   
   achievements_assignement AchievementsAssignement[] @relation("achievementsAssignementRelation")
 }
 
 model AchievementsAssignement {
+  // assignement_id String    @id @default(uuid())
   achievement_id Int
   achievement    Achievements @relation("achievementsAssignementRelation", fields: [achievement_id], references: [achievement_id])
   player_id      String
   player         RankingData  @relation(fields: [player_id], references: [user_id])
 
-  @@id([achievement_id, player_id])
+  @@unique([achievement_id, player_id])
 }
 
 model GameHistoryTab {

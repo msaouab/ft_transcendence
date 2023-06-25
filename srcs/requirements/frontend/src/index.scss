@@ -1,0 +1,65 @@
+/* src/index.css */
+
+// import tailwind
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@200;300;400;500;600;700;800&family=Ubuntu:wght@300;400;500;700&display=swap');
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+
+:root {
+  --goldColor: #F5E9CF;
+  --backColor: #1E1D19;
+  --fontColor: #FFFFFF;
+  --backgColor: #b4b4b460;
+  --backgcard: rgba(128, 128, 128, 0.932);
+  --fontFamily: 'Oxanium';
+}
+
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Color of the track */
+  border-radius: 8px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; /* Color of the scroll handle */
+  border-radius: 8px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Color of the scroll handle on hover */
+  border-radius: 8px;
+}
+  body {
+  font-family: 'Oxanium', cursive;
+  }
+
+.debug {
+  border: 1px solid red !important;
+
+  & * {
+    border: 1px solid green !important;
+
+    & * {
+      border: 1px solid blue !important;
+    }
+  }
+}

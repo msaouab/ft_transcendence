@@ -1,5 +1,25 @@
 
 
+ - [x] filter messages by date( add param queiries)
 
-- [ ] align with RESTful API guidelines
-- [ ] add swagger for API documentation
+ - [x] add queiries to get unseen messages
+ - [x] add new message action when not message are there (search for add newmessage action later)
+ - [x] add a default open chatbox when chat page is loaded (search for add default chatbox later)
+ - [x] make the message component maxwidth 50%
+ - [x] make the message preview in list users  
+ - [x] show date at last message only + show only first message as rounded with dot
+ - [ ] add searches endpoint it should takes query params and return
+
+ - [x] the dot , date thing doesn't work!!! do you understand that my friend!!!!
+ - [x] when a surfing to another page and then back to chat a problem, messages disaparead
+ - [x] font doesn't seem to work
+ - [ ] the path should redirect to profile and then to login , that causes problems
+ - [ ] even when logged and clicking playNow it always redirct to login
+ - [ ] a lot of errors in the console
+ - [ ] sidebar is still showing the wrong visited page
+ - [ ] games "section" have a none value
+
+# Notes
+- webapp is crashing in logout ()
+
+
