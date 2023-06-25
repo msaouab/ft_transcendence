@@ -49,11 +49,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(client: Socket) {
         const { id } = client;
-        console.log(`Client with id ${id} connected to chat namespace`);
     }
     handleDisconnect(client: Socket) {
         const { id } = client;
-        console.log(`Client with id ${id} disconnected`);
         this.clients.forEach((value, key) => {
             if (value.id === id) {
                 this.clients.delete(key);
@@ -127,91 +125,74 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage('joinGroupRoom')
     async handleJoinGroupRoom(client: Socket, payload: any) {
-        console.log("We've got the event to join a group room");
         return await this.chatService.joinGroupChatRoom(client, payload, this.server);
     }
 
     @SubscribeMessage('leaveGroupRoom')
     async handleLeaveGroupRoom(client: Socket, payload: any) {
-        console.log("We've got the event to leave a group room");
         return await this.chatService.leaveGroupChatRoom(client, payload, this.server);
     }
 
     @SubscribeMessage('sendGroupMessage')
     async handleGroupChat(client: Socket, payload: any) {
-        console.log("We've got the event to send a group message: ", payload);
         return await this.chatService.sendGroupMessage(client, payload, this.server);
     }
 
     @SubscribeMessage('addChannelMember')
     async handleAddChannelMember(client: Socket, payload: any) {
-        console.log("We've got the event to add a channel member: ", payload);
         return await this.chatService.addChannelMember(client, payload, this.server);
     }
 
     @SubscribeMessage('addAdmin')
     async handleAddChannelAdmin(client: Socket, payload: any) {
-        console.log("We've got the event to add a channel admin: ", payload);
         return await this.chatService.addChannelAdmin(client, payload, this.server);
     }
     @SubscribeMessage('removeAdmin')
     async handleRemoveChannelAdmin(client: Socket, payload: any) {
-        console.log("We've got the event to remove a channel admin: ", payload);
         return await this.chatService.removeChannelAdmin(client, payload, this.server);
     }
     @SubscribeMessage('muteUser')
     async handleMuteUser(client: Socket, payload: any) {
-        console.log("We've got the event to mute a user: ", payload);
         return await this.chatService.muteUser(client, payload, this.server);
     }
     @SubscribeMessage('unmuteUser')
     async handleUnmuteUser(client: Socket, payload: any) {
-        console.log("We've got the event to unmute a user: ", payload);
         return await this.chatService.unmuteUser(client, payload, this.server);
     }
     @SubscribeMessage('kickUser')
     async handleKickUser(client: Socket, payload: any) {
-        console.log("We've got the event to kick a user: ", payload);
         return await this.chatService.kickUser(client, payload, this.server);
     }
     @SubscribeMessage('banUser')
     async handleBanUser(client: Socket, payload: any) {
-        console.log("We've got the event to ban a user: ", payload);
         return await this.chatService.banUser(client, payload, this.server);
     }
     @SubscribeMessage('unbanUser')
     async handleUnbanUser(client: Socket, payload: any) {
-        console.log("We've got the event to unban a user: ", payload);
         return await this.chatService.unbanUser(client, payload, this.server);
     }
     @SubscribeMessage('joinPrivateChannel')
     async handleJoinPrivateChannel(client: Socket, payload: any) {
-        console.log("We've got the event to join a private channel: ", payload);
         return await this.chatService.joinPrivateChannel(client, payload, this.server);
     }
     @SubscribeMessage('sendMessageG')
     async handleSendMessageG(client: Socket, payload: any) {
-        console.log("We've got the event to send a message in a group: ", payload);
         return await this.chatService.sendMessageG(client, payload, this.server);
     }
     @SubscribeMessage('leaveChannel')
     async handleLeaveChannel(client: Socket, payload: any) {
-        console.log("We've got the event to leave a channel: ", payload);
         return await this.chatService.leaveChannel(client, payload, this.server);
     }
     @SubscribeMessage('deleteChannel')
     async handleDeleteChannel(client: Socket, payload: any) {
-        console.log("We've got the event to delete a channel: ", payload);
         return await this.chatService.deleteChannel(client, payload, this.server);
     }
     @SubscribeMessage('createChannel')
     async handleCreateChannel(client: Socket, payload: any) {
-        console.log("We've got the event to create a new channel: ", payload);
         return await this.chatService.createChannel(client, payload, this.server);
     }
     @SubscribeMessage('updateChannelPassword')
     async handleUpdateChannelPassword(client: Socket, payload: any) {
-        console.log("We've got the event to update a channel password: ", payload);
         return await this.chatService.updateChannelPassword(client, payload, this.server);
     }
 }

@@ -34,6 +34,7 @@ interface GroupChatBoxProps {
   socket: any;
   connected: boolean;
   joinedRooms: string[];
+  setSelected: (selected: string) => void;
 }
 
 const GroupChatBox = ({
@@ -42,6 +43,7 @@ const GroupChatBox = ({
   socket,
   connected,
   joinedRooms,
+  setSelected,
 }: GroupChatBoxProps) => {
   let intialState = {
     messages: [] as GroupSingleMessage[],
@@ -120,7 +122,6 @@ const GroupChatBox = ({
   useEffect(() => {
     if (connected) {
       socket.current.on("newGroupMessage", (data: any) => {
-        console.log("new group message from GroupChatBox: ", data);
         setGroupChatRooms(prev => {
           const index = prev.findIndex((group: GroupMessage) => group.group_id === data.group_id);
           if (index === -1) {
@@ -146,6 +147,7 @@ const GroupChatBox = ({
         else {
           setSelectedGroupChat(data);
         }
+        setSelected(data.group_id);
       });
     }
     return () => {
@@ -179,6 +181,7 @@ const GroupChatBox = ({
             }));
           });
         }
+        setSelected(message.group_id);
       });
     }
     return () => {
@@ -306,7 +309,6 @@ const GroupChatBox = ({
       socket.current.on("memberLeaveChannel", (message: any) => {
         try {
           if (message.id === Cookies.get('id')) {
-            console.log("member leave channel message: ", groupChatRooms);
             setSelectedGroupChat({} as GroupMessage);
             let channel: GroupMessage = {} as GroupMessage;
             setGroupChatRooms((prev: any) => {
@@ -354,7 +356,7 @@ const GroupChatBox = ({
 
   return (
     <>
-      <GroupChatBoxStyle id="chat-box">
+      <GroupChatBoxStyle id="chat-box debug">
         {selectedGroupChat.group_id === undefined ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="text-2xl text-white">nothing to see here</div>

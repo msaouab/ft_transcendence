@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { getDateChat } from '../../common/CommonFunc';
 import { LuGamepad2 } from 'react-icons/lu';
+import { useNavigate } from "react-router-dom";
 
 
 interface MessageContainerProps {
@@ -140,13 +141,12 @@ import Cookies from 'js-cookie';
 
 
 const Message = ({ avatar, role, message, sender }: MessageProps) => {
+  const navigate = useNavigate();
 
   const { sender_name, content, dateCreated } = message;
 
   const handleGameInvite = () => {
-    console.log("sender_id: ", Cookies.get('id'));
-    console.log("receiver_id: ", message.sender_id);
-    console.log("im trying to send game invite to user with id: ", message.sender_id);
+    navigate(`/game/startGame?friend=${message.sender_id}`);
   }
 
   return (

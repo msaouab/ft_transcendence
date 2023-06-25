@@ -33,10 +33,10 @@ const PlayerContainer = styled.div<{
 `;
 
 const Game = () => {
-	const { setTypeRoom, typeRoom, setModeRoom, modeRoom, mysocket } =
+	const {  typeRoom, modeRoom, mysocket } =
 		useGameContext();
 	const location = useLocation();
-	const { user, benome, width } = location.state;
+	const { user, benome } = location.state;
 	const [score, setScore] = useState({ player1: 0, player2: 0 });
 
 	const payload = {
@@ -58,16 +58,6 @@ const Game = () => {
 		};
 	}, [mysocket]);
 
-	// console.log("user:", user);
-
-
-	// useEffect(() => {
-		// const RoomType = localStorage.getItem("typeRoom");
-		// const RoomMode = localStorage.getItem("modeRoom");
-		// if (RoomType) setTypeRoom(RoomType);
-		// if (RoomMode) setModeRoom(RoomMode);
-	// }, [typeRoom, mysocket]);
-
 	return (
 		<CanvasContainer isFirst>
 			<PlayerContainer isFirst height={payload.height} width={payload.width}>
@@ -79,8 +69,6 @@ const Game = () => {
 			</PlayerContainer>
 			{mysocket ? (
 				<PingPong
-					// width={width}
-					// height={payload.height}
 				/>
 			) : (
 				<p>Loading...</p>

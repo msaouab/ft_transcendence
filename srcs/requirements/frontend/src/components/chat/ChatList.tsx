@@ -61,7 +61,7 @@ const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, soc
     return (
 
         // <ChatListWrapperStyle>
-        <ChatListStyle className='h-full flex flex-col gap-2 p-2'>
+        <ChatListStyle className='h-full flex flex-col gap-2 p-2 '>
             {/* <SearchBar /> */}
             <div className='h-[50%] flex-1 '>
 
@@ -75,7 +75,8 @@ const ChatList = ({ setSelectedChat, newLatestMessage, setSelectedGroupChat, soc
                     setSelected={setSelected} />
             </div>
             <div className='h-[50%] flex-1'>
-                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} />
+                <UsersChatList setSelectedChat={setSelectedChat} newLatestMessage={newLatestMessage} selected={selected}
+                    setSelected={setSelected} />
 
             </div>
         </ChatListStyle>

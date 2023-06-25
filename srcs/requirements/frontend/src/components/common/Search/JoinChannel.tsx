@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CiLock, CiWarning } from "react-icons/ci";
 import { useGlobalContext } from '../../../provider/AppContext';
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import styled from 'styled-components';
 import { HOSTNAME } from '../../../api/axios';
 
@@ -176,29 +176,22 @@ const JoinChannel = ({ joinChannel, setJoinChannel }: JoinChannelProps) => {
     const [connected, setConnected] = useState<boolean>(false);
 
     useEffect(() => {
-        console.log("Channel: ", channel);
-        console.log("password ", password);
-        console.log("readyToJoin ", readyToJoin);
         if (!connected) {
             socket.current = io(`http://${HOSTNAME}:3000/chat`);
             setConnected(true);
-            console.log('connected to the server')
         }
         return () => {
             socket.current.disconnect();
             setConnected(false);
-            console.log('disconnected from the server')
         }
     }, []);
 
     useEffect(() => {
         if (channel.id) {
-            console.log("joining the room: ", channel.id);
             socket.current.emit("joinGroupRoom", { group_id: channel.id });
         }
         return () => {
             if (channel.id) {
-                console.log("leaving the room: ", channel.id);
                 socket.current.emit("leaveGroupRoom", { group_id: channel.id });
             }
         };
@@ -207,7 +200,6 @@ const JoinChannel = ({ joinChannel, setJoinChannel }: JoinChannelProps) => {
     useEffect(() => {
         if (connected) {
             socket.current.on("newChannelMember", (message: any) => {
-                console.log("newChannelMember: ", message);
                 const newMessge = {
                     group_id: channel.id,
                     sender_id: channel.id,
@@ -223,24 +215,15 @@ const JoinChannel = ({ joinChannel, setJoinChannel }: JoinChannelProps) => {
                 setShow(false);
             });
             socket.current.on("error", (message: any) => {
-                console.log("error: ", message);
                 setError(true);
                 setReadyToJoin(false);
             });
         }
-        // return () => {
-        //     console.log("disconnected");
-        //     socket.current.off("test");
-        // }
     }, [connected]);
 
     useEffect(() => {
-        console.log("readyToJoin: ", readyToJoin);
-        console.log("connected: ", connected);
         if (connected) {
-            console.log("readyToJoin: ", channel.type);
             if (channel.type === "Public") {
-                console.log("Public Channel");
                 socket.current.emit("addChannelMember", {
                     channel_id: channel.id,
                     type: channel.type,
@@ -250,7 +233,6 @@ const JoinChannel = ({ joinChannel, setJoinChannel }: JoinChannelProps) => {
                 setJoind(true);
             }
             else if (readyToJoin === true) {
-                console.log("Private Channel");
                 socket.current.emit("addChannelMember", {
                     channel_id: channel.id,
                     type: channel.type,

@@ -102,7 +102,6 @@ export class GameGateway
 		console.log(`Client connected: ${client.id}`);
 	}
 	async handleDisconnect(client: Socket) {
-		console.log(`Client disconnected: ${client.id}`);
 		this.roomMap.forEach(async (value, key) => {
 			const userId =
 				client.id === value.socket[0].id ? value.player1.id : value.player2.id;
@@ -219,7 +218,7 @@ export class GameGateway
 			}
 		} else if (type === "Time") {
 			const lastTime = new Date().getTime();
-			return (lastTime - room.time) / 1000 >= 600;
+			return (lastTime - room.time) / 1000 >= 60;
 		}
 		return false;
 	}

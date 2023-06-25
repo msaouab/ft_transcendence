@@ -90,7 +90,7 @@ const ChatTab = ({ privateMessage, selected }:
             </div>
             <div className="chat-tab__info">
                 {/* <div className="chat-tab__info__name font-black "> */}
-                <Link to={`/user/${otherUserId}`} className="chat-tab__info__name font-black hover:underline">
+                <Link to={`/profile/${otherUserId}`} className="chat-tab__info__name font-black hover:underline">
                     {privateMessage.login}
                 </Link>
                 {/* </div> */}

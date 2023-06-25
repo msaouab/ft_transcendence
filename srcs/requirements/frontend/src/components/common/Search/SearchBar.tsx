@@ -11,8 +11,7 @@ import Cookies from 'js-cookie';
 import { BiGroup } from 'react-icons/bi';
 import JoinChannel from './JoinChannel';
 import { HOSTNAME } from '../../../api/axios';
-import { getAvatarUrlById } from '../CommonFunc';
-// import {use}
+
 export const SearchBarStyle = styled.div`
     background:  rgba(217, 217, 217, 0.3);
     border-radius: 10px;
@@ -167,7 +166,6 @@ const SearchBar = () => {
 
             socket.current.on('connect', () => {
                 setSearchConnected(true);
-                // console.log("connected");
             });
         }
     }, [dropdown, fullScreenDropdown]);
@@ -220,9 +218,7 @@ const SearchBar = () => {
 
 
     const handleSearch = (searchProp: string) => {
-        console.log("Handle search")
         if (!searchConnected) {
-            console.log("not connected");
             return null;
         }
         socket.current.on('searchInfo', (data: any) => {
@@ -230,7 +226,7 @@ const SearchBar = () => {
         }
         );
         setSearch(searchProp);
-        socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') });        // console.log("search", searchProp });
+        socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') }); 
     };
     const handleDropdown = () => {
         setDropdown(!dropdown);
@@ -294,7 +290,6 @@ const SearchBar = () => {
                                                 <div className="search-results-header flex flex-row items-center w-full justify-between">
                                                     <h1 className="text-base font-bold text-zinc-800 w-auto text-left justify-between" > People</h1>
                                                     <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900 w-auto">
-                                                        {/* <a className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline mr-1 " >See more</a> */}
                                                     </div>
                                                 </div>
 
@@ -306,12 +301,8 @@ const SearchBar = () => {
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
                                                             <Link to={`/profile/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
-                                                                {/* change later */}
                                                                 <div className="flex flex-row flex-start items-center gap-4 w-full">
-
                                                                 <img src={user.avatar} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
-                                                                    {/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
-                                                                    {/* </div> */}
                                                                     <div className="search-result-info ">
                                                                         <h1 className="text-xl font-bold ">{user.login}</h1>
                                                                         <p className="text-zinc-900" >{user.firstName} {user.lastName}</p>
@@ -346,8 +337,6 @@ const SearchBar = () => {
                                                 const isInChannel = channel.users.some((user: any) => {
                                                     return user.user_id === Cookies.get('id');
                                                 });
-
-                                                // console.log("channel: ", channel)
                                                 return (
                                                     <div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
                                                         <div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
@@ -396,11 +385,7 @@ const SearchBar = () => {
                 fullScreenDropdown &&
                 <SearchBarFull fullScreenDropdown={fullScreenDropdown} searchBarRef={searchBarRef} key={search} handleTempChat={handleTempChat} />
             }
-
-
-            {/* there should be  */}
             {showTempChat == true &&
-
                 <TmpChatBox showTempChat={showTempChat} setShowTempChat={setShowTempChat} user={tmpChatData} key={tmpChatData} />
             }
             {

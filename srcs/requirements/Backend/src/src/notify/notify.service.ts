@@ -19,7 +19,6 @@ export class NotificationService {
 			});
 
 			if (!user) {
-				console.log("user not found");
 				return;
 				// throw new HttpException("User not found", 404);
 			}

@@ -39,7 +39,6 @@ export class MessageService {
 
     async createPrivateChatMessage(body: createMessageDto): Promise<PrivateMessage> {
         try {
-            console.log("Body: ", body);
             const privateChatMessages = await this.prismaService.privateMessage.create({
                 data: {
                     ...body
@@ -50,7 +49,6 @@ export class MessageService {
 
             }
 
-            console.log("Private Chat Message created: ", privateChatMessages);
             return privateChatMessages;
         } catch (error) {
             console.log("Error: ", error);
@@ -89,7 +87,6 @@ export class MessageService {
         */
         const userId = request.cookies.id;
         if (!userId) {
-            console.log("userId: ", userId);
             throw new HttpException("You are not logged in", 401);
         }
         const privateChatMessage = await this.prismaService.privateMessage.findUnique({
@@ -99,7 +96,6 @@ export class MessageService {
         });
 
         // }
-        console.log("privateChatMessage: ", privateChatMessage);
         if (privateChatMessage == null) {
             throw new HttpException("Private Chat Message not found", 404);
         }

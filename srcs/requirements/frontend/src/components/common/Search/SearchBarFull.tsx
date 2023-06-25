@@ -10,7 +10,6 @@ import { useState, useEffect, useRef } from "react";
 import Cookies from "js-cookie";
 import { io } from "socket.io-client";
 import { HOSTNAME } from "../../../api/axios";
-import { getAvatarUrlById } from '../CommonFunc';
 import JoinChannel from './JoinChannel';
 import { BiGroup } from 'react-icons/bi';
 
@@ -84,10 +83,8 @@ margin-left: 10px;
 input:focus {
 outline: none;
 }
-// flex flex-row items-center gap-4 w-full border-zinc-900
 
 .search-icon {
-// width: 30px;
 align-self: center;
 color: #ffff;
 cursor: pointer;
@@ -153,26 +150,21 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 		if (socket.current) {
 			socket.current.on('disconnect', () => {
 				setSearchConnected(false);
-				// console.log("disconnected");
 			}
 			);
 		}
 
 
 		if (!fullScreenDropdown && searchConnected) {
-			// console.log("disconnecting");
 			socket.current.disconnect();
 			setSearchConnected(false);
-			// reset search results
 			setSearchResults([]);
 			setSearch('');
 		}
 		if ((fullScreenDropdown) && !searchConnected) {
-			// console.log("connecting");
 			socket.current = io(`http://${HOSTNAME}:3000/search`);
 			socket.current.on('connect', () => {
 				setSearchConnected(true);
-				// console.log("connected");
 			});
 		}
 	}, [fullScreenDropdown]);
@@ -180,18 +172,15 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 
 
 	const handleSearch = (searchProp: string) => {
-		// console.log("Handle search")
 		if (!searchConnected) {
-			// console.log("not connected");
 			return null;
 		}
 		socket.current.on('searchInfo', (data: any) => {
-			// console.log("searchInfo", data);
 			setSearchResults(data);
 		}
 		);
 		setSearch(searchProp);
-		socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') });        // console.log("search", searchProp });
+		socket.current.emit("search", { search: searchProp, limit: 6, user_id: Cookies.get('id') });
 	};
 
 
@@ -216,7 +205,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 		fullScreenDropdown && (
 			<DropdownSeachStyle className="full-screen-dropdown-search" ref={searchBarRef}>
 				<SearchBarStyle className="full-screen-search-bar w-full">
-					{/* <div className="search-bar-container  "> */}
 					<div className="search-bar-icon">
 					</div>
 					<div className="search-bar-input flex flex-row items-center gap-4 w-full 
@@ -225,7 +213,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 							<CiSearch
 								className="search-icon"
 								size={30}
-							// onClick={() => setFullScreenDropdown(false)}
 							/>
 						</div>
 
@@ -279,13 +266,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 							searchResults['users'] && searchResults['users'].length > 0 ? (
 								<div className="search-results-header flex flex-row items-center w-full justify-between">
 									<h1 className="text-base font-bold text-zinc-800 w-9/12 text-left">People</h1>
-									{/* <div className="search-see-more  gap-2 cursor-pointer hover:text-zinc-900 self-end">
-										<Link
-											to={`/search?entity=users&keyword=${search}`}
-											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-										>See more</Link>
-
-									</div> */}
 								</div>
 
 							) : null
@@ -298,13 +278,8 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 									<div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
 										<div className="search-result-avatar w-full flex flex-row rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
 											<Link to={`/user/${user.id}`} className="flex flex-row justify-between items-center gap-4 w-full ">
-												{/* change later */}
-												{/* <img src={user.avatar} alt="avatar" /> */}
 												<div className="flex flex-row flex-start items-center gap-4 w-full">
 													<img src={user.avatar} alt="avatar" className="rounded-full w-10 h-10 ml-3" />
-
-													{/* <img src="https://www.w3schools.com/howto/img_avatar.png" alt="avatar" className="rounded-full w-10 h-10 ml-3" /> */}
-													{/* </div> */}
 													<div className="search-result-info ">
 														<h1
 															className="text-xl font-bold "
@@ -347,13 +322,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 
 										className='text-base font-bold text-zinc-800 w-9/12 text-left'
 									>Channels</h1>
-
-									{/* <div className="search-see-more flex flex-row flex-end gap-2 cursor-pointer hover:text-zinc-900">
-										<Link
-											to={`/search?entity=channels&keyword=${search}`}
-											className="text-sm font-bold text-zinc-800 text-left w-full hover:text-zinc-900 underline ml-4"
-										>See more</Link>
-									</div> */}
 								</div>
 							) : null
 						}
@@ -362,8 +330,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 								const isInChannel = channel.users.some((user: any) => {
 									return user.user_id === Cookies.get('id');
 								});
-
-								// console.log("channel: ", channel)
 								return (
 									<div className="search-result flex flex-row jusotfy-between items-center gap-4 py-0.5 w-full rounded-lg" key={index}>
 										<div className="search-result-avatar w-full rounded-lg transition duration-200 ease-in-out hover:bg-[rgba(0,0,0,0.1)] cursor-pointer py-2">
@@ -382,7 +348,6 @@ const SearchBarFull = ({ fullScreenDropdown, searchBarRef, handleTempChat }: { f
 												isInChannel ? (null) : (
 													<a className="chat-button drop-shadow-2xl rounded-full p-2 hover:bg-[#27272a] hover:text-white" onClick={(e) => {
 														e.preventDefault();
-														// setDropdown(false);
 														setSearch('');
 														setSearchResults([]);
 														handleJoinChannel(channel);

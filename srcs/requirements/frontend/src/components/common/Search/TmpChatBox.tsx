@@ -7,10 +7,7 @@ import { useRef } from "react";
 import { io } from "socket.io-client";
 
 import styled from "styled-components";
-import { getAvatarUrl } from "../CommonFunc";
 import { HOSTNAME } from "../../../api/axios";
-
-// import { useGlobalContext } from "../../../provider/AppContext";
 const TmpChatStyle = styled.div`
 	position: absolute;
 	bottom: 0;
@@ -86,7 +83,7 @@ const TmpChatBox = ({
 				`http://${HOSTNAME}:3000/api/v1/user/${userId}`
 			);
 
-			const avatar = getAvatarUrl();
+			const avatar = user.data.avatar;
 			return {
 				login: user.data.login,
 				avatar: avatar,

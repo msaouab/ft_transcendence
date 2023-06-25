@@ -160,6 +160,7 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
           }
           return prev;
         });
+        setSelected(message.group_id);
       });
     }
     return () => {
@@ -240,7 +241,6 @@ const GroupChatList = ({ setSelectedGroupChat, setSelectedChat, socket, connecte
               <div
                 key={props.group_id}
                 onClick={() => {
-                  console.log("selected group: ", props);
                   setSelected(props.group_id);
                   setSelectedChat({} as PrivateMessage);
                   setSelectedGroupChat(props);

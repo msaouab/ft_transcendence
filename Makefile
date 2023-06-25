@@ -34,7 +34,9 @@ env:
 	else \
 		echo "VITE_API_URL=$$(hostname)" >> ./srcs/requirements/frontend/.env.example; \
 	fi
-
+	@if grep -q "SECRET=* " ./srcs/requirements/Backend/src/db-env-example; then \
+		sed -i "s/SECRET=* /SECRET=$$(openssl rand -base64 32)/g" ./srcs/requirements/Backend/src/db-env-example; \
+	fi
 	@bash ./scripts/user_input.sh
 	@cp ./srcs/env-example ./srcs/.env
 	@cp ./srcs/requirements/Backend/src/db-env-example ./srcs/requirements/Backend/src/.env

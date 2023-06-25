@@ -115,7 +115,6 @@ export const ChalengerCard = ({ id, login, roomID, type, mode }: any) => {
 		};
 		const getUser = async (id: string) => {
 			const userInfo = await getUserInfo(id);
-			console.log("userInfo", userInfo);
 			setUser(userInfo);
 		};
 		// getAvatarImg(id);

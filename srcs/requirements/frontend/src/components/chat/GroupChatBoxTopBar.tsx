@@ -55,7 +55,6 @@ const GroupChatBoxTopBar = ({
           return data.id === currentUserId
         });
       }
-      console.log("channel subscribers", res);
       setChannel(res.channel);
       setSubscribers(res.subscribers.length);
     }).catch(err => console.log(err));

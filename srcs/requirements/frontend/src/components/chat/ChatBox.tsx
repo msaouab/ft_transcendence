@@ -9,7 +9,7 @@ import { GetJoindChannels } from "../../api/axios";
 const ChatBoxStyle = styled.div`
 	background: transparent;
 	width: 100%;
-	height: ${(props) => (props.size === "small" ? "100%" : "95%")};
+	height: ${(props) => (props.size === "small" ? "100%" : "100%")};
 	display: flex;
 	flex-direction: column;
 	background: ${(props) =>
@@ -45,8 +45,9 @@ const ChatBox = ({
 	chatSocket,
 	connected,
 	selectedGroupChat,
-    setSelectedGroupChat,
+	setSelectedGroupChat,
 	setSelectedChat,
+	setSelected,
 
 }: {
 	selectedChat: PrivateMessage;
@@ -58,7 +59,7 @@ const ChatBox = ({
 	selectedGroupChat: GroupMessage;
 	setSelectedGroupChat: any;
 	setSelectedChat: any;
-	
+	setSelected: any;
 
 
 }) => {
@@ -74,8 +75,8 @@ const ChatBox = ({
 	const updateSeenStatus = (messages: singleMessage[]) => {
 		messages.forEach((message: any) => {
 			if (message.seen === false && message.sender_id !== Cookies.get("id")) {
-				const url = `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}`; 
-                axios
+				const url = `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${message.chatRoom_id}/message/${message.id}`;
+				axios
 					.put(
 						url,
 						{
@@ -83,9 +84,9 @@ const ChatBox = ({
 						}
 					)
 					.then((response) => {
-						if (response.status !== 200) {
-							alert("error updating the seen status of the messages");
-						}
+						// if (response.status !== 200) {
+						// 	alert("error updating the seen status of the messages");
+						// }
 					})
 					.catch((error) => {
 						console.log("error", error);
@@ -94,67 +95,12 @@ const ChatBox = ({
 		});
 	};
 
-	
+
 
 	useEffect(() => {
-		console.log("chatbox useeffect");
 		if (connected) {
-			console.log("chatbox useeffect connected");
 			chatSocket.current.on("newPrivateMessage", (message: any) => {
-				// console.log("new private message", message);
-				// // if privatechatroom doesn't exist yet in the list of privatechatrooms, add it
-				// const getUser = async (
-				// 	sender_id: string,
-				// 	receiver_id: string
-				// ): Promise<{ login: string; avatar: string; status: string }> => {
-				// 	const userId =
-				// 		sender_id === Cookies.get("id") ? receiver_id : sender_id;
-                //     const url = `http://${HOSTNAME}:3000/api/v1/user/${userId}`;
-				// 	const user = await axios.get(
-				// 		url
-				// 	);
-				// 	const avatar = getAvatarUrl();
-				// 	return {
-				// 		login: user.data.login,
-				// 		avatar: avatar,
-				// 		status: user.data.status,
-				// 	};
-				// };
-				// // getPrivateRoom(message.chatRoom_id).then((privateRoom) => {
-				// const checkNew = async () => {
-				// 	if (
-				// 		!privateChatRooms.find(
-				// 			(chatRoom: any) => chatRoom.chatRoomid === message.chatRoom_id
-				// 		) &&
-				// 		message.sender_id !== Cookies.get("id")
-				// 	) {
-				// 		// const login = await getUser(message.sender_id, message.receiver_id).then((user) => user.login);
-				// 		// // co
-				// 		// const profileImage = await getUser(message.sender_id, message.receiver_id).then((user) => user.profileImage);
-				// 		const { login, avatar, status } = await getUser(
-				// 			message.sender_id,
-				// 			message.receiver_id
-				// 		);
-				// 		const newPrivatRoom: PrivateMessage = {
-				// 			chatRoomid: message.chatRoom_id,
-				// 			messageId: message.id,
-				// 			sender_id: message.sender_id,
-				// 			receiver_id: message.receiver_id,
-				// 			lastMessage: message.content,
-				// 			lastMessageDate: message.dateCreated,
-				// 			seen: message.seen,
-				// 			login: login,
-				// 			profileImage: avatar,
-				// 			blocked: false,
-				// 			status: status,
-				// 		};
-				// 		setPrivateChatRooms((prevState: any) => [
-				// 			...prevState,
-				// 			newPrivatRoom,
-				// 		]);
-				// 	}
-				// };
-				// checkNew();
+				setSelected(message.chatRoom_id);
 				setState((prevState: any) => ({
 					...prevState,
 					messages: [message, ...prevState.messages],
@@ -286,7 +232,6 @@ const ChatBox = ({
 			chatSocket.current.on("memberLeaveChannel", (message: any) => {
 				try {
 					if (message.id === Cookies.get('id')) {
-						console.log("member leave channel message: ", groupChatRooms);
 						setSelectedGroupChat({} as GroupMessage);
 						let channel: GroupMessage = {} as GroupMessage;
 						setGroupChatRooms((prev: any) => {
@@ -330,6 +275,7 @@ const ChatBox = ({
 					}
 					return prev;
 				});
+				setSelected(message.group_id);
 			});
 
 			chatSocket.current.on("newGroupMessage", (data: any) => {
@@ -347,6 +293,7 @@ const ChatBox = ({
 				setSelectedChat({} as PrivateMessage);
 				// setSelected(data.group_id);
 				setSelectedGroupChat(data);
+				setSelected(data.group_id);
 			});
 		}
 		return () => {
@@ -381,7 +328,7 @@ const ChatBox = ({
 		}
 		// making the url dynamic
 		const url = `http://${HOSTNAME}:3000/api/v1/chatrooms/private/${currentChat.chatRoomid}/messages?limit=${limit}&offset=${offset}`;
-        let responseMessages = await axios.get(
+		let responseMessages = await axios.get(
 			url
 		);
 		setTotalMessages(responseMessages.data[0]);
@@ -426,7 +373,7 @@ const ChatBox = ({
 	return (
 		<ChatBoxStyle size={size} id="chat-box">
 			{selectedChat.sender_id === undefined &&
-			selectedChat.receiver_id === undefined ? (
+				selectedChat.receiver_id === undefined ? (
 				<div className="flex flex-col items-center justify-center h-full">
 					<div className="text-2xl text-white">nothing to see here</div>
 					<div className="text-xl text-white">try selecting a chat</div>
@@ -471,10 +418,10 @@ const ChatBox = ({
 export default ChatBox;
 
 /* 
-                when clicked, opening a websocket connection to the server 
-                and sending the user id to the server
-                the server will send back the messages between the two users
-                and the client will display them
-                also we need to fetch old messages
+				when clicked, opening a websocket connection to the server 
+				and sending the user id to the server
+				the server will send back the messages between the two users
+				and the client will display them
+				also we need to fetch old messages
 
 */

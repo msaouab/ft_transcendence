@@ -122,9 +122,6 @@ export class ChatService {
         }
         // console.log("We're joining the private chat room id: ", privateChatRoom.id);
         await client.join(privateChatRoom.id);
-        console.log(
-            `User with id: ${senderId} joined the private chat room: ${privateChatRoom.id}`
-        );
         return privateChatRoom;
     }
 
@@ -150,9 +147,6 @@ export class ChatService {
                 },
             });
             client.leave(privateChatRoom.id);
-            console.log(
-                `User with id: ${senderId} left the private chat room: ${privateChatRoom.id}`
-            );
             return privateChatRoom;
         } catch (error) {
             if (error instanceof PrismaClientKnownRequestError) {
@@ -219,10 +213,8 @@ export class ChatService {
                 take: 1,
             });
             if (messages.length == 0) {
-                console.log("this is the first message");
                 // check if the other user is online
                 if (clients.has(payload.receiver_id)) {
-                    console.log("the other user is online");
                     const otherClientSocket = clients.get(payload.receiver_id);
                     await otherClientSocket.join(privateRoom.id);
                     // emit the event roomJoined to the other user
@@ -250,7 +242,6 @@ export class ChatService {
                     lastUpdatedTime: new Date(),
                 },
             });
-            console.log("We're sending the event to room: ", privateRoom);
             // if not both sockets are connected , we send a private
             server.to(privateRoom.id).emit("newPrivateMessage", message);
         } catch (error) {
@@ -261,12 +252,8 @@ export class ChatService {
         }
         // if receiver is online notify him
         if (onlineClients.has(payload.receiver_id)) {
-            console.log("receiver is online and we're sending him a notification");
             const otherClientSocket = onlineClients.get(payload.receiver_id);
-            console.log("We're sending the chatNotif event to the other client");
             otherClientSocket.emit("chatNotif", { num: 1 });
-        } else {
-            console.log("receiver is offline");
         }
     }
 
@@ -444,7 +431,6 @@ export class ChatService {
             throw new HttpException('Group chat room not found', 404);
         }
         await client.join(group_id);
-        console.log("The client has joined the room: ", group_id);
         return channel;
     }
 
@@ -462,7 +448,6 @@ export class ChatService {
             throw new HttpException('Group chat room not found', 404);
         }
         await client.leave(group_id);
-        console.log("The client has left the room: ", group_id);
         return channel;
     }
 
@@ -470,7 +455,6 @@ export class ChatService {
         await this.unbanUsers(client, server);
         await this.unMuteUsers(client, server);
         const { channel_id, user_id, type, password } = payload;
-        console.log(channel_id, user_id, type, password);
         const user = await this.prisma.user.findUnique({
             where: {
                 id: user_id
@@ -836,11 +820,7 @@ export class ChatService {
                 client.emit('error', 'Channel not joined');
             }
             const end_time = new Date();
-            console.log('typeof end_time: ', typeof banTime);
-            console.log('end_time: ', end_time);
-            // banTime is string
             end_time.setMinutes(end_time.getMinutes() + parseInt(banTime));
-            console.log('end_time: ', end_time);
             const bannedUser = await this.prisma.bannedMembers.create({
                 data: {
                     banned_id: userId,
@@ -850,7 +830,6 @@ export class ChatService {
                 }
             })
             if (!bannedUser) {
-                console.log('bannedUser: ', bannedUser);
                 client.emit('error', 'User not banned');
             }
             const res = {
@@ -906,7 +885,6 @@ export class ChatService {
             if (!joindChannel) {
                 client.emit('error', 'Channel not joined');
             }
-            console.log('bannedUser: ', bannedUser);
             server.to(group_id).emit('unbanChannelUser', {
                 avatar: admin.avatar,
                 id: admin.id,

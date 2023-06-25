@@ -31,12 +31,10 @@ export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(client: Socket) {
         const { id } = client;
-        console.log(`Client with id ${id} connected to search namespace`);
     }
 
     handleDisconnect(client: Socket) {
         const { id } = client;
-        console.log(`Client with id ${id} disconnected`);
     }
 
     @SubscribeMessage('search')
@@ -45,7 +43,6 @@ export class SearchGateway implements OnGatewayConnection, OnGatewayDisconnect {
         limit: number,
         user_id: string,
     }) {
-        console.log("We've got the event it's: ", payload);
         // console.log("We've got the event it's: ", payload.search);
         const result = await this.SearchService.searchWebSocket(payload.search, payload.limit, payload.user_id);
         // console.log("The result is: ", result);

@@ -32,7 +32,6 @@ function CheckMark() {
       )
       .then((response) => {
         if (response.status === 200) {
-          console.log("2fa enabled");
           setIsTfaEnabled(checked);
         }
       })

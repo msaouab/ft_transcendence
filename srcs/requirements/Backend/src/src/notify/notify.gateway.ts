@@ -46,18 +46,15 @@ export class NotificationGateway
 		// console.log("We've got the event to add the client to the map");
 
 		clients.set(id, client);
-		console.log("clients: ---------------", clients.keys());
 		await this.notificationService.updateUserStatus(id, userStatus);
 	}
 
 	handleConnection(client: Socket) {
 		const { id } = client;
-		console.log(`Client with id ${id} connected to root namespace`);
 	}
 
 	async handleDisconnect(client: Socket) {
 		const { id } = client;
-		console.log(`Client with id ${id} disconnected`);
 		const user = [...clients.entries()].find(({ 1: v }) => v.id === client.id);
 		// if user is not found , return
 		if (user) {

@@ -118,10 +118,7 @@ const MessageContent = ({ content, sender_id, id, chatRoomId, setState }: { cont
     const navigate = useNavigate();
 
     const handleGameInvite = () => {
-        console.log("sender_id: ", Cookies.get('id'));
-        console.log("receiver_id: ", sender_id);
-        console.log("im trying to send game invite to user with id: ", sender_id);
-        navigate("/game/startGame", {});
+        navigate(`/game/startGame?friend=${sender_id}`);
     }
 
     return (

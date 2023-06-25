@@ -73,7 +73,6 @@ export class SearchService {
             },
         });
 
-        console.log("Banned Channels are: ", bannedChannels);
 
 
         const updatedChannels = [];
@@ -84,10 +83,8 @@ export class SearchService {
                 },
             });
 
-            console.log("Channel Users are: ", users);
             // if the channel is in bannedChannels
             if (bannedChannels.find((bannedChannel) => bannedChannel.channel_id === channel.id)) {
-                console.log("Channel is in bannedChannels");
                 continue;
             }
             const updatedChannel = { ...channel, users: users };

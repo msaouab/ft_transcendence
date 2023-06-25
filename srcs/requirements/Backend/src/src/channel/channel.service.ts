@@ -502,6 +502,7 @@ export class ChannelService {
             });
             for (const message of res) {
                 let joindChannel = null;
+                let user = null;
                 if (message.sender_id !== channelId) {
                     joindChannel = await this.prisma.channelsJoinTab.findFirst({
                         where: {
@@ -517,13 +518,22 @@ export class ChannelService {
                             }
                         }
                     });
+                    user = await this.prisma.user.findFirst({
+                        where: {
+                            id: message.sender_id
+                        },
+                        select: {
+                            login: true,
+                            avatar: true,
+                        }
+                    })
                 }
                 messages.push({
                     id: message.id,
                     group_id: message.receiver_id,
                     sender_id: message.sender_id,
-                    sender_name: joindChannel ? joindChannel.user.login : "Server",
-                    sender_avatar: joindChannel ? joindChannel.user.avatar : "Server",
+                    sender_name: user ? user.login : "Server",
+                    sender_avatar: user ? user.avatar : "Server",
                     content: message.content,
                     dateCreated: message.dateCreated.toISOString(),
                     role: joindChannel ? joindChannel.role : "Server",

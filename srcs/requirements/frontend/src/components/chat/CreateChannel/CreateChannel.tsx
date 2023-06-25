@@ -197,13 +197,10 @@ const Model = (props: ModelProps) => {
 
   useEffect(() => {
     if (props.connected) {
-      console.log("channelCreated");
       props.socket.current.on("channelCreated", (data: any) => {
-        console.log("channelCreated", data);
         props.setShow(false);
       });
       props.socket.current.on("errorExistChannel", (data: any) => {
-        console.log("errorExistChannel", data);
         setExeption(true);
       });
     }

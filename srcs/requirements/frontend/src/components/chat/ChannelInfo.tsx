@@ -56,7 +56,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
         if (openBanTimeDialog === true && banTime === "")
             return;
         if (openBanTimeDialog === true && banTime !== "") {
-            console.log("this user will be banned for: ", banTime);
             socket.current.emit("banUser", { group_id: selectedGroupChat.group_id, userId: user.id, banTime: banTime });
             setBanTime("");
             setOpenDialog(false);
@@ -139,20 +138,17 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     }
 
     const handleLeaveChannel = () => {
-        console.log("leave channel");
         socket.current.emit("leaveChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
     }
 
     const updateChannelPassword = (e: any) => {
         e.preventDefault();
-        console.log("update channel password");
         socket.current.emit("updateChannelPassword", { group_id: selectedGroupChat.group_id, password: password });
         setPassword("");
         setOpenOwnerDialog(false);
     }
 
     const handleDeleteChannel = () => {
-        console.log("delete channel");
         socket.current.emit("deleteChannel", { group_id: selectedGroupChat.group_id, user_id: currentUser.id });
     }
 
@@ -164,7 +160,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
     useEffect(() => {
         if (connected) {
             socket.current.on("newChannelAdmin", (data: any) => {
-                console.log("newChannelAdmin: ", data);
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
                         return { ...prev, role: "Admin" }
@@ -181,7 +176,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("removeChannelAdmin", (data: any) => {
-                console.log("removeChannelAdmin: ", data);
                 setCurrentUser((prev: any) => {
                     if (prev.id === data.id) {
                         return { ...prev, role: "Member" }
@@ -198,7 +192,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("muteChannelUser", (data: any) => {
-                console.log("muteChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -213,7 +206,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("unmuteChannelUser", (data: any) => {
-                console.log("unmuteChannelUser: ", data);
                 setMutedUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -228,7 +220,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("kickChannelUser", (data: any) => {
-                console.log("kickChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -237,7 +228,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 }
             });
             socket.current.on("banChannelUser", (data: any) => {
-                console.log("banChannelUser: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -246,7 +236,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("unbanChannelUser", (data: any) => {
-                console.log("unbanChannelUser: ", data);
                 setBannedUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -255,7 +244,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 })
             });
             socket.current.on("memberLeaveChannel", (data: any) => {
-                console.log("memberLeaveChannel: ", data);
                 setChannelUsers((prev: any) => {
                     return prev.filter((user: any) => user.id !== data.id)
                 })
@@ -267,11 +255,9 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                 }
             });
             socket.current.on("channelDeleted", (data: any) => {
-                console.log("channelDeleted: ", data);
                 setOpen(false);
             });
             socket.current.on("channelUpdated", (data: any) => {
-                console.log("channelUpdated: ", data);
                 setChannel(data);
             });
         }
@@ -438,7 +424,6 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                                     (currentUser.role === "Owner" && currentUser.id === user.id) &&
                                                     <span className='tools'>
                                                         <RxDotsVertical className='text-lg' onClick={() => {
-                                                            console.log("channel?.password", channel);
                                                             setPassword(channel?.password || "");
                                                             setOpenOwnerDialog(true);
                                                         }} />
@@ -469,22 +454,35 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                                     </button>
                                                 )
                                             }
-                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleKickUser(selectedUser)} >
-                                                Kick
-                                            </button>
-                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleMuteUser(selectedUser)}>
-                                                {selectedUser && selectedUser.role === "Muted" ? "Unmute" : "Mute"}
-                                            </button>
-                                            <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleBanUser(selectedUser)}>
-                                                {selectedUser && selectedUser.role === "Banned" ? "Unban" : "Ban"}
-                                            </button>
+                                            {
+                                                selectedUser && selectedUser.role !== "Muted" && selectedUser.role !== "Banned" && (
+                                                    <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleKickUser(selectedUser)} >
+                                                        Kick
+                                                    </button>
+                                                )
+                                            }
+                                            {
+                                                selectedUser && selectedUser.role !== "Banned" && (
+                                                    <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleMuteUser(selectedUser)}>
+                                                        {selectedUser && selectedUser.role === "Muted" ? "Unmute" : "Mute"}
+                                                    </button>
+                                                )
+                                            }
+                                            {
+                                                selectedUser && selectedUser.role !== "Muted" && (
+                                                    <button className={`${buttonStyle}  bg-red-800`} onClick={() => handleBanUser(selectedUser)}>
+                                                        {selectedUser && selectedUser.role === "Banned" ? "Unban" : "Ban"}
+                                                    </button>
+                                                )
+                                            }
+
                                         </div>
                                     </Dialog>
                                 )
                             }
 
                             {/* /// choosing ban time dialog ///// */}
-                            <Dialog key={selectedGroupChat.group_id} size="sm" open={openBanTimeDialog} handler={() => {
+                            <Dialog  size="sm" open={openBanTimeDialog} handler={() => {
                                 setBanTime("");
                                 setOpenBanTimeDialog(false);
                             }} className="flex flex-col gap-4 items-center justify-center p-10 " >
@@ -503,7 +501,7 @@ const ChannelInfo = ({ open, setOpen, selectedGroupChat, socket, connected }: pr
                                 </div>
                             </Dialog>
                             {/* /// choosing mute time dialog ///// */}
-                            <Dialog key={selectedGroupChat.group_id} size="sm" open={openMuteTimeDialog} handler={() => {
+                            <Dialog  size="sm" open={openMuteTimeDialog} handler={() => {
                                 setMuteTime("");
                                 setOpenMuteTimeDialog(false);
                             }} className="flex flex-col gap-4 items-center justify-center p-10 " >

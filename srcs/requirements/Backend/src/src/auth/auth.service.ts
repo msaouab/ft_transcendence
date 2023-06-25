@@ -25,19 +25,19 @@ export class AuthService {
                 },
             })
             if (find_user) {
-                return this.login(user,res);
+                return this.login(user, res);
             }
             const Cryptr = require('cryptr');
-            const cryptr = new Cryptr(process.env.SECRET )
+            const cryptr = new Cryptr(process.env.SECRET)
             const secret = authenticator.generateSecret();
             const encryptedString = cryptr.encrypt(secret);
             const token = authenticator.generate(encryptedString);
             const createUser = await this.prisma.user.create({
                 data: {
                     login: user.username,
-                    email:  user._json.email,
-                    firstName:  user.name.givenName,
-                    lastName:  user.name.familyName,
+                    email: user._json.email,
+                    firstName: user.name.givenName,
+                    lastName: user.name.familyName,
                     avatar: `http://${HOSTNAME}:3000/default.png`,
                     status: 'Online',
                     otp_base32: encryptedString,
@@ -48,40 +48,40 @@ export class AuthService {
                     user_id: createUser.id,
                 },
             })
-            }
+        }
         catch (e) {
             console.log(e);
         }
-        return this.login(user,res);
+        return this.login(user, res);
     }
 
-    async logout(user,res) {
+    async logout(user, res) {
         if (!user)
             throw new NotFoundException('User not found');
         try {
-        const find_user = await this.prisma.user.findUnique({
-            where: {
-                email: user._json.email,
-            },
-        })
-        if (find_user) {
-            const updateUser = await this.prisma.user.update({
+            const find_user = await this.prisma.user.findUnique({
                 where: {
-                    id: find_user.id,
-                },
-                data: {
-                    status: 'Offline',
-                    otp_verified: false,
+                    email: user._json.email,
                 },
             })
-            res.clearCookie('id');
-            return updateUser;
-        }
+            if (find_user) {
+                const updateUser = await this.prisma.user.update({
+                    where: {
+                        id: find_user.id,
+                    },
+                    data: {
+                        status: 'Offline',
+                        otp_verified: false,
+                    },
+                })
+                res.clearCookie('id');
+                return updateUser;
+            }
         }
         catch (e) {
             console.log(e);
         }
-        
+
     }
 
     async login(user, res) {
@@ -104,12 +104,12 @@ export class AuthService {
                     // httpOnly: true,
                     // secure: false,
                 })
-            
+
                 return updateUser;
             }
 
             else {
-                return this.signup(user,res);
+                return this.signup(user, res);
             }
         }
         catch (e) {
@@ -117,32 +117,11 @@ export class AuthService {
         }
     }
 
-    // async delete(user,res) {
-    //     try  {
-    //         const find_user = await this.prisma.user.findUnique({
-    //             where: {
-    //                 email: user._json.email,
-    //             },
-    //         })
-    //         if (find_user) {
-    //             const deleteUser = await this.prisma.user.delete({
-    //                 where: {
-    //                     id: find_user.id,
-    //                 },
-    //             })
-    //            res.clearCookie('id');
-    //             // return deleteUser;
-    //         }
-    //     }
-    //     catch (e) {
-    //         console.log(e);
-    //     }
-    // }
 
 
-    async set2fa(id, body: TfaDto, user)
-    {
-        const Digitsinput = body.sixDigits; 
+
+    async set2fa(id, body: TfaDto, user) {
+        const Digitsinput = body.sixDigits;
         const find_user = await this.prisma.user.findUnique({
             where: {
                 id: id,
@@ -166,17 +145,7 @@ export class AuthService {
             return updateUser;
         }
     }
-    
-    // async twoFactorverify(body, user,req) {
-    //     var st = await this.twoFactor(user);
-    //     var verify = speakeasy.totp.verify({
-    //         secret : st,
-    //         encoding: 'base32',
-    //         token: req.body.number,
-    //     });
-    //     console.log(verify);
-    //     // res.render('restaurants',{  });}
+
 }
 
 
-  

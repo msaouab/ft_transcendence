@@ -51,7 +51,6 @@ function Avatar() {
         setFileName("");
       })
       .catch((error) => {
-        console.log("Error uploading file:", error);
         notify("error");
       });
   };

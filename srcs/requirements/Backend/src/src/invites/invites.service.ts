@@ -203,7 +203,6 @@ export class InvitesService {
             notification_id: notification_id,
         },
     })
-    console.log("findnotification", findnotification.notification_id)
     if (!findnotification) {
         throw new ConflictException("Notification does not exist");
     }

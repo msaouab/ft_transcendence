@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-// import WebFont from 'webfontloader';
 import avatar from '../../../public/default.png'
 import Cookies from 'js-cookie'
 import { HOSTNAME } from "../../api/axios";
@@ -91,11 +90,6 @@ function	Friends() {
 	const [loading, setLoading] = useState(true);
 	
 	const navigate = useNavigate();
-	
-	const [user, printData] = useState({
-		friendUser_id: '',
-	});
-	
 	
 	const [friends, setFriends] = useState<friendsInterface[]>([]);
 	useEffect(() => {

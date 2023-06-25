@@ -30,14 +30,18 @@ const UsersChatListStyle = styled.div`
 const UsersChatList = ({
 	setSelectedChat,
 	newLatestMessage,
+	selected,
+    setSelected,
 }: {
 	setSelectedChat: (chat: PrivateMessage) => void;
 	newLatestMessage: { chatRoomId: string; message: string };
+	selected: string;
+	setSelected: (selected: string) => void
 }) => {
 	// privatChatroom context
 
 	const { privateChatRooms, setPrivateChatRooms } = useGlobalContext();
-	const [selected, setSelected] = useState<string>("");
+	// const [selected, setSelected] = useState<string>("");
 
 	const getUser = async (
 		sender_id: string,

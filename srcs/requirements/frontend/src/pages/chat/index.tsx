@@ -31,9 +31,9 @@ const ChatStyle = Styled.div`
   }
   
   .chat-box-wrapper {
-    margin-top: 20px;
+    margin-top: 10px;
     max-width: 1000px;    
-    height: 100%;
+    height: 98.5%;
     // min-height: 80%;
     width: 60%;
   }
@@ -119,13 +119,10 @@ const Chat = () => {
       // chatSocket.current.emit('alive', {id: Cookies.get("id")});
       setConnected(true);
       chatSocket.current.emit('alive', { id: Cookies.get("id") });
-      console.log("connected to the server");
 
       getGroupChatRooms().then((res: any) => {
-        console.log("res: ", res);
         setGroupChatRooms(res);
         res.forEach((groupChatRoom: GroupMessage) => {
-          console.log("joining the room: ", groupChatRoom.group_id);
           chatSocket.current.emit("joinGroupRoom", { group_id: groupChatRoom.group_id });
           setJoinedRooms(prev => [...prev, groupChatRoom.group_id]);
         });
@@ -142,18 +139,13 @@ const Chat = () => {
       // });
     });
 
-    chatSocket.current.on("roomJoined", () => {
-      console.log("room joined");
-    });
 
     Cookies.set("chatNotif", "0");
     setChatNotif(0);
 
 
     return () => {
-      console.log("disconnected from the server");
       groupChatRooms.forEach((groupChatRoom: GroupMessage) => {
-        console.log("leaving the room: ", groupChatRoom.group_id);
         chatSocket.current.emit("leaveGroupRoom", { group_id: groupChatRoom.group_id });
         setJoinedRooms(prev => prev.filter(room => room !== groupChatRoom.group_id));
       });
@@ -166,7 +158,6 @@ const Chat = () => {
 
   useEffect(() => {
     if (selectedChat.chatRoomid) {
-      console.log("joining the room");
       const payload = {
         currentId: Cookies.get("id"),
         senderId: selectedChat.sender_id,
@@ -176,7 +167,6 @@ const Chat = () => {
     }
     return () => {
       if (selectedChat.chatRoomid) {
-        console.log("leaving the room");
         const payload = {
           currentId: Cookies.get("id"),
           senderId: selectedChat.sender_id,
@@ -190,7 +180,6 @@ const Chat = () => {
 
   useEffect(() => {
     if (!selectedChat.chatRoomid) {
-      // console.log("no chat room selected from global context");
       return;
     }
     for (let i = 0; i < privateChatRooms.length; i++) {
@@ -210,7 +199,6 @@ const Chat = () => {
           closestDate = date;
         }
       }
-      // console.log("selecting the closest chat room");
       setSelectedChat(closestChatRoom);
       return;
     } else {
@@ -233,7 +221,7 @@ const Chat = () => {
           const user = await axios.get(
             url
           );
-          const avatar = getAvatarUrl();
+          const avatar = user.data.avatar;
           return {
             login: user.data.login,
             avatar: avatar,
@@ -259,7 +247,7 @@ const Chat = () => {
             status: status,
           };
           setPrivateChatRooms((prevState: any) => {
-            const index = prevState.findIndex( (chatRoom: PrivateMessage) => chatRoom.chatRoomid === message.chatRoom_id);
+            const index = prevState.findIndex((chatRoom: PrivateMessage) => chatRoom.chatRoomid === message.chatRoom_id);
             if (index === -1) {
               return [newPrivatRoom, ...prevState];
             }
@@ -268,10 +256,11 @@ const Chat = () => {
             newPrivateChatRooms[index].lastMessageDate = message.dateCreated;
             return newPrivateChatRooms;
           });
+          setSelected(newPrivatRoom.chatRoomid);
         };
         getUserFunc();
       });
-      
+
     }
   }, [connected]);
 
@@ -395,7 +384,6 @@ const Chat = () => {
       chatSocket.current.on("memberLeaveChannel", (message: any) => {
         try {
           if (message.id === Cookies.get('id')) {
-            console.log("member leave channel message: ", groupChatRooms);
             setSelectedGroupChat({} as GroupMessage);
             let channel: GroupMessage = {} as GroupMessage;
             setGroupChatRooms((prev: any) => {
@@ -445,7 +433,7 @@ const Chat = () => {
 
   // useEffect(() => {
   //   if (connected) {
-      
+
   //   }
   //   // return () => {
   //   //   chatSocket.current.off("newGroupMessage");
@@ -455,7 +443,6 @@ const Chat = () => {
   useEffect(() => {
     if (connected) {
       chatSocket.current.on("channelCreated", (message: any) => {
-        console.log("channel created message: ", message);
         setGroupChatRooms((prev: any) => {
           return [...prev, message];
         });
@@ -471,7 +458,7 @@ const Chat = () => {
 
   return (
     <ChatStyle className="">
-      <div className="chat-list  ">
+      <div className="chat-list  h-full">
         <ChatList
           setSelectedChat={setSelectedChat}
           newLatestMessage={newLatestMessage}
@@ -482,7 +469,7 @@ const Chat = () => {
           setSelected={setSelected}
         />
       </div>
-      <div className="chat-box-wrapper">
+      <div className="chat-box-wrapper ">
         {selectedChat.chatRoomid ? (
           <ChatBox
             setSelectedChat={setSelectedChat}
@@ -494,6 +481,7 @@ const Chat = () => {
             connected={connected}
             selectedGroupChat={selectedGroupChat}
             setSelectedGroupChat={setSelectedGroupChat}
+            setSelected={setSelected}
           />
         ) : (
           <GroupChatBox
@@ -503,6 +491,7 @@ const Chat = () => {
             connected={connected}
             key={selectedGroupChat.group_id}
             joinedRooms={joinedRooms}
+            setSelected={setSelected}
           />
         )}
       </div>

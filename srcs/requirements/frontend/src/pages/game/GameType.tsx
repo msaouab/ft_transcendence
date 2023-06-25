@@ -136,7 +136,7 @@ const GameType = () => {
 	}, []);
 
 	const getFriendsData = () => {
-		if (!id) alert("you must login first");
+		// if (!id) alert("you must login first");
 		getFriendsInfo(id).then((res) => {
 			setFriends(res);
 		});

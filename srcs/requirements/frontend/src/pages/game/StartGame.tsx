@@ -7,7 +7,7 @@ import { useGameContext } from "../../provider/GameProvider";
 import styled, { keyframes } from "styled-components";
 import Lottie from "react-lottie";
 import PongAnimation from "../../assets/Lottie/PongAnimation.json";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const StartGameContainer = styled.div`
 	display: flex;
@@ -78,6 +78,12 @@ const StartGame = () => {
 		// height: 1000,
 	};
 
+	const [query] = useSearchParams();
+	if (query.get("friend")) {
+		payload.friend = query.get("friend");
+		payload.mode = "Friend";
+	}
+
 	useEffect(() => {
 		const socket = io(`http://${HOSTNAME}:3000/game`, {
 			query: {userId: Cookies.get('userid')},
@@ -108,7 +114,6 @@ const StartGame = () => {
 		let isReal = false;
 		const getAllData = async () => {
 			const userdata = await getUserInfo(payload.userId);
-			console.log("payload.userId:", userdata)
 			setUser(userdata);
 			let Benome;
 			//  = await getUserInfo(benomeId);
