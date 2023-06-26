@@ -4,6 +4,9 @@ This project is about creating a website for the mighty Pong contest!
 
 # Overview
 Thanks to your website, users will play Pong with others. You will provide a nice user interface, a chat, and real-time multiplayer online games!
+
+<img src="./Image/Overview.jpg" />
+
 Your work has to comply with the following rules:
 - Your website backend must be written in NestJS.
 - The frontend must be written with a TypeScript framework of your choice.
